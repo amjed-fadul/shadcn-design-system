@@ -34,7 +34,10 @@
     "src/hooks/use-mobile.ts": "2b0fe1dfef3b17850bbac040665f514a8ffd0f15"
   },
   "testFiles": {
-    "tests/studio-components.test.tsx": "9872e4c0df1f3f2abc62b9f896c0f0f2313ce491",
+    "tests/studio-components-core.test.tsx": "9fa31b03792df755b9f55c09c4aca7ad86483da7",
+    "tests/studio-components-overlays.test.tsx": "ac7e146c04ab674780ae156000a493ee8fd6ca00",
+    "tests/studio-components-sidebar.test.tsx": "9941c4f20578e75d6b2dccff9040c62d52d5d90f",
+    "tests/studio-test-utils.tsx": "55869d3ef7c64140021d0c69afd96ce81212f71f",
     "tests/provenance.test.ts": "de4f220c9b370aacd223f7732ae3d56d19a45bdf",
     "tests/snapshot-integrity.test.ts": "0edfcb066b3231fd47c7ba602be8e7ffc49fc89d"
   },
@@ -60,8 +63,8 @@
     "tooltip"
   ],
   "tests": {
-    "path": "tests/studio-components.test.tsx",
-    "blobSha": "9872e4c0df1f3f2abc62b9f896c0f0f2313ce491",
+    "path": "tests/studio-components-core.test.tsx",
+    "blobSha": "9fa31b03792df755b9f55c09c4aca7ad86483da7",
     "scope": ["simple primitive", "controlled/form", "compound", "portal/overlay", "scroll/layout"],
     "provenanceTestPath": "tests/provenance.test.ts",
     "provenanceTestBlobSha": "de4f220c9b370aacd223f7732ae3d56d19a45bdf"
@@ -69,8 +72,8 @@
   "verification": {
     "npmCi": "passed; 519 packages installed; 0 vulnerabilities",
     "typecheck": "passed",
-    "focusedTests": "passed; 3 files; 15 tests",
-    "fullTests": "passed; 5 files; 18 tests",
+    "focusedTests": "passed; 3 files; 11 tests",
+    "fullTests": "passed; 7 files; 18 tests",
     "productionBuild": "passed",
     "productionAudit": "passed; 0 vulnerabilities",
     "fullAudit": "passed; 0 vulnerabilities",
