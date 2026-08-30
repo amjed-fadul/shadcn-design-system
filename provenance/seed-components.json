@@ -1,54 +1,48 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "upstream": {
     "repository": "shadcn-ui/ui",
     "tag": "shadcn@4.19.0",
     "commit": "1773ecfeeb4a04366978d353e69b5c7ded78dcb2",
+    "tagObjectSha": "b2e03eed0fa416f6623b9d2225cee2af9e3b1fd3",
     "base": "radix",
     "style": "nova",
-    "styleSourcePath": "apps/v4/registry/styles/style-nova.css"
+    "styleSourcePath": "apps/v4/registry/styles/style-nova.css",
+    "styleSourceBlobSha": "514a3e8e00deac2ef59fee04c57cb10fd277ef39"
+  },
+  "sourceResolution": {
+    "cliVersionIsInsufficient": true,
+    "note": "The CLI version alone does not determine generated registry output. This snapshot is resolved from the pinned upstream commit, radix base, nova style, neutral theme configuration, components.json, and the checked-in source paths below."
   },
   "derivation": {
-    "kind": "semantic-token-normalized-shadcn",
-    "evidenceRepository": "amjed-fadul/agentic-design-canvas",
-    "normalizationCommit": "41dec7325b4c6675677263ab22922a6318fddf5d",
-    "note": "The canonical checked-in files are semantic-token-normalized shadcn derivatives. They are not claimed to be byte-identical to the upstream base files."
+    "defaultKind": "semantic-token-normalized-derivative",
+    "operations": [
+      "rewrite upstream aliases to this repository aliases",
+      "replace upstream IconPlaceholder with lucide-react icons",
+      "flatten cn-* Nova style classes into canonical semantic-token utilities",
+      "reuse already pinned internal components instead of adding package dependencies"
+    ],
+    "note": "The canonical checked-in files are not claimed to be byte-identical to upstream registry files."
   },
   "components": {
-    "button": {
-      "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
-      "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f",
-      "derivedEvidencePath": "canvas/src/components/ui/button.tsx",
-      "derivedEvidenceBlobSha": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc",
-      "canonicalPath": "src/components/ui/button.tsx"
-    },
-    "badge": {
-      "upstreamPath": "apps/v4/registry/bases/radix/ui/badge.tsx",
-      "upstreamBlobSha": "ccca32ca0046ed2b8da4057d4d7c6ef3dc307ffb",
-      "derivedEvidencePath": "canvas/src/components/ui/badge.tsx",
-      "derivedEvidenceBlobSha": "6bad35c93c25d6e6727f7a29da54ef6b548648d1",
-      "canonicalPath": "src/components/ui/badge.tsx"
-    },
-    "input": {
-      "upstreamPath": "apps/v4/registry/bases/radix/ui/input.tsx",
-      "upstreamBlobSha": "d00c3b57fca65cbc6628e654be961fbefb01d86a",
-      "derivedEvidencePath": "canvas/src/components/ui/input.tsx",
-      "derivedEvidenceBlobSha": "b136f1b9dd57c87fa67a09c4f7170702586cc325",
-      "canonicalPath": "src/components/ui/input.tsx"
-    },
-    "separator": {
-      "upstreamPath": "apps/v4/registry/bases/radix/ui/separator.tsx",
-      "upstreamBlobSha": "cfc2811dbbdd03b5f7e2a2c5a53647a43a5e84f9",
-      "derivedEvidencePath": "canvas/src/components/ui/separator.tsx",
-      "derivedEvidenceBlobSha": "ca11501513c539f3bba6d6dd28332e9acfd6eef6",
-      "canonicalPath": "src/components/ui/separator.tsx"
-    },
-    "skeleton": {
-      "upstreamPath": "apps/v4/registry/bases/radix/ui/skeleton.tsx",
-      "upstreamBlobSha": "bf3f986f79f532374d6054f5520dd10ff5663ea1",
-      "derivedEvidencePath": "canvas/src/components/ui/skeleton.tsx",
-      "derivedEvidenceBlobSha": "6973ca2767016afa60964bba606f5c4df266aa55",
-      "canonicalPath": "src/components/ui/skeleton.tsx"
-    }
+    "button": { "canonicalPath": "src/components/ui/button.tsx", "canonicalBlobSha": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx", "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f", "packageDependencies": ["class-variance-authority@0.7.1", "radix-ui@1.6.7"] },
+    "badge": { "canonicalPath": "src/components/ui/badge.tsx", "canonicalBlobSha": "6bad35c93c25d6e6727f7a29da54ef6b548648d1", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/badge.tsx", "upstreamBlobSha": "ccca32ca0046ed2b8da4057d4d7c6ef3dc307ffb", "packageDependencies": ["class-variance-authority@0.7.1", "radix-ui@1.6.7"] },
+    "input": { "canonicalPath": "src/components/ui/input.tsx", "canonicalBlobSha": "b136f1b9dd57c87fa67a09c4f7170702586cc325", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/input.tsx", "upstreamBlobSha": "d00c3b57fca65cbc6628e654be961fbefb01d86a", "packageDependencies": [] },
+    "separator": { "canonicalPath": "src/components/ui/separator.tsx", "canonicalBlobSha": "ca11501513c539f3bba6d6dd28332e9acfd6eef6", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/separator.tsx", "upstreamBlobSha": "cfc2811dbbdd03b5f7e2a2c5a53647a43a5e84f9", "packageDependencies": ["radix-ui@1.6.7"] },
+    "skeleton": { "canonicalPath": "src/components/ui/skeleton.tsx", "canonicalBlobSha": "6973ca2767016afa60964bba606f5c4df266aa55", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/skeleton.tsx", "upstreamBlobSha": "bf3f986f79f532374d6054f5520dd10ff5663ea1", "packageDependencies": [] },
+    "card": { "canonicalPath": "src/components/ui/card.tsx", "canonicalBlobSha": "4b484f56d89892f1359a41815ff876d8a77e0d11", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/card.tsx", "upstreamBlobSha": "2ba46512ffc3dd65f008c04d53399189d390fb79", "packageDependencies": [] },
+    "textarea": { "canonicalPath": "src/components/ui/textarea.tsx", "canonicalBlobSha": "fbba18bddf871f5658d6081edfb11fa4c0ac48f7", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/textarea.tsx", "upstreamBlobSha": "d7e09d7fcfdd19daa5b6910f915c5705d2ec8f6a", "packageDependencies": [] },
+    "checkbox": { "canonicalPath": "src/components/ui/checkbox.tsx", "canonicalBlobSha": "8f27ed4f7788845a88fd6961e684b9806f944387", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/checkbox.tsx", "upstreamBlobSha": "a17fa1e2fd4517f1abc5f812cb923f44e02f7ef7", "packageDependencies": ["lucide-react@1.33.0", "radix-ui@1.6.7"] },
+    "table": { "canonicalPath": "src/components/ui/table.tsx", "canonicalBlobSha": "0d8a7c8801cc49dc40196330b9f3aa05f0a1614a", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/table.tsx", "upstreamBlobSha": "2fc2f8b89907719013f9c4f08ee4c0d1b435c4bb", "packageDependencies": [] },
+    "label": { "canonicalPath": "src/components/ui/label.tsx", "canonicalBlobSha": "aff6008cd7073fe0093a50a5efe31593d43ba85d", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/label.tsx", "upstreamBlobSha": "3e8c362d9444a3708ef1b58464920453f3f07650", "packageDependencies": ["radix-ui@1.6.7"] },
+    "tabs": { "canonicalPath": "src/components/ui/tabs.tsx", "canonicalBlobSha": "587338bbf188d9577ba03f23c2765341f5b25e8b", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/tabs.tsx", "upstreamBlobSha": "10b069cf016777aa8ddb813098b6e41d1da740a4", "packageDependencies": ["class-variance-authority@0.7.1", "radix-ui@1.6.7"] },
+    "select": { "canonicalPath": "src/components/ui/select.tsx", "canonicalBlobSha": "a18203c391b82e6c74cb9965e3ad850cd4543b25", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/select.tsx", "upstreamBlobSha": "f576bf455da400681c62e9f5a80a95315ee52172", "packageDependencies": ["lucide-react@1.33.0", "radix-ui@1.6.7"] },
+    "dropdown-menu": { "canonicalPath": "src/components/ui/dropdown-menu.tsx", "canonicalBlobSha": "963a17ac0994fa6f042a6ef637b8e243114899b5", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/dropdown-menu.tsx", "upstreamBlobSha": "01a12bdc321ee20bab46e48748b4d8ff94058b04", "packageDependencies": ["lucide-react@1.33.0", "radix-ui@1.6.7"] },
+    "accordion": { "canonicalPath": "src/components/ui/accordion.tsx", "canonicalBlobSha": "c02677242e0b1dc17285c0554868e0553a530666", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/accordion.tsx", "upstreamBlobSha": "2ba94b62680f33f1d36b9092866578695cf5f633", "packageDependencies": ["lucide-react@1.33.0", "radix-ui@1.6.7"] },
+    "dialog": { "canonicalPath": "src/components/ui/dialog.tsx", "canonicalBlobSha": "e51b829a56b094b0e0aa7c8552fdfab0c3cb368c", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/dialog.tsx", "upstreamBlobSha": "da9bc058324e4a676a1b9eedd86290a8d4f2213f", "packageDependencies": ["lucide-react@1.33.0", "radix-ui@1.6.7"] },
+    "sheet": { "canonicalPath": "src/components/ui/sheet.tsx", "canonicalBlobSha": "660fdc011d46e48e0ce5a033fa9beac28f042589", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/sheet.tsx", "upstreamBlobSha": "28f34f894ea37e24b46056fd040bc46ae8b5902e", "packageDependencies": ["lucide-react@1.33.0", "radix-ui@1.6.7"] },
+    "tooltip": { "canonicalPath": "src/components/ui/tooltip.tsx", "canonicalBlobSha": "f0005df95e52a85122de5fc59e41af694ddff6a1", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/tooltip.tsx", "upstreamBlobSha": "5dbba467c3adeb802a19b01dbfd967a9d5c10d41", "packageDependencies": ["radix-ui@1.6.7"] },
+    "scroll-area": { "canonicalPath": "src/components/ui/scroll-area.tsx", "canonicalBlobSha": "d509c2fccf31621c4461f7264c2f62a4e32c1492", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/scroll-area.tsx", "upstreamBlobSha": "9f45d3bb9f75cc74b3f297da6e7caa137e112e7a", "packageDependencies": ["radix-ui@1.6.7"] },
+    "sidebar": { "canonicalPath": "src/components/ui/sidebar.tsx", "canonicalBlobSha": "a2cc82dbfd31c8f75a326946cf9fe87389d334d0", "implementationKind": "semantic-token-normalized-derivative", "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx", "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4", "packageDependencies": ["lucide-react@1.33.0", "radix-ui@1.6.7"], "scopeJustification": "Approved Studio V1 IA has persistent navigation across Overview, Design System, Changelog, and Settings; this is the only product-shell component included in the Phase 1 minimum set." }
   }
 }
