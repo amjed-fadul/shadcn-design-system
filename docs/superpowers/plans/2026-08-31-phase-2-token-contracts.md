@@ -6,7 +6,7 @@
 
 **Architecture:** The committed token contract is a factual projection of already-approved sources, not a second source of truth. Local canonical theme values in `src/index.css` have precedence over Tailwind defaults; Tailwind 4.3.3 supplies only namespaces not overridden locally. Semantic color relationships are recorded only when they are explicit in source—never inferred by matching identical values.
 
-**Tech stack:** Node 22.18.0, TypeScript 5.5.4, JSON, JSON Schema Draft 2020-12, Ajv 8.17.1 as a pinned dev-only schema validator, Vitest 3.2.7, Tailwind CSS 4.3.3.
+**Tech stack:** Node 22.18.0, TypeScript 5.5.4, JSON, JSON Schema Draft 2020-12, Ajv 8.20.0 as a pinned dev-only schema validator, Vitest 3.2.7, Tailwind CSS 4.3.3.
 
 **Spec:** `docs/MASTER-PLAN.md`, Phase 2.
 
@@ -586,7 +586,7 @@ Create: tests/token-contract-invariants.test.ts
 Add exactly:
 
 ```json
-"ajv": "8.17.1"
+"ajv": "8.20.0"
 ```
 
 under `devDependencies`.
@@ -594,7 +594,7 @@ under `devDependencies`.
 Run:
 
 ```bash
-npm install --save-dev --save-exact ajv@8.17.1
+npm install --save-dev --save-exact ajv@8.20.0
 ```
 
 Do not change unrelated packages.
