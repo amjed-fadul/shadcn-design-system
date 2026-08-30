@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "upstream": {
+    "repository": "shadcn-ui/ui",
+    "tag": "shadcn@4.19.0",
+    "commit": "1773ecfeeb4a04366978d353e69b5c7ded78dcb2",
+    "base": "radix",
+    "style": "nova",
+    "styleSourcePath": "apps/v4/registry/styles/style-nova.css"
+  },
+  "derivation": {
+    "kind": "semantic-token-normalized-shadcn",
+    "evidenceRepository": "amjed-fadul/agentic-design-canvas",
+    "normalizationCommit": "41dec7325b4c6675677263ab22922a6318fddf5d",
+    "note": "The canonical checked-in files are semantic-token-normalized shadcn derivatives. They are not claimed to be byte-identical to the upstream base files."
+  },
+  "components": {
+    "button": {
+      "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
+      "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f",
+      "derivedEvidencePath": "canvas/src/components/ui/button.tsx",
+      "derivedEvidenceBlobSha": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc",
+      "canonicalPath": "src/components/ui/button.tsx"
+    },
+    "badge": {
+      "upstreamPath": "apps/v4/registry/bases/radix/ui/badge.tsx",
+      "upstreamBlobSha": "ccca32ca0046ed2b8da4057d4d7c6ef3dc307ffb",
+      "derivedEvidencePath": "canvas/src/components/ui/badge.tsx",
+      "derivedEvidenceBlobSha": "6bad35c93c25d6e6727f7a29da54ef6b548648d1",
+      "canonicalPath": "src/components/ui/badge.tsx"
+    },
+    "input": {
+      "upstreamPath": "apps/v4/registry/bases/radix/ui/input.tsx",
+      "upstreamBlobSha": "d00c3b57fca65cbc6628e654be961fbefb01d86a",
+      "derivedEvidencePath": "canvas/src/components/ui/input.tsx",
+      "derivedEvidenceBlobSha": "b136f1b9dd57c87fa67a09c4f7170702586cc325",
+      "canonicalPath": "src/components/ui/input.tsx"
+    },
+    "separator": {
+      "upstreamPath": "apps/v4/registry/bases/radix/ui/separator.tsx",
+      "upstreamBlobSha": "cfc2811dbbdd03b5f7e2a2c5a53647a43a5e84f9",
+      "derivedEvidencePath": "canvas/src/components/ui/separator.tsx",
+      "derivedEvidenceBlobSha": "ca11501513c539f3bba6d6dd28332e9acfd6eef6",
+      "canonicalPath": "src/components/ui/separator.tsx"
+    },
+    "skeleton": {
+      "upstreamPath": "apps/v4/registry/bases/radix/ui/skeleton.tsx",
+      "upstreamBlobSha": "bf3f986f79f532374d6054f5520dd10ff5663ea1",
+      "derivedEvidencePath": "canvas/src/components/ui/skeleton.tsx",
+      "derivedEvidenceBlobSha": "6973ca2767016afa60964bba606f5c4df266aa55",
+      "canonicalPath": "src/components/ui/skeleton.tsx"
+    }
+  }
+}
