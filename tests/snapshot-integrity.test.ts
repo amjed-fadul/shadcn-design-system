@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto"
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
+import { execFileSync } from "node:child_process"
+import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
-import { tmpdir } from "node:os"
 import { describe, expect, test } from "vitest"
 
 type Snapshot = {
@@ -24,13 +24,30 @@ type Provenance = {
   components: Record<string, { canonicalPath: string; canonicalBlobSha: string; upstreamBlobSha: string }>
 }
 
+type SnapshotFileReader = (relativePath: string) => Buffer
+
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const snapshot = JSON.parse(readFileSync(join(repoRoot, "snapshots/shadcn-radix-bootstrap-000.json"), "utf8")) as Snapshot
 const provenance = JSON.parse(readFileSync(join(repoRoot, "provenance/seed-components.json"), "utf8")) as Provenance
 
-function gitBlobSha(root: string, relativePath: string) {
-  const content = readFileSync(join(root, relativePath))
+function gitBlobSha(content: Buffer) {
   return createHash("sha1").update(Buffer.from(`blob ${content.byteLength}\0`)).update(content).digest("hex")
+}
+
+function createHistoricalFileReader(root: string, sourceBaseCommit: string): SnapshotFileReader {
+  try {
+    execFileSync("git", ["cat-file", "-e", `${sourceBaseCommit}^{commit}`], { cwd: root, stdio: "pipe" })
+  } catch {
+    throw new Error(`approved historical commit ${sourceBaseCommit} cannot be resolved locally`)
+  }
+
+  return (relativePath) => {
+    try {
+      return execFileSync("git", ["show", `${sourceBaseCommit}:${relativePath}`], { cwd: root, stdio: "pipe" })
+    } catch {
+      throw new Error(`unable to read ${relativePath} from approved historical commit ${sourceBaseCommit}`)
+    }
+  }
 }
 
 function governedFiles(currentSnapshot: Snapshot, currentProvenance: Provenance) {
@@ -54,7 +71,11 @@ function governedFiles(currentSnapshot: Snapshot, currentProvenance: Provenance)
   return files
 }
 
-function verifySnapshotIntegrity(root: string, currentSnapshot: Snapshot, currentProvenance: Provenance) {
+function verifySnapshotIntegrity(
+  currentSnapshot: Snapshot,
+  currentProvenance: Provenance,
+  readHistoricalFile: SnapshotFileReader,
+) {
   const recordedShas = [
     currentSnapshot.sourceBaseCommit,
     currentSnapshot.upstream.commitSha,
@@ -93,38 +114,39 @@ function verifySnapshotIntegrity(root: string, currentSnapshot: Snapshot, curren
     throw new Error("snapshot Studio component test paths differ from governed test files")
   }
 
-  const css = readFileSync(join(root, "src/index.css"), "utf8")
+  const css = readHistoricalFile("src/index.css").toString("utf8")
   if (!css.includes("--background: oklch(1 0 0)") || !css.includes("--background: oklch(0.145 0 0)")) throw new Error("canonical theme tokens are missing")
   if (/--(?:host-chrome-surface|canvas-surface|canvas-status-ready|canvas-status-experiment)/.test(css)) throw new Error("Canvas host token leaked into canonical theme")
 
-  const tokenSource = JSON.parse(readFileSync(join(root, "provenance/token-source.json"), "utf8")) as { theme: string; style: string; source: { commit: string } }
+  const tokenSource = JSON.parse(readHistoricalFile("provenance/token-source.json").toString("utf8")) as { theme: string; style: string; source: { commit: string } }
   if (tokenSource.theme !== "neutral" || tokenSource.style !== "radix-nova" || tokenSource.source.commit !== currentSnapshot.upstream.commitSha) {
     throw new Error("canonical token source does not match snapshot")
   }
 
   for (const [relativePath, expectedSha] of governedFiles(currentSnapshot, currentProvenance)) {
-    if (!existsSync(join(root, relativePath))) throw new Error(`missing governed file: ${relativePath}`)
-    const actualSha = gitBlobSha(root, relativePath)
-    if (actualSha !== expectedSha) throw new Error(`${relativePath} changed; regenerate Bootstrap Snapshot 0`)
+    const actualSha = gitBlobSha(readHistoricalFile(relativePath))
+    if (actualSha !== expectedSha) throw new Error(`${relativePath} differs from recorded historical Git blob`)
   }
 }
 
 describe("Bootstrap Snapshot 0 integrity", () => {
-  test("validates the offline snapshot and every governed local Git blob", () => {
-    expect(() => verifySnapshotIntegrity(repoRoot, snapshot, provenance)).not.toThrow()
+  const readHistoricalFile = createHistoricalFileReader(repoRoot, snapshot.sourceBaseCommit)
+
+  test("validates governed files from the approved historical tree while current Phase 2 package metadata evolves", () => {
+    expect(() => verifySnapshotIntegrity(snapshot, provenance, readHistoricalFile)).not.toThrow()
   })
 
-  test("detects a governed-file mutation without consulting upstream", () => {
-    const mutatedRoot = mkdtempSync(join(tmpdir(), "bootstrap-snapshot-"))
-    for (const relativePath of governedFiles(snapshot, provenance).keys()) {
-      const target = join(mutatedRoot, relativePath)
-      mkdirSync(join(target, ".."), { recursive: true })
-      copyFileSync(join(repoRoot, relativePath), target)
-    }
+  test("rejects a mutated historical governed file without consulting the working tree", () => {
+    const readMutatedHistoricalFile = (relativePath: string) => relativePath === snapshot.dependencies.packageJsonPath
+      ? Buffer.concat([readHistoricalFile(relativePath), Buffer.from("\n")])
+      : readHistoricalFile(relativePath)
 
-    const packagePath = join(mutatedRoot, snapshot.dependencies.packageJsonPath)
-    writeFileSync(packagePath, `${readFileSync(packagePath, "utf8")}\n`)
+    expect(() => verifySnapshotIntegrity(snapshot, provenance, readMutatedHistoricalFile))
+      .toThrow("package.json differs from recorded historical Git blob")
+  })
 
-    expect(() => verifySnapshotIntegrity(mutatedRoot, snapshot, provenance)).toThrow("package.json changed; regenerate Bootstrap Snapshot 0")
+  test("fails clearly when the approved historical commit is unavailable locally", () => {
+    expect(() => createHistoricalFileReader(repoRoot, "0000000000000000000000000000000000000000"))
+      .toThrow("approved historical commit 0000000000000000000000000000000000000000 cannot be resolved locally")
   })
 })

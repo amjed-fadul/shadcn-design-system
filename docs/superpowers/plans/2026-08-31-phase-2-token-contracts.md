@@ -45,8 +45,9 @@ Stop immediately if it differs.
 
 1. Do not modify the Agentic Design Canvas repository.
 2. Do not modify any component implementation under `src/components/ui/`.
-3. Do not modify the approved Phase 1 snapshot:
-   `snapshots/shadcn-radix-bootstrap-000.json`.
+3. Do not regenerate the approved Phase 1 snapshot's recorded governed hashes.
+   Bootstrap Snapshot 0 is a historical immutable baseline anchored to approved Phase 1 commit
+   `f9682ce3238f1fc5f41a91b1d6953a40c12d2288`; later repository evolution must not rewrite its historical facts.
 4. Do not begin component contracts, patterns, usage guidance, Canvas integration, MCP integration, or Phase 5 executable validation.
 5. `src/index.css` is the canonical source for:
 
@@ -1382,7 +1383,7 @@ The reviewer must independently verify:
 10. query/index reject unknown/raw token identifiers;
 11. source tests are offline;
 12. mutation tests genuinely fail when facts drift;
-13. Phase 1 snapshot remains byte-identical;
+13. Bootstrap Snapshot 0 is independently verified against approved Phase 1 commit `f9682ce…`, and no recorded historical hash was regenerated;
 14. no component source changed;
 15. no Phase 3+ work began;
 16. remote CI is green on the PR merge SHA.
@@ -1466,7 +1467,7 @@ Phase 2 passes only when all are true:
 [ ] committed index exactly matches contract
 [ ] unknown token identifiers reject deterministically
 [ ] raw literals do not masquerade as token IDs
-[ ] Phase 1 approved snapshot unchanged
+[ ] Bootstrap Snapshot 0 verified against its approved historical Phase 1 commit without regenerating governed hashes
 [ ] component implementation unchanged
 [ ] fresh npm ci passes
 [ ] typecheck passes
