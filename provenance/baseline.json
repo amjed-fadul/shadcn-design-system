@@ -17,6 +17,8 @@
     "packageJsonPath": "canvas/package.json"
   },
   "contractStatus": "not-started",
-  "componentSetStatus": "not-started",
-  "tokenFreezeStatus": "not-started"
+  "componentSetStatus": "studio-v1-minimum-included",
+  "tokenFreezeStatus": "frozen-source",
+  "componentScopePath": "docs/PHASE-1-COMPONENT-SCOPE.md",
+  "snapshotPath": "snapshots/shadcn-radix-bootstrap-000.json"
 }
