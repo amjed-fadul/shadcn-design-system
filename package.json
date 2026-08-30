@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "snapshot:verify": "vitest run tests/snapshot-integrity.test.ts"
   },
   "dependencies": {
     "@fontsource-variable/geist": "5.3.0",

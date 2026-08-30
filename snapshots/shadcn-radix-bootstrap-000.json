@@ -1,6 +1,6 @@
 {
   "id": "shadcn-radix-bootstrap-000",
-  "status": "approved",
+  "status": "candidate",
   "verifiedAt": "2026-08-30",
   "sourceBaseCommit": "b2325b7d1fb6933bd373422ae3e4514471a39a83",
   "sourceBaseCommitNote": "The snapshot records the verified working tree derived from this commit; included files are independently hashed below.",
@@ -12,10 +12,12 @@
   },
   "configuration": {
     "path": "components.json",
-    "blobSha": "5c23ec49120d22a89a3907b1338c372f9a710894f"
+    "blobSha": "5c23ec49120d22a89a3907b1338c372f9a710894"
   },
   "dependencies": {
-    "packageJsonSha": "3053685b0db5ec5702a195806d9726ee936a356e",
+    "packageJsonPath": "package.json",
+    "packageJsonSha": "432980a0fbdf733f7254f6a0b2371afc9f908488",
+    "packageLockPath": "package-lock.json",
     "packageLockSha": "6d0b1d73fcff373f2a4410c241e51817f5f35184",
     "installCommand": "npm ci"
   },
@@ -24,10 +26,17 @@
     "src/lib/utils.ts": "bd0c391ddd1088e9067844c48835bf4abcd61783",
     "docs/MASTER-PLAN.md": "ec29ff4e32bbb00d2606604b8079f931f3682db9",
     "docs/PHASE-1-COMPONENT-SCOPE.md": "c00862f0b1ceb0e06644236e20c6bf9dc738bc02",
+    "docs/PHASE-1-FIDELITY-AUDIT.md": "b5e009db13c359874ce24465f78141024ec8aec0",
     "provenance/upstream.json": "27b2831b6c8a8e9404ab5952838a7599ce303b7e",
     "provenance/token-source.json": "d145e1747d99a51b66752b1ce9245fb12b157f8a",
     "provenance/baseline.json": "b748a148c1a70d3ce87e3d6c4977294b3f5d7033",
-    "provenance/seed-components.json": "7501d7507d90ee98e7d7b44b7858a39b52026092"
+    "provenance/seed-components.json": "c873fd53b1d791c205965d060ae8bea686a903a8",
+    "src/hooks/use-mobile.ts": "2b0fe1dfef3b17850bbac040665f514a8ffd0f15"
+  },
+  "testFiles": {
+    "tests/studio-components.test.tsx": "9872e4c0df1f3f2abc62b9f896c0f0f2313ce491",
+    "tests/provenance.test.ts": "de4f220c9b370aacd223f7732ae3d56d19a45bdf",
+    "tests/snapshot-integrity.test.ts": "0edfcb066b3231fd47c7ba602be8e7ffc49fc89d"
   },
   "componentSet": [
     "accordion",
@@ -52,7 +61,7 @@
   ],
   "tests": {
     "path": "tests/studio-components.test.tsx",
-    "blobSha": "ebcbe8631970c59bea0423ac6593f610ba12f37b",
+    "blobSha": "9872e4c0df1f3f2abc62b9f896c0f0f2313ce491",
     "scope": ["simple primitive", "controlled/form", "compound", "portal/overlay", "scroll/layout"],
     "provenanceTestPath": "tests/provenance.test.ts",
     "provenanceTestBlobSha": "de4f220c9b370aacd223f7732ae3d56d19a45bdf"
@@ -60,12 +69,13 @@
   "verification": {
     "npmCi": "passed; 519 packages installed; 0 vulnerabilities",
     "typecheck": "passed",
-    "focusedTests": "passed; 2 files; 9 tests",
-    "fullTests": "passed; 4 files; 12 tests",
+    "focusedTests": "passed; 3 files; 15 tests",
+    "fullTests": "passed; 5 files; 18 tests",
     "productionBuild": "passed",
     "productionAudit": "passed; 0 vulnerabilities",
     "fullAudit": "passed; 0 vulnerabilities",
-    "upstreamAndCanonicalHashReconciliation": "passed; 19 components"
+    "upstreamAndCanonicalHashReconciliation": "passed; 19 components",
+    "snapshotIntegrity": "passed; offline; 1 file; 2 tests; governed-file mutation rejected"
   },
   "phase": "Phase 1 foundation; token and component contracts are not included"
 }
