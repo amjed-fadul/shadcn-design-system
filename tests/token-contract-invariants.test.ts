@@ -38,22 +38,23 @@ describe("token contract semantic invariants", () => {
   })
 
   test.each([
-    ["duplicate token IDs", (contract: TokenContract) => contract.tokens.push({ ...contract.tokens[1] })],
-    ["unknown source IDs", (contract: TokenContract) => { (contract.tokens[0] as unknown as { sourceId: string }).sourceId = "unknown" }],
-    ["missing alias targets", (contract: TokenContract) => { contract.tokens[1].value = { kind: "alias", tokenId: "spacing.missing" } }],
-    ["missing derived dependencies", (contract: TokenContract) => { contract.tokens[1].value = { kind: "derived", expression: "var(--missing)", dependencies: ["spacing.missing"] } }],
-    ["alias cycles", (contract: TokenContract) => { contract.tokens.push({ ...contract.tokens[1], id: "spacing.peer", binding: { cssVariable: "--spacing-peer" } }); contract.tokens[1].value = { kind: "alias", tokenId: "spacing.peer" }; contract.tokens[2].value = { kind: "alias", tokenId: "spacing.unit" } }],
-    ["derived-reference cycles", (contract: TokenContract) => { contract.tokens.push({ ...contract.tokens[1], id: "spacing.peer", binding: { cssVariable: "--spacing-peer" } }); contract.tokens[1].value = { kind: "derived", expression: "var(--spacing-peer)", dependencies: ["spacing.peer"] }; contract.tokens[2].value = { kind: "derived", expression: "var(--spacing)", dependencies: ["spacing.unit"] } }],
-    ["color tokens with non-mode values", (contract: TokenContract) => { contract.tokens[0].value = { kind: "literal", value: "white" } }],
-    ["color mode maps missing dark", (contract: TokenContract) => { contract.tokens[0].value = { kind: "modes", values: { light: "white" } } as unknown as TokenContract["tokens"][number]["value"] }],
-    ["categories absent from coverage", (contract: TokenContract) => { contract.tokens[1].category = "shadow" }],
-    ["duplicate canonical CSS variables", (contract: TokenContract) => { contract.tokens[1].sourceId = "canonical-theme"; contract.tokens[1].binding.cssVariable = "--background" }],
-    ["missing derived rule base tokens", (contract: TokenContract) => { (contract.derivedRules[0] as unknown as { baseTokenId: string }).baseTokenId = "spacing.missing" }],
-  ])("reports %s", (_description, mutateContract) => {
+    ["duplicate token IDs", (contract: TokenContract) => contract.tokens.push({ ...contract.tokens[1] }), "Duplicate token ID: spacing.unit."],
+    ["unknown source IDs", (contract: TokenContract) => { (contract.tokens[0] as unknown as { sourceId: string }).sourceId = "unknown" }, "Token color.background has unknown sourceId unknown."],
+    ["missing alias targets", (contract: TokenContract) => { contract.tokens[1].value = { kind: "alias", tokenId: "spacing.missing" } }, "Alias token spacing.unit targets missing token spacing.missing."],
+    ["missing derived dependencies", (contract: TokenContract) => { contract.tokens[1].value = { kind: "derived", expression: "var(--missing)", dependencies: ["spacing.missing"] } }, "Derived token spacing.unit depends on missing token spacing.missing."],
+    ["alias cycles", (contract: TokenContract) => { contract.tokens.push({ ...contract.tokens[1], id: "spacing.peer", binding: { cssVariable: "--spacing-peer" } }); contract.tokens[1].value = { kind: "alias", tokenId: "spacing.peer" }; contract.tokens[2].value = { kind: "alias", tokenId: "spacing.unit" } }, "Alias cycle: spacing.unit -> spacing.peer -> spacing.unit."],
+    ["derived-reference cycles", (contract: TokenContract) => { contract.tokens.push({ ...contract.tokens[1], id: "spacing.peer", binding: { cssVariable: "--spacing-peer" } }); contract.tokens[1].value = { kind: "derived", expression: "var(--spacing-peer)", dependencies: ["spacing.peer"] }; contract.tokens[2].value = { kind: "derived", expression: "var(--spacing)", dependencies: ["spacing.unit"] } }, "Derived-reference cycle: spacing.unit -> spacing.peer -> spacing.unit."],
+    ["mixed derived and alias cycles", (contract: TokenContract) => { contract.tokens.push({ ...contract.tokens[1], id: "spacing.peer", binding: { cssVariable: "--spacing-peer" } }); contract.tokens[1].value = { kind: "derived", expression: "var(--spacing-peer)", dependencies: ["spacing.peer"] }; contract.tokens[2].value = { kind: "alias", tokenId: "spacing.unit" } }, "Derived-reference cycle: spacing.unit -> spacing.peer -> spacing.unit."],
+    ["color tokens with non-mode values", (contract: TokenContract) => { contract.tokens[0].value = { kind: "literal", value: "white" } }, "Color token color.background must use a modes value."],
+    ["color mode maps missing light", (contract: TokenContract) => { contract.tokens[0].value = { kind: "modes", values: { dark: "black" } } as unknown as TokenContract["tokens"][number]["value"] }, "Color token color.background is missing a light mode value."],
+    ["color mode maps missing dark", (contract: TokenContract) => { contract.tokens[0].value = { kind: "modes", values: { light: "white" } } as unknown as TokenContract["tokens"][number]["value"] }, "Color token color.background is missing a dark mode value."],
+    ["categories absent from coverage", (contract: TokenContract) => { contract.tokens[1].category = "shadow" }, "Token spacing.unit has category shadow outside coverage.contracted."],
+    ["duplicate canonical CSS variables", (contract: TokenContract) => { contract.tokens[1].sourceId = "canonical-theme"; contract.tokens[1].binding.cssVariable = "--background" }, "Canonical CSS variable --background is bound by both color.background and spacing.unit."],
+    ["missing derived rule base tokens", (contract: TokenContract) => { (contract.derivedRules[0] as unknown as { baseTokenId: string }).baseTokenId = "spacing.missing" }, "Derived rule spacing.multiplier references missing base token spacing.missing."],
+  ])("reports %s", (_description, mutateContract, expectedError) => {
     const errors = validateTokenContractInvariants(mutate(mutateContract))
 
-    expect(errors).toHaveLength(1)
-    expect(errors[0]).toMatch(/.+/)
+    expect(errors).toEqual([expectedError])
   })
 
   test("throws all invariant errors as a single readable message", () => {

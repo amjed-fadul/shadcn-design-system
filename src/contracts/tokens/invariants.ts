@@ -2,15 +2,21 @@ import type { TokenContract, TokenDefinition } from "./types"
 
 const knownSourceIds = new Set(["canonical-theme", "tailwind-theme"])
 
-function findReferenceCycle(tokens: TokenDefinition[], kind: "alias" | "derived"): string[] | undefined {
+function findReferenceCycle(
+  tokens: TokenDefinition[],
+  kind: "alias" | "derived" | "reference",
+): string[] | undefined {
   const dependencies = new Map<string, string[]>()
+  const referenceKinds = new Map<string, "alias" | "derived">()
 
   for (const token of tokens) {
-    if (kind === "alias" && token.value.kind === "alias") {
+    if ((kind === "alias" || kind === "reference") && token.value.kind === "alias") {
       dependencies.set(token.id, [token.value.tokenId])
+      referenceKinds.set(token.id, "alias")
     }
-    if (kind === "derived" && token.value.kind === "derived") {
+    if ((kind === "derived" || kind === "reference") && token.value.kind === "derived") {
       dependencies.set(token.id, token.value.dependencies)
+      referenceKinds.set(token.id, "derived")
     }
   }
 
@@ -21,7 +27,11 @@ function findReferenceCycle(tokens: TokenDefinition[], kind: "alias" | "derived"
   function visit(tokenId: string): string[] | undefined {
     if (active.has(tokenId)) {
       const cycleStart = path.indexOf(tokenId)
-      return [...path.slice(cycleStart), tokenId]
+      const cycle = [...path.slice(cycleStart), tokenId]
+      if (kind !== "reference") return cycle
+
+      const cycleKinds = new Set(cycle.map((id) => referenceKinds.get(id)))
+      return cycleKinds.has("alias") && cycleKinds.has("derived") ? cycle : undefined
     }
     if (visited.has(tokenId)) return undefined
 
@@ -103,6 +113,11 @@ export function validateTokenContractInvariants(contract: TokenContract): string
 
   const derivedCycle = findReferenceCycle(contract.tokens, "derived")
   if (derivedCycle) errors.push(`Derived-reference cycle: ${derivedCycle.join(" -> ")}.`)
+
+  const mixedReferenceCycle = findReferenceCycle(contract.tokens, "reference")
+  if (mixedReferenceCycle) {
+    errors.push(`Derived-reference cycle: ${mixedReferenceCycle.join(" -> ")}.`)
+  }
 
   for (const rule of contract.derivedRules) {
     if (!tokenIds.has(rule.baseTokenId)) {
