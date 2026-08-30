@@ -1,0 +1,22 @@
+{
+  "id": "shadcn-radix-bootstrap-000",
+  "status": "foundation",
+  "style": "radix-nova",
+  "base": "radix",
+  "baseColor": "neutral",
+  "cssVariables": true,
+  "iconLibrary": "lucide",
+  "upstream": {
+    "release": "shadcn@4.19.0",
+    "commitSha": "1773ecfeeb4a04366978d353e69b5c7ded78dcb2"
+  },
+  "canvasEvidence": {
+    "repository": "amjed-fadul/agentic-design-canvas",
+    "configurationEvidenceCommit": "3e6d274e7dba102938a465e0333f2e8ae98e49b3",
+    "componentsJsonPath": "canvas/components.json",
+    "packageJsonPath": "canvas/package.json"
+  },
+  "contractStatus": "not-started",
+  "componentSetStatus": "not-started",
+  "tokenFreezeStatus": "not-started"
+}
