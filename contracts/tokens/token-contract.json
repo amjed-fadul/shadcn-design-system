@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "id": "shadcn-radix-token-contract-001",
+  "status": "candidate",
+  "baselineSnapshotId": "shadcn-radix-bootstrap-000",
+  "sourceBaselineCommit": "f9682ce3238f1fc5f41a91b1d6953a40c12d2288",
+  "sourceProvenancePath": "provenance/token-contract-source.json",
+  "modes": ["light", "dark"],
+  "coverage": {
+    "contracted": ["color", "radius", "font-family"],
+    "representedElsewhere": [],
+    "notContracted": []
+  },
+  "derivedRules": [],
+  "tokens": [
+    {
+      "id": "color.background",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--background", "tailwindThemeVariable": "--color-background", "tailwindExpression": "var(--background)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(1 0 0)", "dark": "oklch(0.145 0 0)" } }
+    },
+    {
+      "id": "color.foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--foreground", "tailwindThemeVariable": "--color-foreground", "tailwindExpression": "var(--foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.145 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.card",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--card", "tailwindThemeVariable": "--color-card", "tailwindExpression": "var(--card)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(1 0 0)", "dark": "oklch(0.205 0 0)" } }
+    },
+    {
+      "id": "color.card-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--card-foreground", "tailwindThemeVariable": "--color-card-foreground", "tailwindExpression": "var(--card-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.145 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.popover",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--popover", "tailwindThemeVariable": "--color-popover", "tailwindExpression": "var(--popover)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(1 0 0)", "dark": "oklch(0.205 0 0)" } }
+    },
+    {
+      "id": "color.popover-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--popover-foreground", "tailwindThemeVariable": "--color-popover-foreground", "tailwindExpression": "var(--popover-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.145 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.primary",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--primary", "tailwindThemeVariable": "--color-primary", "tailwindExpression": "var(--primary)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.205 0 0)", "dark": "oklch(0.922 0 0)" } }
+    },
+    {
+      "id": "color.primary-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--primary-foreground", "tailwindThemeVariable": "--color-primary-foreground", "tailwindExpression": "var(--primary-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.985 0 0)", "dark": "oklch(0.205 0 0)" } }
+    },
+    {
+      "id": "color.secondary",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--secondary", "tailwindThemeVariable": "--color-secondary", "tailwindExpression": "var(--secondary)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.97 0 0)", "dark": "oklch(0.269 0 0)" } }
+    },
+    {
+      "id": "color.secondary-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--secondary-foreground", "tailwindThemeVariable": "--color-secondary-foreground", "tailwindExpression": "var(--secondary-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.205 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.muted",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--muted", "tailwindThemeVariable": "--color-muted", "tailwindExpression": "var(--muted)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.97 0 0)", "dark": "oklch(0.269 0 0)" } }
+    },
+    {
+      "id": "color.muted-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--muted-foreground", "tailwindThemeVariable": "--color-muted-foreground", "tailwindExpression": "var(--muted-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.556 0 0)", "dark": "oklch(0.708 0 0)" } }
+    },
+    {
+      "id": "color.accent",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--accent", "tailwindThemeVariable": "--color-accent", "tailwindExpression": "var(--accent)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.97 0 0)", "dark": "oklch(0.269 0 0)" } }
+    },
+    {
+      "id": "color.accent-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--accent-foreground", "tailwindThemeVariable": "--color-accent-foreground", "tailwindExpression": "var(--accent-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.205 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.destructive",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--destructive", "tailwindThemeVariable": "--color-destructive", "tailwindExpression": "var(--destructive)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.577 0.245 27.325)", "dark": "oklch(0.704 0.191 22.216)" } }
+    },
+    {
+      "id": "color.border",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--border", "tailwindThemeVariable": "--color-border", "tailwindExpression": "var(--border)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.922 0 0)", "dark": "oklch(1 0 0 / 10%)" } }
+    },
+    {
+      "id": "color.input",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--input", "tailwindThemeVariable": "--color-input", "tailwindExpression": "var(--input)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.922 0 0)", "dark": "oklch(1 0 0 / 15%)" } }
+    },
+    {
+      "id": "color.ring",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--ring", "tailwindThemeVariable": "--color-ring", "tailwindExpression": "var(--ring)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.708 0 0)", "dark": "oklch(0.556 0 0)" } }
+    },
+    {
+      "id": "color.chart-1",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--chart-1", "tailwindThemeVariable": "--color-chart-1", "tailwindExpression": "var(--chart-1)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.87 0 0)", "dark": "oklch(0.87 0 0)" } }
+    },
+    {
+      "id": "color.chart-2",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--chart-2", "tailwindThemeVariable": "--color-chart-2", "tailwindExpression": "var(--chart-2)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.556 0 0)", "dark": "oklch(0.556 0 0)" } }
+    },
+    {
+      "id": "color.chart-3",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--chart-3", "tailwindThemeVariable": "--color-chart-3", "tailwindExpression": "var(--chart-3)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.439 0 0)", "dark": "oklch(0.439 0 0)" } }
+    },
+    {
+      "id": "color.chart-4",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--chart-4", "tailwindThemeVariable": "--color-chart-4", "tailwindExpression": "var(--chart-4)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.371 0 0)", "dark": "oklch(0.371 0 0)" } }
+    },
+    {
+      "id": "color.chart-5",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--chart-5", "tailwindThemeVariable": "--color-chart-5", "tailwindExpression": "var(--chart-5)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.269 0 0)", "dark": "oklch(0.269 0 0)" } }
+    },
+    {
+      "id": "color.sidebar",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar", "tailwindThemeVariable": "--color-sidebar", "tailwindExpression": "var(--sidebar)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.985 0 0)", "dark": "oklch(0.205 0 0)" } }
+    },
+    {
+      "id": "color.sidebar-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar-foreground", "tailwindThemeVariable": "--color-sidebar-foreground", "tailwindExpression": "var(--sidebar-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.145 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.sidebar-primary",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar-primary", "tailwindThemeVariable": "--color-sidebar-primary", "tailwindExpression": "var(--sidebar-primary)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.205 0 0)", "dark": "oklch(0.488 0.243 264.376)" } }
+    },
+    {
+      "id": "color.sidebar-primary-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar-primary-foreground", "tailwindThemeVariable": "--color-sidebar-primary-foreground", "tailwindExpression": "var(--sidebar-primary-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.985 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.sidebar-accent",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar-accent", "tailwindThemeVariable": "--color-sidebar-accent", "tailwindExpression": "var(--sidebar-accent)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.97 0 0)", "dark": "oklch(0.269 0 0)" } }
+    },
+    {
+      "id": "color.sidebar-accent-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar-accent-foreground", "tailwindThemeVariable": "--color-sidebar-accent-foreground", "tailwindExpression": "var(--sidebar-accent-foreground)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.205 0 0)", "dark": "oklch(0.985 0 0)" } }
+    },
+    {
+      "id": "color.sidebar-border",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar-border", "tailwindThemeVariable": "--color-sidebar-border", "tailwindExpression": "var(--sidebar-border)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.922 0 0)", "dark": "oklch(1 0 0 / 10%)" } }
+    },
+    {
+      "id": "color.sidebar-ring",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--sidebar-ring", "tailwindThemeVariable": "--color-sidebar-ring", "tailwindExpression": "var(--sidebar-ring)" },
+      "value": { "kind": "modes", "values": { "light": "oklch(0.708 0 0)", "dark": "oklch(0.556 0 0)" } }
+    },
+    {
+      "id": "radius.base",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius" },
+      "value": { "kind": "literal", "value": "0.625rem" }
+    },
+    {
+      "id": "radius.sm",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius-sm" },
+      "value": { "kind": "derived", "expression": "calc(var(--radius) * 0.6)", "dependencies": ["radius.base"] }
+    },
+    {
+      "id": "radius.md",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius-md" },
+      "value": { "kind": "derived", "expression": "calc(var(--radius) * 0.8)", "dependencies": ["radius.base"] }
+    },
+    {
+      "id": "radius.lg",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius-lg" },
+      "value": { "kind": "derived", "expression": "var(--radius)", "dependencies": ["radius.base"] }
+    },
+    {
+      "id": "radius.xl",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius-xl" },
+      "value": { "kind": "derived", "expression": "calc(var(--radius) * 1.4)", "dependencies": ["radius.base"] }
+    },
+    {
+      "id": "radius.2xl",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius-2xl" },
+      "value": { "kind": "derived", "expression": "calc(var(--radius) * 1.8)", "dependencies": ["radius.base"] }
+    },
+    {
+      "id": "radius.3xl",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius-3xl" },
+      "value": { "kind": "derived", "expression": "calc(var(--radius) * 2.2)", "dependencies": ["radius.base"] }
+    },
+    {
+      "id": "radius.4xl",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--radius-4xl" },
+      "value": { "kind": "derived", "expression": "calc(var(--radius) * 2.6)", "dependencies": ["radius.base"] }
+    },
+    {
+      "id": "font.sans",
+      "category": "font-family",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--font-sans" },
+      "value": { "kind": "literal", "value": "\"Geist Variable\", sans-serif" }
+    },
+    {
+      "id": "font.heading",
+      "category": "font-family",
+      "sourceId": "canonical-theme",
+      "binding": { "cssVariable": "--font-heading" },
+      "value": { "kind": "alias", "tokenId": "font.sans" }
+    }
+  ]
+}
