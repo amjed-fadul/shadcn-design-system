@@ -13,7 +13,7 @@ type Snapshot = {
   configuration: { path: string; blobSha: string }
   dependencies: { packageJsonPath: string; packageJsonSha: string; packageLockPath: string; packageLockSha: string; installCommand: string }
   sourceFiles: Record<string, string>
-  tests: { path: string; blobSha: string; provenanceTestPath: string; provenanceTestBlobSha: string }
+  tests: { paths: string[]; scope: string[]; provenanceTestPath: string; provenanceTestBlobSha: string }
   testFiles: Record<string, string>
   componentSet: string[]
 }
@@ -39,7 +39,6 @@ function governedFiles(currentSnapshot: Snapshot, currentProvenance: Provenance)
     [currentSnapshot.dependencies.packageJsonPath, currentSnapshot.dependencies.packageJsonSha],
     [currentSnapshot.dependencies.packageLockPath, currentSnapshot.dependencies.packageLockSha],
     ...Object.entries(currentSnapshot.sourceFiles),
-    [currentSnapshot.tests.path, currentSnapshot.tests.blobSha],
     [currentSnapshot.tests.provenanceTestPath, currentSnapshot.tests.provenanceTestBlobSha],
     ...Object.entries(currentSnapshot.testFiles),
   ])
@@ -63,7 +62,6 @@ function verifySnapshotIntegrity(root: string, currentSnapshot: Snapshot, curren
     currentSnapshot.configuration.blobSha,
     currentSnapshot.dependencies.packageJsonSha,
     currentSnapshot.dependencies.packageLockSha,
-    currentSnapshot.tests.blobSha,
     currentSnapshot.tests.provenanceTestBlobSha,
     ...Object.values(currentSnapshot.sourceFiles),
     ...Object.values(currentSnapshot.testFiles),
@@ -75,7 +73,7 @@ function verifySnapshotIntegrity(root: string, currentSnapshot: Snapshot, curren
   }
 
   if (currentSnapshot.id !== "shadcn-radix-bootstrap-000") throw new Error("unexpected snapshot id")
-  if (currentSnapshot.status !== "candidate") throw new Error(`unexpected snapshot status: ${currentSnapshot.status}`)
+  if (currentSnapshot.status !== "approved") throw new Error(`unexpected snapshot status: ${currentSnapshot.status}`)
   if (currentSnapshot.upstream.repository !== "shadcn-ui/ui" || currentSnapshot.upstream.tag !== "shadcn@4.19.0") {
     throw new Error("snapshot upstream identity changed")
   }
@@ -87,6 +85,13 @@ function verifySnapshotIntegrity(root: string, currentSnapshot: Snapshot, curren
   const provenanceSet = Object.keys(currentProvenance.components).sort()
   if (JSON.stringify(componentSet) !== JSON.stringify(provenanceSet)) throw new Error("snapshot component set differs from provenance")
   if (new Set(currentSnapshot.componentSet).size !== currentSnapshot.componentSet.length) throw new Error("snapshot component set contains duplicates")
+
+  const studioTestPaths = Object.keys(currentSnapshot.testFiles)
+    .filter((path) => path.startsWith("tests/studio-components-") && path.endsWith(".test.tsx"))
+    .sort()
+  if (JSON.stringify([...currentSnapshot.tests.paths].sort()) !== JSON.stringify(studioTestPaths)) {
+    throw new Error("snapshot Studio component test paths differ from governed test files")
+  }
 
   const css = readFileSync(join(root, "src/index.css"), "utf8")
   if (!css.includes("--background: oklch(1 0 0)") || !css.includes("--background: oklch(0.145 0 0)")) throw new Error("canonical theme tokens are missing")

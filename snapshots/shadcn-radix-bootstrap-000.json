@@ -1,6 +1,6 @@
 {
   "id": "shadcn-radix-bootstrap-000",
-  "status": "candidate",
+  "status": "approved",
   "verifiedAt": "2026-08-30",
   "sourceBaseCommit": "b2325b7d1fb6933bd373422ae3e4514471a39a83",
   "sourceBaseCommitNote": "The snapshot records the verified working tree derived from this commit; included files are independently hashed below.",
@@ -39,7 +39,7 @@
     "tests/studio-components-sidebar.test.tsx": "9941c4f20578e75d6b2dccff9040c62d52d5d90f",
     "tests/studio-test-utils.tsx": "55869d3ef7c64140021d0c69afd96ce81212f71f",
     "tests/provenance.test.ts": "de4f220c9b370aacd223f7732ae3d56d19a45bdf",
-    "tests/snapshot-integrity.test.ts": "0edfcb066b3231fd47c7ba602be8e7ffc49fc89d"
+    "tests/snapshot-integrity.test.ts": "07004de14d049cc6ccce0bdeaa0b6fe08adf461b"
   },
   "componentSet": [
     "accordion",
@@ -63,8 +63,11 @@
     "tooltip"
   ],
   "tests": {
-    "path": "tests/studio-components-core.test.tsx",
-    "blobSha": "9fa31b03792df755b9f55c09c4aca7ad86483da7",
+    "paths": [
+      "tests/studio-components-core.test.tsx",
+      "tests/studio-components-overlays.test.tsx",
+      "tests/studio-components-sidebar.test.tsx"
+    ],
     "scope": ["simple primitive", "controlled/form", "compound", "portal/overlay", "scroll/layout"],
     "provenanceTestPath": "tests/provenance.test.ts",
     "provenanceTestBlobSha": "de4f220c9b370aacd223f7732ae3d56d19a45bdf"
