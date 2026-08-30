@@ -27,8 +27,8 @@ type Provenance = {
 type SnapshotFileReader = (relativePath: string) => Buffer
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
+const approvedSnapshotSourceBaseCommit = "f9682ce3238f1fc5f41a91b1d6953a40c12d2288"
 const snapshot = JSON.parse(readFileSync(join(repoRoot, "snapshots/shadcn-radix-bootstrap-000.json"), "utf8")) as Snapshot
-const provenance = JSON.parse(readFileSync(join(repoRoot, "provenance/seed-components.json"), "utf8")) as Provenance
 
 function gitBlobSha(content: Buffer) {
   return createHash("sha1").update(Buffer.from(`blob ${content.byteLength}\0`)).update(content).digest("hex")
@@ -73,9 +73,13 @@ function governedFiles(currentSnapshot: Snapshot, currentProvenance: Provenance)
 
 function verifySnapshotIntegrity(
   currentSnapshot: Snapshot,
-  currentProvenance: Provenance,
   readHistoricalFile: SnapshotFileReader,
 ) {
+  if (currentSnapshot.sourceBaseCommit !== approvedSnapshotSourceBaseCommit) {
+    throw new Error("snapshot source base commit changed")
+  }
+
+  const historicalProvenance = JSON.parse(readHistoricalFile("provenance/seed-components.json").toString("utf8")) as Provenance
   const recordedShas = [
     currentSnapshot.sourceBaseCommit,
     currentSnapshot.upstream.commitSha,
@@ -86,7 +90,7 @@ function verifySnapshotIntegrity(
     currentSnapshot.tests.provenanceTestBlobSha,
     ...Object.values(currentSnapshot.sourceFiles),
     ...Object.values(currentSnapshot.testFiles),
-    ...Object.values(currentProvenance.components).flatMap((component) => [component.canonicalBlobSha, component.upstreamBlobSha]),
+    ...Object.values(historicalProvenance.components).flatMap((component) => [component.canonicalBlobSha, component.upstreamBlobSha]),
   ]
 
   for (const sha of recordedShas) {
@@ -100,10 +104,10 @@ function verifySnapshotIntegrity(
   }
   if (currentSnapshot.upstream.commitSha !== "1773ecfeeb4a04366978d353e69b5c7ded78dcb2") throw new Error("snapshot upstream commit changed")
   if (currentSnapshot.dependencies.installCommand !== "npm ci") throw new Error("snapshot install command changed")
-  if (!currentProvenance.sourceResolution.cliVersionIsInsufficient) throw new Error("CLI-only provenance was accepted")
+  if (!historicalProvenance.sourceResolution.cliVersionIsInsufficient) throw new Error("CLI-only provenance was accepted")
 
   const componentSet = [...currentSnapshot.componentSet].sort()
-  const provenanceSet = Object.keys(currentProvenance.components).sort()
+  const provenanceSet = Object.keys(historicalProvenance.components).sort()
   if (JSON.stringify(componentSet) !== JSON.stringify(provenanceSet)) throw new Error("snapshot component set differs from provenance")
   if (new Set(currentSnapshot.componentSet).size !== currentSnapshot.componentSet.length) throw new Error("snapshot component set contains duplicates")
 
@@ -123,7 +127,7 @@ function verifySnapshotIntegrity(
     throw new Error("canonical token source does not match snapshot")
   }
 
-  for (const [relativePath, expectedSha] of governedFiles(currentSnapshot, currentProvenance)) {
+  for (const [relativePath, expectedSha] of governedFiles(currentSnapshot, historicalProvenance)) {
     const actualSha = gitBlobSha(readHistoricalFile(relativePath))
     if (actualSha !== expectedSha) throw new Error(`${relativePath} differs from recorded historical Git blob`)
   }
@@ -133,7 +137,24 @@ describe("Bootstrap Snapshot 0 integrity", () => {
   const readHistoricalFile = createHistoricalFileReader(repoRoot, snapshot.sourceBaseCommit)
 
   test("validates governed files from the approved historical tree while current Phase 2 package metadata evolves", () => {
-    expect(() => verifySnapshotIntegrity(snapshot, provenance, readHistoricalFile)).not.toThrow()
+    expect(() => verifySnapshotIntegrity(snapshot, readHistoricalFile)).not.toThrow()
+  })
+
+  test("rejects a well-formed snapshot anchor other than the approved Phase 1 commit", () => {
+    expect(() => verifySnapshotIntegrity(
+      { ...snapshot, sourceBaseCommit: "1111111111111111111111111111111111111111" },
+      readHistoricalFile,
+    )).toThrow("snapshot source base commit changed")
+  })
+
+  test("parses component provenance from the injected historical reader", () => {
+    const historicalProvenance = JSON.parse(readHistoricalFile("provenance/seed-components.json").toString("utf8")) as Provenance
+    const readMutatedHistoricalProvenance = (relativePath: string) => relativePath === "provenance/seed-components.json"
+      ? Buffer.from(JSON.stringify({ ...historicalProvenance, components: {} }))
+      : readHistoricalFile(relativePath)
+
+    expect(() => verifySnapshotIntegrity(snapshot, readMutatedHistoricalProvenance))
+      .toThrow("snapshot component set differs from provenance")
   })
 
   test("rejects a mutated historical governed file without consulting the working tree", () => {
@@ -141,7 +162,7 @@ describe("Bootstrap Snapshot 0 integrity", () => {
       ? Buffer.concat([readHistoricalFile(relativePath), Buffer.from("\n")])
       : readHistoricalFile(relativePath)
 
-    expect(() => verifySnapshotIntegrity(snapshot, provenance, readMutatedHistoricalFile))
+    expect(() => verifySnapshotIntegrity(snapshot, readMutatedHistoricalFile))
       .toThrow("package.json differs from recorded historical Git blob")
   })
 
