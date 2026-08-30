@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "theme": "neutral",
+  "style": "radix-nova",
+  "source": {
+    "repository": "shadcn-ui/ui",
+    "release": "shadcn@4.19.0",
+    "commit": "1773ecfeeb4a04366978d353e69b5c7ded78dcb2",
+    "path": "apps/v4/public/r/colors/neutral.json"
+  },
+  "localEvidence": {
+    "repository": "amjed-fadul/agentic-design-canvas",
+    "commit": "a68e7d144db1ba7e9d549862f394655cffb2f809",
+    "path": "canvas/src/index.css"
+  },
+  "decisions": {
+    "include": [
+      "shadcn neutral semantic light/dark tokens",
+      "sidebar semantic tokens",
+      "radius scale derived from --radius",
+      "Geist Variable as the canonical sans font"
+    ],
+    "exclude": [
+      "Canvas host chrome tokens",
+      "Canvas selection tokens",
+      "Canvas ready/experiment status tokens"
+    ]
+  }
+}
