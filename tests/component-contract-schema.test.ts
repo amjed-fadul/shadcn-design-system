@@ -17,7 +17,7 @@ function validFamily(): any {
     id: "example",
     source: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40), implementationKind: "example" },
     evidence: evidence(),
-    exports: [{ name: "Example", kind: "component", authorableJsx: true, component: { localProps: [], inherits: [], slots: [], composition: { requires: [], provides: [], hardConstraints: [] }, stateChannels: [], conditionalApi: [], events: [], tokenDependencies: [], rendering: { defaultHost: { kind: "intrinsic", name: "div", evidenceRefs: ["source"] }, dataAttributes: [], portals: { value: false, evidenceRefs: ["source"] }, automaticStructure: [] }, accessibility: [] }, evidenceRefs: ["source"] }],
+    exports: [{ name: "Example", kind: "component", authorableJsx: true, component: { localProps: [], inherits: [], slots: [], inheritedPropDefaults: [], composition: { requires: [], provides: [], hardConstraints: [] }, stateChannels: [], conditionalApi: [], events: [], tokenDependencies: [], rendering: { rootNodeId: "host", publicPropsTargetNodeId: "host", nodes: [{ id: "host", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] }, accessibility: [] }, evidenceRefs: ["source"] }],
     unresolved: [],
   }
 }
@@ -49,13 +49,42 @@ describe("component contract JSON Schemas", () => {
     expect(validate(contractSetSchema, { schemaVersion: 1, id: "contracts", status: "candidate", designSystemId: "example", sourceBaselineCommit: "a".repeat(40), tokenContractId: "tokens", familyCount: 2, familyFiles: ["contracts/components/families/example.json"], interfaceFiles: ["contracts/components/interfaces/html.example.json"] })).toBe(true)
   })
 
+  test("accepts an evidence-backed node-targeted portal boundary", () => {
+    const family = validFamily()
+    family.exports[0].component.rendering = {
+      rootNodeId: "root", publicPropsTargetNodeId: "content",
+      nodes: [
+        { id: "root", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: false, dataAttributes: [], children: [{ nodeId: "portal", evidenceRefs: ["source"] }], evidenceRefs: ["source"] },
+        { id: "portal", host: { kind: "fragment" }, receivesPublicProps: false, dataAttributes: [], children: [{ nodeId: "content", evidenceRefs: ["source"] }], evidenceRefs: ["source"] },
+        { id: "content", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] },
+      ],
+      portalBoundaries: [{ nodeId: "portal", evidenceRefs: ["source"] }],
+    }
+    expect(validate(familySchema, family)).toBe(true)
+  })
+
+  test("accepts an evidence-backed conditional child reference and component host", () => {
+    const family = validFamily()
+    family.exports[0].component.rendering = {
+      rootNodeId: "root", publicPropsTargetNodeId: "content",
+      nodes: [
+        { id: "root", host: { kind: "component-export", exportName: "Example" }, receivesPublicProps: false, dataAttributes: [], children: [{ nodeId: "content", when: { propName: "tone", equals: "quiet" }, evidenceRefs: ["source"] }], evidenceRefs: ["source"] },
+        { id: "content", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] },
+      ],
+      portalBoundaries: [],
+    }
+    expect(validate(familySchema, family)).toBe(true)
+  })
+
   test.each([
     ["unknown structured property", (value: any) => ({ ...value, unknown: true })],
     ["invalid export kind", (value: any) => ({ ...value, exports: [{ ...value.exports[0], kind: "widget" }] })],
     ["malformed evidence kind", (value: any) => ({ ...value, evidence: { source: { kind: "memory", source: "x" } } })],
     ["invalid structured prop type", (value: any) => ({ ...value, exports: [{ ...value.exports[0], component: { ...value.exports[0].component, localProps: [{ name: "tone", required: false, type: { kind: "unknown" }, evidenceRefs: ["source"] }] } }] })],
     ["malformed slot cardinality", (value: any) => ({ ...value, exports: [{ ...value.exports[0], component: { ...value.exports[0].component, slots: [{ propName: "asChild", default: false, replacesHost: true, childCardinality: { min: -1, max: 0 }, forwardsProps: true, childRequires: [], refForwarding: "unresolved", evidenceRefs: ["source"] }] } }] })],
-    ["malformed rendering default host", (value: any) => ({ ...value, exports: [{ ...value.exports[0], component: { ...value.exports[0].component, rendering: { ...value.exports[0].component.rendering, defaultHost: { kind: "intrinsic" } } } }] })],
+    ["malformed rendering host", (value: any) => ({ ...value, exports: [{ ...value.exports[0], component: { ...value.exports[0].component, rendering: { ...value.exports[0].component.rendering, nodes: [{ ...value.exports[0].component.rendering.nodes[0], host: { kind: "intrinsic" } }] } } }] })],
+    ["malformed portal boundary", (value: any) => ({ ...value, exports: [{ ...value.exports[0], component: { ...value.exports[0].component, rendering: { ...value.exports[0].component.rendering, portalBoundaries: [{ nodeId: "host" }] } } }] })],
+    ["malformed render child reference", (value: any) => ({ ...value, exports: [{ ...value.exports[0], component: { ...value.exports[0].component, rendering: { ...value.exports[0].component.rendering, nodes: [{ ...value.exports[0].component.rendering.nodes[0], children: [{ nodeId: "host" }] }] } } }] })],
     ["malformed accessibility owner", (value: any) => ({ ...value, exports: [{ ...value.exports[0], component: { ...value.exports[0].component, accessibility: [{ feature: "name", owner: "browser", mechanism: "author", evidenceRefs: ["source"] }] } }] })],
   ])("rejects a family with %s", (_description, mutate) => {
     expect(validate(familySchema, mutate(validFamily()))).toBe(false)

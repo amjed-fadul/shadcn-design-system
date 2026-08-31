@@ -32,6 +32,18 @@
 * Every task receives a fresh reviewer/subagent after GREEN.
 * Keep factual uncertainties explicit as `unresolved`.
 
+## Task 3 architecture amendment — 2026-08-31
+
+This amendment resulted from independent Task 3 review. It records only the three accepted generic corrections:
+
+1. Rendering uses a design-system-neutral tree with an explicit root node, public-props target node, host descriptors, child references, and evidence-backed data attributes. This preserves non-exported wrappers such as Table's outer `div` without inventing authoring composition constraints.
+2. Component definitions record inherited-prop defaults separately from local props. This captures wrapper-supplied defaults such as Separator's `orientation: "horizontal"` and `decorative: true` without duplicating inherited API declarations.
+3. Token dependencies are reconciled for completeness from canonical TSX/CVA class sources through independent utility analysis. Modifier/state prefixes and opacity suffixes do not hide dependencies; numeric spacing utilities resolve through `spacing.unit` and `spacing.multiplier`, and static contracts must match the normalized source-derived set.
+
+The render tree preserves evidence-backed portal semantics through node-targeted portal boundaries. The tree replaces the old flat automatic-structure representation but does not discard portal facts.
+
+Render child edges are evidence-backed references and may carry a public-prop condition; component-export hosts must identify JSX-authorable component exports.
+
 ---
 
 ## Model/session map

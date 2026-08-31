@@ -7,7 +7,7 @@ function validFamily(): ComponentFamilyContract {
   return {
     schemaVersion: 1, id: "example", source: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40), implementationKind: "example" },
     evidence: { source: { kind: "canonical-source", source: "src/example.tsx" } },
-    exports: [{ name: "Example", kind: "component", authorableJsx: true, component: { localProps: [{ name: "tone", required: false, type: { kind: "enum", values: ["quiet"] }, evidenceRefs: ["source"] }], inherits: ["html.example"], slots: [], composition: { requires: [], provides: [], hardConstraints: [] }, stateChannels: [], conditionalApi: [], events: [], tokenDependencies: [{ tokenId: "color.primary", evidenceRefs: ["source"] }], rendering: { defaultHost: { kind: "intrinsic", name: "div", evidenceRefs: ["source"] }, dataAttributes: [], portals: { value: false, evidenceRefs: ["source"] }, automaticStructure: [] }, accessibility: [] }, evidenceRefs: ["source"] }], unresolved: [],
+    exports: [{ name: "Example", kind: "component", authorableJsx: true, component: { localProps: [{ name: "tone", required: false, type: { kind: "enum", values: ["quiet"] }, evidenceRefs: ["source"] }], inherits: ["html.example"], slots: [], inheritedPropDefaults: [], composition: { requires: [], provides: [], hardConstraints: [] }, stateChannels: [], conditionalApi: [], events: [], tokenDependencies: [{ tokenId: "color.primary", evidenceRefs: ["source"] }], rendering: { rootNodeId: "host", publicPropsTargetNodeId: "host", nodes: [{ id: "host", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] }, accessibility: [] }, evidenceRefs: ["source"] }], unresolved: [],
   }
 }
 
@@ -17,12 +17,103 @@ function changed(change: (family: ComponentFamilyContract) => void) {
   return family
 }
 
+function withPortalBoundary(): ComponentFamilyContract {
+  const family = validFamily() as any
+  family.exports[0].component.rendering = {
+    rootNodeId: "root", publicPropsTargetNodeId: "content",
+    nodes: [
+      { id: "root", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: false, dataAttributes: [], children: [{ nodeId: "portal", evidenceRefs: ["source"] }], evidenceRefs: ["source"] },
+      { id: "portal", host: { kind: "fragment" }, receivesPublicProps: false, dataAttributes: [], children: [{ nodeId: "content", evidenceRefs: ["source"] }], evidenceRefs: ["source"] },
+      { id: "content", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] },
+    ],
+    portalBoundaries: [{ nodeId: "portal", evidenceRefs: ["source"] }],
+  }
+  return family
+}
+
+function withConditionalChild(): ComponentFamilyContract {
+  const family = validFamily() as any
+  family.exports[0].component.rendering = {
+    rootNodeId: "root", publicPropsTargetNodeId: "child",
+    nodes: [
+      { id: "root", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: false, dataAttributes: [], children: [{ nodeId: "child", when: { propName: "tone", equals: "quiet" }, evidenceRefs: ["source"] }], evidenceRefs: ["source"] },
+      { id: "child", host: { kind: "intrinsic", tag: "span" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] },
+    ],
+    portalBoundaries: [],
+  }
+  return family
+}
+
 const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
 
 describe("component contract semantic invariants", () => {
   test("accepts a valid generic family", () => {
     expect(validateComponentFamilyInvariants(validFamily(), authority)).toEqual([])
     expect(() => assertComponentFamilyInvariants(validFamily(), authority)).not.toThrow()
+  })
+
+  test("accepts a portal boundary targeting a reachable render node", () => {
+    expect(validateComponentFamilyInvariants(withPortalBoundary(), authority)).toEqual([])
+  })
+
+  test("accepts a conditional render child reference", () => {
+    expect(validateComponentFamilyInvariants(withConditionalChild(), authority)).toEqual([])
+  })
+
+  test.each([
+    ["wrong boolean condition type", (f: any) => { f.exports[0].component.localProps[0].type = { kind: "boolean" } }, "Component Example render child condition for root->child has boolean prop tone but equals is not boolean."],
+    ["illegal enum condition literal", (f: any) => { f.exports[0].component.rendering.nodes[0].children[0].when.equals = "loud" }, "Component Example render child condition for root->child has enum prop tone without value: loud."],
+    ["missing child edge evidence", (f: any) => { f.exports[0].component.rendering.nodes[0].children[0].evidenceRefs = [] }, "Render child Example.root->child is missing evidence references."],
+    ["unknown condition prop", (f: any) => { f.exports[0].component.rendering.nodes[0].children[0].when.propName = "missing" }, "Component Example render child condition references unknown prop: missing."],
+  ])("rejects %s", (_description, mutate, expected) => {
+    const family = withConditionalChild()
+    mutate(family)
+    expect(validateComponentFamilyInvariants(family, authority)).toContain(expected)
+  })
+
+  test("accepts a component-export render host when the export is JSX-authorable", () => {
+    const family = changed((f: any) => { f.exports[0].component.rendering.nodes[0].host = { kind: "component-export", exportName: "Example" } })
+    expect(validateComponentFamilyInvariants(family, authority)).toEqual([])
+  })
+
+  test("rejects a component-export render host when the export is not JSX-authorable", () => {
+    const family = changed((f: any) => {
+      f.exports.push({ name: "Helper", kind: "helper", authorableJsx: false, evidenceRefs: ["source"] })
+      f.exports[0].component.rendering.nodes[0].host = { kind: "component-export", exportName: "Helper" }
+    })
+    expect(validateComponentFamilyInvariants(family, authority)).toContain("Component Example render host references non-JSX-authorable export: Helper.")
+  })
+
+  test("rejects a hook render host", () => {
+    const family = changed((f: any) => {
+      f.exports.push({ name: "Hook", kind: "hook", authorableJsx: false, evidenceRefs: ["source"] })
+      f.exports[0].component.rendering.nodes[0].host = { kind: "component-export", exportName: "Hook" }
+    })
+    expect(validateComponentFamilyInvariants(family, authority)).toContain("Component Example render host references non-JSX-authorable export: Hook.")
+  })
+
+  test.each([
+    ["unknown portal node", (f: any) => { f.exports[0].component.rendering.portalBoundaries[0].nodeId = "missing" }, "Component Example portal boundary references unknown render node: missing."],
+    ["disconnected portal node", (f: any) => { f.exports[0].component.rendering.nodes.push({ id: "orphan", host: { kind: "intrinsic", tag: "span" }, receivesPublicProps: false, dataAttributes: [], children: [], evidenceRefs: ["source"] }); f.exports[0].component.rendering.portalBoundaries[0].nodeId = "orphan" }, "Component Example portal boundary references unreachable render node: orphan."],
+    ["duplicate portal node", (f: any) => { f.exports[0].component.rendering.portalBoundaries.push({ nodeId: "portal", evidenceRefs: ["source"] }) }, "Component Example has duplicate portal boundary for render node: portal."],
+    ["missing portal evidence", (f: any) => { f.exports[0].component.rendering.portalBoundaries[0].evidenceRefs = [] }, "Portal boundary Example.portal is missing evidence references."],
+  ])("rejects %s", (_description, mutate, expected) => {
+    const family = withPortalBoundary()
+    mutate(family)
+    expect(validateComponentFamilyInvariants(family, authority)).toContain(expected)
+  })
+
+  test.each([
+    ["missing root", (f: any) => { f.exports[0].component.rendering.rootNodeId = "missing" }, "Component Example rendering root node is missing: missing."],
+    ["missing public-props target", (f: any) => { f.exports[0].component.rendering.publicPropsTargetNodeId = "missing" }, "Component Example rendering public-props target node is missing: missing."],
+    ["duplicate render-node ID", (f: any) => { f.exports[0].component.rendering.nodes.push({ ...f.exports[0].component.rendering.nodes[0] }) }, "Component Example has duplicate render-node ID: host."],
+    ["disconnected render node", (f: any) => { f.exports[0].component.rendering.nodes.push({ id: "orphan", host: { kind: "intrinsic", tag: "span" }, receivesPublicProps: false, dataAttributes: [], children: [], evidenceRefs: ["source"] }) }, "Component Example rendering contains disconnected nodes."],
+    ["render cycle", (f: any) => { f.exports[0].component.rendering.nodes[0].children.push({ nodeId: "host", evidenceRefs: ["source"] }) }, "Component Example rendering contains a cycle at node: host."],
+    ["non-target public props", (f: any) => { f.exports[0].component.rendering.nodes[0].receivesPublicProps = false }, "Component Example rendering public-props target must receive public props."],
+    ["unknown component render host", (f: any) => { f.exports[0].component.rendering.nodes[0].host = { kind: "component-export", exportName: "Missing" } }, "Component Example render host references unknown export: Missing."],
+    ["unknown inherited render host", (f: any) => { f.exports[0].component.rendering.nodes[0].host = { kind: "inherited-interface", interfaceId: "html.missing" } }, "Component Example render host references unknown interface: html.missing."],
+  ])("rejects %s render tree", (_description, mutate, expected) => {
+    expect(validateComponentFamilyInvariants(changed(mutate), authority)).toContain(expected)
   })
 
   test.each([
@@ -36,7 +127,7 @@ describe("component contract semantic invariants", () => {
     ["unknown derived token rule", (f: ComponentFamilyContract) => { f.exports[0].component!.tokenDependencies[0].viaDerivedRule = { id: "spacing.unknown", multiplier: 2 } }, "Component Example references unknown derived token rule: spacing.unknown."],
     ["bad state-channel prop reference", (f: ComponentFamilyContract) => f.exports[0].component!.stateChannels.push({ name: "open", propName: "missing", evidenceRefs: ["source"] }), "Component Example state channel open references unknown prop: missing."],
     ["bad event prop reference", (f: ComponentFamilyContract) => f.exports[0].component!.events.push({ propName: "onMissing", evidenceRefs: ["source"] }), "Component Example event references unknown prop: onMissing."],
-    ["bad automatic export reference", (f: ComponentFamilyContract) => f.exports[0].component!.rendering.automaticStructure.push({ exportName: "Missing", evidenceRefs: ["source"] }), "Component Example automatic structure references unknown export: Missing."],
+    ["bad render child reference", (f: ComponentFamilyContract) => f.exports[0].component!.rendering.nodes[0].children.push({ nodeId: "Missing", evidenceRefs: ["source"] }), "Component Example render node host references unknown child: Missing."],
     ["slot maximum below minimum", (f: ComponentFamilyContract) => f.exports[0].component!.slots.push({ propName: "items", default: false, replacesHost: false, childCardinality: { min: 2, max: 1 }, forwardsProps: false, childRequires: [], refForwarding: "unresolved", evidenceRefs: ["source"] }), "Slot Example.items has max 1 below min 2."],
     ["source identity mismatch", (f: ComponentFamilyContract) => { f.source.canonicalBlobSha = "b".repeat(40) }, "Family source canonicalBlobSha does not match approved source identity."],
     ["missing conditional API evidence", (f: ComponentFamilyContract) => f.exports[0].component!.conditionalApi.push({ propName: "tone", equals: "quiet", effects: [], evidenceRefs: ["missing"] }), "Conditional API Example.tone references missing evidence: missing."],
@@ -45,12 +136,18 @@ describe("component contract semantic invariants", () => {
     expect(validateComponentFamilyInvariants(changed(mutate), authority)).toContain(expected)
   })
 
-  test("permits inherited state and event prop references and resolves automatic exports independent of declaration order", () => {
+  test.each([
+    ["unknown inherited default", (f: any) => f.exports[0].component.inheritedPropDefaults.push({ propName: "missing", value: true, evidenceRefs: ["source"] }), "Component Example inherited prop default references unknown inherited prop: missing."],
+    ["duplicate inherited defaults", (f: any) => { f.exports[0].component.inheritedPropDefaults.push({ propName: "inheritedState", value: true, evidenceRefs: ["source"] }); f.exports[0].component.inheritedPropDefaults.push({ propName: "inheritedState", value: false, evidenceRefs: ["source"] }) }, "Component Example has duplicate inherited prop default: inheritedState."],
+    ["default collides with local prop", (f: any) => f.exports[0].component.inheritedPropDefaults.push({ propName: "tone", value: "quiet", evidenceRefs: ["source"] }), "Component Example inherited prop default references unknown inherited prop: tone."],
+  ])("rejects %s inherited default", (_description, mutate, expected) => {
+    expect(validateComponentFamilyInvariants(changed(mutate), authority)).toContain(expected)
+  })
+
+  test("permits inherited state and event prop references", () => {
     const family = validFamily()
     family.exports[0].component!.stateChannels.push({ name: "state", propName: "inheritedState", evidenceRefs: ["source"] })
     family.exports[0].component!.events.push({ propName: "onClick", evidenceRefs: ["source"] })
-    family.exports[0].component!.rendering.automaticStructure.push({ exportName: "Later", evidenceRefs: ["source"] })
-    family.exports.push({ name: "Later", kind: "helper", authorableJsx: false, evidenceRefs: ["source"] })
     expect(validateComponentFamilyInvariants(family, authority)).toEqual([])
   })
 })

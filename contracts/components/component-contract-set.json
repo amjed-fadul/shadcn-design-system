@@ -6,6 +6,32 @@
   "sourceBaselineCommit": "6f14d8f9f5b5638ab97db009d7c164a65331dca7",
   "tokenContractId": "shadcn-radix-token-contract-001",
   "familyCount": 19,
-  "familyFiles": ["contracts/components/families/button.json"],
-  "interfaceFiles": ["contracts/components/interfaces/html.button.json"]
+  "familyFiles": [
+    "contracts/components/families/badge.json",
+    "contracts/components/families/button.json",
+    "contracts/components/families/card.json",
+    "contracts/components/families/input.json",
+    "contracts/components/families/label.json",
+    "contracts/components/families/separator.json",
+    "contracts/components/families/skeleton.json",
+    "contracts/components/families/table.json",
+    "contracts/components/families/textarea.json"
+  ],
+  "interfaceFiles": [
+    "contracts/components/interfaces/html.button.json",
+    "contracts/components/interfaces/html.caption.json",
+    "contracts/components/interfaces/html.div.json",
+    "contracts/components/interfaces/html.input.json",
+    "contracts/components/interfaces/html.span.json",
+    "contracts/components/interfaces/html.table.json",
+    "contracts/components/interfaces/html.tbody.json",
+    "contracts/components/interfaces/html.td.json",
+    "contracts/components/interfaces/html.textarea.json",
+    "contracts/components/interfaces/html.tfoot.json",
+    "contracts/components/interfaces/html.th.json",
+    "contracts/components/interfaces/html.thead.json",
+    "contracts/components/interfaces/html.tr.json",
+    "contracts/components/interfaces/radix.label.root.json",
+    "contracts/components/interfaces/radix.separator.root.json"
+  ]
 }
