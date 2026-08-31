@@ -53,6 +53,7 @@ const invalidIds = [
   "spacing.17",
   "spacing.multiplier",
   "radius.unknown",
+  "font.sans-serif",
 ]
 
 describe("token contract query boundary", () => {
@@ -150,5 +151,22 @@ describe("token contract query boundary", () => {
     expect(listTokenIds()[0]).toBe(originalFirstId)
     expect(lookupToken("color.background")).toEqual(originalBackground)
     expect(getTokenContract().tokens.some((token) => token.id === "mutated.id")).toBe(false)
+  })
+
+  test("does not permit a token returned from listTokens to mutate canonical query state", () => {
+    const listedBackground = listTokens().find((token) => token.id === "color.background")
+
+    expect(listedBackground).toBeDefined()
+    expect(Object.isFrozen(listedBackground)).toBe(true)
+    expect(() => { (listedBackground as { id: string }).id = "mutated.from-list" }).toThrow()
+
+    const lookedUpBackground = lookupToken("color.background")
+    expect(lookedUpBackground.ok).toBe(true)
+    if (lookedUpBackground.ok) {
+      expect(lookedUpBackground.token).toBe(listedBackground)
+      expect(lookedUpBackground.token.id).toBe("color.background")
+    }
+    expect(listTokens().some((token) => token.id === "mutated.from-list")).toBe(false)
+    expect(getTokenContract().tokens.some((token) => token.id === "mutated.from-list")).toBe(false)
   })
 })
