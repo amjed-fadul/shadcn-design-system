@@ -22,9 +22,11 @@
       "themeCssSha256": "443d7af364200f8ec8352dc78e39485a118a1840d498c97967bf0ae402b39167",
       "packageLockIntegrity": "sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==",
       "spacingFunction": {
-        "path": "node_modules/tailwindcss/dist/chunk-C2OYBFIH.mjs",
-        "sha256": "4b15bfa07f438749d3512e4e0decfa2acdb4c3268e3293853af51bdf1b0535f4",
-        "marker": "K=/^(--spacing)\\(/i"
+        "path": "node_modules/tailwindcss/dist/lib.mjs",
+        "sha256": "8ebfd51c44d6cca0ef675007e97e6aa918944df2b662c2d7bfa50fdfaa98bb64",
+        "bareValueMarker": "handleBareValue:({value:K})=>!e.resolve(null,[\"--spacing\"])||!Q(K)?null:`--spacing(${K})`",
+        "resolverMarker": "d=`calc(${f} * ${l.value.value})`",
+        "semantics": "The compiler maps a numeric bare utility value to --spacing(<multiplier>) when --spacing resolves, and resolves spacing values as calc(<resolved --spacing> * <multiplier>)."
       }
     }
   }

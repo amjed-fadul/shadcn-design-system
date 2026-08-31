@@ -48,16 +48,29 @@ describe("pinned Tailwind theme token source", () => {
     expect(createHash("sha256").update(themeCss).digest("hex")).toBe(provenance.sources.tailwindTheme.themeCssSha256)
   })
 
-  test("recognizes the pinned package's --spacing(number) theme function offline", () => {
+  test("pins the package compiler path for --spacing(number) transform semantics offline", () => {
     const provenance = JSON.parse(readFileSync(provenancePath, "utf8")) as {
-      sources: { tailwindTheme: { spacingFunction: { path: string, sha256: string, marker: string } } }
+      sources: {
+        tailwindTheme: {
+          spacingFunction: {
+            path: string
+            sha256: string
+            bareValueMarker: string
+            resolverMarker: string
+            semantics: string
+          }
+        }
+      }
     }
     const evidence = provenance.sources.tailwindTheme.spacingFunction
     const source = readFileSync(new URL(`../${evidence.path}`, import.meta.url))
 
     expect(createHash("sha256").update(source).digest("hex")).toBe(evidence.sha256)
-    expect(source.toString("utf8")).toContain(evidence.marker)
-    expect(evidence.marker).toBe("K=/^(--spacing)\\(/i")
+    expect(source.toString("utf8")).toContain(evidence.bareValueMarker)
+    expect(source.toString("utf8")).toContain(evidence.resolverMarker)
+    expect(evidence.bareValueMarker).toBe('handleBareValue:({value:K})=>!e.resolve(null,["--spacing"])||!Q(K)?null:`--spacing(${K})`')
+    expect(evidence.resolverMarker).toBe('d=`calc(${f} * ${l.value.value})`')
+    expect(evidence.semantics).toBe("The compiler maps a numeric bare utility value to --spacing(<multiplier>) when --spacing resolves, and resolves spacing values as calc(<resolved --spacing> * <multiplier>).")
   })
 
   test("reconciles every contracted Tailwind value to @theme default only", () => {
