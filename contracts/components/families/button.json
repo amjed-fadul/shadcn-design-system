@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "button",
+  "source": {
+    "canonicalPath": "src/components/ui/button.tsx",
+    "canonicalBlobSha": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
+    "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f"
+  },
+  "evidence": {
+    "source": { "kind": "canonical-source", "source": "src/components/ui/button.tsx@1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc" },
+    "interface": { "kind": "inherited-interface", "source": "html.button" },
+    "tokens": { "kind": "token-contract", "source": "shadcn-radix-token-contract-001" }
+  },
+  "exports": [
+    {
+      "name": "Button", "kind": "component", "authorableJsx": true, "evidenceRefs": ["source"],
+      "component": {
+        "localProps": [
+          { "name": "variant", "required": false, "type": { "kind": "enum", "values": ["default", "outline", "secondary", "ghost", "destructive", "link"] }, "default": "default", "evidenceRefs": ["source"] },
+          { "name": "size", "required": false, "type": { "kind": "enum", "values": ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"] }, "default": "default", "evidenceRefs": ["source"] },
+          { "name": "asChild", "required": false, "type": { "kind": "boolean" }, "default": false, "evidenceRefs": ["source"] }
+        ],
+        "inherits": ["html.button"],
+        "slots": [{ "propName": "asChild", "default": false, "replacesHost": true, "childCardinality": { "min": 1, "max": 1 }, "forwardsProps": true, "childRequires": [], "refForwarding": "unresolved", "evidenceRefs": ["source"] }],
+        "composition": { "requires": [], "provides": [], "hardConstraints": [] },
+        "stateChannels": [], "conditionalApi": [], "events": [],
+        "tokenDependencies": [
+          { "tokenId": "radius.md", "evidenceRefs": ["source", "tokens"] }, { "tokenId": "font-size.sm", "evidenceRefs": ["source", "tokens"] }, { "tokenId": "font-weight.medium", "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.ring", "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.destructive", "evidenceRefs": ["source", "tokens"] },
+          { "tokenId": "color.primary", "when": { "propName": "variant", "equals": "default" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.primary-foreground", "when": { "propName": "variant", "equals": "default" }, "evidenceRefs": ["source", "tokens"] },
+          { "tokenId": "color.border", "when": { "propName": "variant", "equals": "outline" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.background", "when": { "propName": "variant", "equals": "outline" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.accent", "when": { "propName": "variant", "equals": "outline" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.accent-foreground", "when": { "propName": "variant", "equals": "outline" }, "evidenceRefs": ["source", "tokens"] },
+          { "tokenId": "color.secondary", "when": { "propName": "variant", "equals": "secondary" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.secondary-foreground", "when": { "propName": "variant", "equals": "secondary" }, "evidenceRefs": ["source", "tokens"] },
+          { "tokenId": "color.accent", "when": { "propName": "variant", "equals": "ghost" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.accent-foreground", "when": { "propName": "variant", "equals": "ghost" }, "evidenceRefs": ["source", "tokens"] },
+          { "tokenId": "color.destructive", "when": { "propName": "variant", "equals": "destructive" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "color.primary", "when": { "propName": "variant", "equals": "link" }, "evidenceRefs": ["source", "tokens"] }
+          , { "tokenId": "radius.sm", "when": { "propName": "size", "equals": "xs" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "radius.md", "when": { "propName": "size", "equals": "xs" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "font-size.xs", "when": { "propName": "size", "equals": "xs" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "radius.sm", "when": { "propName": "size", "equals": "sm" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "radius.md", "when": { "propName": "size", "equals": "sm" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "font-size.xs", "when": { "propName": "size", "equals": "sm" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "radius.sm", "when": { "propName": "size", "equals": "icon-xs" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "radius.md", "when": { "propName": "size", "equals": "icon-xs" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "radius.sm", "when": { "propName": "size", "equals": "icon-sm" }, "evidenceRefs": ["source", "tokens"] }, { "tokenId": "radius.md", "when": { "propName": "size", "equals": "icon-sm" }, "evidenceRefs": ["source", "tokens"] }
+        ],
+        "rendering": { "defaultHost": { "kind": "intrinsic", "name": "button", "evidenceRefs": ["source"] }, "dataAttributes": [{ "name": "data-slot", "value": "button", "evidenceRefs": ["source"] }, { "name": "data-variant", "sourceProp": "variant", "evidenceRefs": ["source"] }, { "name": "data-size", "sourceProp": "size", "evidenceRefs": ["source"] }], "portals": { "value": false, "evidenceRefs": ["source"] }, "automaticStructure": [] },
+        "accessibility": [{ "feature": "native host semantics", "owner": "native", "mechanism": "button", "evidenceRefs": ["source"] }, { "feature": "accessible name", "owner": "author", "mechanism": "author-provided content or labeling", "evidenceRefs": ["interface"] }, { "feature": "host semantic suitability under asChild", "owner": "author", "mechanism": "replacement child must carry appropriate semantics for the intended interaction", "evidenceRefs": ["source"] }]
+      }
+    },
+    { "name": "buttonVariants", "kind": "helper", "authorableJsx": false, "evidenceRefs": ["source"] }
+  ],
+  "unresolved": []
+}

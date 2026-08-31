@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "shadcn-radix-component-contracts-001",
+  "status": "candidate",
+  "designSystemId": "shadcn-radix-bootstrap",
+  "sourceBaselineCommit": "6f14d8f9f5b5638ab97db009d7c164a65331dca7",
+  "tokenContractId": "shadcn-radix-token-contract-001",
+  "familyCount": 19,
+  "familyFiles": ["contracts/components/families/button.json"],
+  "interfaceFiles": ["contracts/components/interfaces/html.button.json"]
+}
