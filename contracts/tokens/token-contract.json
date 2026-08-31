@@ -7,11 +7,72 @@
   "sourceProvenancePath": "provenance/token-contract-source.json",
   "modes": ["light", "dark"],
   "coverage": {
-    "contracted": ["color", "radius", "font-family"],
-    "representedElsewhere": [],
-    "notContracted": []
+    "contracted": ["color", "radius", "font-family", "font-size", "font-weight", "letter-spacing", "line-height", "spacing", "shadow"],
+    "representedElsewhere": [
+      {
+        "namespace": "border-color",
+        "tokenIds": ["color.border", "color.input"],
+        "reason": "Border color semantics are already represented by the canonical semantic color contract."
+      }
+    ],
+    "notContracted": [
+      {
+        "namespace": "primitive-color",
+        "reason": "Tailwind exposes raw palette values, but the governed reusable shadcn contract uses the canonical semantic color vocabulary. No semantic-to-primitive relationship is explicitly authored in the approved source, so Phase 2 does not invent one."
+      },
+      {
+        "namespace": "border-width",
+        "reason": "No named canonical border-width design token is established by the approved local theme or selected Tailwind theme token model."
+      },
+      {
+        "namespace": "inset-shadow",
+        "reason": "Present in Tailwind but intentionally outside the approved Phase 2 standard box-shadow scope."
+      },
+      {
+        "namespace": "drop-shadow",
+        "reason": "Present in Tailwind but intentionally outside the approved Phase 2 standard box-shadow scope."
+      },
+      {
+        "namespace": "text-shadow",
+        "reason": "Present in Tailwind but intentionally outside the approved Phase 2 standard box-shadow scope."
+      },
+      {
+        "namespace": "breakpoint",
+        "reason": "Tailwind capabilities exist but are outside the Studio-driven Phase 2 governed token scope."
+      },
+      {
+        "namespace": "container",
+        "reason": "Tailwind capabilities exist but are outside the Studio-driven Phase 2 governed token scope."
+      },
+      {
+        "namespace": "blur",
+        "reason": "Tailwind capabilities exist but are outside the Studio-driven Phase 2 governed token scope."
+      },
+      {
+        "namespace": "animation",
+        "reason": "Tailwind capabilities exist but are outside the Studio-driven Phase 2 governed token scope."
+      },
+      {
+        "namespace": "canvas-product-token",
+        "reason": "Canvas-specific product tokens are explicitly excluded from this reusable design system."
+      }
+    ]
   },
-  "derivedRules": [],
+  "derivedRules": [
+    {
+      "id": "spacing.multiplier",
+      "category": "spacing",
+      "baseTokenId": "spacing.unit",
+      "parameter": {
+        "name": "multiplier",
+        "type": "number",
+        "minimum": 0
+      },
+      "expression": "calc(var(--spacing) * <multiplier>)",
+      "tailwindSyntax": "--spacing(<multiplier>)",
+      "producesTokenIds": false
+    }
+  ],
   "tokens": [
     {
       "id": "color.background",
@@ -299,6 +360,293 @@
       "sourceId": "canonical-theme",
       "binding": { "cssVariable": "--font-heading" },
       "value": { "kind": "alias", "tokenId": "font.sans" }
+    },
+    {
+      "id": "font-size.xs",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-xs", "companionVariables": { "lineHeight": "--text-xs--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "0.75rem", "lineHeight": "calc(1 / 0.75)" }
+    },
+    {
+      "id": "font-size.sm",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-sm", "companionVariables": { "lineHeight": "--text-sm--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "0.875rem", "lineHeight": "calc(1.25 / 0.875)" }
+    },
+    {
+      "id": "font-size.base",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-base", "companionVariables": { "lineHeight": "--text-base--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "1rem", "lineHeight": "calc(1.5 / 1)" }
+    },
+    {
+      "id": "font-size.lg",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-lg", "companionVariables": { "lineHeight": "--text-lg--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "1.125rem", "lineHeight": "calc(1.75 / 1.125)" }
+    },
+    {
+      "id": "font-size.xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-xl", "companionVariables": { "lineHeight": "--text-xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "1.25rem", "lineHeight": "calc(1.75 / 1.25)" }
+    },
+    {
+      "id": "font-size.2xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-2xl", "companionVariables": { "lineHeight": "--text-2xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "1.5rem", "lineHeight": "calc(2 / 1.5)" }
+    },
+    {
+      "id": "font-size.3xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-3xl", "companionVariables": { "lineHeight": "--text-3xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "1.875rem", "lineHeight": "calc(2.25 / 1.875)" }
+    },
+    {
+      "id": "font-size.4xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-4xl", "companionVariables": { "lineHeight": "--text-4xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "2.25rem", "lineHeight": "calc(2.5 / 2.25)" }
+    },
+    {
+      "id": "font-size.5xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-5xl", "companionVariables": { "lineHeight": "--text-5xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "3rem", "lineHeight": "1" }
+    },
+    {
+      "id": "font-size.6xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-6xl", "companionVariables": { "lineHeight": "--text-6xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "3.75rem", "lineHeight": "1" }
+    },
+    {
+      "id": "font-size.7xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-7xl", "companionVariables": { "lineHeight": "--text-7xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "4.5rem", "lineHeight": "1" }
+    },
+    {
+      "id": "font-size.8xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-8xl", "companionVariables": { "lineHeight": "--text-8xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "6rem", "lineHeight": "1" }
+    },
+    {
+      "id": "font-size.9xl",
+      "category": "font-size",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--text-9xl", "companionVariables": { "lineHeight": "--text-9xl--line-height" } },
+      "value": { "kind": "typography-size", "fontSize": "8rem", "lineHeight": "1" }
+    },
+    {
+      "id": "font-weight.thin",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-thin" },
+      "value": { "kind": "literal", "value": "100" }
+    },
+    {
+      "id": "font-weight.extralight",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-extralight" },
+      "value": { "kind": "literal", "value": "200" }
+    },
+    {
+      "id": "font-weight.light",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-light" },
+      "value": { "kind": "literal", "value": "300" }
+    },
+    {
+      "id": "font-weight.normal",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-normal" },
+      "value": { "kind": "literal", "value": "400" }
+    },
+    {
+      "id": "font-weight.medium",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-medium" },
+      "value": { "kind": "literal", "value": "500" }
+    },
+    {
+      "id": "font-weight.semibold",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-semibold" },
+      "value": { "kind": "literal", "value": "600" }
+    },
+    {
+      "id": "font-weight.bold",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-bold" },
+      "value": { "kind": "literal", "value": "700" }
+    },
+    {
+      "id": "font-weight.extrabold",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-extrabold" },
+      "value": { "kind": "literal", "value": "800" }
+    },
+    {
+      "id": "font-weight.black",
+      "category": "font-weight",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--font-weight-black" },
+      "value": { "kind": "literal", "value": "900" }
+    },
+    {
+      "id": "letter-spacing.tighter",
+      "category": "letter-spacing",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--tracking-tighter" },
+      "value": { "kind": "literal", "value": "-0.05em" }
+    },
+    {
+      "id": "letter-spacing.tight",
+      "category": "letter-spacing",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--tracking-tight" },
+      "value": { "kind": "literal", "value": "-0.025em" }
+    },
+    {
+      "id": "letter-spacing.normal",
+      "category": "letter-spacing",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--tracking-normal" },
+      "value": { "kind": "literal", "value": "0em" }
+    },
+    {
+      "id": "letter-spacing.wide",
+      "category": "letter-spacing",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--tracking-wide" },
+      "value": { "kind": "literal", "value": "0.025em" }
+    },
+    {
+      "id": "letter-spacing.wider",
+      "category": "letter-spacing",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--tracking-wider" },
+      "value": { "kind": "literal", "value": "0.05em" }
+    },
+    {
+      "id": "letter-spacing.widest",
+      "category": "letter-spacing",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--tracking-widest" },
+      "value": { "kind": "literal", "value": "0.1em" }
+    },
+    {
+      "id": "line-height.tight",
+      "category": "line-height",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--leading-tight" },
+      "value": { "kind": "literal", "value": "1.25" }
+    },
+    {
+      "id": "line-height.snug",
+      "category": "line-height",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--leading-snug" },
+      "value": { "kind": "literal", "value": "1.375" }
+    },
+    {
+      "id": "line-height.normal",
+      "category": "line-height",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--leading-normal" },
+      "value": { "kind": "literal", "value": "1.5" }
+    },
+    {
+      "id": "line-height.relaxed",
+      "category": "line-height",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--leading-relaxed" },
+      "value": { "kind": "literal", "value": "1.625" }
+    },
+    {
+      "id": "line-height.loose",
+      "category": "line-height",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--leading-loose" },
+      "value": { "kind": "literal", "value": "2" }
+    },
+    {
+      "id": "spacing.unit",
+      "category": "spacing",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--spacing" },
+      "value": { "kind": "literal", "value": "0.25rem" }
+    },
+    {
+      "id": "shadow.2xs",
+      "category": "shadow",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--shadow-2xs" },
+      "value": { "kind": "literal", "value": "0 1px rgb(0 0 0 / 0.05)" }
+    },
+    {
+      "id": "shadow.xs",
+      "category": "shadow",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--shadow-xs" },
+      "value": { "kind": "literal", "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)" }
+    },
+    {
+      "id": "shadow.sm",
+      "category": "shadow",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--shadow-sm" },
+      "value": { "kind": "literal", "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)" }
+    },
+    {
+      "id": "shadow.md",
+      "category": "shadow",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--shadow-md" },
+      "value": { "kind": "literal", "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)" }
+    },
+    {
+      "id": "shadow.lg",
+      "category": "shadow",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--shadow-lg" },
+      "value": { "kind": "literal", "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)" }
+    },
+    {
+      "id": "shadow.xl",
+      "category": "shadow",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--shadow-xl" },
+      "value": { "kind": "literal", "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" }
+    },
+    {
+      "id": "shadow.2xl",
+      "category": "shadow",
+      "sourceId": "tailwind-theme",
+      "binding": { "cssVariable": "--shadow-2xl" },
+      "value": { "kind": "literal", "value": "0 25px 50px -12px rgb(0 0 0 / 0.25)" }
     }
   ]
 }
