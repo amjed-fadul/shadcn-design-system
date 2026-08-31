@@ -11,6 +11,7 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "tokens:verify": "vitest run tests/token-contract-*.test.ts",
     "snapshot:verify": "vitest run tests/snapshot-integrity.test.ts"
   },
   "dependencies": {
