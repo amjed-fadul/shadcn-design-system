@@ -327,7 +327,7 @@ describe("Phase 2 token contract mutation resistance", () => {
     const tokens = listTokens()
     const tokenIds = listTokenIds()
 
-    expect(() => { (contract as { status: string }).status = "approved" }).toThrow()
+    expect(() => { (contract as { status: string }).status = "candidate" }).toThrow()
     expect(() => { (contract.tokens as TokenDefinition[]).pop() }).toThrow()
     if (background.ok && background.token.value.kind === "modes") {
       const modeValues = background.token.value.values
@@ -339,7 +339,7 @@ describe("Phase 2 token contract mutation resistance", () => {
     expect(() => { (tokens as TokenDefinition[]).pop() }).toThrow()
     expect(() => { (tokenIds as string[]).pop() }).toThrow()
 
-    expect(getTokenContract().status).toBe("candidate")
+    expect(getTokenContract().status).toBe("approved")
     expect(lookupToken("color.background")).toEqual(background)
     expect(listTokens()).toHaveLength(82)
     expect(listTokenIds()).toHaveLength(82)
