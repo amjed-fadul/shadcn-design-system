@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest"
 
 import { assertComponentFamilyInvariants, validateComponentFamilyInvariants } from "../src/contracts/components/invariants"
-import type { ComponentFamilyContract } from "../src/contracts/components/types"
+import type { ComponentFamilyContract, InheritedInterfaceContract } from "../src/contracts/components/types"
+import "./helpers/component-contract-model-extension"
 
 function validFamily(): ComponentFamilyContract {
   return {
@@ -44,7 +45,15 @@ function withConditionalChild(): ComponentFamilyContract {
   return family
 }
 
-const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
+const htmlExample: InheritedInterfaceContract = {
+  schemaVersion: 1, id: "html.example",
+  source: { kind: "react-intrinsic", package: "@types/react", version: "18.3.3", declarationPath: "node_modules/@types/react/index.d.ts", declarationSha256: "a".repeat(64), symbol: "React.JSX.IntrinsicElements[\"example\"]" },
+  evidence: { declaration: { kind: "inherited-interface", source: "node_modules/@types/react/index.d.ts" } },
+  props: [{ name: "inheritedState", required: false, type: { kind: "boolean" }, typeText: "boolean", evidenceRefs: ["declaration"] }],
+  events: [{ propName: "onClick", required: false, payload: { kind: "boolean" }, payloadTypeText: "boolean", evidenceRefs: ["declaration"] }],
+  unresolved: [],
+}
+const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
 
 describe("component contract semantic invariants", () => {
   test("accepts a valid generic family", () => {
@@ -125,12 +134,12 @@ describe("component contract semantic invariants", () => {
     ["local and inherited prop collision", (f: ComponentFamilyContract) => f.exports[0].component!.localProps.push({ ...f.exports[0].component!.localProps[0], name: "onClick" }), "Component Example local prop collides with inherited prop: onClick."],
     ["unknown token dependency", (f: ComponentFamilyContract) => { f.exports[0].component!.tokenDependencies[0].tokenId = "color.missing" }, "Component Example references unknown token: color.missing."],
     ["unknown derived token rule", (f: ComponentFamilyContract) => { f.exports[0].component!.tokenDependencies[0].viaDerivedRule = { id: "spacing.unknown", multiplier: 2 } }, "Component Example references unknown derived token rule: spacing.unknown."],
-    ["bad state-channel prop reference", (f: ComponentFamilyContract) => f.exports[0].component!.stateChannels.push({ name: "open", propName: "missing", evidenceRefs: ["source"] }), "Component Example state channel open references unknown prop: missing."],
+    ["bad state-channel prop reference", (f: ComponentFamilyContract) => f.exports[0].component!.stateChannels.push({ name: "open", controlledProp: "missing", evidenceRefs: ["source"] }), "State channel Example.open references unknown controlled prop: missing."],
     ["bad event prop reference", (f: ComponentFamilyContract) => f.exports[0].component!.events.push({ propName: "onMissing", evidenceRefs: ["source"] }), "Component Example event references unknown prop: onMissing."],
     ["bad render child reference", (f: ComponentFamilyContract) => f.exports[0].component!.rendering.nodes[0].children.push({ nodeId: "Missing", evidenceRefs: ["source"] }), "Component Example render node host references unknown child: Missing."],
     ["slot maximum below minimum", (f: ComponentFamilyContract) => f.exports[0].component!.slots.push({ propName: "items", default: false, replacesHost: false, childCardinality: { min: 2, max: 1 }, forwardsProps: false, childRequires: [], refForwarding: "unresolved", evidenceRefs: ["source"] }), "Slot Example.items has max 1 below min 2."],
     ["source identity mismatch", (f: ComponentFamilyContract) => { f.source.canonicalBlobSha = "b".repeat(40) }, "Family source canonicalBlobSha does not match approved source identity."],
-    ["missing conditional API evidence", (f: ComponentFamilyContract) => f.exports[0].component!.conditionalApi.push({ propName: "tone", equals: "quiet", effects: [], evidenceRefs: ["missing"] }), "Conditional API Example.tone references missing evidence: missing."],
+    ["missing conditional API evidence", (f: ComponentFamilyContract) => f.exports[0].component!.conditionalApi.push({ when: { propName: "tone", equals: "quiet" }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["missing"] }), "Conditional API Example.tone references missing evidence: missing."],
     ["missing unresolved evidence", (f: ComponentFamilyContract) => f.unresolved.push({ topic: "unknown", scope: "example", reason: "unknown", evidenceAttempted: [], evidenceRefs: ["missing"] }), "Unresolved fact unknown references missing evidence: missing."],
   ])("rejects %s", (_description, mutate, expected) => {
     expect(validateComponentFamilyInvariants(changed(mutate), authority)).toContain(expected)
@@ -146,8 +155,7 @@ describe("component contract semantic invariants", () => {
 
   test("permits inherited state and event prop references", () => {
     const family = validFamily()
-    family.exports[0].component!.stateChannels.push({ name: "state", propName: "inheritedState", evidenceRefs: ["source"] })
-    family.exports[0].component!.events.push({ propName: "onClick", evidenceRefs: ["source"] })
+    family.exports[0].component!.stateChannels.push({ name: "state", controlledProp: "inheritedState", changeEventProp: "onClick", evidenceRefs: ["source"] })
     expect(validateComponentFamilyInvariants(family, authority)).toEqual([])
   })
 })

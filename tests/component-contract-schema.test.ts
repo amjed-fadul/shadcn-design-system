@@ -6,6 +6,7 @@ import familySchema from "../contracts/components/component-family.schema.json"
 import interfaceSchema from "../contracts/components/inherited-interface.schema.json"
 import button from "../contracts/components/families/button.json"
 import htmlButton from "../contracts/components/interfaces/html.button.json"
+import accordionRoot from "../contracts/components/interfaces/radix.accordion.root.json"
 
 function evidence() {
   return { source: { kind: "canonical-source", source: "src/example.tsx" } }
@@ -46,6 +47,7 @@ describe("component contract JSON Schemas", () => {
     expect(validate(interfaceSchema, validInterface())).toBe(true)
     expect(validate(familySchema, button)).toBe(true)
     expect(validate(interfaceSchema, htmlButton)).toBe(true)
+    expect(validate(interfaceSchema, accordionRoot)).toBe(true)
     expect(validate(contractSetSchema, { schemaVersion: 1, id: "contracts", status: "candidate", designSystemId: "example", sourceBaselineCommit: "a".repeat(40), tokenContractId: "tokens", familyCount: 2, familyFiles: ["contracts/components/families/example.json"], interfaceFiles: ["contracts/components/interfaces/html.example.json"] })).toBe(true)
   })
 

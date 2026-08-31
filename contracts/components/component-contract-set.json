@@ -31,6 +31,7 @@
     "contracts/components/interfaces/html.th.json",
     "contracts/components/interfaces/html.thead.json",
     "contracts/components/interfaces/html.tr.json",
+    "contracts/components/interfaces/radix.accordion.root.json",
     "contracts/components/interfaces/radix.label.root.json",
     "contracts/components/interfaces/radix.separator.root.json"
   ]

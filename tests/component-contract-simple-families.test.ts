@@ -32,6 +32,7 @@ function authority(families: ComponentFamilyContract[], interfaces: InheritedInt
   return {
     interfaceIds: new Set(interfaces.map((item) => item.id)),
     interfacePropNames: new Map(interfaces.map((item) => [item.id, new Set(item.props.map((prop) => prop.name))])),
+    interfaceContracts: new Map(interfaces.map((item) => [item.id, item])),
     tokenIds: new Set(tokenContract.tokens.map((token) => token.id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)),
     sourceIdentity: undefined,

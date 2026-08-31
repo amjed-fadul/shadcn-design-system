@@ -44,6 +44,14 @@ The render tree preserves evidence-backed portal semantics through node-targeted
 
 Render child edges are evidence-backed references and may carry a public-prop condition; component-export hosts must identify JSX-authorable component exports.
 
+## Task 4A architecture amendment — 2026-08-31
+
+The generic factual model preserves discriminated APIs without component-specific type kinds:
+
+1. Structured property types may recursively express literals, arrays, and unions in addition to the existing primitive, enum, and TypeScript forms. A literal is distinct from its primitive, so a specific string does not widen to every string.
+2. A state channel references its controlled prop, uncontrolled/default prop, and change-event prop by role. The value and callback-payload types remain on those factual prop/event definitions rather than being duplicated in the channel.
+3. Conditional API cases use a generic discriminant condition plus branch-local prop, event, and state-channel definitions. This lets a consumer retain branch-specific value and callback-payload types without flattening them into an invalid broad union.
+
 ---
 
 ## Model/session map
