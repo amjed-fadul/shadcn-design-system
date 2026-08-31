@@ -1,6 +1,36 @@
 import type { TokenContract, TokenDefinition } from "./types"
 
 const knownSourceIds = new Set(["canonical-theme", "tailwind-theme"])
+const primitiveColorNames = [
+  "slate", "gray", "zinc", "neutral", "stone",
+  "red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal", "cyan", "sky",
+  "blue", "indigo", "violet", "purple", "fuchsia", "pink", "rose", "black", "white",
+] as const
+const primitiveColorPattern = new RegExp(
+  `(?:--(?:color-)?|color\\.)(?:${primitiveColorNames.join("|")})(?:-|$)`,
+  "i",
+)
+const excludedScopeNamespaces = [
+  "border-width",
+  "inset-shadow",
+  "drop-shadow",
+  "text-shadow",
+  "breakpoint",
+  "container",
+  "blur",
+  "animation",
+  "canvas-product-token",
+] as const
+
+function excludedScopeNamespace(tokenId: string): string | undefined {
+  if (primitiveColorNames.some((name) => tokenId === `color.${name}` || tokenId.startsWith(`color.${name}-`))) return "primitive-color"
+  return excludedScopeNamespaces.find((namespace) =>
+    tokenId === namespace
+    || tokenId.startsWith(`${namespace}.`)
+    || tokenId.endsWith(`.${namespace}`)
+    || tokenId.includes(`.${namespace}.`),
+  )
+}
 
 function findReferenceCycle(
   tokens: TokenDefinition[],
@@ -95,6 +125,15 @@ export function validateTokenContractInvariants(contract: TokenContract): string
         }
       }
     }
+
+  }
+
+  for (const entry of contract.coverage.representedElsewhere) {
+    for (const tokenId of entry.tokenIds) {
+      if (!tokenIds.has(tokenId)) {
+        errors.push(`Coverage namespace ${entry.namespace} references missing token ${tokenId}.`)
+      }
+    }
   }
 
   const canonicalVariables = new Map<string, string>()
@@ -128,7 +167,29 @@ export function validateTokenContractInvariants(contract: TokenContract): string
   return errors
 }
 
+export function validatePhaseTwoTokenScope(contract: TokenContract): string[] {
+  const errors: string[] = []
+
+  for (const token of contract.tokens) {
+    const excludedNamespace = excludedScopeNamespace(token.id)
+    if (excludedNamespace) {
+      errors.push(`Token ${token.id} uses excluded Phase 2 scope namespace ${excludedNamespace}.`)
+    }
+    if (token.id.startsWith("spacing.") && token.id !== "spacing.unit") {
+      errors.push(`Token ${token.id} is outside the sole Phase 2 spacing.unit token scope.`)
+    }
+    if (primitiveColorPattern.test(JSON.stringify({ binding: token.binding, value: token.value }))) {
+      errors.push(`Token ${token.id} introduces a primitive-color mapping.`)
+    }
+  }
+
+  return errors
+}
+
 export function assertTokenContractInvariants(contract: TokenContract): void {
-  const errors = validateTokenContractInvariants(contract)
+  const errors = [
+    ...validateTokenContractInvariants(contract),
+    ...validatePhaseTwoTokenScope(contract),
+  ]
   if (errors.length > 0) throw new Error(errors.join("\n"))
 }

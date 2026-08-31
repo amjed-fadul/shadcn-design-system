@@ -1,17 +1,10 @@
-# Canonical token source
+# Token contract
 
-Phase 1 freezes the source values only. Machine-readable token contracts are created in Phase 2.
+Phase 2 provides a machine-readable token contract, exact source reconciliation, semantic invariants, a compact deterministic index, an exact-match query boundary, and mutation/drift protection.
 
-## Included
+The contract contains 82 factual token definitions and one spacing derivation rule. Its status is `candidate` pending independent Phase 2 review.
 
-- Neutral shadcn semantic color tokens for light and dark modes.
-- Sidebar semantic tokens shipped by the neutral shadcn theme.
-- Radius source `--radius: 0.625rem` and the derived radius scale exposed through Tailwind.
-- Geist Variable as the canonical sans/heading font used by the current Canvas shadcn implementation.
-
-## Excluded
-
-Canvas-specific host chrome, selection, ready-status, experiment-status, and other product tokens are intentionally excluded. They belong to the Canvas product, not to this reusable shadcn design system.
+Usage guidance is not part of Phase 2.
 
 ## Provenance
 
