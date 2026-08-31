@@ -2,8 +2,8 @@
   "id": "shadcn-radix-bootstrap-000",
   "status": "approved",
   "verifiedAt": "2026-08-30",
-  "sourceBaseCommit": "b2325b7d1fb6933bd373422ae3e4514471a39a83",
-  "sourceBaseCommitNote": "The snapshot records the verified working tree derived from this commit; included files are independently hashed below.",
+  "sourceBaseCommit": "f9682ce3238f1fc5f41a91b1d6953a40c12d2288",
+  "sourceBaseCommitNote": "The approved repository commit whose tree this historical snapshot describes; included files are independently hashed below.",
   "upstream": {
     "repository": "shadcn-ui/ui",
     "tag": "shadcn@4.19.0",

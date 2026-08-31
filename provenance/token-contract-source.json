@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "snapshotId": "shadcn-radix-bootstrap-000",
+    "sourceCommit": "f9682ce3238f1fc5f41a91b1d6953a40c12d2288"
+  },
+  "sources": {
+    "canonicalTheme": {
+      "path": "src/index.css",
+      "blobSha": "d8c0cfe33f88e04af7aea72c952abee5903d836e"
+    },
+    "shadcnNeutral": {
+      "repository": "shadcn-ui/ui",
+      "release": "shadcn@4.19.0",
+      "commit": "1773ecfeeb4a04366978d353e69b5c7ded78dcb2",
+      "path": "apps/v4/public/r/colors/neutral.json"
+    },
+    "tailwindTheme": {
+      "package": "tailwindcss",
+      "version": "4.3.3",
+      "path": "node_modules/tailwindcss/theme.css",
+      "themeCssSha256": "443d7af364200f8ec8352dc78e39485a118a1840d498c97967bf0ae402b39167",
+      "packageLockIntegrity": "sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==",
+      "spacingFunction": {
+        "path": "node_modules/tailwindcss/dist/lib.mjs",
+        "sha256": "8ebfd51c44d6cca0ef675007e97e6aa918944df2b662c2d7bfa50fdfaa98bb64",
+        "bareValueMarker": "handleBareValue:({value:K})=>!e.resolve(null,[\"--spacing\"])||!Q(K)?null:`--spacing(${K})`",
+        "resolverMarker": "d=`calc(${f} * ${l.value.value})`",
+        "semantics": "The compiler maps a numeric bare utility value to --spacing(<multiplier>) when --spacing resolves, and resolves spacing values as calc(<resolved --spacing> * <multiplier>)."
+      }
+    }
+  }
+}

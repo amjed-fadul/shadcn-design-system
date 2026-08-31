@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adc.local/contracts/tokens/token-contract.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "status", "baselineSnapshotId", "sourceBaselineCommit", "sourceProvenancePath", "modes", "coverage", "derivedRules", "tokens"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "const": "shadcn-radix-token-contract-001" },
+    "status": { "enum": ["candidate", "approved"] },
+    "baselineSnapshotId": { "const": "shadcn-radix-bootstrap-000" },
+    "sourceBaselineCommit": { "type": "string" },
+    "sourceProvenancePath": { "const": "provenance/token-contract-source.json" },
+    "modes": { "type": "array", "prefixItems": [{ "const": "light" }, { "const": "dark" }], "items": false, "minItems": 2, "maxItems": 2 },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "derivedRules": { "type": "array", "items": { "$ref": "#/$defs/derivedRule" } },
+    "tokens": { "type": "array", "items": { "$ref": "#/$defs/tokenDefinition" } }
+  },
+  "$defs": {
+    "tokenCategory": { "enum": ["color", "radius", "font-family", "font-size", "font-weight", "letter-spacing", "line-height", "spacing", "shadow"] },
+    "tokenId": { "type": "string", "pattern": "^[a-z][a-z0-9-]*(\\.[a-z0-9-]+)+$" },
+    "cssVariable": { "type": "string", "pattern": "^--[a-z0-9-]+$" },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contracted", "representedElsewhere", "notContracted"],
+      "properties": {
+        "contracted": { "type": "array", "items": { "$ref": "#/$defs/tokenCategory" } },
+        "representedElsewhere": { "type": "array", "items": { "$ref": "#/$defs/representedElsewhere" } },
+        "notContracted": { "type": "array", "items": { "$ref": "#/$defs/notContracted" } }
+      }
+    },
+    "representedElsewhere": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "tokenIds", "reason"],
+      "properties": {
+        "namespace": { "type": "string" },
+        "tokenIds": { "type": "array", "items": { "$ref": "#/$defs/tokenId" } },
+        "reason": { "type": "string" }
+      }
+    },
+    "notContracted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "reason"],
+      "properties": { "namespace": { "type": "string" }, "reason": { "type": "string" } }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cssVariable"],
+      "properties": {
+        "cssVariable": { "$ref": "#/$defs/cssVariable" },
+        "tailwindThemeVariable": { "$ref": "#/$defs/cssVariable" },
+        "tailwindExpression": { "type": "string" },
+        "companionVariables": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": { ".+": { "$ref": "#/$defs/cssVariable" } }
+        }
+      }
+    },
+    "literalValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "value"],
+      "properties": { "kind": { "const": "literal" }, "value": { "anyOf": [{ "type": "string" }, { "type": "number" }] } }
+    },
+    "modeValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "values"],
+      "properties": {
+        "kind": { "const": "modes" },
+        "values": {
+          "type": "object", "additionalProperties": false, "required": ["light", "dark"],
+          "properties": { "light": { "type": "string" }, "dark": { "type": "string" } }
+        }
+      }
+    },
+    "aliasValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "tokenId"],
+      "properties": { "kind": { "const": "alias" }, "tokenId": { "$ref": "#/$defs/tokenId" } }
+    },
+    "derivedValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "expression", "dependencies"],
+      "properties": { "kind": { "const": "derived" }, "expression": { "type": "string" }, "dependencies": { "type": "array", "items": { "$ref": "#/$defs/tokenId" } } }
+    },
+    "typographySizeValue": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "fontSize", "lineHeight"],
+      "properties": { "kind": { "const": "typography-size" }, "fontSize": { "type": "string" }, "lineHeight": { "type": "string" } }
+    },
+    "tokenDefinition": {
+      "type": "object", "additionalProperties": false, "required": ["id", "category", "sourceId", "binding", "value"],
+      "properties": {
+        "id": { "$ref": "#/$defs/tokenId" }, "category": { "$ref": "#/$defs/tokenCategory" },
+        "sourceId": { "enum": ["canonical-theme", "tailwind-theme"] }, "binding": { "$ref": "#/$defs/binding" },
+        "value": { "oneOf": [{ "$ref": "#/$defs/literalValue" }, { "$ref": "#/$defs/modeValue" }, { "$ref": "#/$defs/aliasValue" }, { "$ref": "#/$defs/derivedValue" }, { "$ref": "#/$defs/typographySizeValue" }] }
+      }
+    },
+    "derivedRule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "category", "baseTokenId", "parameter", "expression", "tailwindSyntax", "producesTokenIds"],
+      "properties": {
+        "id": { "const": "spacing.multiplier" }, "category": { "const": "spacing" }, "baseTokenId": { "const": "spacing.unit" },
+        "parameter": {
+          "type": "object", "additionalProperties": false, "required": ["name", "type", "minimum"],
+          "properties": { "name": { "const": "multiplier" }, "type": { "const": "number" }, "minimum": { "const": 0 } }
+        },
+        "expression": { "const": "calc(var(--spacing) * <multiplier>)" }, "tailwindSyntax": { "const": "--spacing(<multiplier>)" }, "producesTokenIds": { "const": false }
+      }
+    }
+  }
+}
