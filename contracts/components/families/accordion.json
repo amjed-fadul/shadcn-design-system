@@ -1,0 +1,431 @@
+{
+  "schemaVersion": 1,
+  "id": "accordion",
+  "source": {
+    "canonicalPath": "src/components/ui/accordion.tsx",
+    "canonicalBlobSha": "c02677242e0b1dc17285c0554868e0553a530666",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/accordion.tsx",
+    "upstreamBlobSha": "2ba94b62680f33f1d36b9092866578695cf5f633"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/accordion.tsx@c02677242e0b1dc17285c0554868e0553a530666"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.accordion.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Accordion",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.accordion.root"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [
+          {
+            "when": {
+              "propName": "type",
+              "equals": "single"
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [
+              {
+                "name": "value",
+                "controlledProp": "value",
+                "defaultProp": "defaultValue",
+                "changeEventProp": "onValueChange",
+                "evidenceRefs": [
+                  "declaration"
+                ]
+              }
+            ],
+            "evidenceRefs": [
+              "declaration"
+            ]
+          },
+          {
+            "when": {
+              "propName": "type",
+              "equals": "multiple"
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [
+              {
+                "name": "value",
+                "controlledProp": "value",
+                "defaultProp": "defaultValue",
+                "changeEventProp": "onValueChange",
+                "evidenceRefs": [
+                  "declaration"
+                ]
+              }
+            ],
+            "evidenceRefs": [
+              "declaration"
+            ]
+          }
+        ],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.accordion.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "accordion",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "AccordionItem",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.accordion.item"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.accordion.item"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "accordion-item",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "AccordionTrigger",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.accordion.trigger"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "header",
+          "publicPropsTargetNodeId": "trigger",
+          "nodes": [
+            {
+              "id": "header",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.accordion.header"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [
+                {
+                  "nodeId": "trigger",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "trigger",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.accordion.trigger"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "accordion-trigger",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "icon",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "accordion-trigger-icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "AccordionContent",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.accordion.content"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "content",
+          "publicPropsTargetNodeId": "content",
+          "nodes": [
+            {
+              "id": "content",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.accordion.content"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "accordion-content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "inner",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "inner",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    }
+  ],
+  "unresolved": []
+}

@@ -30,6 +30,7 @@ export function analyzeIntrinsicReactInterface(tag: keyof React.JSX.IntrinsicEle
 
 function structuredType(checker: ts.TypeChecker, type: ts.Type, location: ts.Node): StructuredPropType {
   if (type.isStringLiteral()) return { kind: "literal", value: type.value }
+  if (type.flags & ts.TypeFlags.BooleanLiteral) return { kind: "literal", value: checker.typeToString(type, location, ts.TypeFormatFlags.NoTruncation) === "true" }
   if (type.flags & ts.TypeFlags.String) return { kind: "string" }
   if (type.flags & ts.TypeFlags.Boolean) return { kind: "boolean" }
   if (type.flags & ts.TypeFlags.Number) return { kind: "number" }
@@ -81,9 +82,8 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
     })
     return { propName, required: symbols.length === branches.length && symbols.every((symbol) => !(symbol.getFlags() & ts.SymbolFlags.Optional)), payload: mergeStructuredTypes(payloadTypes.map((type) => structuredType(checker, type, declaration))), payloadTypeText: mergedTypeText(checker, payloadTypes, declaration), evidenceRefs }
   })
-  const discriminator = propFacts.find((prop) => prop.type.kind === "enum")
-  if (!discriminator) throw new Error(`Package export ${source.symbol} does not expose a literal discriminator.`)
-  const conditionalApi = branches.map((branch) => {
+  const discriminator = branches.length > 1 ? propFacts.find((prop) => prop.type.kind === "enum") : undefined
+  const conditionalApi = discriminator ? branches.map((branch) => {
     const typeSymbol = checker.getPropertyOfType(branch, discriminator.name)
     const type = typeSymbol && checker.getTypeOfSymbolAtLocation(typeSymbol, typeSymbol.valueDeclaration ?? declaration)
     if (!type?.isStringLiteral()) throw new Error(`Package export ${source.symbol} has a non-literal discriminator branch.`)
@@ -103,6 +103,6 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
       return { eventPropName: event.propName, payload: structuredType(checker, checker.getTypeOfSymbolAtLocation(payload, declaration), declaration), evidenceRefs }
     })
     return { when: { propName: discriminator.name, equals: type.value }, propRefinements, eventRefinements, stateChannels: [], evidenceRefs }
-  })
+  }) : []
   return { props: propFacts, events: eventFacts, conditionalApi }
 }

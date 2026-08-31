@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "id": "checkbox",
+  "source": {
+    "canonicalPath": "src/components/ui/checkbox.tsx",
+    "canonicalBlobSha": "8f27ed4f7788845a88fd6961e684b9806f944387",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/checkbox.tsx",
+    "upstreamBlobSha": "a17fa1e2fd4517f1abc5f812cb923f44e02f7ef7"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/checkbox.tsx@8f27ed4f7788845a88fd6961e684b9806f944387"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.checkbox.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Checkbox",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.checkbox.root"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "checked",
+            "controlledProp": "checked",
+            "defaultProp": "defaultChecked",
+            "changeEventProp": "onCheckedChange",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.checkbox.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "checkbox",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "indicator",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "indicator",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.checkbox.indicator"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "checkbox-indicator",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "icon",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    }
+  ],
+  "unresolved": []
+}

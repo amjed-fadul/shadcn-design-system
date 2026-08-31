@@ -1,0 +1,427 @@
+{
+  "schemaVersion": 1,
+  "id": "tabs",
+  "source": {
+    "canonicalPath": "src/components/ui/tabs.tsx",
+    "canonicalBlobSha": "587338bbf188d9577ba03f23c2765341f5b25e8b",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/tabs.tsx",
+    "upstreamBlobSha": "10b069cf016777aa8ddb813098b6e41d1da740a4"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/tabs.tsx@587338bbf188d9577ba03f23c2765341f5b25e8b"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.tabs"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Tabs",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.tabs.root"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [
+          {
+            "propName": "orientation",
+            "value": "horizontal",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "value",
+            "controlledProp": "value",
+            "defaultProp": "defaultValue",
+            "changeEventProp": "onValueChange",
+            "evidenceRefs": [
+              "declaration"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.tabs.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "tabs",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-orientation",
+                  "source": "prop",
+                  "prop": "orientation",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "TabsList",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "line"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "radix.tabs.list"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "when": {
+              "propName": "variant",
+              "equals": "line"
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.tabs.list"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "tabs-list",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-variant",
+                  "source": "prop",
+                  "prop": "variant",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "TabsTrigger",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.tabs.trigger"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "shadow.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.tabs.trigger"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "tabs-trigger",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "TabsContent",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.tabs.content"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.tabs.content"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "tabs-content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "tabsListVariants",
+      "kind": "helper",
+      "authorableJsx": false,
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ],
+  "unresolved": []
+}

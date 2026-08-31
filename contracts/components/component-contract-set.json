@@ -7,15 +7,20 @@
   "tokenContractId": "shadcn-radix-token-contract-001",
   "familyCount": 19,
   "familyFiles": [
+    "contracts/components/families/accordion.json",
     "contracts/components/families/badge.json",
     "contracts/components/families/button.json",
     "contracts/components/families/card.json",
+    "contracts/components/families/checkbox.json",
     "contracts/components/families/input.json",
     "contracts/components/families/label.json",
+    "contracts/components/families/scroll-area.json",
     "contracts/components/families/separator.json",
     "contracts/components/families/skeleton.json",
     "contracts/components/families/table.json",
-    "contracts/components/families/textarea.json"
+    "contracts/components/families/tabs.json",
+    "contracts/components/families/textarea.json",
+    "contracts/components/families/tooltip.json"
   ],
   "interfaceFiles": [
     "contracts/components/interfaces/html.button.json",
@@ -32,7 +37,28 @@
     "contracts/components/interfaces/html.thead.json",
     "contracts/components/interfaces/html.tr.json",
     "contracts/components/interfaces/radix.accordion.root.json",
+    "contracts/components/interfaces/radix.accordion.content.json",
+    "contracts/components/interfaces/radix.accordion.header.json",
+    "contracts/components/interfaces/radix.accordion.item.json",
+    "contracts/components/interfaces/radix.accordion.trigger.json",
+    "contracts/components/interfaces/radix.checkbox.indicator.json",
+    "contracts/components/interfaces/radix.checkbox.root.json",
     "contracts/components/interfaces/radix.label.root.json",
-    "contracts/components/interfaces/radix.separator.root.json"
+    "contracts/components/interfaces/radix.scroll-area.corner.json",
+    "contracts/components/interfaces/radix.scroll-area.root.json",
+    "contracts/components/interfaces/radix.scroll-area.scrollbar.json",
+    "contracts/components/interfaces/radix.scroll-area.thumb.json",
+    "contracts/components/interfaces/radix.scroll-area.viewport.json",
+    "contracts/components/interfaces/radix.separator.root.json",
+    "contracts/components/interfaces/radix.tabs.content.json",
+    "contracts/components/interfaces/radix.tabs.list.json",
+    "contracts/components/interfaces/radix.tabs.root.json",
+    "contracts/components/interfaces/radix.tabs.trigger.json",
+    "contracts/components/interfaces/radix.tooltip.arrow.json",
+    "contracts/components/interfaces/radix.tooltip.content.json",
+    "contracts/components/interfaces/radix.tooltip.portal.json",
+    "contracts/components/interfaces/radix.tooltip.provider.json",
+    "contracts/components/interfaces/radix.tooltip.root.json",
+    "contracts/components/interfaces/radix.tooltip.trigger.json"
   ]
 }
