@@ -68,6 +68,7 @@ function authority() {
     interfaceContracts: new Map(interfaces.map((item) => [item.id, item])),
     tokenIds: new Set(tokenContract.tokens.map((token) => token.id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)),
+    capabilityIds: new Set<string>(),
   }
 }
 

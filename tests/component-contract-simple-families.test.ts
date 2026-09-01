@@ -40,6 +40,7 @@ function authority(families: ComponentFamilyContract[], interfaces: InheritedInt
     interfaceContracts: new Map(interfaces.map((item) => [item.id, item])),
     tokenIds: new Set(tokenContract.tokens.map((token) => token.id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)),
+    capabilityIds: new Set<string>(),
     sourceIdentity: undefined,
   }
 }
@@ -108,7 +109,7 @@ describe("simple/native-oriented component contracts", () => {
     expect(badge.localProps[0].default).toBe(variants.defaults.variant)
     expect(badge.localProps[1].default).toBe(defaults.get("asChild"))
     expect(badge.slots).toHaveLength(1)
-    expect(badge.slots[0]).toMatchObject({ propName: "asChild", default: false, replacesHost: true, childCardinality: { min: 1, max: 1 }, forwardsProps: true, childRequires: [], refForwarding: "unresolved" })
+    expect(badge.slots[0]).toMatchObject({ propName: "asChild", default: false, replacesHost: true, childCardinality: { min: 0, max: 1 }, forwardsProps: true, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" })
   })
 
   test("reconciles CVA and local defaults for Card", () => {

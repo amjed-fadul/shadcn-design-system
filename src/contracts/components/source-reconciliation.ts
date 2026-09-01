@@ -1,15 +1,16 @@
-import { readFileSync } from "node:fs"
-
-import ts from "typescript"
-
 import type { ComponentFamilyContract, SourceExpressionIdentity, UnresolvedFact } from "./types"
 
 export type SourceUnresolvedFinding = SourceExpressionIdentity & { reason: string }
 export type SourceEvidenceResult = { topic: string; scope: string; unresolved: readonly SourceUnresolvedFinding[] }
 
-export type SourceOwnedSlotCardinality = {
+/** Source-owned facts are supplied by a configured source adapter. */
+export type SourceOwnedSlotFact = {
   propName: string
+  replacesHost: boolean
+  forwardsProps: boolean
   childCardinality: { min: number; max: number }
+  /** Source-specific exception requirements, when the cardinality has one. */
+  childRequires?: string[]
 }
 
 /** Turns source-analyzer disagreement into a stable production rejection. */
@@ -53,51 +54,27 @@ export function reconcileSourceEvidenceCompleteness(family: ComponentFamilyContr
   return errors
 }
 
-function sourceFunction(file: ts.SourceFile, exportName: string): ts.FunctionLikeDeclaration | undefined {
-  let result: ts.FunctionLikeDeclaration | undefined
-  const visit = (node: ts.Node) => {
-    if (result) return
-    if (ts.isFunctionDeclaration(node) && node.name?.text === exportName) result = node
-    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === exportName && node.initializer && (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))) result = node.initializer
-    ts.forEachChild(node, visit)
-  }
-  visit(file)
-  return result
-}
-
-/**
- * Extracts the one-child contract of a delegated host selected by a public
- * boolean. This is intentionally source-specific evidence, not a generic
- * component-contract invariant.
- */
-export function analyzeDelegatedSlotCardinality(sourcePath: string, exportName: string): SourceOwnedSlotCardinality[] {
-  const file = ts.createSourceFile(sourcePath, readFileSync(sourcePath, "utf8"), ts.ScriptTarget.Latest, true)
-  const declaration = sourceFunction(file, exportName)
-  if (!declaration) return []
-  const facts: SourceOwnedSlotCardinality[] = []
-  const visit = (node: ts.Node) => {
-    if (ts.isVariableDeclaration(node) && node.initializer && ts.isConditionalExpression(node.initializer) && ts.isIdentifier(node.initializer.condition) && ts.isPropertyAccessExpression(node.initializer.whenTrue) && node.initializer.whenTrue.name.text === "Root") {
-      facts.push({ propName: node.initializer.condition.text, childCardinality: { min: 1, max: 1 } })
-    }
-    ts.forEachChild(node, visit)
-  }
-  if (declaration.body) ts.forEachChild(declaration.body, visit)
-  return facts
-}
-
-/** Reconciles only source-owned slot cardinality facts discovered by the source analyzer. */
-export function reconcileSourceOwnedSlotCardinality(family: ComponentFamilyContract, exportName: string, sourceFacts: readonly SourceOwnedSlotCardinality[]): string[] {
+/** Reconciles source-owned delegated-host facts supplied by a source adapter. */
+export function reconcileSourceOwnedSlotCardinality(family: ComponentFamilyContract, exportName: string, sourceFacts: readonly SourceOwnedSlotFact[], sourceOwnedPropNames: readonly string[] = []): string[] {
   const component = family.exports.find((entry) => entry.name === exportName)?.component
   if (!component) return [`Family ${family.id} does not contain component export ${exportName}.`]
   const errors: string[] = []
+  for (const propName of sourceOwnedPropNames) {
+    if (component.slots.some((slot) => slot.propName === propName) && !sourceFacts.some((fact) => fact.propName === propName)) errors.push(`Component ${exportName} source-owned slot is not present in source: ${propName}.`)
+  }
   for (const fact of sourceFacts) {
     const slot = component.slots.find((candidate) => candidate.propName === fact.propName)
     if (!slot) {
       errors.push(`Component ${exportName} is missing source-owned slot: ${fact.propName}.`)
       continue
     }
+    if (slot.replacesHost !== fact.replacesHost) errors.push(`Slot ${exportName}.${fact.propName} must retain source-owned replacement-host semantics.`)
+    if (slot.forwardsProps !== fact.forwardsProps) errors.push(`Slot ${exportName}.${fact.propName} must retain source-owned prop-forwarding semantics.`)
     if (slot.childCardinality.min !== fact.childCardinality.min || slot.childCardinality.max !== fact.childCardinality.max) {
       errors.push(`Slot ${exportName}.${fact.propName} must retain source-owned child cardinality ${fact.childCardinality.min}..${fact.childCardinality.max}.`)
+    }
+    if (fact.childRequires && JSON.stringify(slot.childRequires) !== JSON.stringify(fact.childRequires)) {
+      errors.push(`Slot ${exportName}.${fact.propName} must retain source-owned child requirements.`)
     }
   }
   return errors

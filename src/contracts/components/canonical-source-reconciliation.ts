@@ -5,10 +5,11 @@ import { join } from "node:path"
 
 import { canonicalInterfaceMemberAuthority } from "./canonical-interface-member-authority"
 import { canonicalRenderSourceAnalysisConventions } from "./canonical-render-source-conventions"
+import { analyzeCanonicalDelegatedHostFacts, canonicalDelegatedHostEvidencePaths, canonicalSourceOwnedSlotPropNames } from "./canonical-slot-source-analysis"
 import { analyzePackageComponentInterface } from "./inherited-interface-source-analysis"
 import type { ComponentContractSourceReconciliationContext } from "./loader"
 import { compareJsxRenderTree, analyzeJsxRenderTree, extractCvaVariantLiterals, extractFunctionPropDefaults, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
-import { analyzeDelegatedSlotCardinality, reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
+import { reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
 import { analyzeComponentTokenSourceForExport, compareComponentTokenDependenciesForExport } from "./canonical-token-source-analysis"
 import type { ComponentFamilyContract, ConditionalApiCase, InheritedInterfaceContract } from "./types"
 
@@ -140,9 +141,9 @@ function reconciliationCacheKey(repositoryRoot: string, context: ComponentContra
   ])
   const hash = createHash("sha256")
   hash.update(JSON.stringify(context))
-  for (const path of [...evidencePaths].sort()) {
+  for (const path of [...evidencePaths, ...canonicalDelegatedHostEvidencePaths()].sort()) {
     hash.update(path)
-    try { hash.update(readFileSync(join(repositoryRoot, path))) }
+    try { hash.update(readFileSync(path.startsWith("/") ? path : join(repositoryRoot, path))) }
     catch (error) { hash.update(`unreadable:${String(error)}`) }
   }
   return hash.digest("hex")
@@ -223,7 +224,9 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
         unresolved: tokenAnalysis.unresolved.map((finding) => ({ ...finding, sourcePath: family.source.canonicalPath })),
       })
       sourceConditionalWhens.set(`${family.id}\u0000${entry.name}`, localConditionalWhens(sourceRendering))
-      errors.push(...reconcileSourceOwnedSlotCardinality(family, entry.name, analyzeDelegatedSlotCardinality(path, entry.name)))
+      const delegatedHostAnalysis = analyzeCanonicalDelegatedHostFacts(path, entry.name)
+      errors.push(...delegatedHostAnalysis.errors)
+      errors.push(...reconcileSourceOwnedSlotCardinality(family, entry.name, delegatedHostAnalysis.facts, canonicalSourceOwnedSlotPropNames(path, entry.name)))
       const renderErrors = compareJsxRenderTree(entry.component.rendering, sourceRendering, canonicalRenderSourceAnalysisConventions)
       if (renderErrors.length > 0) {
         if (renderErrors.some((error) => error.startsWith("Data attributes mismatch"))) errors.push(`Family ${family.id} render data-slot facts do not match source evidence.`)

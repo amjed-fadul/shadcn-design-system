@@ -43,7 +43,7 @@ describe("Button component contract", () => {
     expect(component.localProps[1].default).toBe(variants.defaults.size)
     expect(component.localProps[2].default).toBe(defaults.get("asChild"))
     const rendering = extractButtonRenderingEvidence(sourcePath, "Button")
-    expect(component.slots[0]).toMatchObject({ propName: rendering.conditionProp, default: rendering.asChildDefault, replacesHost: rendering.whenTrue === "Slot.Root" && rendering.whenFalse === rendering.defaultHost, forwardsProps: rendering.forwardsProps, childCardinality: { min: 1, max: 1 }, childRequires: [], refForwarding: "unresolved" })
+    expect(component.slots[0]).toMatchObject({ propName: rendering.conditionProp, default: rendering.asChildDefault, replacesHost: rendering.whenTrue === "Slot.Root" && rendering.whenFalse === rendering.defaultHost, forwardsProps: rendering.forwardsProps, childCardinality: { min: 0, max: 1 }, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" })
     expect(component.rendering.rootNodeId).toBe("host")
     expect(component.rendering.publicPropsTargetNodeId).toBe("host")
     expect(component.rendering.nodes).toHaveLength(1)
@@ -68,7 +68,7 @@ describe("Button component contract", () => {
     expect(normalize(dependencies.filter((dependency) => !dependency.when))).toEqual(normalize(analyzeTailwindTokenDependencies(baseClasses)))
     for (const [variant, classNames] of Object.entries(variantClasses.variant)) expect(normalize(dependencies.filter((dependency) => dependency.when?.propName === "variant" && dependency.when.equals === variant))).toEqual(normalize(analyzeTailwindTokenDependencies(classNames)))
     for (const [size, classNames] of Object.entries(variantClasses.size)) expect(normalize(dependencies.filter((dependency) => dependency.when?.propName === "size" && dependency.when.equals === size))).toEqual(normalize(analyzeTailwindTokenDependencies(classNames)))
-    const authority = { interfaceIds: new Set([htmlButton.id]), interfacePropNames: new Map([[htmlButton.id, new Set(htmlButton.props.map((prop) => prop.name))]]), interfaceContracts: new Map([[htmlButton.id, htmlButton as InheritedInterfaceContract]]), tokenIds: new Set(tokenContract.tokens.map((token) => token.id)), derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)), sourceIdentity: { canonicalPath: button.source.canonicalPath, canonicalBlobSha: readCanonicalSourceBlobSha(sourcePath) } }
+    const authority = { interfaceIds: new Set([htmlButton.id]), interfacePropNames: new Map([[htmlButton.id, new Set(htmlButton.props.map((prop) => prop.name))]]), interfaceContracts: new Map([[htmlButton.id, htmlButton as InheritedInterfaceContract]]), tokenIds: new Set(tokenContract.tokens.map((token) => token.id)), derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)), capabilityIds: new Set<string>(), sourceIdentity: { canonicalPath: button.source.canonicalPath, canonicalBlobSha: readCanonicalSourceBlobSha(sourcePath) } }
     expect(validateInheritedInterfaceInvariants(htmlButton as InheritedInterfaceContract)).toEqual([])
     expect(validateComponentFamilyInvariants(button as ComponentFamilyContract, authority)).toEqual([])
   })

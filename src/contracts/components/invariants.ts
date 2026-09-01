@@ -259,6 +259,9 @@ function validateConditionalApi(errors: string[], family: ComponentFamilyContrac
 
 export function validateComponentFamilyInvariants(family: ComponentFamilyContract, authority: ComponentInvariantAuthority): string[] {
   const errors: string[] = []
+  // Runtime callers may bypass TypeScript; absence is deliberately fail-closed
+  // so composition facts never self-authorize.
+  const capabilityIds = authority.capabilityIds ?? new Set<string>()
   const seenNames = new Set<string>()
   for (const entry of family.exports) {
     if (seenNames.has(entry.name)) errors.push(`Duplicate export name: ${entry.name}.`)
@@ -317,14 +320,14 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
       for (const capability of component.composition[relation]) {
         if (seenCapabilities.has(capability)) errors.push(`Component ${entry.name} has duplicate ${label} capability: ${capability}.`)
         seenCapabilities.add(capability)
-        if (authority.capabilityIds && !authority.capabilityIds.has(capability)) errors.push(`Component ${entry.name} ${label} references unknown capability: ${capability}.`)
+        if (!capabilityIds.has(capability)) errors.push(`Component ${entry.name} ${label} references unknown capability: ${capability}.`)
       }
     }
     const providedCapabilities = new Set<string>()
     for (const capability of component.composition.provides) {
       if (providedCapabilities.has(capability)) errors.push(`Component ${entry.name} has duplicate provided capability: ${capability}.`)
       providedCapabilities.add(capability)
-      if (authority.capabilityIds && !authority.capabilityIds.has(capability)) errors.push(`Component ${entry.name} provides unknown capability: ${capability}.`)
+      if (!capabilityIds.has(capability)) errors.push(`Component ${entry.name} provides unknown capability: ${capability}.`)
     }
     const tokenDependencyKeys = new Set<string>()
     for (const token of component.tokenDependencies) {

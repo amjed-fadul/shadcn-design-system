@@ -116,11 +116,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [
@@ -359,11 +367,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],
@@ -439,11 +455,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],
@@ -669,11 +693,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],
@@ -774,11 +806,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],
@@ -884,11 +924,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],
@@ -994,11 +1042,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],
@@ -1097,11 +1153,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],
@@ -1313,11 +1377,19 @@
             "propName": "asChild",
             "default": false,
             "replacesHost": true,
-            "childCardinality": { "min": 1, "max": 1 },
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
-            "evidenceRefs": ["source", "declaration"]
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inheritedPropDefaults": [],

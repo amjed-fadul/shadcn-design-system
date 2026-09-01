@@ -53,7 +53,7 @@ const htmlExample: InheritedInterfaceContract = {
   events: [{ propName: "onClick", required: false, payload: { kind: "boolean" }, payloadTypeText: "boolean", evidenceRefs: ["declaration"] }],
   unresolved: [],
 }
-const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
+const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), capabilityIds: new Set<string>(), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
 
 describe("component contract semantic invariants", () => {
   test("rejects a contract set whose declared family count exceeds its manifest", () => {

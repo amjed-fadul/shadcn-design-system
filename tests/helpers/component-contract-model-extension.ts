@@ -68,7 +68,7 @@ function accordionStyleFixture(): ComponentFamilyContract {
   }
 }
 
-const authority = { interfaceIds: new Set<string>(), interfacePropNames: new Map<string, Set<string>>(), interfaceContracts: new Map<string, InheritedInterfaceContract>(), tokenIds: new Set<string>(), derivedTokenRuleIds: new Set<string>(), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
+const authority = { interfaceIds: new Set<string>(), interfacePropNames: new Map<string, Set<string>>(), interfaceContracts: new Map<string, InheritedInterfaceContract>(), tokenIds: new Set<string>(), derivedTokenRuleIds: new Set<string>(), capabilityIds: new Set<string>(), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
 type TestAuthority = typeof authority
 
 function accordionAuthority() {

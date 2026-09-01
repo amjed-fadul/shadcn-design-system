@@ -1473,11 +1473,13 @@
             "default": false,
             "replacesHost": true,
             "childCardinality": {
-              "min": 1,
+              "min": 0,
               "max": 1
             },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
             "evidenceRefs": [
               "source"
@@ -1615,11 +1617,13 @@
             "default": false,
             "replacesHost": true,
             "childCardinality": {
-              "min": 1,
+              "min": 0,
               "max": 1
             },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
             "evidenceRefs": [
               "source"
@@ -1990,11 +1994,13 @@
             "default": false,
             "replacesHost": true,
             "childCardinality": {
-              "min": 1,
+              "min": 0,
               "max": 1
             },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
             "evidenceRefs": [
               "source"
@@ -2433,11 +2439,13 @@
             "default": false,
             "replacesHost": true,
             "childCardinality": {
-              "min": 1,
+              "min": 0,
               "max": 1
             },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
             "evidenceRefs": [
               "source"
@@ -3047,11 +3055,13 @@
             "default": false,
             "replacesHost": true,
             "childCardinality": {
-              "min": 1,
+              "min": 0,
               "max": 1
             },
             "forwardsProps": true,
-            "childRequires": [],
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
             "refForwarding": "unresolved",
             "evidenceRefs": [
               "source"

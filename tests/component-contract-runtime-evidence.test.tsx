@@ -59,6 +59,7 @@ function authority(): ComponentInvariantAuthority {
     interfaceContracts: interfacesById,
     tokenIds: new Set(tokenContract.tokens.map((token) => token.id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)),
+    capabilityIds: new Set(families.flatMap((family) => family.exports.flatMap((entry) => entry.component?.composition.provides ?? []))),
   }
 }
 

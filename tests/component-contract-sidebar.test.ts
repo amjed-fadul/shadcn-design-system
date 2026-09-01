@@ -37,6 +37,7 @@ function authority() {
     interfaceContracts: new Map(contracts.map((item) => [item.id, item])),
     tokenIds: new Set(tokenContract.tokens.map(({ id }) => id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map(({ id }) => id)),
+    capabilityIds: new Set(["sidebar.context"]),
   }
 }
 

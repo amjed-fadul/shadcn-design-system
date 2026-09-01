@@ -89,7 +89,7 @@ function declarationExposesProp(contract: InheritedInterfaceContract, propName: 
     throw error
   }
 }
-const asChildSlot = { propName: "asChild", default: false, replacesHost: true, childCardinality: { min: 1, max: 1 }, forwardsProps: true, childRequires: [], refForwarding: "unresolved" as const, evidenceRefs: ["source", "declaration"] }
+const asChildSlot = { propName: "asChild", default: false, replacesHost: true, childCardinality: { min: 0, max: 1 }, forwardsProps: true, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" as const, evidenceRefs: ["source", "declaration"] }
 function asChildSlotErrors(contract: ComponentFamilyContract) {
   const errors: string[] = []
   for (const entry of contract.exports) {
@@ -107,6 +107,7 @@ function authority() {
     interfaceContracts: new Map(contracts.map((item) => [item.id, item])),
     tokenIds: new Set(tokenContract.tokens.map(({ id }) => id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map(({ id }) => id)),
+    capabilityIds: new Set(["dialog.context", "dropdown-menu.context", "dropdown-menu.subcontext", "select.context", "sheet.context"]),
   }
 }
 

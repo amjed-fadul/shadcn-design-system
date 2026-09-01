@@ -1,7 +1,9 @@
-import { readFileSync } from "node:fs"
-import { resolve } from "node:path"
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join, resolve } from "node:path"
 
 import Ajv2020 from "ajv/dist/2020.js"
+import ts from "typescript"
 import { describe, expect, test } from "vitest"
 
 import familySchema from "../contracts/components/component-family.schema.json"
@@ -10,14 +12,16 @@ import { validateComponentFamilyInvariants, validateInheritedInterfaceInvariants
 import { createComponentContractLoader, type ComponentContractArtifactSource, type ComponentContractIndex } from "../src/contracts/components/loader"
 import { createComponentContractQuery } from "../src/contracts/components/query"
 import { compareJsxRenderTree } from "../src/contracts/components/render-source-analysis"
+import { analyzeConfiguredDelegatedHostFacts } from "../src/contracts/components/delegated-host-source-analysis"
+import { reconcileSourceOwnedSlotCardinality } from "../src/contracts/components/source-reconciliation"
 import { createTokenSourceAnalyzer } from "../src/contracts/components/token-source-analysis"
 import type { ComponentContractSet, ComponentFamilyContract, ComponentInvariantAuthority, InheritedInterfaceContract } from "../src/contracts/components/types"
 
 const evidence = {
-  source: { kind: "canonical-source" as const, source: "packages/starboard/review-panel.tsx" },
+  source: { kind: "canonical-source" as const, source: "tests/fixtures/starboard-delegated-host-fixture.tsx" },
   declaration: { kind: "inherited-interface" as const, source: "fixtures/starboard.d.ts" },
 }
-const source = { canonicalPath: "packages/starboard/review-panel.tsx", canonicalBlobSha: "a".repeat(40), implementationKind: "fictional" }
+const source = { canonicalPath: "tests/fixtures/starboard-delegated-host-fixture.tsx", canonicalBlobSha: "a".repeat(40), implementationKind: "fictional" }
 
 function surfaceInterface(): InheritedInterfaceContract {
   return {
@@ -47,11 +51,12 @@ function neutralFamily(): ComponentFamilyContract {
           localProps: [
             { name: "presentation", required: false, type: { kind: "enum", values: ["inline", "overlay"] }, default: "inline", evidenceRefs: ["source"] },
             { name: "tone", required: false, type: { kind: "enum", values: ["calm", "urgent"] }, default: "calm", evidenceRefs: ["source"] },
+            { name: "delegateHost", required: false, type: { kind: "boolean" }, default: false, evidenceRefs: ["source"] },
             { name: "children", required: false, type: { kind: "typescript", typeText: "ReactNode" }, evidenceRefs: ["source"] },
           ],
           inherits: ["starboard.surface"],
           inheritedPropDefaults: [],
-          slots: [{ propName: "children", default: true, replacesHost: false, childCardinality: { min: 0, max: 1 }, forwardsProps: false, childRequires: [], refForwarding: "unresolved", evidenceRefs: ["source"] }],
+          slots: [{ propName: "delegateHost", default: false, replacesHost: true, childCardinality: { min: 1, max: 1 }, forwardsProps: true, childRequires: [], refForwarding: "unresolved", evidenceRefs: ["source"] }],
           composition: { requires: ["review-session"], provides: ["review-panel.context"], hardConstraints: ["review-session"] },
           stateChannels: [{ name: "open", controlledProp: "open", defaultProp: "initialOpen", changeEventProp: "onOpenChange", evidenceRefs: ["source", "declaration"] }],
           conditionalApi: [],
@@ -90,6 +95,37 @@ function neutralFamily(): ComponentFamilyContract {
     ],
     unresolved: [],
   }
+}
+
+const neutralDelegatedHostConventions = {
+  matchesReplacementHost(expression: ts.Expression) {
+    return ts.isIdentifier(expression) && expression.text === "ReplacementSurface"
+  },
+}
+
+const neutralDelegatedHostFixture = resolve(process.cwd(), "tests/fixtures/starboard-delegated-host-fixture.tsx")
+
+function neutralDelegatedHostLoad(source: ComponentContractArtifactSource = neutralArtifacts(), sourcePath = neutralDelegatedHostFixture) {
+  return createComponentContractLoader({
+    source,
+    tokenIds: new Set(["color.notice", "space.unit"]),
+    derivedTokenRuleIds: new Set(["space.scale"]),
+    capabilityIds: new Set(["review-session", "review-panel.context"]),
+    sourceReconciler: ({ families }) => {
+      const analysis = analyzeConfiguredDelegatedHostFacts(sourcePath, "ReviewPanel", neutralDelegatedHostConventions)
+      return [
+        ...reconcileSourceOwnedSlotCardinality(families[0], "ReviewPanel", analysis.facts, ["delegateHost"]),
+        ...analysis.errors,
+      ]
+    },
+  })
+}
+
+function sourceFixture(source: string) {
+  const directory = mkdtempSync(join(tmpdir(), "delegated-host-source-"))
+  const path = join(directory, "review-panel.tsx")
+  writeFileSync(path, source)
+  return { path, cleanup: () => rmSync(directory, { recursive: true, force: true }) }
 }
 
 function authority(): ComponentInvariantAuthority {
@@ -168,12 +204,21 @@ describe("design-system-neutral component contracts", () => {
     expect(validateComponentFamilyInvariants(family, authority())).toEqual([])
   })
 
+  test("fails closed when direct invariant validation has no capability registry", () => {
+    const authorityWithoutCapabilities = authority() as Partial<ComponentInvariantAuthority>
+    delete authorityWithoutCapabilities.capabilityIds
+
+    expect(validateComponentFamilyInvariants(neutralFamily(), authorityWithoutCapabilities as ComponentInvariantAuthority)).toContain("Component ReviewPanel required capability references unknown capability: review-session.")
+  })
+
   test("keeps generic schema and invariant core free of design-system or component-family special cases", () => {
     const core = [
       "src/contracts/components/types.ts",
       "src/contracts/components/invariants.ts",
       "src/contracts/components/loader.ts",
       "src/contracts/components/query.ts",
+      "src/contracts/components/source-reconciliation.ts",
+      "src/contracts/components/delegated-host-source-analysis.ts",
       "src/contracts/components/token-source-analysis.ts",
       "src/contracts/components/render-source-analysis.ts",
       "contracts/components/component-family.schema.json",
@@ -183,6 +228,7 @@ describe("design-system-neutral component contracts", () => {
     expect(core).not.toMatch(/shadcn|radix|accordion|button|dialog|tooltip|sidebar/i)
     expect(core).not.toMatch(/color\.(?:background|foreground|primary)|spacing\.(?:unit|multiplier)/i)
     expect(core).not.toMatch(/canonical-loader|canonical-query/i)
+    expect(core).not.toMatch(/whenTrue\.name\.text === "Root"/)
     expect(JSON.stringify(neutralFamily())).not.toMatch(/asChild|Radix|CVA|shadcn|variant|size/)
   })
 
@@ -216,6 +262,8 @@ describe("design-system-neutral component contracts", () => {
     expectError((family) => { family.exports[0].component!.stateChannels[0].controlledProp = "missingOpen" }, "State channel ReviewPanel.open references unknown controlled prop: missingOpen.")
     expectError((family) => { family.exports[0].component!.conditionalApi.push({ when: { propName: "missing", equals: true }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] }) }, "Conditional API ReviewPanel references unknown discriminant prop: missing.")
     expectError((family) => { family.exports[0].component!.composition.requires.push("missing-capability") }, "Component ReviewPanel required capability references unknown capability: missing-capability.")
+    expectError((family) => { family.exports[0].component!.composition.provides.push("missing-capability") }, "Component ReviewPanel provides unknown capability: missing-capability.")
+    expectError((family) => { family.exports[0].component!.composition.hardConstraints.push("missing-capability") }, "Component ReviewPanel hard constraint references unknown capability: missing-capability.")
     expectError((family) => { (family.exports[0].component!.rendering as { alternatives: Array<{ rendering: { portalBoundaries: Array<{ nodeId: string; evidenceRefs: string[] }> } }> }).alternatives[0].rendering.portalBoundaries.push({ nodeId: "missing", evidenceRefs: ["source"] }) }, "Component ReviewPanel alternative 0 portal boundary references unknown render node: missing.")
     expectError((family) => { family.exports[0].component!.tokenDependencies.push({ tokenId: "color.unknown", evidenceRefs: ["source"] }) }, "Component ReviewPanel references unknown token: color.unknown.")
   })
@@ -236,9 +284,47 @@ describe("design-system-neutral component contracts", () => {
       { familyId: "review-panel", exportName: "ReviewPanel", relation: "provides" },
       { familyId: "review-panel", exportName: "ReviewPanelActions", relation: "requires" },
     ])
+    expect(() => query.queryComponentCapabilities("missing-capability")).toThrow("COMPONENT_CAPABILITY_NOT_CONTRACTED")
     expect(query.queryComponentTokenDependencies("color.notice")[0].dependency.tokenId).toBe("color.notice")
     expect(() => { ;(query.listComponentFamilies() as ComponentFamilyContract[]).push(neutralFamily()) }).toThrow()
     expect(() => { ;(query.getComponentFamily("review-panel") as ComponentFamilyContract).id = "forged" }).toThrow()
+  })
+
+  test.each([
+    ["requires", "Component ReviewPanel required capability references unknown capability: missing-capability."],
+    ["provides", "Component ReviewPanel provides unknown capability: missing-capability."],
+    ["hardConstraints", "Component ReviewPanel hard constraint references unknown capability: missing-capability."],
+  ] as const)("rejects invented %s capabilities through the generic production loader authority", (relation, expected) => {
+    const artifacts = neutralArtifacts()
+    const source: ComponentContractArtifactSource = {
+      readJson(path) {
+        const document = artifacts.readJson(path)
+        if (!path.endsWith("review-panel.json")) return document
+        const family = document as ComponentFamilyContract
+        family.exports[0].component!.composition[relation].push("missing-capability")
+        return family
+      },
+    }
+    const load = createComponentContractLoader({
+      source,
+      tokenIds: new Set(["color.notice", "space.unit"]),
+      derivedTokenRuleIds: new Set(["space.scale"]),
+      capabilityIds: new Set(["review-session", "review-panel.context"]),
+      sourceReconciler: () => [],
+    })
+
+    expect(load).toThrow(expected)
+  })
+
+  test("treats an omitted generic capability registry as an empty authoritative registry", () => {
+    const load = createComponentContractLoader({
+      source: neutralArtifacts(),
+      tokenIds: new Set(["color.notice", "space.unit"]),
+      derivedTokenRuleIds: new Set(["space.scale"]),
+      sourceReconciler: () => [],
+    })
+
+    expect(load).toThrow("Component ReviewPanel required capability references unknown capability: review-session.")
   })
 
   test("runs a configured source reconciler before exposing a generic contract", () => {
@@ -301,5 +387,168 @@ describe("design-system-neutral component contracts", () => {
     })
 
     expect(load).toThrow("review-panel fixture source export drift")
+  })
+
+  test("reconciles configured neutral replacement-host and prop-forwarding facts through production loading", () => {
+    const analysis = analyzeConfiguredDelegatedHostFacts(neutralDelegatedHostFixture, "ReviewPanel", neutralDelegatedHostConventions)
+    expect(analysis.errors).toEqual([])
+    expect(analysis.facts).toEqual([{
+      propName: "delegateHost",
+      replacesHost: true,
+      forwardsProps: true,
+      childCardinality: { min: 1, max: 1 },
+    }])
+    expect(neutralDelegatedHostLoad()).not.toThrow()
+  })
+
+  test.each([
+    ["missing", (family: ComponentFamilyContract) => { family.exports[0].component!.slots = [] }, "Component ReviewPanel is missing source-owned slot: delegateHost."],
+    ["widened", (family: ComponentFamilyContract) => { family.exports[0].component!.slots[0].childCardinality = { min: 0, max: Number.MAX_SAFE_INTEGER } }, "Slot ReviewPanel.delegateHost must retain source-owned child cardinality 1..1."],
+    ["narrowed", (family: ComponentFamilyContract) => { family.exports[0].component!.slots[0].childCardinality = { min: 2, max: 2 } }, "Slot ReviewPanel.delegateHost must retain source-owned child cardinality 1..1."],
+    ["replacement-host drift", (family: ComponentFamilyContract) => { family.exports[0].component!.slots[0].replacesHost = false }, "Slot ReviewPanel.delegateHost must retain source-owned replacement-host semantics."],
+    ["prop-forwarding drift", (family: ComponentFamilyContract) => { family.exports[0].component!.slots[0].forwardsProps = false }, "Slot ReviewPanel.delegateHost must retain source-owned prop-forwarding semantics."],
+  ] as const)("rejects %s neutral delegated-host facts through configured production loading", (_name, mutate, expected) => {
+    const artifacts = neutralArtifacts()
+    const source: ComponentContractArtifactSource = {
+      readJson(path) {
+        const document = artifacts.readJson(path)
+        if (!path.endsWith("review-panel.json")) return document
+        mutate(document as ComponentFamilyContract)
+        return document
+      },
+    }
+
+    expect(neutralDelegatedHostLoad(source)).toThrow(expected)
+  })
+
+  test.each([
+    ["exact", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        return React.cloneElement(React.Children.only(children), props)
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `, undefined],
+    ["missing", `
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        return <section data-delegate={delegateHost} {...props} />
+      }
+    `, "Component ReviewPanel source-owned slot is not present in source: delegateHost."],
+    ["widened", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        return <section {...props}>{children}</section>
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `, `Slot ReviewPanel.delegateHost must retain source-owned child cardinality 0..${Number.MAX_SAFE_INTEGER}.`],
+    ["superficial count", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        const observedExactlyOne = React.Children.count(children) === 1
+        return <section data-observed={observedExactlyOne} {...props}>{children}</section>
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `, `Slot ReviewPanel.delegateHost must retain source-owned child cardinality 0..${Number.MAX_SAFE_INTEGER}.`],
+    ["uncalled only helper", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        const observeExactlyOne = () => React.Children.only(children)
+        return <section data-observed={Boolean(observeExactlyOne)} {...props}>{children}</section>
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `, `Slot ReviewPanel.delegateHost must retain source-owned child cardinality 0..${Number.MAX_SAFE_INTEGER}.`],
+    ["no-op assert", `
+      function assert(_condition: boolean) {}
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        assert(React.Children.count(children) === 2)
+        return <section {...props}>{children}</section>
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `, `Slot ReviewPanel.delegateHost must retain source-owned child cardinality 0..${Number.MAX_SAFE_INTEGER}.`],
+    ["non-rejecting count guard", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        if (React.Children.count(children) !== 2) return <section {...props}>{children}</section>
+        return <section {...props}>{children}</section>
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `, `Slot ReviewPanel.delegateHost must retain source-owned child cardinality 0..${Number.MAX_SAFE_INTEGER}.`],
+    ["narrowed", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        if (React.Children.count(children) !== 2) throw new Error("two children required")
+        return <section {...props}>{children}</section>
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `, "Slot ReviewPanel.delegateHost must retain source-owned child cardinality 2..2."],
+    ["replacement", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        return React.cloneElement(React.Children.only(children), props)
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? "section" : ReplacementSurface
+        return <Host {...props} />
+      }
+    `, "Slot ReviewPanel.delegateHost must retain source-owned replacement-host semantics."],
+    ["forwarding", `
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        return React.cloneElement(React.Children.only(children), props)
+      }
+      export function ReviewPanel({ delegateHost = false, children }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host>{children}</Host>
+      }
+    `, "Slot ReviewPanel.delegateHost must retain source-owned prop-forwarding semantics."],
+  ] as const)("reconciles %s delegated-host source facts freshly for every loader input", (_name, fixtureSource, expected) => {
+    const fixture = sourceFixture(fixtureSource)
+    try {
+      if (expected) expect(neutralDelegatedHostLoad(neutralArtifacts(), fixture.path)).toThrow(expected)
+      else expect(neutralDelegatedHostLoad(neutralArtifacts(), fixture.path)).not.toThrow()
+    } finally {
+      fixture.cleanup()
+    }
+  })
+
+  test("does not reuse delegated-host facts after the same source path changes", () => {
+    const fixture = sourceFixture(`
+      function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+        return React.cloneElement(React.Children.only(children), props)
+      }
+      export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+        const Host = delegateHost ? ReplacementSurface : "section"
+        return <Host {...props} />
+      }
+    `)
+    try {
+      const load = neutralDelegatedHostLoad(neutralArtifacts(), fixture.path)
+      expect(load).not.toThrow()
+      writeFileSync(fixture.path, `
+        function ReplacementSurface({ children, ...props }: React.ComponentProps<"section">) {
+          return <section {...props}>{children}</section>
+        }
+        export function ReviewPanel({ delegateHost = false, ...props }: React.ComponentProps<"section"> & { delegateHost?: boolean }) {
+          const Host = delegateHost ? ReplacementSurface : "section"
+          return <Host {...props} />
+        }
+      `)
+      expect(load).toThrow(`Slot ReviewPanel.delegateHost must retain source-owned child cardinality 0..${Number.MAX_SAFE_INTEGER}.`)
+    } finally {
+      fixture.cleanup()
+    }
   })
 })
