@@ -83,10 +83,11 @@ type JsxDataAttribute = { name: string; value?: string; prop?: string; condition
   | { source: "unresolved" }
 )
 export type JsxDerivedSpread = { source: "prop" | "state"; name: string }
-export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition }
+export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; resolvedHost?: { tag: string; kind: "intrinsic" | "component" | "member" | "unresolved" }; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition }
 export type JsxRenderAlternative = ({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { root: JsxRenderNode }
 export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; unresolved: string[] }
-type JsxScope = { aliases: Map<string, JsxRenderNode>; derivedSpreads: Map<string, JsxDerivedSpread> }
+type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment"> }
+type JsxScope = { aliases: Map<string, JsxRenderNode>; hostAliases: Map<string, JsxHost>; derivedSpreads: Map<string, JsxDerivedSpread> }
 
 function jsxTagName(tagName: ts.JsxTagNameExpression, file: ts.SourceFile): { tag: string; kind: JsxRenderNode["kind"] } {
   const tag = tagName.getText(file)
@@ -225,12 +226,22 @@ function jsxChildren(children: readonly ts.JsxChild[], file: ts.SourceFile, unre
   })
 }
 
+function aliasHost(expression: ts.Expression, file: ts.SourceFile): JsxHost | undefined {
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return aliasHost(expression.expression, file)
+  if (ts.isConditionalExpression(expression)) return aliasHost(expression.whenFalse, file)
+  if (ts.isStringLiteral(expression)) return { tag: expression.text, kind: "intrinsic" }
+  if (ts.isIdentifier(expression)) return { tag: expression.text, kind: /^[a-z]/.test(expression.text) ? "intrinsic" : "component" }
+  if (ts.isPropertyAccessExpression(expression)) return { tag: expression.getText(file), kind: "member" }
+  return undefined
+}
+
 function jsxNode(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.JsxFragment, file: ts.SourceFile, unresolved: string[], publicBindings: Set<string>, scope: JsxScope): JsxRenderNode {
   if (ts.isJsxFragment(node)) return { tag: "Fragment", kind: "fragment", portal: false, receivesPublicProps: false, dataAttributes: [], derivedSpreads: [], children: jsxChildren(node.children, file, unresolved, publicBindings, scope) }
   const opening = ts.isJsxElement(node) ? node.openingElement : node
   const name = jsxTagName(opening.tagName, file)
   if (name.kind === "unresolved") unresolved.push(`Unsupported JSX tag: ${name.tag}`)
-  return { ...name, portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved, scope), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings, scope) : [] }
+  const resolvedHost = ts.isIdentifier(opening.tagName) ? scope.hostAliases.get(opening.tagName.text) : undefined
+  return { ...name, ...(resolvedHost ? { resolvedHost } : {}), portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved, scope), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings, scope) : [] }
 }
 
 type ReturnedJsx = { expression: ts.Expression; when?: JsxRenderCondition; otherwise?: true }
@@ -265,13 +276,15 @@ function returnedJsx(functionDeclaration: SourceFunction, publicBindings: Set<st
 }
 
 function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publicBindings: Set<string>, unresolved: string[]) {
-  const scope: JsxScope = { aliases: new Map(), derivedSpreads: new Map() }
+  const scope: JsxScope = { aliases: new Map(), hostAliases: new Map(), derivedSpreads: new Map() }
   const visit = (node: ts.Node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
       if (ts.isJsxElement(node.initializer) || ts.isJsxSelfClosingElement(node.initializer) || ts.isJsxFragment(node.initializer)) {
         const nodes = jsxExpressionChildren(node.initializer, file, unresolved, publicBindings, scope)
         if (nodes.length === 1) scope.aliases.set(node.name.text, nodes[0])
       } else {
+        const host = aliasHost(node.initializer, file)
+        if (host) scope.hostAliases.set(node.name.text, host)
         const spread = tracedPropSpread(node.initializer, publicBindings)
         if (spread) scope.derivedSpreads.set(node.name.text, spread)
       }
@@ -304,15 +317,16 @@ type ContractRendering = ContractRenderingTree | { alternatives: Array<({ when: 
 function normalizedRenderName(name: string) { return name.replace(/primitive/gi, "").replace(/[^a-z0-9]/gi, "").replace(/^radix/i, "").toLowerCase() }
 
 function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNode) {
-  if (host.kind === "intrinsic") return source.kind === "intrinsic" && source.tag === host.tag
-  if (host.kind === "fragment") return source.kind === "fragment"
-  if (host.kind === "component-export") return normalizedRenderName(source.tag) === normalizedRenderName(host.exportName ?? "")
+  const resolved = source.resolvedHost ?? source
+  if (host.kind === "intrinsic") return resolved.kind === "intrinsic" && resolved.tag === host.tag
+  if (host.kind === "fragment") return resolved.kind === "fragment"
+  if (host.kind === "component-export") return normalizedRenderName(resolved.tag) === normalizedRenderName(host.exportName ?? "")
   if (host.kind === "inherited-interface") {
-    const sourceName = normalizedRenderName(source.tag)
+    const sourceName = normalizedRenderName(resolved.tag)
     const interfaceName = normalizedRenderName(host.interfaceId ?? "")
-    return sourceName.endsWith(interfaceName) || (source.tag.startsWith("SheetPrimitive.") && sourceName.replace(/^sheet/, "dialog") === interfaceName)
+    return sourceName.endsWith(interfaceName) || (resolved.tag.startsWith("SheetPrimitive.") && sourceName.replace(/^sheet/, "dialog") === interfaceName)
   }
-  return host.kind === "unresolved" && (source.kind === "component" || source.kind === "member" || source.kind === "unresolved")
+  return host.kind === "unresolved" && (source.kind === "component" || source.kind === "member" || source.kind === "unresolved" || Boolean(source.resolvedHost))
 }
 
 function sameDataAttributes(expected: ContractRenderNode["dataAttributes"], actual: JsxRenderNode["dataAttributes"]) {

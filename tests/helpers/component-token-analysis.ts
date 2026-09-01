@@ -138,8 +138,26 @@ export function analyzeComponentTokenSource(sourcePath: string): ComponentTokenS
   return { resolved: unique(output.resolved), unresolved: unique(output.unresolved) }
 }
 
-function findTopLevelFunction(source: ts.SourceFile, exportName: string): ts.FunctionDeclaration | undefined {
-  return source.statements.find((statement): statement is ts.FunctionDeclaration => ts.isFunctionDeclaration(statement) && statement.name?.text === exportName)
+type SourceFunction = ts.FunctionDeclaration | ts.ArrowFunction
+
+function findTopLevelFunction(source: ts.SourceFile, exportName: string): SourceFunction | undefined {
+  for (const statement of source.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name?.text === exportName) return statement
+    if (!ts.isVariableStatement(statement)) continue
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name) || declaration.name.text !== exportName || !declaration.initializer) continue
+      if (ts.isArrowFunction(declaration.initializer)) return declaration.initializer
+      let result: ts.ArrowFunction | undefined
+      const visit = (node: ts.Node) => {
+        if (result) return
+        if (ts.isArrowFunction(node)) result = node
+        else ts.forEachChild(node, visit)
+      }
+      visit(declaration.initializer)
+      if (result) return result
+    }
+  }
+  return undefined
 }
 
 function topLevelCvaScope(source: ts.SourceFile): Scope {

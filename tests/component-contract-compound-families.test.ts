@@ -187,7 +187,10 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
     const dependencies = family(id).exports.flatMap(({ component }) => component?.tokenDependencies ?? [])
     expect(compareComponentTokenDependencies(sourcePath(id), dependencies)).toEqual([])
     expect(dependencies).not.toEqual([])
-    expect(compareComponentTokenDependencies(sourcePath(id), dependencies.slice(1))).not.toEqual([])
+    const key = (dependency: typeof dependencies[number]) => JSON.stringify({ tokenId: dependency.tokenId, when: dependency.when, viaDerivedRule: dependency.viaDerivedRule })
+    const uniqueIndex = dependencies.findIndex((dependency, index, all) => all.filter((candidate) => key(candidate) === key(dependency)).length === 1)
+    expect(uniqueIndex).toBeGreaterThanOrEqual(0)
+    expect(compareComponentTokenDependencies(sourcePath(id), dependencies.filter((_, index) => index !== uniqueIndex))).not.toEqual([])
     expect(compareComponentTokenDependencies(sourcePath(id), [...dependencies, { tokenId: "color.primary", evidenceRefs: ["source", "tokens"] }])).not.toEqual([])
   })
 
@@ -236,7 +239,10 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
     expect(sourceAnalysis.compareJsxRenderTree(renderMutation, sourceAnalysis.analyzeJsxRenderTree(sourcePath("dialog"), "DialogContent"))).not.toEqual([])
 
     const tokenMutation = family("select").exports.flatMap(({ component }) => component?.tokenDependencies ?? [])
-    expect(compareComponentTokenDependencies(sourcePath("select"), tokenMutation.slice(1))).not.toEqual([])
+    const tokenKey = (dependency: typeof tokenMutation[number]) => JSON.stringify({ tokenId: dependency.tokenId, when: dependency.when, viaDerivedRule: dependency.viaDerivedRule })
+    const tokenUniqueIndex = tokenMutation.findIndex((dependency, index, all) => all.filter((candidate) => tokenKey(candidate) === tokenKey(dependency)).length === 1)
+    expect(tokenUniqueIndex).toBeGreaterThanOrEqual(0)
+    expect(compareComponentTokenDependencies(sourcePath("select"), tokenMutation.filter((_, index) => index !== tokenUniqueIndex))).not.toEqual([])
 
     const dialogInterface = inherited("radix.dialog.root")
     const declarationMutation = structuredClone(dialogInterface)

@@ -173,13 +173,6 @@
             ]
           },
           {
-            "tokenId": "radius.md",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "spacing.unit",
             "when": {
               "propName": "variant",
@@ -273,6 +266,13 @@
         "conditionalApi": [],
         "events": [],
         "tokenDependencies": [
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
           {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
