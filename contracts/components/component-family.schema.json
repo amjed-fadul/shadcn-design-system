@@ -112,12 +112,20 @@
       "type": "object", "additionalProperties": false, "required": ["nodeId", "evidenceRefs"],
       "properties": { "nodeId": { "type": "string" }, "when": { "$ref": "#/$defs/renderCondition" }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     },
+    "renderDataAttribute": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "literal" }, "value": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "prop", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "prop" }, "prop": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "primitive-state" }, "value": { "type": "string" }, "prop": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "condition", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "derived-condition" }, "condition": { "$ref": "#/$defs/renderCondition" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
+      ]
+    },
     "renderNode": {
       "type": "object", "additionalProperties": false,
       "required": ["id", "host", "receivesPublicProps", "dataAttributes", "children", "evidenceRefs"],
       "properties": {
         "id": { "type": "string" }, "host": { "$ref": "#/$defs/renderHost" }, "receivesPublicProps": { "type": "boolean" },
-        "dataAttributes": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["name", "source", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "enum": ["literal", "prop", "primitive-state"] }, "value": { "type": "string" }, "prop": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } } },
+        "dataAttributes": { "type": "array", "items": { "$ref": "#/$defs/renderDataAttribute" } },
         "children": { "type": "array", "items": { "$ref": "#/$defs/renderChildRef" } }, "evidenceRefs": { "$ref": "#/$defs/refs" }
       }
     },

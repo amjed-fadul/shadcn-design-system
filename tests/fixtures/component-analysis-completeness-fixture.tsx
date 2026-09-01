@@ -5,7 +5,7 @@ declare const classes: string
 declare const cvaClasses: string
 declare const condition: boolean
 declare const tone: string
-declare const compute: () => Record<string, unknown>
+declare const compute: { (): Record<string, unknown>; (value: unknown): unknown }
 declare const dynamicChild: unknown
 declare const dynamicVariants: Record<string, unknown>
 declare const Primitive: any
@@ -74,4 +74,12 @@ function MultipleReturnFixture({ condition, ...rest }: { condition: boolean }) {
   return <Primitive.Root {...rest} />
 }
 
-export { ConditionalRenderFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+function DerivedAttributeFixture({ mode = "a", ...rest }: { mode?: "a" | "b" }) {
+  return <Primitive.Root data-match={mode === "a"} {...rest} />
+}
+
+function UnsupportedDerivedAttributeFixture({ mode = "a", ...rest }: { mode?: "a" | "b" }) {
+  return <Primitive.Root data-match={compute(mode)} {...rest} />
+}
+
+export { ConditionalRenderFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

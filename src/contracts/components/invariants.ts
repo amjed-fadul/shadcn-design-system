@@ -80,13 +80,28 @@ export function resolveConditionalApiShape(component: ComponentDefinition, selec
   return resolveConditionalApiShapeAtStage(component, selection, authority, true)
 }
 
-function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Set<string>, localProps: ComponentDefinition["localProps"]) {
+function validateRenderCondition(errors: string[], componentName: string, scope: string, condition: { propName: string; equals: string | number | boolean }, props: Map<string, PublicPropFact>) {
+  const prop = props.get(condition.propName)
+  if (!prop || prop.availability !== "available") {
+    errors.push(`Component ${componentName} ${scope} condition references unknown prop: ${condition.propName}.`)
+    return
+  }
+  if (!prop.type || !isStructuredPropTypeAssignable({ kind: "literal", value: condition.equals }, prop.type)) {
+    errors.push(`Component ${componentName} ${scope} condition has incompatible literal for prop ${condition.propName}: ${String(condition.equals)}.`)
+  }
+}
+
+function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]) {
   const ids = new Set<string>()
   for (const node of rendering.nodes) {
     if (ids.has(node.id)) errors.push(`Component ${componentName} has duplicate render-node ID: ${node.id}.`)
     ids.add(node.id)
     hasEvidence(errors, node.evidenceRefs, family.evidence, `Render node ${componentName}.${node.id}`)
-    for (const attr of node.dataAttributes) hasEvidence(errors, attr.evidenceRefs, family.evidence, `Render attribute ${componentName}.${node.id}.${attr.name}`)
+    for (const attr of node.dataAttributes) {
+      hasEvidence(errors, attr.evidenceRefs, family.evidence, `Render attribute ${componentName}.${node.id}.${attr.name}`)
+      if (attr.source === "derived-condition") validateRenderCondition(errors, componentName, `render attribute ${node.id}.${attr.name}`, attr.condition, props)
+      if (attr.source === "prop" && !props.has(attr.prop)) errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} references unknown prop: ${attr.prop}.`)
+    }
     if (node.host.kind === "component-export" && !exportEntries.has(node.host.exportName)) errors.push(`Component ${componentName} render host references unknown export: ${node.host.exportName}.`)
     if (node.host.kind === "component-export" && exportEntries.has(node.host.exportName) && (exportEntries.get(node.host.exportName)!.kind !== "component" || !exportEntries.get(node.host.exportName)!.authorableJsx)) errors.push(`Component ${componentName} render host references non-JSX-authorable export: ${node.host.exportName}.`)
     if (node.host.kind === "inherited-interface" && !authority.interfaceIds.has(node.host.interfaceId)) errors.push(`Component ${componentName} render host references unknown interface: ${node.host.interfaceId}.`)
@@ -261,9 +276,14 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
       if (token.viaDerivedRule && !authority.derivedTokenRuleIds.has(token.viaDerivedRule.id)) errors.push(`Component ${entry.name} references unknown derived token rule: ${token.viaDerivedRule.id}.`)
     }
     validateConditionalApi(errors, family, entry.name, component, props, events, authority)
-    validateRenderingTree(errors, family, entry.name, component.rendering, authority, new Map(family.exports.map(({ name, kind, authorableJsx }) => [name, { kind, authorableJsx }])), new Set(props.keys()), component.localProps)
+    validateRenderingTree(errors, family, entry.name, component.rendering, authority, new Map(family.exports.map(({ name, kind, authorableJsx }) => [name, { kind, authorableJsx }])), props, component.localProps)
+    const slotNames = new Set<string>()
     for (const slot of component.slots) {
+      if (slotNames.has(slot.propName)) errors.push(`Component ${entry.name} has duplicate Slot fact for prop: ${slot.propName}.`)
+      slotNames.add(slot.propName)
       hasEvidence(errors, slot.evidenceRefs, family.evidence, `Slot ${entry.name}.${slot.propName}`)
+      const prop = props.get(slot.propName)
+      if (!prop || prop.availability !== "available") errors.push(`Component ${entry.name} slot references unknown public prop: ${slot.propName}.`)
       if (slot.childCardinality.max < slot.childCardinality.min) errors.push(`Slot ${entry.name}.${slot.propName} has max ${slot.childCardinality.max} below min ${slot.childCardinality.min}.`)
     }
     for (const fact of component.accessibility) hasEvidence(errors, fact.evidenceRefs, family.evidence, `Accessibility ${entry.name}.${fact.feature}`)

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "radix.dialog.portal",
+  "source": {
+    "kind": "package-declaration",
+    "package": "@radix-ui/react-dialog",
+    "version": "1.1.23",
+    "declarationPath": "node_modules/@radix-ui/react-dialog/dist/index.d.ts",
+    "declarationSha256": "2059b04988eece7f6e992a5c218e9c5361b8fed24cb04caddb7e1cb4339e236b",
+    "symbol": "Portal"
+  },
+  "evidence": {
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "node_modules/@radix-ui/react-dialog/dist/index.d.ts@2059b04988eece7f6e992a5c218e9c5361b8fed24cb04caddb7e1cb4339e236b"
+    }
+  },
+  "props": [
+    {
+      "name": "container",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "typescript",
+            "typeText": "Element"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "DocumentFragment"
+          }
+        ]
+      },
+      "typeText": "Element | DocumentFragment",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "forceMount",
+      "required": false,
+      "type": {
+        "kind": "literal",
+        "value": true
+      },
+      "typeText": "true",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "events": [],
+  "conditionalApi": [],
+  "unresolved": []
+}

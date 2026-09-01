@@ -48,6 +48,12 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, button)).toBe(true)
     expect(validate(interfaceSchema, htmlButton)).toBe(true)
     expect(validate(interfaceSchema, accordionRoot)).toBe(true)
+    const derivedAttribute = validFamily()
+    derivedAttribute.exports[0].component.rendering.nodes[0].dataAttributes.push({ name: "data-match", source: "derived-condition", condition: { propName: "mode", equals: "a" }, evidenceRefs: ["source"] })
+    expect(validate(familySchema, derivedAttribute)).toBe(true)
+    const malformedDerivedAttribute = structuredClone(derivedAttribute)
+    malformedDerivedAttribute.exports[0].component.rendering.nodes[0].dataAttributes[0].source = "literal"
+    expect(validate(familySchema, malformedDerivedAttribute)).toBe(false)
     expect(validate(contractSetSchema, { schemaVersion: 1, id: "contracts", status: "candidate", designSystemId: "example", sourceBaselineCommit: "a".repeat(40), tokenContractId: "tokens", familyCount: 2, familyFiles: ["contracts/components/families/example.json"], interfaceFiles: ["contracts/components/interfaces/html.example.json"] })).toBe(true)
   })
 

@@ -23,8 +23,27 @@ export function listModuleExports(sourcePath: string): ModuleExportEvidence[] {
 
 export function readCanonicalSourceBlobSha(sourcePath: string): string { return execFileSync("git", ["hash-object", sourcePath], { encoding: "utf8" }).trim() }
 
+type SourceFunction = ts.FunctionDeclaration | ts.ArrowFunction
+
+function findSourceFunction(sourcePath: string, exportName: string): SourceFunction | undefined {
+  const file = sourceFile(sourcePath)
+  for (const statement of file.statements) {
+    if (ts.isFunctionDeclaration(statement) && statement.name?.text === exportName) return statement
+    if (!ts.isVariableStatement(statement)) continue
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name) || declaration.name.text !== exportName || !declaration.initializer) continue
+      if (ts.isArrowFunction(declaration.initializer)) return declaration.initializer
+      let result: ts.ArrowFunction | undefined
+      const visit = (node: ts.Node) => { if (result) return; if (ts.isArrowFunction(node)) result = node; else ts.forEachChild(node, visit) }
+      visit(declaration.initializer)
+      if (result) return result
+    }
+  }
+  return undefined
+}
+
 export function extractFunctionPropDefaults(sourcePath: string, exportName: string): Map<string, string | number | boolean | null> {
-  const functionDeclaration = sourceFile(sourcePath).statements.find((statement): statement is ts.FunctionDeclaration => ts.isFunctionDeclaration(statement) && statement.name?.text === exportName)
+  const functionDeclaration = findSourceFunction(sourcePath, exportName)
   const result = new Map<string, string | number | boolean | null>(); const parameter = functionDeclaration?.parameters[0]
   if (!parameter || !ts.isObjectBindingPattern(parameter.name)) return result
   for (const element of parameter.name.elements) if (ts.isIdentifier(element.name) && element.initializer) { const value = literal(element.initializer); if (value !== undefined) result.set(element.name.text, value) }
@@ -50,7 +69,14 @@ export function extractButtonRenderingEvidence(sourcePath: string, exportName: s
   return { asChildDefault: extractFunctionPropDefaults(sourcePath, exportName).get("asChild"), conditionProp, whenTrue: replacementHost, whenFalse: defaultHost, replacementHost, defaultHost, dataAttributes, forwardsProps, portals }
 }
 
-export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; portal: boolean; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; value?: string; prop?: string }>; children: JsxRenderNode[] }
+export type JsxRenderCondition = { propName: string; equals: string | number | boolean }
+type JsxDataAttribute = { name: string; value?: string; prop?: string; condition?: JsxRenderCondition; expression?: string } & (
+  | { source: "literal" | "primitive-state" }
+  | { source: "prop"; prop: string }
+  | { source: "derived-condition"; condition: JsxRenderCondition }
+  | { source: "unresolved" }
+)
+export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition }
 export type JsxRenderTree = { root?: JsxRenderNode; unresolved: string[] }
 
 function jsxTagName(tagName: ts.JsxTagNameExpression, file: ts.SourceFile): { tag: string; kind: JsxRenderNode["kind"] } {
@@ -60,13 +86,24 @@ function jsxTagName(tagName: ts.JsxTagNameExpression, file: ts.SourceFile): { ta
   return { tag, kind: "unresolved" }
 }
 
-function publicPropBindings(functionDeclaration: ts.FunctionDeclaration) {
+function publicPropBindings(functionDeclaration: SourceFunction) {
   const bindings = new Set<string>()
   const parameter = functionDeclaration.parameters[0]
   if (!parameter) return bindings
   if (ts.isIdentifier(parameter.name)) bindings.add(parameter.name.text)
-  if (ts.isObjectBindingPattern(parameter.name)) for (const element of parameter.name.elements) if (element.dotDotDotToken && ts.isIdentifier(element.name)) bindings.add(element.name.text)
+  if (ts.isObjectBindingPattern(parameter.name)) for (const element of parameter.name.elements) if (ts.isIdentifier(element.name)) bindings.add(element.name.text)
   return bindings
+}
+
+function derivedCondition(expression: ts.Expression, publicBindings: Set<string>): JsxRenderCondition | undefined {
+  if (!ts.isBinaryExpression(expression) || expression.operatorToken.kind !== ts.SyntaxKind.EqualsEqualsEqualsToken) return undefined
+  const left = ts.isIdentifier(expression.left) ? expression.left.text : undefined
+  const right = ts.isIdentifier(expression.right) ? expression.right.text : undefined
+  const leftLiteral = literal(expression.left)
+  const rightLiteral = literal(expression.right)
+  if (left && publicBindings.has(left) && rightLiteral !== undefined && rightLiteral !== null) return { propName: left, equals: rightLiteral }
+  if (right && publicBindings.has(right) && leftLiteral !== undefined && leftLiteral !== null) return { propName: right, equals: leftLiteral }
+  return undefined
 }
 
 function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, publicBindings: Set<string>, unresolved: string[]) {
@@ -78,11 +115,23 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
       else unresolved.push(`Unsupported spread provenance: ${property.expression.getText(file)}`)
     }
     if (ts.isJsxAttribute(property) && ts.isIdentifier(property.name) && property.name.text.startsWith("data-")) {
-      const value = property.initializer && ts.isStringLiteral(property.initializer) ? property.initializer.text : undefined
+      if (property.initializer && ts.isStringLiteral(property.initializer)) {
+        dataAttributes.push({ name: property.name.text, source: "literal", value: property.initializer.text })
+        continue
+      }
       const expression = property.initializer && ts.isJsxExpression(property.initializer) ? property.initializer.expression : undefined
-      const prop = expression && ts.isIdentifier(expression) ? expression.text : undefined
-      if (expression && !prop) unresolved.push(`Dynamic data attribute ${property.name.text}: ${expression.getText(file)}`)
-      dataAttributes.push({ name: property.name.text, ...(value === undefined ? {} : { value }), ...(prop === undefined ? {} : { prop }) })
+      if (expression && ts.isIdentifier(expression)) {
+        dataAttributes.push({ name: property.name.text, source: "prop", prop: expression.text })
+        continue
+      }
+      const condition = expression && derivedCondition(expression, publicBindings)
+      if (condition) {
+        dataAttributes.push({ name: property.name.text, source: "derived-condition", condition })
+        continue
+      }
+      const expressionText = expression?.getText(file)
+      unresolved.push(`Dynamic data attribute ${property.name.text}: ${expressionText ?? "true"}`)
+      dataAttributes.push({ name: property.name.text, source: "unresolved", ...(expressionText ? { expression: expressionText } : {}) })
     }
   }
   return { receivesPublicProps, dataAttributes }
@@ -92,7 +141,14 @@ function jsxExpressionChildren(expression: ts.Expression | undefined, file: ts.S
   if (!expression || ts.isIdentifier(expression) && expression.text === "children") return []
   if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return jsxExpressionChildren(expression.expression, file, unresolved, publicBindings)
   if (ts.isConditionalExpression(expression)) { unresolved.push(`Conditional JSX child cannot establish unconditional automatic structure: ${expression.condition.getText(file)}`); return [...jsxExpressionChildren(expression.whenTrue, file, unresolved, publicBindings), ...jsxExpressionChildren(expression.whenFalse, file, unresolved, publicBindings)] }
-  if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) { unresolved.push(`Conditional JSX child cannot establish unconditional automatic structure: ${expression.left.getText(file)}`); return jsxExpressionChildren(expression.right, file, unresolved, publicBindings) }
+  if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+    if (ts.isIdentifier(expression.left)) {
+      const propName = expression.left.text
+      return jsxExpressionChildren(expression.right, file, unresolved, publicBindings).map((node) => ({ ...node, when: { propName, equals: true } }))
+    }
+    unresolved.push(`Conditional JSX child cannot establish automatic structure: ${expression.left.getText(file)}`)
+    return jsxExpressionChildren(expression.right, file, unresolved, publicBindings)
+  }
   if (ts.isJsxElement(expression)) return [jsxNode(expression, file, unresolved, publicBindings)]
   if (ts.isJsxSelfClosingElement(expression)) return [jsxNode(expression, file, unresolved, publicBindings)]
   if (ts.isJsxFragment(expression)) return [jsxNode(expression, file, unresolved, publicBindings)]
@@ -113,11 +169,12 @@ function jsxNode(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.JsxFragment
   const opening = ts.isJsxElement(node) ? node.openingElement : node
   const name = jsxTagName(opening.tagName, file)
   if (name.kind === "unresolved") unresolved.push(`Unsupported JSX tag: ${name.tag}`)
-  return { ...name, portal: name.tag === "Portal" || name.tag.endsWith(".Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings) : [] }
+  return { ...name, portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings) : [] }
 }
 
-function returnedJsx(functionDeclaration: ts.FunctionDeclaration): ts.Expression[] {
+function returnedJsx(functionDeclaration: SourceFunction): ts.Expression[] {
   const results: ts.Expression[] = []
+  if (ts.isArrowFunction(functionDeclaration) && !ts.isBlock(functionDeclaration.body)) return [functionDeclaration.body]
   const visit = (node: ts.Node) => { if (ts.isReturnStatement(node) && node.expression) results.push(node.expression); else if (!ts.isFunctionLike(node) || node === functionDeclaration) ts.forEachChild(node, visit) }
   if (functionDeclaration.body) ts.forEachChild(functionDeclaration.body, visit)
   return results
@@ -125,7 +182,7 @@ function returnedJsx(functionDeclaration: ts.FunctionDeclaration): ts.Expression
 
 export function analyzeJsxRenderTree(sourcePath: string, exportName: string): JsxRenderTree {
   const file = sourceFile(sourcePath)
-  const declaration = file.statements.find((statement): statement is ts.FunctionDeclaration => ts.isFunctionDeclaration(statement) && statement.name?.text === exportName)
+  const declaration = findSourceFunction(sourcePath, exportName)
   const expressions = declaration ? returnedJsx(declaration) : []
   const unresolved: string[] = []
   if (!expressions.length) return { unresolved: [`No returned JSX found for ${exportName}`] }
@@ -137,7 +194,7 @@ export function analyzeJsxRenderTree(sourcePath: string, exportName: string): Js
   return { ...(roots.length ? { root: roots[0] } : {}), unresolved }
 }
 
-type ContractRenderNode = { id: string; host: { kind: string; tag?: string; interfaceId?: string; exportName?: string }; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; value?: string; prop?: string }>; children: Array<{ nodeId: string }> }
+type ContractRenderNode = { id: string; host: { kind: string; tag?: string; interfaceId?: string; exportName?: string }; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; value?: string; prop?: string; condition?: JsxRenderCondition } & ({ source: "literal" | "primitive-state" } | { source: "prop"; prop: string } | { source: "derived-condition"; condition: JsxRenderCondition })>; children: Array<{ nodeId: string; when?: JsxRenderCondition }> }
 type ContractRendering = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: ContractRenderNode[]; portalBoundaries: Array<{ nodeId: string }> }
 
 function normalizedRenderName(name: string) { return name.replace(/primitive/gi, "").replace(/[^a-z0-9]/gi, "").replace(/^radix/i, "").toLowerCase() }
@@ -146,12 +203,19 @@ function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNo
   if (host.kind === "intrinsic") return source.kind === "intrinsic" && source.tag === host.tag
   if (host.kind === "fragment") return source.kind === "fragment"
   if (host.kind === "component-export") return normalizedRenderName(source.tag) === normalizedRenderName(host.exportName ?? "")
-  if (host.kind === "inherited-interface") return normalizedRenderName(source.tag).endsWith(normalizedRenderName(host.interfaceId ?? ""))
+  if (host.kind === "inherited-interface") {
+    const sourceName = normalizedRenderName(source.tag)
+    const interfaceName = normalizedRenderName(host.interfaceId ?? "")
+    return sourceName.endsWith(interfaceName) || (source.tag.startsWith("SheetPrimitive.") && sourceName.replace(/^sheet/, "dialog") === interfaceName)
+  }
   return host.kind === "unresolved" && (source.kind === "component" || source.kind === "member" || source.kind === "unresolved")
 }
 
 function sameDataAttributes(expected: ContractRenderNode["dataAttributes"], actual: JsxRenderNode["dataAttributes"]) {
-  return expected.length === actual.length && expected.every((attribute, index) => attribute.name === actual[index]?.name && attribute.value === actual[index]?.value && attribute.prop === actual[index]?.prop)
+  return expected.length === actual.length && expected.every((attribute, index) => {
+    const candidate = actual[index]
+    return attribute.name === candidate?.name && attribute.source === candidate?.source && attribute.value === candidate?.value && attribute.prop === candidate?.prop && JSON.stringify(attribute.condition ?? null) === JSON.stringify(candidate?.source === "derived-condition" ? candidate.condition : null)
+  })
 }
 
 /** Compares contract rendering facts with a source-derived JSX tree without assigning semantics to unresolved expressions. */
@@ -171,7 +235,12 @@ export function compareJsxRenderTree(rendering: ContractRendering, source: JsxRe
     if (!sameDataAttributes(expected.dataAttributes, actual.dataAttributes)) errors.push(`Data attributes mismatch at ${path}.`)
     if (portalNodes.has(id) !== actual.portal) errors.push(`Portal boundary mismatch at ${path}.`)
     if (expected.children.length !== actual.children.length) errors.push(`Automatic child count mismatch at ${path}.`)
-    for (let index = 0; index < Math.min(expected.children.length, actual.children.length); index++) compare(expected.children[index].nodeId, actual.children[index], `${path}>${actual.children[index].tag}`)
+    for (let index = 0; index < Math.min(expected.children.length, actual.children.length); index++) {
+      const expectedChild = expected.children[index]
+      const actualChild = actual.children[index]
+      if (JSON.stringify(expectedChild.when ?? null) !== JSON.stringify(actualChild.when ?? null)) errors.push(`Conditional render edge mismatch at ${path}>${actualChild.tag}.`)
+      compare(expectedChild.nodeId, actualChild, `${path}>${actualChild.tag}`)
+    }
   }
   compare(rendering.rootNodeId, source.root, source.root.tag)
   if (rendering.publicPropsTargetNodeId && !seen.has(rendering.publicPropsTargetNodeId)) errors.push("Public-props target is not source-reachable.")

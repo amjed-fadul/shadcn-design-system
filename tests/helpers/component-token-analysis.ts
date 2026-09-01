@@ -10,7 +10,7 @@ for (const [utility, token] of [
   ["secondary", "color.secondary"], ["secondary-foreground", "color.secondary-foreground"], ["muted", "color.muted"], ["muted-foreground", "color.muted-foreground"],
   ["accent", "color.accent"], ["accent-foreground", "color.accent-foreground"], ["destructive", "color.destructive"], ["border", "color.border"], ["input", "color.input"], ["ring", "color.ring"],
 ] as const) for (const prefix of ["bg", "text", "border", "ring", "outline", "decoration", "fill", "stroke"]) direct.set(`${prefix}-${utility}`, token)
-for (const [utility, token] of [["rounded-sm", "radius.sm"], ["rounded-md", "radius.md"], ["rounded-lg", "radius.lg"], ["rounded-xl", "radius.xl"], ["shadow-sm", "shadow.sm"], ["shadow-md", "shadow.md"], ["font-heading", "font.heading"], ["font-sans", "font.sans"], ["text-xs", "font-size.xs"], ["text-sm", "font-size.sm"], ["text-base", "font-size.base"], ["text-lg", "font-size.lg"], ["font-medium", "font-weight.medium"], ["font-normal", "font-weight.normal"], ["font-semibold", "font-weight.semibold"]] as const) direct.set(utility, token)
+for (const [utility, token] of [["rounded-sm", "radius.sm"], ["rounded-md", "radius.md"], ["rounded-lg", "radius.lg"], ["rounded-xl", "radius.xl"], ["shadow-sm", "shadow.sm"], ["shadow-md", "shadow.md"], ["shadow-lg", "shadow.lg"], ["tracking-widest", "letter-spacing.widest"], ["font-heading", "font.heading"], ["font-sans", "font.sans"], ["text-xs", "font-size.xs"], ["text-sm", "font-size.sm"], ["text-base", "font-size.base"], ["text-lg", "font-size.lg"], ["font-medium", "font-weight.medium"], ["font-normal", "font-weight.normal"], ["font-semibold", "font-weight.semibold"]] as const) direct.set(utility, token)
 
 const approvedTokenIds = new Set(tokenContract.tokens.map((token) => token.id))
 const contractedNamespaces = new Set(tokenContract.coverage.contracted)
@@ -181,6 +181,7 @@ function contractedNamespaceFor(utility: string): string | undefined {
 function isArbitraryValueUtility(utility: string) { return /-\[[^\]]+\]$/.test(utility) }
 function hasCssKeywordValue(utility: string) { return /-(?:inherit|initial|unset|revert|revert-layer)$/.test(utility) }
 function usesCurrentColor(utility: string, namespace: string | undefined) { return namespace === "color" && /-current$/.test(utility) }
+function isRawPrimitiveColorUtility(utility: string) { return /^(?:bg|text|border|ring|outline|decoration|fill|stroke)-(?:black|white|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(?:-(?:50|100|200|300|400|500|600|700|800|900|950))?$/.test(utility) }
 function isRecognizedNoApprovedToken(utility: string, namespace: string | undefined) {
   return isArbitraryValueUtility(utility) || hasCssKeywordValue(utility) || usesCurrentColor(utility, namespace) || utility === "leading-none" || utility === "rounded-full"
 }
@@ -204,8 +205,8 @@ export function auditComponentTokenCoverage(sourcePath: string): TokenCoverageFi
       continue
     }
     const namespace = contractedNamespaceFor(utility)
-    if (notContractedUtilities.has(utility) || /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility)) {
-      const notContractedNamespace = /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility) ? "primitive-color" : "border-width"
+    if (isRawPrimitiveColorUtility(utility) || notContractedUtilities.has(utility) || /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility)) {
+      const notContractedNamespace = isRawPrimitiveColorUtility(utility) || /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility) ? "primitive-color" : "border-width"
       findings.push({ utility, classification: "known-not-contracted-namespace", namespace: notContractedNamespace })
     } else if (isRecognizedNoApprovedToken(utility, namespace)) {
       findings.push({ utility, classification: "recognized-no-approved-token", namespace })

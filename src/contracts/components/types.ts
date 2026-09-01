@@ -26,7 +26,13 @@ export type TokenDependency = EvidenceRef & { tokenId: string; when?: { propName
 export type RenderHost = { kind: "intrinsic"; tag: string } | { kind: "inherited-interface"; interfaceId: string } | { kind: "component-export"; exportName: string } | { kind: "fragment" } | { kind: "unresolved" }
 export type RenderCondition = { propName: string; equals: string | number | boolean }
 export type RenderChildRef = EvidenceRef & { nodeId: string; when?: RenderCondition }
-export type RenderNode = { id: string; host: RenderHost; receivesPublicProps: boolean; dataAttributes: Array<EvidenceRef & { name: string; source: "literal" | "prop" | "primitive-state"; value?: string; prop?: string }>; children: RenderChildRef[]; evidenceRefs: string[] }
+export type RenderDataAttribute = EvidenceRef & { name: string; value?: string; prop?: string; condition?: RenderCondition } & (
+  | { source: "literal" }
+  | { source: "prop"; prop: string }
+  | { source: "primitive-state" }
+  | { source: "derived-condition"; condition: RenderCondition }
+)
+export type RenderNode = { id: string; host: RenderHost; receivesPublicProps: boolean; dataAttributes: RenderDataAttribute[]; children: RenderChildRef[]; evidenceRefs: string[] }
 export type PortalBoundary = EvidenceRef & { nodeId: string }
 export type RenderingFact = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: RenderNode[]; portalBoundaries: PortalBoundary[] }
 export type InheritedPropDefault = EvidenceRef & { propName: string; value: string | number | boolean | null }

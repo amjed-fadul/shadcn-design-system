@@ -1,0 +1,1049 @@
+{
+  "schemaVersion": 1,
+  "id": "dialog",
+  "source": {
+    "canonicalPath": "src/components/ui/dialog.tsx",
+    "canonicalBlobSha": "e51b829a56b094b0e0aa7c8552fdfab0c3cb368c",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/dialog.tsx",
+    "upstreamBlobSha": "da9bc058324e4a676a1b9eedd86290a8d4f2213f"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/dialog.tsx@e51b829a56b094b0e0aa7c8552fdfab0c3cb368c"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.dialog"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Dialog",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.dialog.root"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [
+            "dialog.context"
+          ],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "open",
+            "controlledProp": "open",
+            "defaultProp": "defaultOpen",
+            "changeEventProp": "onOpenChange",
+            "evidenceRefs": [
+              "declaration"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogClose",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.dialog.close"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": { "min": 1, "max": 1 },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": ["source", "declaration"]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "dialog.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.close"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-close",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogContent",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "showCloseButton",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": true,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "radix.dialog.content"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": { "min": 1, "max": 1 },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": ["source", "declaration"]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "dialog.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [
+          {
+            "when": {
+              "propName": "showCloseButton",
+              "equals": true
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [],
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "when": {
+              "propName": "showCloseButton",
+              "equals": false
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [],
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 6
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "shadow.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "portal",
+          "publicPropsTargetNodeId": "content",
+          "nodes": [
+            {
+              "id": "portal",
+              "host": {
+                "kind": "component-export",
+                "exportName": "DialogPortal"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [
+                {
+                  "nodeId": "overlay",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "overlay",
+              "host": {
+                "kind": "component-export",
+                "exportName": "DialogOverlay"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "content",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.content"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "close",
+                  "when": {
+                    "propName": "showCloseButton",
+                    "equals": true
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "close",
+              "host": {
+                "kind": "component-export",
+                "exportName": "DialogClose"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-close",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "button",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "button",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [
+                {
+                  "nodeId": "icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "sr-only",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "icon",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "sr-only",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "span"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": [
+            {
+              "nodeId": "portal",
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogDescription",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.dialog.description"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": { "min": 1, "max": 1 },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": ["source", "declaration"]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "dialog.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.description"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-description",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogFooter",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "showCloseButton",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [
+          {
+            "when": {
+              "propName": "showCloseButton",
+              "equals": true
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [],
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "when": {
+              "propName": "showCloseButton",
+              "equals": false
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [],
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-footer",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "node-1",
+                  "when": {
+                    "propName": "showCloseButton",
+                    "equals": true
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "node-1",
+              "host": {
+                "kind": "component-export",
+                "exportName": "DialogClose"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [
+                {
+                  "nodeId": "node-2",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "node-2",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogHeader",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-header",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogOverlay",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.dialog.overlay"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": { "min": 1, "max": 1 },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": ["source", "declaration"]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "dialog.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.overlay"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-overlay",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogPortal",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.dialog.portal"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "dialog.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.portal"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-portal",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": [
+            {
+              "nodeId": "root",
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogTitle",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.dialog.title"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": { "min": 1, "max": 1 },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": ["source", "declaration"]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "dialog.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "font.heading",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.semibold",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.title"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-title",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "DialogTrigger",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.dialog.trigger"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": { "min": 1, "max": 1 },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": ["source", "declaration"]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "dialog.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.dialog.trigger"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "dialog-trigger",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    }
+  ],
+  "unresolved": []
+}
