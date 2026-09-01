@@ -1,5 +1,8 @@
 export {
   ComponentContractQueryError,
+  createComponentContractQuery,
+} from "./query"
+export {
   getComponentContractSet,
   getComponentFamily,
   getInheritedInterface,
@@ -8,5 +11,8 @@ export {
   lookupComponentExport,
   queryComponentCapabilities,
   queryComponentTokenDependencies,
-} from "./query"
-export type { ComponentCapabilityMatch, ComponentContractQueryErrorCode, ComponentTokenDependencyMatch } from "./query"
+} from "./canonical-query"
+export type { ComponentCapabilityMatch, ComponentContractQuery, ComponentContractQueryErrorCode, ComponentTokenDependencyMatch } from "./query"
+export { loadComponentContracts } from "./canonical-loader"
+export { ComponentContractLoadError, createComponentContractLoader } from "./loader"
+export type { ComponentContractArtifactSource, ComponentContractIndex, ComponentContractLoaderOptions, ComponentContractSourceReconciler, LoadedComponentContracts } from "./loader"

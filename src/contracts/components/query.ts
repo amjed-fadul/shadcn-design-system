@@ -1,4 +1,3 @@
-import { loadComponentContracts } from "./loader"
 import type { DeepReadonly, LoadedComponentContracts } from "./loader"
 import type { ComponentContractSet, ComponentFamilyContract, InheritedInterfaceContract, PublicExportContract, TokenDependency } from "./types"
 
@@ -105,49 +104,58 @@ function buildIndexes(loaded: LoadedComponentContracts): QueryIndexes {
   return indexes
 }
 
-const loaded = loadComponentContracts()
-const indexes = buildIndexes(loaded)
+export type ComponentContractQuery = Readonly<{
+  getComponentContractSet(): DeepReadonly<ComponentContractSet>
+  listComponentFamilies(): readonly DeepReadonly<ComponentFamilyContract>[]
+  getComponentFamily(familyId: string): DeepReadonly<ComponentFamilyContract>
+  lookupComponentExport(familyId: string, exportName: string): DeepReadonly<PublicExportContract>
+  getInheritedInterface(interfaceId: string): DeepReadonly<InheritedInterfaceContract>
+  isAuthorableJsxExport(familyId: string, exportName: string): boolean
+  queryComponentCapabilities(capability: string): readonly ComponentCapabilityMatch[]
+  queryComponentTokenDependencies(tokenId: string): readonly ComponentTokenDependencyMatch[]
+}>
 
-export function getComponentContractSet(): DeepReadonly<ComponentContractSet> {
-  return loaded.contractSet
-}
-
-export function listComponentFamilies(): readonly DeepReadonly<ComponentFamilyContract>[] {
-  return Object.freeze([...indexes.families])
-}
-
-export function getComponentFamily(familyId: string): DeepReadonly<ComponentFamilyContract> {
-  const family = indexes.familiesById.get(familyId)
-  if (!family) throw new ComponentContractQueryError("COMPONENT_FAMILY_NOT_CONTRACTED", `Family is not contracted: ${familyId}.`)
-  return family
-}
-
-export function lookupComponentExport(familyId: string, exportName: string): DeepReadonly<PublicExportContract> {
-  getComponentFamily(familyId)
-  const entry = indexes.exportsByQualifiedName.get(qualified(familyId, exportName))
-  if (!entry) throw new ComponentContractQueryError("COMPONENT_EXPORT_NOT_CONTRACTED", `Export is not contracted: ${familyId}.${exportName}.`)
-  return entry
-}
-
-export function getInheritedInterface(interfaceId: string): DeepReadonly<InheritedInterfaceContract> {
-  const contract = indexes.interfacesById.get(interfaceId)
-  if (!contract) throw new ComponentContractQueryError("INHERITED_INTERFACE_NOT_CONTRACTED", `Inherited interface is not contracted: ${interfaceId}.`)
-  return contract
-}
-
-export function isAuthorableJsxExport(familyId: string, exportName: string) {
-  const entry = lookupComponentExport(familyId, exportName)
-  return entry.kind === "component" && entry.authorableJsx
-}
-
-export function queryComponentCapabilities(capability: string): readonly ComponentCapabilityMatch[] {
-  const matches = indexes.capabilities.get(capability)
-  if (!matches) throw new ComponentContractQueryError("COMPONENT_CAPABILITY_NOT_CONTRACTED", `Capability is not contracted: ${capability}.`)
-  return freezeResults(matches.map((match) => ({ ...match })))
-}
-
-export function queryComponentTokenDependencies(tokenId: string): readonly ComponentTokenDependencyMatch[] {
-  const matches = indexes.tokens.get(tokenId)
-  if (!matches) throw new ComponentContractQueryError("COMPONENT_TOKEN_NOT_CONTRACTED", `Token has no contracted component dependencies: ${tokenId}.`)
-  return freezeResults(matches.map((match) => ({ ...match })))
+/** Builds immutable indexes over any production loader, without canonical-family assumptions. */
+export function createComponentContractQuery(load: () => LoadedComponentContracts): ComponentContractQuery {
+  const loaded = load()
+  const indexes = buildIndexes(loaded)
+  const getComponentFamily = (familyId: string): DeepReadonly<ComponentFamilyContract> => {
+    const family = indexes.familiesById.get(familyId)
+    if (!family) throw new ComponentContractQueryError("COMPONENT_FAMILY_NOT_CONTRACTED", `Family is not contracted: ${familyId}.`)
+    return family
+  }
+  return Object.freeze({
+    getComponentContractSet: () => loaded.contractSet,
+    listComponentFamilies: () => Object.freeze([...indexes.families]),
+    getComponentFamily,
+    lookupComponentExport: (familyId, exportName) => {
+      getComponentFamily(familyId)
+      const entry = indexes.exportsByQualifiedName.get(qualified(familyId, exportName))
+      if (!entry) throw new ComponentContractQueryError("COMPONENT_EXPORT_NOT_CONTRACTED", `Export is not contracted: ${familyId}.${exportName}.`)
+      return entry
+    },
+    getInheritedInterface: (interfaceId) => {
+      const contract = indexes.interfacesById.get(interfaceId)
+      if (!contract) throw new ComponentContractQueryError("INHERITED_INTERFACE_NOT_CONTRACTED", `Inherited interface is not contracted: ${interfaceId}.`)
+      return contract
+    },
+    isAuthorableJsxExport: (familyId, exportName) => {
+      const entry = indexes.exportsByQualifiedName.get(qualified(familyId, exportName))
+      if (!entry) {
+        getComponentFamily(familyId)
+        throw new ComponentContractQueryError("COMPONENT_EXPORT_NOT_CONTRACTED", `Export is not contracted: ${familyId}.${exportName}.`)
+      }
+      return entry.kind === "component" && entry.authorableJsx
+    },
+    queryComponentCapabilities: (capability) => {
+      const matches = indexes.capabilities.get(capability)
+      if (!matches) throw new ComponentContractQueryError("COMPONENT_CAPABILITY_NOT_CONTRACTED", `Capability is not contracted: ${capability}.`)
+      return freezeResults(matches.map((match) => ({ ...match })))
+    },
+    queryComponentTokenDependencies: (tokenId) => {
+      const matches = indexes.tokens.get(tokenId)
+      if (!matches) throw new ComponentContractQueryError("COMPONENT_TOKEN_NOT_CONTRACTED", `Token has no contracted component dependencies: ${tokenId}.`)
+      return freezeResults(matches.map((match) => ({ ...match })))
+    },
+  })
 }

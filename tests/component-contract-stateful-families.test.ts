@@ -110,6 +110,13 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
       expect.objectContaining({ sourceText: "...dynamicVariants", reason: expect.stringContaining("CVA variant value") }),
       expect.objectContaining({ sourceText: "...dynamicVariants", reason: expect.stringContaining("CVA compound") }),
     ]))
+    expect(source.unresolved.filter((finding) => finding.reason.includes("CVA")).map((finding) => `${finding.expressionKind}|${finding.sourceText}|${finding.reason}`)).toEqual([
+      "Identifier|dynamicVariants|Unsupported dynamic CVA variants.",
+      "SpreadAssignment|...dynamicVariants|Unsupported CVA variant property.",
+      "SpreadAssignment|...dynamicVariants|Unsupported CVA configuration property.",
+      "SpreadAssignment|...dynamicVariants|Unsupported CVA variant value property.",
+      "SpreadAssignment|...dynamicVariants|Unsupported CVA compound variant property.",
+    ])
   })
 
   test("classifies arbitrary values, CSS keywords, and current color by generic utility semantics", () => {

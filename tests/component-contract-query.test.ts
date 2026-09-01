@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { loadComponentContracts } from "../src/contracts/components/loader"
+import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import {
   getComponentContractSet,
   getComponentFamily,

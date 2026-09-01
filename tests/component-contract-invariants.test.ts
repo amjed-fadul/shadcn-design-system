@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 
-import { assertComponentFamilyInvariants, validateComponentFamilyInvariants } from "../src/contracts/components/invariants"
-import type { ComponentFamilyContract, InheritedInterfaceContract } from "../src/contracts/components/types"
+import { assertComponentFamilyInvariants, validateComponentContractSetInvariants, validateComponentFamilyInvariants } from "../src/contracts/components/invariants"
+import type { ComponentContractSet, ComponentFamilyContract, InheritedInterfaceContract } from "../src/contracts/components/types"
 import "./helpers/component-contract-model-extension"
 
 function validFamily(): ComponentFamilyContract {
@@ -56,6 +56,15 @@ const htmlExample: InheritedInterfaceContract = {
 const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
 
 describe("component contract semantic invariants", () => {
+  test("rejects a contract set whose declared family count exceeds its manifest", () => {
+    const contractSet: ComponentContractSet = {
+      schemaVersion: 1, id: "example", status: "candidate", designSystemId: "example", sourceBaselineCommit: "a".repeat(40), tokenContractId: "example-tokens",
+      familyCount: 2, familyFiles: ["contracts/components/families/example.json"], interfaceFiles: [],
+    }
+
+    expect(validateComponentContractSetInvariants(contractSet)).toEqual(["Contract set familyCount must equal familyFiles length."])
+  })
+
   test("accepts a valid generic family", () => {
     expect(validateComponentFamilyInvariants(validFamily(), authority)).toEqual([])
     expect(() => assertComponentFamilyInvariants(validFamily(), authority)).not.toThrow()

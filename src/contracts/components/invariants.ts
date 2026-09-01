@@ -5,7 +5,10 @@ type PublicPropFact = { name: string; availability: "available" | "unavailable";
 
 export function isStructuredPropTypeAssignable(source: StructuredPropType, target: StructuredPropType): boolean {
   if (source.kind === "union") return source.members.every((member) => isStructuredPropTypeAssignable(member, target))
-  if (target.kind === "union") return target.members.some((member) => isStructuredPropTypeAssignable(source, member))
+  if (target.kind === "union") {
+    if (target.members.some((member) => isStructuredPropTypeAssignable(source, member))) return true
+    return source.kind === "boolean" && target.members.some((member) => member.kind === "literal" && member.value === true) && target.members.some((member) => member.kind === "literal" && member.value === false)
+  }
   if (target.kind === "typescript") return source.kind === "typescript" && source.typeText === target.typeText
   if (source.kind === "typescript") return false
   if (target.kind === "array") return source.kind === "array" && isStructuredPropTypeAssignable(source.item, target.item)
@@ -189,6 +192,13 @@ function validateStateChannels(errors: string[], family: ComponentFamilyContract
     if (state.changeEventProp) {
       if (!events.has(state.changeEventProp) && props.has(state.changeEventProp)) errors.push(`State channel ${componentName}.${state.name} change role references a value prop instead of an event: ${state.changeEventProp}.`)
       else if (!events.has(state.changeEventProp)) errors.push(`State channel ${componentName}.${state.name} references unknown change event: ${state.changeEventProp}.`)
+      else {
+        const changeEvent = events.get(state.changeEventProp)!
+        const stateValueTypes = [controlled?.type, defaultValue?.type].filter((type): type is StructuredPropType => Boolean(type))
+        if (stateValueTypes.length > 0 && (!changeEvent.payload || stateValueTypes.some((type) => !isStructuredPropTypeAssignable(changeEvent.payload!, type)))) {
+          errors.push(`State channel ${componentName}.${state.name} has incompatible change event payload.`)
+        }
+      }
     }
     if (controlled?.type && defaultValue?.type && !areStructuredPropTypesCompatible(controlled.type, defaultValue.type)) errors.push(`State channel ${componentName}.${state.name} has incompatible controlled and default value types.`)
   }
@@ -302,8 +312,26 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
       registerEvent(event, false)
     }
     validateStateChannels(errors, family, entry.name, component.stateChannels, props, events)
+    for (const [relation, label] of [["requires", "required capability"], ["hardConstraints", "hard constraint"]] as const) {
+      const seenCapabilities = new Set<string>()
+      for (const capability of component.composition[relation]) {
+        if (seenCapabilities.has(capability)) errors.push(`Component ${entry.name} has duplicate ${label} capability: ${capability}.`)
+        seenCapabilities.add(capability)
+        if (authority.capabilityIds && !authority.capabilityIds.has(capability)) errors.push(`Component ${entry.name} ${label} references unknown capability: ${capability}.`)
+      }
+    }
+    const providedCapabilities = new Set<string>()
+    for (const capability of component.composition.provides) {
+      if (providedCapabilities.has(capability)) errors.push(`Component ${entry.name} has duplicate provided capability: ${capability}.`)
+      providedCapabilities.add(capability)
+      if (authority.capabilityIds && !authority.capabilityIds.has(capability)) errors.push(`Component ${entry.name} provides unknown capability: ${capability}.`)
+    }
+    const tokenDependencyKeys = new Set<string>()
     for (const token of component.tokenDependencies) {
       hasEvidence(errors, token.evidenceRefs, family.evidence, `Token dependency ${entry.name}.${token.tokenId}`)
+      const key = JSON.stringify({ tokenId: token.tokenId, ...(token.when ? { when: token.when } : {}), ...(token.viaDerivedRule ? { viaDerivedRule: token.viaDerivedRule } : {}) })
+      if (tokenDependencyKeys.has(key)) errors.push(`Component ${entry.name} has duplicate token dependency: ${token.tokenId}.`)
+      tokenDependencyKeys.add(key)
       if (!authority.tokenIds.has(token.tokenId)) errors.push(`Component ${entry.name} references unknown token: ${token.tokenId}.`)
       if (token.viaDerivedRule && !authority.derivedTokenRuleIds.has(token.viaDerivedRule.id)) errors.push(`Component ${entry.name} references unknown derived token rule: ${token.viaDerivedRule.id}.`)
     }
@@ -362,5 +390,5 @@ export function validateInheritedInterfaceInvariants(contract: InheritedInterfac
   return errors
 }
 export function assertInheritedInterfaceInvariants(contract: InheritedInterfaceContract): void { const errors = validateInheritedInterfaceInvariants(contract); if (errors.length) throw new Error(errors.join("\n")) }
-export function validateComponentContractSetInvariants(contract: ComponentContractSet): string[] { return contract.familyCount < contract.familyFiles.length ? ["Contract set familyFiles exceeds familyCount."] : [] }
+export function validateComponentContractSetInvariants(contract: ComponentContractSet): string[] { return contract.familyCount !== contract.familyFiles.length ? ["Contract set familyCount must equal familyFiles length."] : [] }
 export function assertComponentContractSetInvariants(contract: ComponentContractSet): void { const errors = validateComponentContractSetInvariants(contract); if (errors.length) throw new Error(errors.join("\n")) }

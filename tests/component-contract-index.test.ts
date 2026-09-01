@@ -5,7 +5,7 @@ import { join } from "node:path"
 import { describe, expect, test } from "vitest"
 
 import type { ComponentContractArtifactSource } from "../src/contracts/components/loader"
-import { loadComponentContracts } from "../src/contracts/components/loader"
+import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import type { ComponentContractSet, ComponentFamilyContract, InheritedInterfaceContract } from "../src/contracts/components/types"
 
 const root = fileURLToPath(new URL("../", import.meta.url))

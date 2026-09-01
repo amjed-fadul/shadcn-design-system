@@ -176,7 +176,7 @@
     },
     "unresolved": {
       "type": "object", "additionalProperties": false, "required": ["topic", "scope", "reason", "evidenceAttempted", "evidenceRefs"],
-      "properties": { "topic": { "type": "string" }, "scope": { "type": "string" }, "reason": { "type": "string" }, "evidenceAttempted": { "type": "array", "items": { "type": "string" } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
+      "properties": { "topic": { "type": "string" }, "scope": { "type": "string" }, "reason": { "type": "string" }, "source": { "type": "object", "additionalProperties": false, "required": ["sourcePath", "start", "end", "expressionKind", "sourceText"], "properties": { "sourcePath": { "type": "string" }, "start": { "type": "integer", "minimum": 0 }, "end": { "type": "integer", "minimum": 0 }, "expressionKind": { "type": "string" }, "sourceText": { "type": "string" } } }, "evidenceAttempted": { "type": "array", "items": { "type": "string" } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     }
   }
 }
