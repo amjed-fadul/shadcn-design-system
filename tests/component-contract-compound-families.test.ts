@@ -7,7 +7,7 @@ import { describe, expect, test } from "vitest"
 import contractSet from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
 import { resolveConditionalApiShape, validateComponentFamilyInvariants, validateInheritedInterfaceInvariants } from "../src/contracts/components/invariants"
-import type { ComponentFamilyContract, InheritedInterfaceContract, RenderingFact } from "../src/contracts/components/types"
+import { isRenderingTree, type ComponentFamilyContract, type InheritedInterfaceContract, type RenderingFact, type RenderingTree } from "../src/contracts/components/types"
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependencies, analyzeComponentTokenSource, auditComponentTokenCoverage, compareComponentTokenDependencies } from "./helpers/component-token-analysis"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
@@ -19,6 +19,11 @@ const task5Exports: Record<string, string[]> = {
   "dropdown-menu": ["DropdownMenu", "DropdownMenuCheckboxItem", "DropdownMenuContent", "DropdownMenuGroup", "DropdownMenuItem", "DropdownMenuLabel", "DropdownMenuPortal", "DropdownMenuRadioGroup", "DropdownMenuRadioItem", "DropdownMenuSeparator", "DropdownMenuShortcut", "DropdownMenuSub", "DropdownMenuSubContent", "DropdownMenuSubTrigger", "DropdownMenuTrigger"],
   dialog: ["Dialog", "DialogClose", "DialogContent", "DialogDescription", "DialogFooter", "DialogHeader", "DialogOverlay", "DialogPortal", "DialogTitle", "DialogTrigger"],
   sheet: ["Sheet", "SheetClose", "SheetContent", "SheetDescription", "SheetFooter", "SheetHeader", "SheetTitle", "SheetTrigger"],
+}
+
+function tree(rendering: RenderingFact): RenderingTree {
+  if (!isRenderingTree(rendering)) throw new Error("Expected an unconditional rendering tree in a pre-Task 6A family.")
+  return rendering
 }
 
 const expectedInterfaces = [
@@ -106,11 +111,11 @@ function authority() {
 }
 
 describe("compound and overlay Phase 3 Task 5 component contracts", () => {
-  test("registers exactly four new families and reaches 18 of 19", () => {
+  test("preserves the four Task 5 families within the completed family set", () => {
     expect(contractSet.familyCount).toBe(19)
-    expect(contractSet.familyFiles).toHaveLength(18)
+    expect(contractSet.familyFiles).toHaveLength(19)
     expect(contractSet.familyFiles.filter((file) => task5Families.some((id) => file.endsWith(`/${id}.json`))).sort()).toEqual(task5Families.map((id) => `contracts/components/families/${id}.json`).sort())
-    expect(contractSet.familyFiles.some((file) => file.endsWith("/sidebar.json"))).toBe(false)
+    expect(contractSet.familyFiles.some((file) => file.endsWith("/sidebar.json"))).toBe(true)
   })
 
   test.each(task5Families)("reconciles %s source exports independently", (id) => {
@@ -210,8 +215,8 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
         expect.objectContaining({ when: { propName: "showCloseButton", equals: true } }),
         expect.objectContaining({ when: { propName: "showCloseButton", equals: false } }),
       ]))
-      expect(content.rendering.portalBoundaries).toEqual(expect.arrayContaining([expect.objectContaining({ nodeId: "portal" })]))
-      expect(content.rendering.nodes).toEqual(expect.arrayContaining([
+      expect(tree(content.rendering).portalBoundaries).toEqual(expect.arrayContaining([expect.objectContaining({ nodeId: "portal" })]))
+      expect(tree(content.rendering).nodes).toEqual(expect.arrayContaining([
         expect.objectContaining({ id: "portal" }),
         expect.objectContaining({ id: "overlay" }),
         expect.objectContaining({ id: "content", receivesPublicProps: true }),
@@ -226,7 +231,7 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
 
   test("rejects render, token, authority, and declaration mutations", () => {
     const dialogContent = family("dialog").exports.find(({ name }) => name === "DialogContent")!.component!
-    const renderMutation = structuredClone(dialogContent.rendering)
+    const renderMutation = structuredClone(tree(dialogContent.rendering))
     renderMutation.portalBoundaries = []
     expect(sourceAnalysis.compareJsxRenderTree(renderMutation, sourceAnalysis.analyzeJsxRenderTree(sourcePath("dialog"), "DialogContent"))).not.toEqual([])
 
@@ -305,7 +310,7 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
   ])("rejects a derived condition with %s", (_label, condition, message) => {
     const candidate = structuredClone(family("tabs"))
     const list = candidate.exports.find(({ name }) => name === "TabsList")!.component!
-    list.rendering.nodes[0].dataAttributes.push({ name: "data-derived", source: "derived-condition", condition, evidenceRefs: ["source"] })
+    tree(list.rendering).nodes[0].dataAttributes.push({ name: "data-derived", source: "derived-condition", condition, evidenceRefs: ["source"] })
     expect(validateComponentFamilyInvariants(candidate, authority()).some((error) => error.includes(message))).toBe(true)
   })
 })

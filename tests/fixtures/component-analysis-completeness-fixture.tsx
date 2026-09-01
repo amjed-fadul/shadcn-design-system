@@ -11,6 +11,9 @@ declare const dynamicVariants: Record<string, unknown>
 declare const Primitive: any
 declare const StaticChild: any
 declare const unrelated: Record<string, unknown>
+declare const Tooltip: any
+declare const TooltipTrigger: any
+declare const TooltipContent: any
 
 function DynamicTokenFixture() {
   return (
@@ -82,4 +85,34 @@ function UnsupportedDerivedAttributeFixture({ mode = "a", ...rest }: { mode?: "a
   return <Primitive.Root data-match={compute(mode)} {...rest} />
 }
 
-export { ConditionalRenderFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+function ConditionalRootFixture({ collapsible, ...rest }: { collapsible: "none" | "offcanvas" }) {
+  const isMobile = condition
+  if (collapsible === "none") return <div {...rest} />
+  if (isMobile) return <Primitive.Sheet {...rest} />
+  return <div {...rest} />
+}
+
+function ConditionalValueFixture({ collapsible, ...rest }: { collapsible: string }) {
+  const state = tone
+  return <Primitive.Root data-collapsible={state === "collapsed" ? collapsible : ""} {...rest} />
+}
+
+function JsxAliasFixture({ tooltip, ...rest }: { tooltip?: string | Record<string, unknown> }) {
+  const button = <Primitive.Button {...rest} />
+  if (!tooltip) return button
+  const tooltipProps = typeof tooltip === "string" ? { children: tooltip } : tooltip
+  return <Tooltip><TooltipTrigger>{button}</TooltipTrigger><TooltipContent {...tooltipProps} /></Tooltip>
+}
+
+function UnsupportedDerivedSpreadFixture({ tooltip, ...rest }: { tooltip?: string }) {
+  const tooltipProps = compute(tooltip) as Record<string, unknown>
+  return <Primitive.Content {...tooltipProps} {...rest} />
+}
+
+function UnsupportedReturnConditionFixture({ condition, mode, ...rest }: { condition: boolean; mode?: { value: boolean } }) {
+  if (condition) return <Primitive.Known {...rest} />
+  if (mode?.value) return <Primitive.Unknown {...rest} />
+  return <Primitive.Fallback {...rest} />
+}
+
+export { ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

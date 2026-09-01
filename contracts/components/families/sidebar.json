@@ -1,0 +1,3224 @@
+{
+  "schemaVersion": 1,
+  "id": "sidebar",
+  "source": {
+    "canonicalPath": "src/components/ui/sidebar.tsx",
+    "canonicalBlobSha": "a2cc82dbfd31c8f75a326946cf9fe87389d334d0",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
+    "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/sidebar.tsx@a2cc82dbfd31c8f75a326946cf9fe87389d334d0"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "react-intrinsic and radix.separator.root declarations"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    },
+    "runtime": {
+      "kind": "runtime-test",
+      "source": "tests/studio-components-sidebar.test.tsx"
+    }
+  },
+  "exports": [
+    {
+      "name": "SidebarProvider",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "defaultOpen",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": true,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "open",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "onOpenChange",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "(open: boolean) => void"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [
+            "sidebar.context"
+          ],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "open",
+            "controlledProp": "open",
+            "defaultProp": "defaultOpen",
+            "changeEventProp": "onOpenChange",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [
+          {
+            "propName": "onOpenChange",
+            "payload": {
+              "kind": "boolean"
+            },
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          }
+        ],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.sidebar",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "provider",
+          "publicPropsTargetNodeId": "wrapper",
+          "nodes": [
+            {
+              "id": "provider",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "derivedSpreads": [],
+              "children": [
+                {
+                  "nodeId": "wrapper",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "wrapper",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-wrapper",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "Sidebar",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "side",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "left",
+                "right"
+              ]
+            },
+            "default": "left",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "sidebar",
+                "floating",
+                "inset"
+              ]
+            },
+            "default": "sidebar",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "collapsible",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "offcanvas",
+                "icon",
+                "none"
+              ]
+            },
+            "default": "offcanvas",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "sidebar.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.sidebar",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "alternatives": [
+            {
+              "when": {
+                "propName": "collapsible",
+                "equals": "none"
+              },
+              "rendering": {
+                "rootNodeId": "plain",
+                "publicPropsTargetNodeId": "plain",
+                "nodes": [
+                  {
+                    "id": "plain",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "when": {
+                "source": "state",
+                "name": "isMobile",
+                "truthiness": "truthy"
+              },
+              "rendering": {
+                "rootNodeId": "sheet",
+                "publicPropsTargetNodeId": "sheet",
+                "nodes": [
+                  {
+                    "id": "sheet",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sheet-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sheet-content",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-mobile",
+                        "source": "literal",
+                        "value": "true",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sheet-header",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "mobile-inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sheet-header",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sheet-title",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "sheet-description",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sheet-title",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sheet-description",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "mobile-inner",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "desktop",
+                "publicPropsTargetNodeId": "container",
+                "nodes": [
+                  {
+                    "id": "desktop",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "state",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-collapsible",
+                        "source": "conditional-value",
+                        "condition": {
+                          "source": "state",
+                          "name": "state",
+                          "equals": "collapsed"
+                        },
+                        "whenTrue": {
+                          "source": "prop",
+                          "name": "collapsible"
+                        },
+                        "whenFalse": {
+                          "source": "literal",
+                          "value": ""
+                        },
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-side",
+                        "source": "prop",
+                        "prop": "side",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "gap",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "container",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "gap",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-gap",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "container",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-container",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-side",
+                        "source": "prop",
+                        "prop": "side",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "inner",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarTrigger",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.button"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "sidebar.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [
+          {
+            "propName": "onClick",
+            "payload": {
+              "kind": "typescript",
+              "typeText": "MouseEvent<HTMLButtonElement>"
+            },
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          }
+        ],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "trigger",
+          "publicPropsTargetNodeId": "trigger",
+          "nodes": [
+            {
+              "id": "trigger",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "trigger",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-trigger",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [
+                {
+                  "nodeId": "icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "label",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "icon",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "label",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "span"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarRail",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.button"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "sidebar.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "rail",
+          "publicPropsTargetNodeId": "rail",
+          "nodes": [
+            {
+              "id": "rail",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "button"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "rail",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-rail",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarInset",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.main"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "inset",
+          "publicPropsTargetNodeId": "inset",
+          "nodes": [
+            {
+              "id": "inset",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "main"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-inset",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarInput",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.input"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "input",
+          "publicPropsTargetNodeId": "input",
+          "nodes": [
+            {
+              "id": "input",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "input",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-input",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarHeader",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "header",
+          "publicPropsTargetNodeId": "header",
+          "nodes": [
+            {
+              "id": "header",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "header",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-header",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarFooter",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "footer",
+          "publicPropsTargetNodeId": "footer",
+          "nodes": [
+            {
+              "id": "footer",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "footer",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-footer",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarSeparator",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.separator.root"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "separator",
+          "publicPropsTargetNodeId": "separator",
+          "nodes": [
+            {
+              "id": "separator",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "separator",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-separator",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarContent",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "content",
+          "publicPropsTargetNodeId": "content",
+          "nodes": [
+            {
+              "id": "content",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarGroup",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "group",
+          "publicPropsTargetNodeId": "group",
+          "nodes": [
+            {
+              "id": "group",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "group",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-group",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarGroupLabel",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 1,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "group-label",
+          "publicPropsTargetNodeId": "group-label",
+          "nodes": [
+            {
+              "id": "group-label",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "group-label",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-group-label",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarGroupAction",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.button"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 1,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "group-action",
+          "publicPropsTargetNodeId": "group-action",
+          "nodes": [
+            {
+              "id": "group-action",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "group-action",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-group-action",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarGroupContent",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "group-content",
+          "publicPropsTargetNodeId": "group-content",
+          "nodes": [
+            {
+              "id": "group-content",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "group-content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-group-content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenu",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.ul"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "menu",
+          "publicPropsTargetNodeId": "menu",
+          "nodes": [
+            {
+              "id": "menu",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "ul"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuItem",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.li"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "menu-item",
+          "publicPropsTargetNodeId": "menu-item",
+          "nodes": [
+            {
+              "id": "menu-item",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "li"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-item",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-item",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuButton",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "outline"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "sm",
+                "lg"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "tooltip",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "string | ComponentProps<typeof TooltipContent>"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.button"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 1,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [
+            "sidebar.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent",
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent-foreground",
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-border",
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent",
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent-foreground",
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.xs",
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 12
+            },
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "alternatives": [
+            {
+              "when": {
+                "propName": "tooltip",
+                "truthiness": "falsy"
+              },
+              "rendering": {
+                "rootNodeId": "button",
+                "publicPropsTargetNodeId": "button",
+                "nodes": [
+                  {
+                    "id": "button",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-active",
+                        "source": "prop",
+                        "prop": "isActive",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "when": {
+                "propName": "tooltip",
+                "truthiness": "truthy"
+              },
+              "rendering": {
+                "rootNodeId": "tooltip",
+                "publicPropsTargetNodeId": "button",
+                "nodes": [
+                  {
+                    "id": "tooltip",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "tooltip-trigger",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "tooltip-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "tooltip-trigger",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "button",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-active",
+                        "source": "prop",
+                        "prop": "isActive",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "tooltip-content",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [
+                      {
+                        "source": "prop",
+                        "name": "tooltip",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuAction",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "showOnHover",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.button"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 1,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "menu-action",
+          "publicPropsTargetNodeId": "menu-action",
+          "nodes": [
+            {
+              "id": "menu-action",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-action",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-action",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuBadge",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "menu-badge",
+          "publicPropsTargetNodeId": "menu-badge",
+          "nodes": [
+            {
+              "id": "menu-badge",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-badge",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-badge",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuSkeleton",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "showIcon",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.div"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "menu-skeleton",
+          "publicPropsTargetNodeId": "menu-skeleton",
+          "nodes": [
+            {
+              "id": "menu-skeleton",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-skeleton",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-skeleton",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [
+                {
+                  "nodeId": "icon",
+                  "when": {
+                    "propName": "showIcon",
+                    "equals": true
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "text",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "icon",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-skeleton-icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-skeleton-icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "text",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-skeleton-text",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-skeleton-text",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuSub",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.ul"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-border",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "menu-sub",
+          "publicPropsTargetNodeId": "menu-sub",
+          "nodes": [
+            {
+              "id": "menu-sub",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "ul"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-sub",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-sub",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuSubItem",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.li"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "menu-sub-item",
+          "publicPropsTargetNodeId": "menu-sub-item",
+          "nodes": [
+            {
+              "id": "menu-sub-item",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "li"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-sub-item",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-sub-item",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "SidebarMenuSubButton",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "sm",
+                "md"
+              ]
+            },
+            "default": "md",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.a"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 1,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "menu-sub-button",
+          "publicPropsTargetNodeId": "menu-sub-button",
+          "nodes": [
+            {
+              "id": "menu-sub-button",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-sidebar",
+                  "source": "literal",
+                  "value": "menu-sub-button",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "sidebar-menu-sub-button",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-size",
+                  "source": "prop",
+                  "prop": "size",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-active",
+                  "source": "prop",
+                  "prop": "isActive",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "derivedSpreads": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "useSidebar",
+      "kind": "hook",
+      "authorableJsx": false,
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ],
+  "unresolved": []
+}

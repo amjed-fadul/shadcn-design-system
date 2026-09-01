@@ -84,6 +84,25 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, family)).toBe(true)
   })
 
+  test("accepts factual render alternatives, conditional values, and derived spreads", () => {
+    const family = validFamily()
+    const branch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], derivedSpreads: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] })
+    family.exports[0].component.rendering = {
+      alternatives: [
+        { when: { propName: "mode", equals: "plain" }, rendering: branch("plain"), evidenceRefs: ["source"] },
+        { when: { source: "state", name: "isMobile", truthiness: "truthy" }, rendering: branch("mobile"), evidenceRefs: ["source"] },
+        { otherwise: true, rendering: branch("desktop"), evidenceRefs: ["source"] },
+      ],
+    }
+    family.exports[0].component.rendering.alternatives[2].rendering.nodes[0].dataAttributes.push({ name: "data-value", source: "conditional-value", condition: { source: "state", name: "state", equals: "open" }, whenTrue: { source: "prop", name: "mode" }, whenFalse: { source: "literal", value: "" }, evidenceRefs: ["source"] })
+    family.exports[0].component.rendering.alternatives[2].rendering.nodes[0].derivedSpreads.push({ source: "prop", name: "mode", evidenceRefs: ["source"] })
+    expect(validate(familySchema, family)).toBe(true)
+
+    const malformed = structuredClone(family)
+    malformed.exports[0].component.rendering.alternatives[2] = { otherwise: false, rendering: branch("bad"), evidenceRefs: ["source"] }
+    expect(validate(familySchema, malformed)).toBe(false)
+  })
+
   test.each([
     ["unknown structured property", (value: any) => ({ ...value, unknown: true })],
     ["invalid export kind", (value: any) => ({ ...value, exports: [{ ...value.exports[0], kind: "widget" }] })],

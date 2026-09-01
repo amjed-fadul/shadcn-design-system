@@ -7,12 +7,17 @@ import { describe, expect, test } from "vitest"
 import contractSet from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
 import { resolveConditionalApiShape, validateComponentFamilyInvariants, validateInheritedInterfaceInvariants } from "../src/contracts/components/invariants"
-import type { ComponentFamilyContract, InheritedInterfaceContract } from "../src/contracts/components/types"
+import { isRenderingTree, type ComponentFamilyContract, type InheritedInterfaceContract, type RenderingFact, type RenderingTree } from "../src/contracts/components/types"
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import * as tokenAnalysis from "./helpers/component-token-analysis"
 import { extractCvaVariantLiterals, extractFunctionPropDefaults, listModuleExports, readCanonicalSourceBlobSha } from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependencies, auditComponentTokenCoverage } from "./helpers/component-token-analysis"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
+
+function tree(rendering: RenderingFact): RenderingTree {
+  if (!isRenderingTree(rendering)) throw new Error("Expected an unconditional rendering tree in a pre-Task 6A family.")
+  return rendering
+}
 
 const task4FamilyFiles = ["accordion", "checkbox", "scroll-area", "tabs", "tooltip"]
 const root = fileURLToPath(new URL("../", import.meta.url))
@@ -124,8 +129,11 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     expect(conditional.root).toMatchObject({ children: expect.arrayContaining([expect.objectContaining({ tag: "StaticChild" })]) })
     expect(conditional.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("Conditional JSX child")]))
     const multipleReturns = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "MultipleReturnFixture")
-    expect(multipleReturns.root).toMatchObject({ tag: "Primitive.Root" })
-    expect(multipleReturns.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("Multiple returned JSX")]))
+    expect(multipleReturns.alternatives).toEqual([
+      { when: { propName: "condition", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Primitive.Root" }) },
+      { when: { propName: "condition", truthiness: "falsy" }, root: expect.objectContaining({ tag: "Primitive.Root" }) },
+    ])
+    expect(multipleReturns.unresolved).toEqual([])
   })
 
   test("discovers direct, conditional, and CVA compound class-bearing expressions without harvesting unrelated strings", () => {
@@ -162,15 +170,15 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     }
 
     const checkbox = structuredClone(family("checkbox")!)
-    checkbox.exports[0].component!.rendering.portalBoundaries.push({ nodeId: "root", evidenceRefs: ["source"] })
+    tree(checkbox.exports[0].component!.rendering).portalBoundaries.push({ nodeId: "root", evidenceRefs: ["source"] })
     expect(compareJsxRenderTree!(checkbox.exports[0].component!.rendering, sourceAnalysis.analyzeJsxRenderTree(join(root, "src/components/ui/checkbox.tsx"), "Checkbox"))).not.toEqual([])
 
     const tooltip = structuredClone(family("tooltip")!)
-    tooltip.exports.find((entry) => entry.name === "TooltipContent")!.component!.rendering.portalBoundaries = []
+    tree(tooltip.exports.find((entry) => entry.name === "TooltipContent")!.component!.rendering).portalBoundaries = []
     expect(compareJsxRenderTree!(tooltip.exports.find((entry) => entry.name === "TooltipContent")!.component!.rendering, sourceAnalysis.analyzeJsxRenderTree(join(root, "src/components/ui/tooltip.tsx"), "TooltipContent"))).not.toEqual([])
 
     const scrollArea = structuredClone(family("scroll-area")!)
-    scrollArea.exports.find((entry) => entry.name === "ScrollArea")!.component!.rendering.nodes.find((node) => node.id === "root")!.children.pop()
+    tree(scrollArea.exports.find((entry) => entry.name === "ScrollArea")!.component!.rendering).nodes.find((node) => node.id === "root")!.children.pop()
     expect(compareJsxRenderTree!(scrollArea.exports.find((entry) => entry.name === "ScrollArea")!.component!.rendering, sourceAnalysis.analyzeJsxRenderTree(join(root, "src/components/ui/scroll-area.tsx"), "ScrollArea"))).not.toEqual([])
   })
 
@@ -241,7 +249,7 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const component = checkbox.exports[0].component!
     expect(component.inherits).toEqual(["radix.checkbox.root"])
     expect(component.stateChannels).toEqual([{ name: "checked", controlledProp: "checked", defaultProp: "defaultChecked", changeEventProp: "onCheckedChange", evidenceRefs: ["source", "declaration"] }])
-    expect(component.rendering.nodes).toEqual(expect.arrayContaining([
+    expect(tree(component.rendering).nodes).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: "root", host: { kind: "inherited-interface", interfaceId: "radix.checkbox.root" }, receivesPublicProps: true, children: [expect.objectContaining({ nodeId: "indicator" })] }),
       expect.objectContaining({ id: "indicator", host: { kind: "inherited-interface", interfaceId: "radix.checkbox.indicator" }, children: [expect.objectContaining({ nodeId: "icon" })] }),
       expect.objectContaining({ id: "icon", host: { kind: "unresolved" } }),
@@ -279,7 +287,7 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const content = tooltip.exports.find((entry) => entry.name === "TooltipContent")!.component!
     expect(provider.inheritedPropDefaults).toEqual([{ propName: "delayDuration", value: 0, evidenceRefs: ["source"] }])
     expect(content.inheritedPropDefaults).toEqual([{ propName: "sideOffset", value: 0, evidenceRefs: ["source"] }])
-    expect(content.rendering.portalBoundaries).toEqual([{ nodeId: "portal", evidenceRefs: ["source"] }])
+    expect(tree(content.rendering).portalBoundaries).toEqual([{ nodeId: "portal", evidenceRefs: ["source"] }])
     expect(validateComponentFamilyInvariants(tooltip, authority())).toEqual([])
   })
 
@@ -287,9 +295,9 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const scrollArea = family("scroll-area")!
     const rootComponent = scrollArea.exports.find((entry) => entry.name === "ScrollArea")!.component!
     const barComponent = scrollArea.exports.find((entry) => entry.name === "ScrollBar")!.component!
-    expect(rootComponent.rendering.nodes.find((node) => node.id === "root")!.children.map((child) => child.nodeId)).toEqual(["viewport", "scrollbar", "corner"])
+    expect(tree(rootComponent.rendering).nodes.find((node) => node.id === "root")!.children.map((child) => child.nodeId)).toEqual(["viewport", "scrollbar", "corner"])
     expect(barComponent.inheritedPropDefaults).toEqual([{ propName: "orientation", value: "vertical", evidenceRefs: ["source"] }])
-    expect(barComponent.rendering.nodes.find((node) => node.id === "scrollbar")!.children.map((child) => child.nodeId)).toEqual(["thumb"])
+    expect(tree(barComponent.rendering).nodes.find((node) => node.id === "scrollbar")!.children.map((child) => child.nodeId)).toEqual(["thumb"])
     expect(validateComponentFamilyInvariants(scrollArea, authority())).toEqual([])
   })
 })

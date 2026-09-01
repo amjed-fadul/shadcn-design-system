@@ -7,10 +7,15 @@ import { describe, expect, test } from "vitest"
 import contractSet from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
 import { validateComponentFamilyInvariants, validateInheritedInterfaceInvariants } from "../src/contracts/components/invariants"
-import type { ComponentFamilyContract, InheritedInterfaceContract } from "../src/contracts/components/types"
+import { isRenderingTree, type ComponentFamilyContract, type InheritedInterfaceContract, type RenderingFact, type RenderingTree } from "../src/contracts/components/types"
 import { extractCvaVariantLiterals, extractDataSlotLiterals, extractFunctionPropDefaults, listModuleExports, readCanonicalSourceBlobSha } from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependencies, analyzeTailwindTokenDependencies, auditComponentTokenCoverage } from "./helpers/component-token-analysis"
 import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
+
+function tree(rendering: RenderingFact): RenderingTree {
+  if (!isRenderingTree(rendering)) throw new Error("Expected an unconditional rendering tree in a pre-Task 6A family.")
+  return rendering
+}
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const familyIds = ["badge", "input", "separator", "skeleton", "card", "textarea", "table", "label"]
@@ -45,7 +50,7 @@ describe("simple/native-oriented component contracts", () => {
     expect(contractSet.familyCount).toBe(19)
     const frozenFiles = ["button", ...familyIds].map((id) => `contracts/components/families/${id}.json`).sort()
     expect(contractSet.familyFiles.filter((file) => frozenFiles.includes(file)).sort()).toEqual(frozenFiles)
-    expect(contractSet.familyFiles).toHaveLength(18)
+    expect(contractSet.familyFiles).toHaveLength(19)
   })
 
   test.each(familyIds)("reconciles %s identity and exact public exports", (id) => {
@@ -76,9 +81,9 @@ describe("simple/native-oriented component contracts", () => {
       if (entry.kind === "component") {
         expect(entry.authorableJsx).toBe(true)
         expect(entry.component).toBeDefined()
-        expect(entry.component!.rendering.nodes.length).toBeGreaterThan(0)
-        expect(entry.component!.rendering.nodes.flatMap((node) => node.dataAttributes).every(({ name, value, prop }) => name.startsWith("data-") && (prop || (value && extractDataSlotLiterals(source).includes(value))))).toBe(true)
-        expect(entry.component!.rendering.nodes.filter((node) => node.receivesPublicProps)).toHaveLength(1)
+        expect(tree(entry.component!.rendering).nodes.length).toBeGreaterThan(0)
+        expect(tree(entry.component!.rendering).nodes.flatMap((node) => node.dataAttributes).every(({ name, value, prop }) => name.startsWith("data-") && (prop || (value && extractDataSlotLiterals(source).includes(value))))).toBe(true)
+        expect(tree(entry.component!.rendering).nodes.filter((node) => node.receivesPublicProps)).toHaveLength(1)
       } else {
         expect(entry.authorableJsx).toBe(false)
         expect(entry.component).toBeUndefined()

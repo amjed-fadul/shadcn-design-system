@@ -69,15 +69,24 @@ export function extractButtonRenderingEvidence(sourcePath: string, exportName: s
   return { asChildDefault: extractFunctionPropDefaults(sourcePath, exportName).get("asChild"), conditionProp, whenTrue: replacementHost, whenFalse: defaultHost, replacementHost, defaultHost, dataAttributes, forwardsProps, portals }
 }
 
-export type JsxRenderCondition = { propName: string; equals: string | number | boolean }
-type JsxDataAttribute = { name: string; value?: string; prop?: string; condition?: JsxRenderCondition; expression?: string } & (
+export type JsxRenderCondition =
+  | { propName: string; equals: string | number | boolean }
+  | { propName: string; truthiness: "truthy" | "falsy" }
+  | { source: "state"; name: string; equals: string | number | boolean }
+  | { source: "state"; name: string; truthiness: "truthy" | "falsy" }
+export type JsxRenderValue = { source: "literal"; value: string | number | boolean } | { source: "prop" | "state"; name: string }
+type JsxDataAttribute = { name: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: JsxRenderValue; whenFalse?: JsxRenderValue; expression?: string } & (
   | { source: "literal" | "primitive-state" }
   | { source: "prop"; prop: string }
   | { source: "derived-condition"; condition: JsxRenderCondition }
+  | { source: "conditional-value"; condition: JsxRenderCondition; whenTrue: JsxRenderValue; whenFalse: JsxRenderValue }
   | { source: "unresolved" }
 )
-export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition }
-export type JsxRenderTree = { root?: JsxRenderNode; unresolved: string[] }
+export type JsxDerivedSpread = { source: "prop" | "state"; name: string }
+export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition }
+export type JsxRenderAlternative = ({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { root: JsxRenderNode }
+export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; unresolved: string[] }
+type JsxScope = { aliases: Map<string, JsxRenderNode>; derivedSpreads: Map<string, JsxDerivedSpread> }
 
 function jsxTagName(tagName: ts.JsxTagNameExpression, file: ts.SourceFile): { tag: string; kind: JsxRenderNode["kind"] } {
   const tag = tagName.getText(file)
@@ -95,23 +104,69 @@ function publicPropBindings(functionDeclaration: SourceFunction) {
   return bindings
 }
 
+function referenceCondition(name: string, publicBindings: Set<string>, condition: { equals: string | number | boolean } | { truthiness: "truthy" | "falsy" }): JsxRenderCondition {
+  return publicBindings.has(name) ? { propName: name, ...condition } : { source: "state", name, ...condition }
+}
+
 function derivedCondition(expression: ts.Expression, publicBindings: Set<string>): JsxRenderCondition | undefined {
   if (!ts.isBinaryExpression(expression) || expression.operatorToken.kind !== ts.SyntaxKind.EqualsEqualsEqualsToken) return undefined
   const left = ts.isIdentifier(expression.left) ? expression.left.text : undefined
   const right = ts.isIdentifier(expression.right) ? expression.right.text : undefined
   const leftLiteral = literal(expression.left)
   const rightLiteral = literal(expression.right)
-  if (left && publicBindings.has(left) && rightLiteral !== undefined && rightLiteral !== null) return { propName: left, equals: rightLiteral }
-  if (right && publicBindings.has(right) && leftLiteral !== undefined && leftLiteral !== null) return { propName: right, equals: leftLiteral }
+  if (left && rightLiteral !== undefined && rightLiteral !== null) return referenceCondition(left, publicBindings, { equals: rightLiteral })
+  if (right && leftLiteral !== undefined && leftLiteral !== null) return referenceCondition(right, publicBindings, { equals: leftLiteral })
   return undefined
 }
 
-function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, publicBindings: Set<string>, unresolved: string[]) {
+function truthinessCondition(expression: ts.Expression, publicBindings: Set<string>): JsxRenderCondition | undefined {
+  if (ts.isIdentifier(expression)) return referenceCondition(expression.text, publicBindings, { truthiness: "truthy" })
+  if (ts.isPrefixUnaryExpression(expression) && expression.operator === ts.SyntaxKind.ExclamationToken && ts.isIdentifier(expression.operand)) return referenceCondition(expression.operand.text, publicBindings, { truthiness: "falsy" })
+  return undefined
+}
+
+function renderValue(expression: ts.Expression, publicBindings: Set<string>): JsxRenderValue | undefined {
+  const value = literal(expression)
+  if (value !== undefined && value !== null) return { source: "literal", value }
+  if (ts.isIdentifier(expression)) return publicBindings.has(expression.text) ? { source: "prop", name: expression.text } : { source: "state", name: expression.text }
+  return undefined
+}
+
+function conditionalValue(expression: ts.Expression, publicBindings: Set<string>) {
+  if (!ts.isConditionalExpression(expression)) return undefined
+  const condition = derivedCondition(expression.condition, publicBindings)
+  const whenTrue = renderValue(expression.whenTrue, publicBindings)
+  const whenFalse = renderValue(expression.whenFalse, publicBindings)
+  return condition && whenTrue && whenFalse ? { condition, whenTrue, whenFalse } : undefined
+}
+
+function tracedPropSpread(expression: ts.Expression, publicBindings: Set<string>): JsxDerivedSpread | undefined {
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return tracedPropSpread(expression.expression, publicBindings)
+  if (ts.isIdentifier(expression) && publicBindings.has(expression.text)) return { source: "prop", name: expression.text }
+  if (ts.isConditionalExpression(expression)) {
+    const whenTrue = tracedPropSpread(expression.whenTrue, publicBindings)
+    const whenFalse = tracedPropSpread(expression.whenFalse, publicBindings)
+    return whenTrue && whenFalse && whenTrue.name === whenFalse.name ? whenTrue : undefined
+  }
+  if (!ts.isObjectLiteralExpression(expression)) return undefined
+  const values: JsxDerivedSpread[] = []
+  for (const property of expression.properties) {
+    if (!ts.isPropertyAssignment(property)) return undefined
+    const value = tracedPropSpread(property.initializer, publicBindings)
+    if (!value) return undefined
+    values.push(value)
+  }
+  return values.length > 0 && values.every((value) => value.name === values[0].name) ? values[0] : undefined
+}
+
+function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, publicBindings: Set<string>, unresolved: string[], scope: JsxScope) {
   let receivesPublicProps = false
   const dataAttributes: JsxRenderNode["dataAttributes"] = []
+  const derivedSpreads: JsxDerivedSpread[] = []
   for (const property of attributes.properties) {
     if (ts.isJsxSpreadAttribute(property)) {
       if (ts.isIdentifier(property.expression) && publicBindings.has(property.expression.text)) receivesPublicProps = true
+      else if (ts.isIdentifier(property.expression) && scope.derivedSpreads.has(property.expression.text)) derivedSpreads.push(scope.derivedSpreads.get(property.expression.text)!)
       else unresolved.push(`Unsupported spread provenance: ${property.expression.getText(file)}`)
     }
     if (ts.isJsxAttribute(property) && ts.isIdentifier(property.name) && property.name.text.startsWith("data-")) {
@@ -121,7 +176,12 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
       }
       const expression = property.initializer && ts.isJsxExpression(property.initializer) ? property.initializer.expression : undefined
       if (expression && ts.isIdentifier(expression)) {
-        dataAttributes.push({ name: property.name.text, source: "prop", prop: expression.text })
+        dataAttributes.push(publicBindings.has(expression.text) ? { name: property.name.text, source: "prop", prop: expression.text } : { name: property.name.text, source: "primitive-state", prop: expression.text })
+        continue
+      }
+      const values = expression && conditionalValue(expression, publicBindings)
+      if (values) {
+        dataAttributes.push({ name: property.name.text, source: "conditional-value", ...values })
         continue
       }
       const condition = expression && derivedCondition(expression, publicBindings)
@@ -134,68 +194,112 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
       dataAttributes.push({ name: property.name.text, source: "unresolved", ...(expressionText ? { expression: expressionText } : {}) })
     }
   }
-  return { receivesPublicProps, dataAttributes }
+  return { receivesPublicProps, dataAttributes, derivedSpreads }
 }
 
-function jsxExpressionChildren(expression: ts.Expression | undefined, file: ts.SourceFile, unresolved: string[], publicBindings: Set<string>): JsxRenderNode[] {
+function jsxExpressionChildren(expression: ts.Expression | undefined, file: ts.SourceFile, unresolved: string[], publicBindings: Set<string>, scope: JsxScope): JsxRenderNode[] {
   if (!expression || ts.isIdentifier(expression) && expression.text === "children") return []
-  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return jsxExpressionChildren(expression.expression, file, unresolved, publicBindings)
-  if (ts.isConditionalExpression(expression)) { unresolved.push(`Conditional JSX child cannot establish unconditional automatic structure: ${expression.condition.getText(file)}`); return [...jsxExpressionChildren(expression.whenTrue, file, unresolved, publicBindings), ...jsxExpressionChildren(expression.whenFalse, file, unresolved, publicBindings)] }
+  if (ts.isIdentifier(expression) && scope.aliases.has(expression.text)) return [structuredClone(scope.aliases.get(expression.text)!)]
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return jsxExpressionChildren(expression.expression, file, unresolved, publicBindings, scope)
+  if (ts.isConditionalExpression(expression)) { unresolved.push(`Conditional JSX child cannot establish unconditional automatic structure: ${expression.condition.getText(file)}`); return [...jsxExpressionChildren(expression.whenTrue, file, unresolved, publicBindings, scope), ...jsxExpressionChildren(expression.whenFalse, file, unresolved, publicBindings, scope)] }
   if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
     if (ts.isIdentifier(expression.left)) {
       const propName = expression.left.text
-      return jsxExpressionChildren(expression.right, file, unresolved, publicBindings).map((node) => ({ ...node, when: { propName, equals: true } }))
+      return jsxExpressionChildren(expression.right, file, unresolved, publicBindings, scope).map((node) => ({ ...node, when: publicBindings.has(propName) ? { propName, equals: true } : { source: "state", name: propName, truthiness: "truthy" } }))
     }
     unresolved.push(`Conditional JSX child cannot establish automatic structure: ${expression.left.getText(file)}`)
-    return jsxExpressionChildren(expression.right, file, unresolved, publicBindings)
+    return jsxExpressionChildren(expression.right, file, unresolved, publicBindings, scope)
   }
-  if (ts.isJsxElement(expression)) return [jsxNode(expression, file, unresolved, publicBindings)]
-  if (ts.isJsxSelfClosingElement(expression)) return [jsxNode(expression, file, unresolved, publicBindings)]
-  if (ts.isJsxFragment(expression)) return [jsxNode(expression, file, unresolved, publicBindings)]
+  if (ts.isJsxElement(expression)) return [jsxNode(expression, file, unresolved, publicBindings, scope)]
+  if (ts.isJsxSelfClosingElement(expression)) return [jsxNode(expression, file, unresolved, publicBindings, scope)]
+  if (ts.isJsxFragment(expression)) return [jsxNode(expression, file, unresolved, publicBindings, scope)]
   unresolved.push(`Unsupported JSX child expression: ${expression.getText(file)}`)
   return []
 }
 
-function jsxChildren(children: readonly ts.JsxChild[], file: ts.SourceFile, unresolved: string[], publicBindings: Set<string>): JsxRenderNode[] {
+function jsxChildren(children: readonly ts.JsxChild[], file: ts.SourceFile, unresolved: string[], publicBindings: Set<string>, scope: JsxScope): JsxRenderNode[] {
   return children.flatMap((child) => {
-    if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child)) return [jsxNode(child, file, unresolved, publicBindings)]
-    if (ts.isJsxExpression(child)) return jsxExpressionChildren(child.expression, file, unresolved, publicBindings)
+    if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child)) return [jsxNode(child, file, unresolved, publicBindings, scope)]
+    if (ts.isJsxExpression(child)) return jsxExpressionChildren(child.expression, file, unresolved, publicBindings, scope)
     return []
   })
 }
 
-function jsxNode(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.JsxFragment, file: ts.SourceFile, unresolved: string[], publicBindings: Set<string>): JsxRenderNode {
-  if (ts.isJsxFragment(node)) return { tag: "Fragment", kind: "fragment", portal: false, receivesPublicProps: false, dataAttributes: [], children: jsxChildren(node.children, file, unresolved, publicBindings) }
+function jsxNode(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.JsxFragment, file: ts.SourceFile, unresolved: string[], publicBindings: Set<string>, scope: JsxScope): JsxRenderNode {
+  if (ts.isJsxFragment(node)) return { tag: "Fragment", kind: "fragment", portal: false, receivesPublicProps: false, dataAttributes: [], derivedSpreads: [], children: jsxChildren(node.children, file, unresolved, publicBindings, scope) }
   const opening = ts.isJsxElement(node) ? node.openingElement : node
   const name = jsxTagName(opening.tagName, file)
   if (name.kind === "unresolved") unresolved.push(`Unsupported JSX tag: ${name.tag}`)
-  return { ...name, portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings) : [] }
+  return { ...name, portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved, scope), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings, scope) : [] }
 }
 
-function returnedJsx(functionDeclaration: SourceFunction): ts.Expression[] {
-  const results: ts.Expression[] = []
-  if (ts.isArrowFunction(functionDeclaration) && !ts.isBlock(functionDeclaration.body)) return [functionDeclaration.body]
-  const visit = (node: ts.Node) => { if (ts.isReturnStatement(node) && node.expression) results.push(node.expression); else if (!ts.isFunctionLike(node) || node === functionDeclaration) ts.forEachChild(node, visit) }
-  if (functionDeclaration.body) ts.forEachChild(functionDeclaration.body, visit)
+type ReturnedJsx = { expression: ts.Expression; when?: JsxRenderCondition; otherwise?: true }
+
+function directReturns(statement: ts.Statement, condition: JsxRenderCondition | undefined, results: ReturnedJsx[]) {
+  if (ts.isReturnStatement(statement) && statement.expression) results.push({ expression: statement.expression, ...(condition ? { when: condition } : {}) })
+  else if (ts.isBlock(statement)) for (const child of statement.statements) directReturns(child, condition, results)
+}
+
+function returnedJsx(functionDeclaration: SourceFunction, publicBindings: Set<string>, unresolved: string[]): ReturnedJsx[] {
+  const results: ReturnedJsx[] = []
+  let hasUnsupportedReturnCondition = false
+  if (ts.isArrowFunction(functionDeclaration) && !ts.isBlock(functionDeclaration.body)) return [{ expression: functionDeclaration.body }]
+  if (!functionDeclaration.body || !ts.isBlock(functionDeclaration.body)) return results
+  for (const statement of functionDeclaration.body.statements) {
+    if (ts.isIfStatement(statement)) {
+      const condition = truthinessCondition(statement.expression, publicBindings) ?? derivedCondition(statement.expression, publicBindings)
+      if (!condition) {
+        unresolved.push(`Unsupported return condition: ${statement.expression.getText()}`)
+        hasUnsupportedReturnCondition = true
+        continue
+      }
+      directReturns(statement.thenStatement, condition, results)
+      if (statement.elseStatement && condition && "truthiness" in condition) directReturns(statement.elseStatement, { ...condition, truthiness: condition.truthiness === "truthy" ? "falsy" : "truthy" }, results)
+      else if (statement.elseStatement) directReturns(statement.elseStatement, undefined, results)
+    } else directReturns(statement, undefined, results)
+  }
+  if (hasUnsupportedReturnCondition) return results.filter((result) => result.when)
+  if (results.length === 2 && results[0].when && "truthiness" in results[0].when && !results[1].when) results[1].when = { ...results[0].when, truthiness: results[0].when.truthiness === "truthy" ? "falsy" : "truthy" }
+  if (results.length > 1) for (const result of results) if (!result.when) result.otherwise = true
   return results
+}
+
+function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publicBindings: Set<string>, unresolved: string[]) {
+  const scope: JsxScope = { aliases: new Map(), derivedSpreads: new Map() }
+  const visit = (node: ts.Node) => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
+      if (ts.isJsxElement(node.initializer) || ts.isJsxSelfClosingElement(node.initializer) || ts.isJsxFragment(node.initializer)) {
+        const nodes = jsxExpressionChildren(node.initializer, file, unresolved, publicBindings, scope)
+        if (nodes.length === 1) scope.aliases.set(node.name.text, nodes[0])
+      } else {
+        const spread = tracedPropSpread(node.initializer, publicBindings)
+        if (spread) scope.derivedSpreads.set(node.name.text, spread)
+      }
+    }
+    if (!ts.isFunctionLike(node) || node === functionDeclaration) ts.forEachChild(node, visit)
+  }
+  if (functionDeclaration.body) ts.forEachChild(functionDeclaration.body, visit)
+  return scope
 }
 
 export function analyzeJsxRenderTree(sourcePath: string, exportName: string): JsxRenderTree {
   const file = sourceFile(sourcePath)
   const declaration = findSourceFunction(sourcePath, exportName)
-  const expressions = declaration ? returnedJsx(declaration) : []
   const unresolved: string[] = []
-  if (!expressions.length) return { unresolved: [`No returned JSX found for ${exportName}`] }
-  const roots = expressions.flatMap((expression) => jsxExpressionChildren(expression, file, unresolved, publicPropBindings(declaration!)))
-  if (roots.length !== 1) {
-    if (!roots.length) unresolved.push(`No JSX root found for ${exportName}`)
-    else unresolved.push(`Multiple returned JSX roots found for ${exportName}`)
-  }
-  return { ...(roots.length ? { root: roots[0] } : {}), unresolved }
+  if (!declaration) return { unresolved: [`No returned JSX found for ${exportName}`] }
+  const bindings = publicPropBindings(declaration)
+  const scope = aliases(declaration, file, bindings, unresolved)
+  const expressions = returnedJsx(declaration, bindings, unresolved)
+  if (!expressions.length) return { unresolved: [...unresolved, `No returned JSX found for ${exportName}`] }
+  const roots = expressions.flatMap((expression) => jsxExpressionChildren(expression.expression, file, unresolved, bindings, scope).map((root) => ({ ...expression, root })))
+  if (roots.length !== expressions.length || !roots.length) unresolved.push(`No JSX root found for ${exportName}`)
+  if (roots.length === 1 && !roots[0].when && !roots[0].otherwise) return { root: roots[0].root, unresolved }
+  return { alternatives: roots.map(({ when, otherwise, root }) => when ? { when, root } : { otherwise: otherwise ?? true, root }), unresolved }
 }
 
-type ContractRenderNode = { id: string; host: { kind: string; tag?: string; interfaceId?: string; exportName?: string }; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; value?: string; prop?: string; condition?: JsxRenderCondition } & ({ source: "literal" | "primitive-state" } | { source: "prop"; prop: string } | { source: "derived-condition"; condition: JsxRenderCondition })>; children: Array<{ nodeId: string; when?: JsxRenderCondition }> }
-type ContractRendering = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: ContractRenderNode[]; portalBoundaries: Array<{ nodeId: string }> }
+type ContractRenderNode = { id: string; host: { kind: string; tag?: string; interfaceId?: string; exportName?: string }; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; source: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: unknown; whenFalse?: unknown }>; derivedSpreads?: Array<{ source: string; name: string }>; children: Array<{ nodeId: string; when?: JsxRenderCondition }> }
+type ContractRenderingTree = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: ContractRenderNode[]; portalBoundaries: Array<{ nodeId: string }> }
+type ContractRendering = ContractRenderingTree | { alternatives: Array<({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { rendering: ContractRenderingTree }> }
 
 function normalizedRenderName(name: string) { return name.replace(/primitive/gi, "").replace(/[^a-z0-9]/gi, "").replace(/^radix/i, "").toLowerCase() }
 
@@ -214,16 +318,20 @@ function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNo
 function sameDataAttributes(expected: ContractRenderNode["dataAttributes"], actual: JsxRenderNode["dataAttributes"]) {
   return expected.length === actual.length && expected.every((attribute, index) => {
     const candidate = actual[index]
-    return attribute.name === candidate?.name && attribute.source === candidate?.source && attribute.value === candidate?.value && attribute.prop === candidate?.prop && JSON.stringify(attribute.condition ?? null) === JSON.stringify(candidate?.source === "derived-condition" ? candidate.condition : null)
+    return attribute.name === candidate?.name && attribute.source === candidate?.source && attribute.value === candidate?.value && attribute.prop === candidate?.prop && JSON.stringify(attribute.condition ?? null) === JSON.stringify(candidate?.condition ?? null) && JSON.stringify(attribute.source === "conditional-value" ? attribute.whenTrue : null) === JSON.stringify(candidate?.source === "conditional-value" ? candidate.whenTrue : null) && JSON.stringify(attribute.source === "conditional-value" ? attribute.whenFalse : null) === JSON.stringify(candidate?.source === "conditional-value" ? candidate.whenFalse : null)
   })
+}
+
+function sameDerivedSpreads(expected: ContractRenderNode["derivedSpreads"], actual: JsxRenderNode["derivedSpreads"]) {
+  return JSON.stringify((expected ?? []).map(({ source, name }) => ({ source, name }))) === JSON.stringify(actual)
 }
 
 /** Compares contract rendering facts with a source-derived JSX tree without assigning semantics to unresolved expressions. */
 export function compareJsxRenderTree(rendering: ContractRendering, source: JsxRenderTree): string[] {
   const errors = [...source.unresolved]
-  if (!source.root) return [...errors, "Source has no render root."]
-  const nodes = new Map(rendering.nodes.map((node) => [node.id, node]))
-  const portalNodes = new Set(rendering.portalBoundaries.map((boundary) => boundary.nodeId))
+  const compareTree = (expectedRendering: ContractRenderingTree, root: JsxRenderNode) => {
+  const nodes = new Map(expectedRendering.nodes.map((node) => [node.id, node]))
+  const portalNodes = new Set(expectedRendering.portalBoundaries.map((boundary) => boundary.nodeId))
   const seen = new Set<string>()
   const compare = (id: string, actual: JsxRenderNode, path: string) => {
     const expected = nodes.get(id)
@@ -233,6 +341,7 @@ export function compareJsxRenderTree(rendering: ContractRendering, source: JsxRe
     if (!renderHostMatches(expected.host, actual)) errors.push(`Render host mismatch at ${path}: ${actual.tag}.`)
     if (expected.receivesPublicProps !== actual.receivesPublicProps) errors.push(`Public-props target mismatch at ${path}.`)
     if (!sameDataAttributes(expected.dataAttributes, actual.dataAttributes)) errors.push(`Data attributes mismatch at ${path}.`)
+    if (!sameDerivedSpreads(expected.derivedSpreads, actual.derivedSpreads)) errors.push(`Derived spreads mismatch at ${path}.`)
     if (portalNodes.has(id) !== actual.portal) errors.push(`Portal boundary mismatch at ${path}.`)
     if (expected.children.length !== actual.children.length) errors.push(`Automatic child count mismatch at ${path}.`)
     for (let index = 0; index < Math.min(expected.children.length, actual.children.length); index++) {
@@ -242,8 +351,22 @@ export function compareJsxRenderTree(rendering: ContractRendering, source: JsxRe
       compare(expectedChild.nodeId, actualChild, `${path}>${actualChild.tag}`)
     }
   }
-  compare(rendering.rootNodeId, source.root, source.root.tag)
-  if (rendering.publicPropsTargetNodeId && !seen.has(rendering.publicPropsTargetNodeId)) errors.push("Public-props target is not source-reachable.")
-  if (seen.size !== rendering.nodes.length) errors.push("Contract has render nodes absent from source.")
+  compare(expectedRendering.rootNodeId, root, root.tag)
+  if (expectedRendering.publicPropsTargetNodeId && !seen.has(expectedRendering.publicPropsTargetNodeId)) errors.push("Public-props target is not source-reachable.")
+  if (seen.size !== expectedRendering.nodes.length) errors.push("Contract has render nodes absent from source.")
+  }
+  if ("alternatives" in rendering) {
+    if (!source.alternatives) return [...errors, "Source has no render alternatives."]
+    if (rendering.alternatives.length !== source.alternatives.length) errors.push("Render alternative count mismatch.")
+    for (let index = 0; index < Math.min(rendering.alternatives.length, source.alternatives.length); index++) {
+      const expected = rendering.alternatives[index]
+      const actual = source.alternatives[index]
+      if (JSON.stringify("when" in expected ? expected.when : { otherwise: true }) !== JSON.stringify("when" in actual ? actual.when : { otherwise: true })) errors.push(`Render alternative condition mismatch at ${index}.`)
+      compareTree(expected.rendering, actual.root)
+    }
+    return errors
+  }
+  if (!source.root) return [...errors, "Source has no render root."]
+  compareTree(rendering, source.root)
   return errors
 }

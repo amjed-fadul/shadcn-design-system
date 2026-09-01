@@ -9,6 +9,8 @@ for (const [utility, token] of [
   ["popover", "color.popover"], ["popover-foreground", "color.popover-foreground"], ["primary", "color.primary"], ["primary-foreground", "color.primary-foreground"],
   ["secondary", "color.secondary"], ["secondary-foreground", "color.secondary-foreground"], ["muted", "color.muted"], ["muted-foreground", "color.muted-foreground"],
   ["accent", "color.accent"], ["accent-foreground", "color.accent-foreground"], ["destructive", "color.destructive"], ["border", "color.border"], ["input", "color.input"], ["ring", "color.ring"],
+  ["sidebar", "color.sidebar"], ["sidebar-foreground", "color.sidebar-foreground"], ["sidebar-primary", "color.sidebar-primary"], ["sidebar-primary-foreground", "color.sidebar-primary-foreground"],
+  ["sidebar-accent", "color.sidebar-accent"], ["sidebar-accent-foreground", "color.sidebar-accent-foreground"], ["sidebar-border", "color.sidebar-border"], ["sidebar-ring", "color.sidebar-ring"],
 ] as const) for (const prefix of ["bg", "text", "border", "ring", "outline", "decoration", "fill", "stroke"]) direct.set(`${prefix}-${utility}`, token)
 for (const [utility, token] of [["rounded-sm", "radius.sm"], ["rounded-md", "radius.md"], ["rounded-lg", "radius.lg"], ["rounded-xl", "radius.xl"], ["shadow-sm", "shadow.sm"], ["shadow-md", "shadow.md"], ["shadow-lg", "shadow.lg"], ["tracking-widest", "letter-spacing.widest"], ["font-heading", "font.heading"], ["font-sans", "font.sans"], ["text-xs", "font-size.xs"], ["text-sm", "font-size.sm"], ["text-base", "font-size.base"], ["text-lg", "font-size.lg"], ["font-medium", "font-weight.medium"], ["font-normal", "font-weight.normal"], ["font-semibold", "font-weight.semibold"]] as const) direct.set(utility, token)
 
@@ -136,6 +138,50 @@ export function analyzeComponentTokenSource(sourcePath: string): ComponentTokenS
   return { resolved: unique(output.resolved), unresolved: unique(output.unresolved) }
 }
 
+function findTopLevelFunction(source: ts.SourceFile, exportName: string): ts.FunctionDeclaration | undefined {
+  return source.statements.find((statement): statement is ts.FunctionDeclaration => ts.isFunctionDeclaration(statement) && statement.name?.text === exportName)
+}
+
+function topLevelCvaScope(source: ts.SourceFile): Scope {
+  const cva = new Map<string, ts.CallExpression>()
+  for (const statement of source.statements) {
+    if (!ts.isVariableStatement(statement)) continue
+    for (const declaration of statement.declarationList.declarations) {
+      if (ts.isIdentifier(declaration.name) && declaration.initializer && isCallTo(declaration.initializer, "cva")) cva.set(declaration.name.text, declaration.initializer)
+    }
+  }
+  return { cva, publicClassBindings: new Set() }
+}
+
+/** Resolves class-bearing token evidence inside one named component export only. */
+export function analyzeComponentTokenSourceForExport(sourcePath: string, exportName: string): ComponentTokenSourceAnalysis {
+  const source = ts.createSourceFile(sourcePath, readFileSync(sourcePath, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  const declaration = findTopLevelFunction(source, exportName)
+  if (!declaration?.body) return {
+    resolved: [],
+    unresolved: [{ sourcePath, start: 0, end: 0, expressionKind: "SourceFile", sourceText: exportName, reason: "No component source found." }],
+  }
+  const output: ComponentTokenSourceAnalysis = { resolved: [], unresolved: [] }
+  const scope = topLevelCvaScope(source)
+  for (const binding of publicClassBindings(declaration)) scope.publicClassBindings.add(binding)
+  const visit = (node: ts.Node): void => {
+    if (ts.isFunctionLike(node) && node !== declaration) return
+    if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && node.name.text === "className" && node.initializer) {
+      if (ts.isStringLiteral(node.initializer)) output.resolved.push({ classNames: node.initializer.text })
+      else if (ts.isJsxExpression(node.initializer)) classSourcesFromExpression(node.initializer.expression, output, sourcePath, source, scope)
+      return
+    }
+    if (isCallTo(node as ts.Expression, "cn")) {
+      classSourcesFromExpression(node as ts.CallExpression, output, sourcePath, source, scope)
+      return
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(declaration.body)
+  const unique = <T>(items: T[]) => items.filter((item, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(item)) === index)
+  return { resolved: unique(output.resolved), unresolved: unique(output.unresolved) }
+}
+
 export type TokenCoverageClassification =
   | "resolved-approved-token"
   | "known-non-token-implementation"
@@ -183,7 +229,7 @@ function hasCssKeywordValue(utility: string) { return /-(?:inherit|initial|unset
 function usesCurrentColor(utility: string, namespace: string | undefined) { return namespace === "color" && /-current$/.test(utility) }
 function isRawPrimitiveColorUtility(utility: string) { return /^(?:bg|text|border|ring|outline|decoration|fill|stroke)-(?:black|white|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(?:-(?:50|100|200|300|400|500|600|700|800|900|950))?$/.test(utility) }
 function isRecognizedNoApprovedToken(utility: string, namespace: string | undefined) {
-  return isArbitraryValueUtility(utility) || hasCssKeywordValue(utility) || usesCurrentColor(utility, namespace) || utility === "leading-none" || utility === "rounded-full"
+  return isArbitraryValueUtility(utility) || hasCssKeywordValue(utility) || usesCurrentColor(utility, namespace) || utility === "leading-none" || utility === "rounded-full" || utility === "shadow-none"
 }
 
 /**
@@ -228,6 +274,14 @@ export function analyzeComponentTokenDependencies(sourcePath: string): TokenDepe
   return dependencies.filter((dependency, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(dependency)) === index)
 }
 
+export function analyzeComponentTokenDependenciesForExport(sourcePath: string, exportName: string): TokenDependency[] {
+  const dependencies: TokenDependency[] = []
+  for (const recipe of analyzeComponentTokenSourceForExport(sourcePath, exportName).resolved) {
+    dependencies.push(...analyzeTailwindTokenDependencies(recipe.classNames).map((dependency) => recipe.propName && recipe.equals ? { ...dependency, when: { propName: recipe.propName, equals: recipe.equals } } : dependency))
+  }
+  return dependencies.filter((dependency, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(dependency)) === index)
+}
+
 /** Compares a contract's normalized dependency set to the class-bearing utilities found in source. */
 export function compareComponentTokenDependencies(sourcePath: string, dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>): string[] {
   const key = ({ tokenId, when, viaDerivedRule }: Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">) => JSON.stringify({ tokenId, ...(when ? { when } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) })
@@ -239,5 +293,17 @@ export function compareComponentTokenDependencies(sourcePath: string, dependenci
     ...analysis.unresolved.map((item) => `Unresolved class evidence at ${sourcePath}:${item.start}: ${item.reason} (${item.sourceText})`),
     ...[...expected].filter((item) => !actual.has(item)).map((item) => `Missing source token dependency: ${item}`),
     ...[...actual].filter((item) => !expected.has(item)).map((item) => `Invented token dependency: ${item}`),
+  ]
+}
+
+export function compareComponentTokenDependenciesForExport(sourcePath: string, exportName: string, dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>): string[] {
+  const key = ({ tokenId, when, viaDerivedRule }: Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">) => JSON.stringify({ tokenId, ...(when ? { when } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) })
+  const analysis = analyzeComponentTokenSourceForExport(sourcePath, exportName)
+  const expected = new Set(analyzeComponentTokenDependenciesForExport(sourcePath, exportName).map(key))
+  const actual = new Set(dependencies.map(key))
+  return [
+    ...analysis.unresolved.map((item) => `Unresolved class evidence at ${sourcePath}:${item.start}: ${item.reason} (${item.sourceText})`),
+    ...[...expected].filter((item) => !actual.has(item)).map((item) => `Missing source token dependency for ${exportName}: ${item}`),
+    ...[...actual].filter((item) => !expected.has(item)).map((item) => `Invented token dependency for ${exportName}: ${item}`),
   ]
 }

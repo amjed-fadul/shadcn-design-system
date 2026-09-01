@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act } from "react"
+import { act, useState } from "react"
 import { describe, expect, test } from "vitest"
 
 import {
@@ -104,6 +104,41 @@ describe("Studio V1 Sidebar component foundation", () => {
     act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true })))
     expect(sidebar?.getAttribute("data-state")).toBe("expanded")
     expect(document.cookie).toContain("sidebar_state=true")
+  })
+
+  test("preserves controlled SidebarProvider open state and onOpenChange values", () => {
+    const observed: boolean[] = []
+    const ControlledSidebar = () => {
+      const [open, setOpen] = useState(true)
+
+      return (
+        <SidebarProvider
+          open={open}
+          onOpenChange={(nextOpen) => {
+            observed.push(nextOpen)
+            setOpen(nextOpen)
+          }}
+        >
+          <Sidebar>
+            <SidebarTrigger />
+          </Sidebar>
+        </SidebarProvider>
+      )
+    }
+
+    const container = render(<ControlledSidebar />)
+    const sidebar = container.querySelector('[data-slot="sidebar"]')
+    const trigger = container.querySelector('[data-slot="sidebar-trigger"]') as HTMLButtonElement
+
+    expect(sidebar?.getAttribute("data-state")).toBe("expanded")
+
+    act(() => trigger.click())
+    expect(observed).toEqual([false])
+    expect(sidebar?.getAttribute("data-state")).toBe("collapsed")
+
+    act(() => trigger.click())
+    expect(observed).toEqual([false, true])
+    expect(sidebar?.getAttribute("data-state")).toBe("expanded")
   })
 
   test("preserves Sidebar mobile Sheet behavior", () => {

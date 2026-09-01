@@ -24,17 +24,27 @@ export type ConditionalApiCase = EvidenceRef & { when: { propName: string; equal
 export type EventContract = EvidenceRef & { propName: string; payload?: StructuredPropType }
 export type TokenDependency = EvidenceRef & { tokenId: string; when?: { propName: string; equals: string | number | boolean }; viaDerivedRule?: { id: string; multiplier: number } }
 export type RenderHost = { kind: "intrinsic"; tag: string } | { kind: "inherited-interface"; interfaceId: string } | { kind: "component-export"; exportName: string } | { kind: "fragment" } | { kind: "unresolved" }
-export type RenderCondition = { propName: string; equals: string | number | boolean }
+export type RenderCondition =
+  | { propName: string; equals: string | number | boolean }
+  | { propName: string; truthiness: "truthy" | "falsy" }
+  | { source: "state"; name: string; equals: string | number | boolean }
+  | { source: "state"; name: string; truthiness: "truthy" | "falsy" }
+export type RenderValue = { source: "literal"; value: string | number | boolean } | { source: "prop" | "state"; name: string }
 export type RenderChildRef = EvidenceRef & { nodeId: string; when?: RenderCondition }
 export type RenderDataAttribute = EvidenceRef & { name: string; value?: string; prop?: string; condition?: RenderCondition } & (
   | { source: "literal" }
   | { source: "prop"; prop: string }
   | { source: "primitive-state" }
   | { source: "derived-condition"; condition: RenderCondition }
+  | { source: "conditional-value"; condition: RenderCondition; whenTrue: RenderValue; whenFalse: RenderValue }
 )
-export type RenderNode = { id: string; host: RenderHost; receivesPublicProps: boolean; dataAttributes: RenderDataAttribute[]; children: RenderChildRef[]; evidenceRefs: string[] }
+export type DerivedRenderSpread = EvidenceRef & { source: "prop" | "state"; name: string }
+export type RenderNode = { id: string; host: RenderHost; receivesPublicProps: boolean; dataAttributes: RenderDataAttribute[]; derivedSpreads?: DerivedRenderSpread[]; children: RenderChildRef[]; evidenceRefs: string[] }
 export type PortalBoundary = EvidenceRef & { nodeId: string }
-export type RenderingFact = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: RenderNode[]; portalBoundaries: PortalBoundary[] }
+export type RenderingTree = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: RenderNode[]; portalBoundaries: PortalBoundary[] }
+export type RenderingAlternative = EvidenceRef & ({ when: RenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { rendering: RenderingTree }
+export type RenderingFact = RenderingTree | { alternatives: RenderingAlternative[] }
+export function isRenderingTree(rendering: RenderingFact): rendering is RenderingTree { return "nodes" in rendering }
 export type InheritedPropDefault = EvidenceRef & { propName: string; value: string | number | boolean | null }
 export type AccessibilityFact = EvidenceRef & { feature: string; owner: "native" | "author" | "component"; mechanism: string }
 export type ComponentDefinition = { localProps: LocalPropContract[]; inherits: string[]; slots: SlotContract[]; inheritedPropDefaults: InheritedPropDefault[]; composition: CompositionContract; stateChannels: StateChannel[]; conditionalApi: ConditionalApiCase[]; events: EventContract[]; tokenDependencies: TokenDependency[]; rendering: RenderingFact; accessibility: AccessibilityFact[] }

@@ -1,4 +1,5 @@
-import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, StructuredPropType } from "./types"
+import { isRenderingTree } from "./types"
+import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType } from "./types"
 
 type PublicPropFact = { name: string; availability: "available" | "unavailable"; required?: boolean; type?: StructuredPropType }
 
@@ -80,18 +81,22 @@ export function resolveConditionalApiShape(component: ComponentDefinition, selec
   return resolveConditionalApiShapeAtStage(component, selection, authority, true)
 }
 
-function validateRenderCondition(errors: string[], componentName: string, scope: string, condition: { propName: string; equals: string | number | boolean }, props: Map<string, PublicPropFact>) {
+function isPublicRenderCondition(condition: RenderCondition): condition is Extract<RenderCondition, { propName: string }> { return "propName" in condition }
+
+function validateRenderCondition(errors: string[], componentName: string, scope: string, condition: RenderCondition, props: Map<string, PublicPropFact>) {
+  if (!isPublicRenderCondition(condition)) return
   const prop = props.get(condition.propName)
   if (!prop || prop.availability !== "available") {
     errors.push(`Component ${componentName} ${scope} condition references unknown prop: ${condition.propName}.`)
     return
   }
+  if ("truthiness" in condition) return
   if (!prop.type || !isStructuredPropTypeAssignable({ kind: "literal", value: condition.equals }, prop.type)) {
     errors.push(`Component ${componentName} ${scope} condition has incompatible literal for prop ${condition.propName}: ${String(condition.equals)}.`)
   }
 }
 
-function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]) {
+function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: RenderingTree, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]) {
   const ids = new Set<string>()
   for (const node of rendering.nodes) {
     if (ids.has(node.id)) errors.push(`Component ${componentName} has duplicate render-node ID: ${node.id}.`)
@@ -101,6 +106,14 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
       hasEvidence(errors, attr.evidenceRefs, family.evidence, `Render attribute ${componentName}.${node.id}.${attr.name}`)
       if (attr.source === "derived-condition") validateRenderCondition(errors, componentName, `render attribute ${node.id}.${attr.name}`, attr.condition, props)
       if (attr.source === "prop" && !props.has(attr.prop)) errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} references unknown prop: ${attr.prop}.`)
+      if (attr.source === "conditional-value") {
+        validateRenderCondition(errors, componentName, `render attribute ${node.id}.${attr.name}`, attr.condition, props)
+        for (const value of [attr.whenTrue, attr.whenFalse]) if (value.source === "prop" && !props.has(value.name)) errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} references unknown prop value: ${value.name}.`)
+      }
+    }
+    for (const spread of node.derivedSpreads ?? []) {
+      hasEvidence(errors, spread.evidenceRefs, family.evidence, `Derived render spread ${componentName}.${node.id}.${spread.name}`)
+      if (spread.source === "prop" && !props.has(spread.name)) errors.push(`Component ${componentName} derived render spread ${node.id} references unknown prop: ${spread.name}.`)
     }
     if (node.host.kind === "component-export" && !exportEntries.has(node.host.exportName)) errors.push(`Component ${componentName} render host references unknown export: ${node.host.exportName}.`)
     if (node.host.kind === "component-export" && exportEntries.has(node.host.exportName) && (exportEntries.get(node.host.exportName)!.kind !== "component" || !exportEntries.get(node.host.exportName)!.authorableJsx)) errors.push(`Component ${componentName} render host references non-JSX-authorable export: ${node.host.exportName}.`)
@@ -119,10 +132,13 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
     hasEvidence(errors, child.evidenceRefs, family.evidence, `Render child ${componentName}.${node.id}->${child.nodeId}`)
     if (!ids.has(child.nodeId)) errors.push(`Component ${componentName} render node ${node.id} references unknown child: ${child.nodeId}.`)
     if (child.when) {
-      if (!props.has(child.when.propName)) errors.push(`Component ${componentName} render child condition references unknown prop: ${child.when.propName}.`)
-      const localProp = localProps.find((prop) => prop.name === child.when!.propName)
-      if (localProp?.type.kind === "boolean" && typeof child.when.equals !== "boolean") errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has boolean prop ${child.when.propName} but equals is not boolean.`)
-      if (localProp?.type.kind === "enum" && (typeof child.when.equals !== "string" || !localProp.type.values.includes(child.when.equals))) errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has enum prop ${child.when.propName} without value: ${String(child.when.equals)}.`)
+      if (isPublicRenderCondition(child.when)) {
+        const condition = child.when
+        if (!props.has(condition.propName)) errors.push(`Component ${componentName} render child condition references unknown prop: ${condition.propName}.`)
+        const localProp = localProps.find((prop) => prop.name === condition.propName)
+        if ("equals" in condition && localProp?.type.kind === "boolean" && typeof condition.equals !== "boolean") errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has boolean prop ${condition.propName} but equals is not boolean.`)
+        if ("equals" in condition && localProp?.type.kind === "enum" && (typeof condition.equals !== "string" || !localProp.type.values.includes(condition.equals))) errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has enum prop ${condition.propName} without value: ${String(condition.equals)}.`)
+      }
     }
   }
   const visiting = new Set<string>(), visited = new Set<string>()
@@ -137,6 +153,22 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
     if (!ids.has(boundary.nodeId)) errors.push(`Component ${componentName} portal boundary references unknown render node: ${boundary.nodeId}.`)
     else if (!visited.has(boundary.nodeId)) errors.push(`Component ${componentName} portal boundary references unreachable render node: ${boundary.nodeId}.`)
   }
+}
+
+function validateRendering(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]) {
+  if (isRenderingTree(rendering)) {
+    validateRenderingTree(errors, family, componentName, rendering, authority, exportEntries, props, localProps)
+    return
+  }
+  let otherwiseCount = 0
+  for (const [index, alternative] of rendering.alternatives.entries()) {
+    hasEvidence(errors, alternative.evidenceRefs, family.evidence, `Render alternative ${componentName}.${index}`)
+    if ("otherwise" in alternative) otherwiseCount += 1
+    else validateRenderCondition(errors, componentName, `render alternative ${index}`, alternative.when, props)
+    validateRenderingTree(errors, family, `${componentName} alternative ${index}`, alternative.rendering, authority, exportEntries, props, localProps)
+  }
+  if (otherwiseCount > 1) errors.push(`Component ${componentName} has multiple otherwise render alternatives.`)
+  if (rendering.alternatives.some((alternative, index) => "otherwise" in alternative && index !== rendering.alternatives!.length - 1)) errors.push(`Component ${componentName} has an otherwise render alternative before the final branch.`)
 }
 
 function validateStateChannels(errors: string[], family: ComponentFamilyContract, componentName: string, channels: ComponentDefinition["stateChannels"], props: Map<string, PublicPropFact>, events: Map<string, EventContract>) {
@@ -276,7 +308,7 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
       if (token.viaDerivedRule && !authority.derivedTokenRuleIds.has(token.viaDerivedRule.id)) errors.push(`Component ${entry.name} references unknown derived token rule: ${token.viaDerivedRule.id}.`)
     }
     validateConditionalApi(errors, family, entry.name, component, props, events, authority)
-    validateRenderingTree(errors, family, entry.name, component.rendering, authority, new Map(family.exports.map(({ name, kind, authorableJsx }) => [name, { kind, authorableJsx }])), props, component.localProps)
+    validateRendering(errors, family, entry.name, component.rendering, authority, new Map(family.exports.map(({ name, kind, authorableJsx }) => [name, { kind, authorableJsx }])), props, component.localProps)
     const slotNames = new Set<string>()
     for (const slot of component.slots) {
       if (slotNames.has(slot.propName)) errors.push(`Component ${entry.name} has duplicate Slot fact for prop: ${slot.propName}.`)

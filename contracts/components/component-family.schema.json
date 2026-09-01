@@ -107,7 +107,20 @@
         { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "unresolved" } } }
       ]
     },
-    "renderCondition": { "$ref": "#/$defs/apiCondition" },
+    "renderCondition": {
+      "oneOf": [
+        { "$ref": "#/$defs/apiCondition" },
+        { "type": "object", "additionalProperties": false, "required": ["propName", "truthiness"], "properties": { "propName": { "type": "string" }, "truthiness": { "enum": ["truthy", "falsy"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["source", "name", "equals"], "properties": { "source": { "const": "state" }, "name": { "type": "string" }, "equals": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] } } },
+        { "type": "object", "additionalProperties": false, "required": ["source", "name", "truthiness"], "properties": { "source": { "const": "state" }, "name": { "type": "string" }, "truthiness": { "enum": ["truthy", "falsy"] } } }
+      ]
+    },
+    "renderValue": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["source", "value"], "properties": { "source": { "const": "literal" }, "value": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] } } },
+        { "type": "object", "additionalProperties": false, "required": ["source", "name"], "properties": { "source": { "enum": ["prop", "state"] }, "name": { "type": "string" } } }
+      ]
+    },
     "renderChildRef": {
       "type": "object", "additionalProperties": false, "required": ["nodeId", "evidenceRefs"],
       "properties": { "nodeId": { "type": "string" }, "when": { "$ref": "#/$defs/renderCondition" }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
@@ -117,7 +130,8 @@
         { "type": "object", "additionalProperties": false, "required": ["name", "source", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "literal" }, "value": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
         { "type": "object", "additionalProperties": false, "required": ["name", "source", "prop", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "prop" }, "prop": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
         { "type": "object", "additionalProperties": false, "required": ["name", "source", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "primitive-state" }, "value": { "type": "string" }, "prop": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
-        { "type": "object", "additionalProperties": false, "required": ["name", "source", "condition", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "derived-condition" }, "condition": { "$ref": "#/$defs/renderCondition" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "condition", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "derived-condition" }, "condition": { "$ref": "#/$defs/renderCondition" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "condition", "whenTrue", "whenFalse", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "conditional-value" }, "condition": { "$ref": "#/$defs/renderCondition" }, "whenTrue": { "$ref": "#/$defs/renderValue" }, "whenFalse": { "$ref": "#/$defs/renderValue" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
       ]
     },
     "renderNode": {
@@ -126,6 +140,7 @@
       "properties": {
         "id": { "type": "string" }, "host": { "$ref": "#/$defs/renderHost" }, "receivesPublicProps": { "type": "boolean" },
         "dataAttributes": { "type": "array", "items": { "$ref": "#/$defs/renderDataAttribute" } },
+        "derivedSpreads": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["source", "name", "evidenceRefs"], "properties": { "source": { "enum": ["prop", "state"] }, "name": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } } },
         "children": { "type": "array", "items": { "$ref": "#/$defs/renderChildRef" } }, "evidenceRefs": { "$ref": "#/$defs/refs" }
       }
     },
@@ -134,6 +149,18 @@
       "required": ["rootNodeId", "publicPropsTargetNodeId", "nodes", "portalBoundaries"],
       "properties": { "rootNodeId": { "type": "string" }, "publicPropsTargetNodeId": { "type": "string" }, "nodes": { "type": "array", "items": { "$ref": "#/$defs/renderNode" } }, "portalBoundaries": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["nodeId", "evidenceRefs"], "properties": { "nodeId": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } } } }
     },
+    "renderingAlternative": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["when", "rendering", "evidenceRefs"], "properties": { "when": { "$ref": "#/$defs/renderCondition" }, "rendering": { "$ref": "#/$defs/renderingTree" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+        { "type": "object", "additionalProperties": false, "required": ["otherwise", "rendering", "evidenceRefs"], "properties": { "otherwise": { "const": true }, "rendering": { "$ref": "#/$defs/renderingTree" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
+      ]
+    },
+    "rendering": {
+      "oneOf": [
+        { "$ref": "#/$defs/renderingTree" },
+        { "type": "object", "additionalProperties": false, "required": ["alternatives"], "properties": { "alternatives": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/renderingAlternative" } } } }
+      ]
+    },
     "accessibility": {
       "type": "object", "additionalProperties": false, "required": ["feature", "owner", "mechanism", "evidenceRefs"],
       "properties": { "feature": { "type": "string" }, "owner": { "enum": ["native", "author", "component"] }, "mechanism": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
@@ -141,7 +168,7 @@
     "component": {
       "type": "object", "additionalProperties": false,
       "required": ["localProps", "inherits", "slots", "composition", "stateChannels", "conditionalApi", "events", "tokenDependencies", "rendering", "accessibility", "inheritedPropDefaults"],
-      "properties": { "localProps": { "type": "array", "items": { "$ref": "#/$defs/localProp" } }, "inherits": { "type": "array", "items": { "type": "string" } }, "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } }, "inheritedPropDefaults": { "type": "array", "items": { "$ref": "#/$defs/inheritedPropDefault" } }, "composition": { "$ref": "#/$defs/composition" }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "conditionalApi": { "type": "array", "items": { "$ref": "#/$defs/conditional" } }, "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }, "tokenDependencies": { "type": "array", "items": { "$ref": "#/$defs/token" } }, "rendering": { "$ref": "#/$defs/renderingTree" }, "accessibility": { "type": "array", "items": { "$ref": "#/$defs/accessibility" } } }
+      "properties": { "localProps": { "type": "array", "items": { "$ref": "#/$defs/localProp" } }, "inherits": { "type": "array", "items": { "type": "string" } }, "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } }, "inheritedPropDefaults": { "type": "array", "items": { "$ref": "#/$defs/inheritedPropDefault" } }, "composition": { "$ref": "#/$defs/composition" }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "conditionalApi": { "type": "array", "items": { "$ref": "#/$defs/conditional" } }, "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }, "tokenDependencies": { "type": "array", "items": { "$ref": "#/$defs/token" } }, "rendering": { "$ref": "#/$defs/rendering" }, "accessibility": { "type": "array", "items": { "$ref": "#/$defs/accessibility" } } }
     },
     "export": {
       "type": "object", "additionalProperties": false, "required": ["name", "kind", "authorableJsx", "evidenceRefs"],
