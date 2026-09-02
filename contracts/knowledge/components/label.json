@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "label-knowledge",
+  "subject": { "kind": "component", "id": "label" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available"
+  },
+  "whatItIs": {
+    "statement": "Renders an accessible label associated with controls.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.label.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Associate the label with a control by wrapping it or by using an explicit label-control association.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.label.docs"] }
+    }
+  ]
+}

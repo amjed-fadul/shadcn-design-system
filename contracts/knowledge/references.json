@@ -2,11 +2,43 @@
   "schemaVersion": 1,
   "references": [
     {
+      "id": "shadcn.accordion.docs",
+      "kind": "official-documentation",
+      "title": "Accordion - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/accordion",
+      "locatorHint": "Accordion; Usage; Composition; Multiple",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.badge.docs",
+      "kind": "official-documentation",
+      "title": "Badge - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/badge",
+      "locatorHint": "Badge; Usage; Variants",
+      "accessedOn": "2026-09-02"
+    },
+    {
       "id": "shadcn.button.docs",
       "kind": "official-documentation",
       "title": "Button - shadcn/ui",
       "locator": "https://ui.shadcn.com/docs/components/base/button",
       "locatorHint": "Button; Usage; Size; With Icon; As Link; API Reference",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.card.docs",
+      "kind": "official-documentation",
+      "title": "Card - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/card",
+      "locatorHint": "Card; Usage; Composition",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.checkbox.docs",
+      "kind": "official-documentation",
+      "title": "Checkbox - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/checkbox",
+      "locatorHint": "Checkbox; Usage; Label",
       "accessedOn": "2026-09-02"
     },
     {
@@ -18,11 +50,123 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.dropdown-menu.docs",
+      "kind": "official-documentation",
+      "title": "Dropdown Menu - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/dropdown-menu",
+      "locatorHint": "Dropdown Menu; Usage; Submenu; Checkboxes; Radio Group",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.input.docs",
+      "kind": "official-documentation",
+      "title": "Input - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/input",
+      "locatorHint": "Input; Usage; Field; Disabled; Invalid",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.label.docs",
+      "kind": "official-documentation",
+      "title": "Label - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/label",
+      "locatorHint": "Label; Usage; Label in Field",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.scroll-area.docs",
+      "kind": "official-documentation",
+      "title": "Scroll Area - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/scroll-area",
+      "locatorHint": "Scroll Area; Usage; Composition; Horizontal",
+      "accessedOn": "2026-09-02"
+    },
+    {
       "id": "shadcn.select.docs",
       "kind": "official-documentation",
       "title": "Select - shadcn/ui",
       "locator": "https://ui.shadcn.com/docs/components/base/select",
       "locatorHint": "Select; Usage; Composition; Groups; Scrollable; Invalid",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.separator.docs",
+      "kind": "official-documentation",
+      "title": "Separator - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/separator",
+      "locatorHint": "Separator; Usage; Vertical",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.sheet.docs",
+      "kind": "official-documentation",
+      "title": "Sheet - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/sheet",
+      "locatorHint": "Sheet; Usage; Side",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.sidebar.docs",
+      "kind": "official-documentation",
+      "title": "Sidebar - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/sidebar",
+      "locatorHint": "Sidebar; Usage; Collapsible; Props",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.skeleton.docs",
+      "kind": "official-documentation",
+      "title": "Skeleton - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/skeleton",
+      "locatorHint": "Skeleton; Usage",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.table.docs",
+      "kind": "official-documentation",
+      "title": "Table - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/table",
+      "locatorHint": "Table; Usage; Composition; Footer; Actions",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.tabs.docs",
+      "kind": "official-documentation",
+      "title": "Tabs - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/tabs",
+      "locatorHint": "Tabs; Usage; Composition; Line",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.textarea.docs",
+      "kind": "official-documentation",
+      "title": "Textarea - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/textarea",
+      "locatorHint": "Textarea; Usage; Disabled",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.tooltip.docs",
+      "kind": "official-documentation",
+      "title": "Tooltip - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/tooltip",
+      "locatorHint": "Tooltip; Usage; Hover",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "radix.checkbox.docs",
+      "kind": "official-documentation",
+      "title": "Checkbox - Radix Primitives",
+      "locator": "https://www.radix-ui.com/primitives/docs/components/checkbox",
+      "locatorHint": "Features; Indeterminate; Accessibility; Keyboard Interactions",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "radix.label.docs",
+      "kind": "official-documentation",
+      "title": "Label - Radix Primitives",
+      "locator": "https://www.radix-ui.com/primitives/docs/components/label",
+      "locatorHint": "Accessibility; htmlFor; Native label association",
       "accessedOn": "2026-09-02"
     },
     {

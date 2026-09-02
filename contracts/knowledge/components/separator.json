@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "separator-knowledge",
+  "subject": { "kind": "component", "id": "separator" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Visually or semantically separates content.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.separator.docs"] }
+  },
+  "options": [
+    {
+      "statement": "Choose vertical orientation when the separation should run vertically.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.separator.docs"] }
+    }
+  ]
+}

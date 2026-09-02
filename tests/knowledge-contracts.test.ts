@@ -249,18 +249,80 @@ describe("knowledge contract boundary", () => {
 })
 
 describe("canonical knowledge vertical slice", () => {
-  test("contains exactly Button, Dialog, Select, and Dialog-with-actions knowledge", () => {
+  test("lists all 19 component knowledge subjects and the existing pattern", () => {
     const loaded = loadKnowledge()
+    const componentIds = [
+      "accordion",
+      "badge",
+      "button",
+      "card",
+      "checkbox",
+      "dialog",
+      "dropdown-menu",
+      "input",
+      "label",
+      "scroll-area",
+      "select",
+      "separator",
+      "sheet",
+      "sidebar",
+      "skeleton",
+      "table",
+      "tabs",
+      "textarea",
+      "tooltip",
+    ]
 
-    expect(loaded.components.map((entry) => entry.subject.id)).toEqual(["button", "dialog", "select"])
+    expect(loaded.components.map((entry) => entry.subject.id)).toEqual(componentIds)
     expect(loaded.patterns.map((entry) => entry.subject.id)).toEqual(["dialog-with-actions"])
+
+    for (const id of componentIds) expect(getComponentKnowledge(id).subject).toEqual({ kind: "component", id })
   })
 
-  test("canonical query exposes components and patterns through separate entrypoints", () => {
-    expect(listComponentKnowledge().map((entry) => entry.subject.id)).toEqual(["button", "dialog", "select"])
+  test("preserves the existing Button, Dialog, and Select knowledge", () => {
+    expect(getComponentKnowledge("button").guidanceStatus.whenToUse).toBe("available")
+    expect(getComponentKnowledge("dialog").guidanceStatus.whenNotToUse).toBe("unresolved")
+    expect(getComponentKnowledge("select").howToUse?.some((claim) => claim.statement.includes("typeahead"))).toBe(true)
+  })
+
+  test("uses shadcn Radix references for every Task 2 component", () => {
+    const references = new Map(loadKnowledge().references.references.map((reference) => [reference.id, reference.locator]))
+    const task2ComponentIds = [
+      "accordion",
+      "badge",
+      "card",
+      "checkbox",
+      "dropdown-menu",
+      "input",
+      "label",
+      "scroll-area",
+      "separator",
+      "sheet",
+      "sidebar",
+      "skeleton",
+      "table",
+      "tabs",
+      "textarea",
+      "tooltip",
+    ]
+
+    for (const id of task2ComponentIds) {
+      expect(references.get(`shadcn.${id}.docs`)).toBe(`https://ui.shadcn.com/docs/components/radix/${id}`)
+    }
+  })
+
+  test("canonical query exposes all components and patterns through separate entrypoints", () => {
+    expect(listComponentKnowledge()).toHaveLength(19)
     expect(listPatternKnowledge().map((entry) => entry.subject.id)).toEqual(["dialog-with-actions"])
     expect(getComponentKnowledge("button").subject).toEqual({ kind: "component", id: "button" })
     expect(getPatternKnowledge("dialog-with-actions").subject).toEqual({ kind: "pattern", id: "dialog-with-actions" })
+  })
+
+  test("leaves unsupported topics absent or explicitly unresolved", () => {
+    const badge = getComponentKnowledge("badge")
+
+    expect(badge.whenNotToUse).toBeUndefined()
+    expect(badge.guidanceStatus.whenNotToUse).toBeUndefined()
   })
 
   test("canonical claims use only registered source-derived evidence", () => {
@@ -292,5 +354,15 @@ describe("canonical knowledge vertical slice", () => {
     expect(pattern).not.toHaveProperty("composition")
     expect(pattern).not.toHaveProperty("hardConstraints")
     expect(pattern).not.toHaveProperty("requiredChildren")
+  })
+
+  test("canonical component knowledge contains no Phase 3 API-shaped fields", () => {
+    for (const component of loadKnowledge().components) {
+      expect(component).not.toHaveProperty("props")
+      expect(component).not.toHaveProperty("tokens")
+      expect(component).not.toHaveProperty("composition")
+      expect(component).not.toHaveProperty("hardConstraints")
+      expect(component).not.toHaveProperty("requiredChildren")
+    }
   })
 })
