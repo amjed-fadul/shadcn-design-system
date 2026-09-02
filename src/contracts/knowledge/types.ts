@@ -54,6 +54,7 @@ export type PatternRole = {
 
 export type GuidanceFields = {
   guidanceStatus: Partial<Record<GuidanceTopic, GuidanceStatus>>
+  purpose?: GuidanceClaim
   whatItIs?: GuidanceClaim
   whenToUse?: GuidanceClaim[]
   whenNotToUse?: GuidanceClaim[]

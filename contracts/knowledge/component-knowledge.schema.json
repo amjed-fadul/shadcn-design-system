@@ -17,6 +17,7 @@
       }
     },
     "guidanceStatus": { "$ref": "#/$defs/guidanceStatus" },
+    "purpose": { "$ref": "#/$defs/claim" },
     "whatItIs": { "$ref": "#/$defs/claim" },
     "whenToUse": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
     "whenNotToUse": { "type": "array", "items": { "$ref": "#/$defs/claim" } },

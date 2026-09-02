@@ -131,6 +131,19 @@ describe("knowledge contract boundary", () => {
     })
   })
 
+  test("accepts a component purpose claim when marked available", () => {
+    const component = {
+      ...minimalComponentKnowledge,
+      guidanceStatus: { ...minimalComponentKnowledge.guidanceStatus, purpose: "available" as const },
+      purpose: {
+        statement: "A fixture component purpose.",
+        basis: { kind: "source-derived", referenceIds: ["fixture.reference"] },
+      },
+    }
+
+    expect(loadFixture({ components: [component] }).components[0].purpose?.statement).toBe("A fixture component purpose.")
+  })
+
   test("accepts a DS-owner-authored claim only with author metadata", () => {
     const component = {
       ...minimalComponentKnowledge,
