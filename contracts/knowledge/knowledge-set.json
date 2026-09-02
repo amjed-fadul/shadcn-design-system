@@ -24,6 +24,10 @@
     "contracts/knowledge/components/tooltip.json"
   ],
   "patternFiles": [
-    "contracts/knowledge/patterns/dialog-with-actions.json"
+    "contracts/knowledge/patterns/accordion-card.json",
+    "contracts/knowledge/patterns/dialog-with-actions.json",
+    "contracts/knowledge/patterns/table-with-row-actions.json",
+    "contracts/knowledge/patterns/textarea-with-submit.json",
+    "contracts/knowledge/patterns/tooltip-for-disabled-action.json"
   ]
 }

@@ -249,7 +249,7 @@ describe("knowledge contract boundary", () => {
 })
 
 describe("canonical knowledge vertical slice", () => {
-  test("lists all 19 component knowledge subjects and the existing pattern", () => {
+  test("lists all 19 component knowledge subjects and the canonical patterns", () => {
     const loaded = loadKnowledge()
     const componentIds = [
       "accordion",
@@ -272,11 +272,19 @@ describe("canonical knowledge vertical slice", () => {
       "textarea",
       "tooltip",
     ]
+    const patternIds = [
+      "accordion-card",
+      "dialog-with-actions",
+      "table-with-row-actions",
+      "textarea-with-submit",
+      "tooltip-for-disabled-action",
+    ]
 
     expect(loaded.components.map((entry) => entry.subject.id)).toEqual(componentIds)
-    expect(loaded.patterns.map((entry) => entry.subject.id)).toEqual(["dialog-with-actions"])
+    expect(loaded.patterns.map((entry) => entry.subject.id)).toEqual(patternIds)
 
     for (const id of componentIds) expect(getComponentKnowledge(id).subject).toEqual({ kind: "component", id })
+    for (const id of patternIds) expect(getPatternKnowledge(id).subject).toEqual({ kind: "pattern", id })
   })
 
   test("preserves the existing Button, Dialog, and Select knowledge", () => {
@@ -313,7 +321,13 @@ describe("canonical knowledge vertical slice", () => {
 
   test("canonical query exposes all components and patterns through separate entrypoints", () => {
     expect(listComponentKnowledge()).toHaveLength(19)
-    expect(listPatternKnowledge().map((entry) => entry.subject.id)).toEqual(["dialog-with-actions"])
+    expect(listPatternKnowledge().map((entry) => entry.subject.id)).toEqual([
+      "accordion-card",
+      "dialog-with-actions",
+      "table-with-row-actions",
+      "textarea-with-submit",
+      "tooltip-for-disabled-action",
+    ])
     expect(getComponentKnowledge("button").subject).toEqual({ kind: "component", id: "button" })
     expect(getPatternKnowledge("dialog-with-actions").subject).toEqual({ kind: "pattern", id: "dialog-with-actions" })
   })
@@ -354,6 +368,38 @@ describe("canonical knowledge vertical slice", () => {
     expect(pattern).not.toHaveProperty("composition")
     expect(pattern).not.toHaveProperty("hardConstraints")
     expect(pattern).not.toHaveProperty("requiredChildren")
+  })
+
+  test("canonical pattern roles reference known knowledge subjects", () => {
+    const loaded = loadKnowledge()
+    const knownSubjects = new Set([
+      ...loaded.components.map((entry) => `${entry.subject.kind}:${entry.subject.id}`),
+      ...loaded.patterns.map((entry) => `${entry.subject.kind}:${entry.subject.id}`),
+    ])
+
+    for (const pattern of loaded.patterns) {
+      for (const role of pattern.roles ?? []) {
+        expect(knownSubjects.has(`${role.subject.kind}:${role.subject.id}`)).toBe(true)
+      }
+    }
+  })
+
+  test("all canonical patterns remain advisory and leave unsupported topics absent or unresolved", () => {
+    const apiFields = ["props", "tokens", "composition", "hardConstraints", "requiredChildren"] as const
+
+    for (const pattern of loadKnowledge().patterns) {
+      for (const field of apiFields) expect(pattern).not.toHaveProperty(field)
+    }
+
+    const tooltipAction = getPatternKnowledge("tooltip-for-disabled-action")
+    expect(tooltipAction.whenNotToUse).toBeUndefined()
+    expect(tooltipAction.guidanceStatus.whenNotToUse).toBeUndefined()
+    expect(tooltipAction.howToUse).toEqual([{
+      statement: "Wrap a disabled Button with a span to show a tooltip.",
+      basis: { kind: "source-derived", referenceIds: ["shadcn.tooltip.docs"] },
+    }])
+    expect(tooltipAction).not.toHaveProperty("hardConstraints")
+    expect(getPatternKnowledge("dialog-with-actions").guidanceStatus.whenNotToUse).toBe("unresolved")
   })
 
   test("canonical component knowledge contains no Phase 3 API-shaped fields", () => {

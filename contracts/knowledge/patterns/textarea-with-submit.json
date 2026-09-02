@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "textarea-with-submit-knowledge",
+  "subject": { "kind": "pattern", "id": "textarea-with-submit" },
+  "guidanceStatus": {
+    "purpose": "available",
+    "whenToUse": "available",
+    "howToUse": "available"
+  },
+  "purpose": {
+    "statement": "A textarea paired with a button for a submit action.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.textarea.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use this pattern when multiline entry needs a submit action.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.textarea.docs"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Pair Textarea with Button to create a textarea with a submit button.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.textarea.docs"] }
+    }
+  ],
+  "roles": [
+    { "subject": { "kind": "component", "id": "textarea" }, "role": "multiline entry" },
+    { "subject": { "kind": "component", "id": "button" }, "role": "submit action" }
+  ]
+}
