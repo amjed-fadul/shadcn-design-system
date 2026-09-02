@@ -5,6 +5,19 @@ export {
 export {
   validateAuthoredUi,
 } from "./validate"
+export {
+  getExecutableRelease,
+  validateAuthoredUiAgainstRelease,
+} from "./canonical-release"
+export {
+  EXECUTABLE_RELEASE_ID,
+  EXECUTABLE_RELEASE_PATH,
+  ExecutableReleaseLoadError,
+  canonicalExecutableReleasePayload,
+  createExecutableRelease,
+  hashExecutableReleasePayload,
+  loadExecutableRelease,
+} from "./release"
 export type {
   AuthoredNode,
   AuthoredTokenUse,
@@ -18,6 +31,8 @@ export type {
   ExecutableDerivedTokenRule,
   ExecutableEvent,
   ExecutableExport,
+  ExecutableRelease,
+  ExecutableReleasePayload,
   ExecutableProp,
   ExecutableTokenContractAuthority,
   JsonPrimitive,

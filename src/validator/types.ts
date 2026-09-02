@@ -139,6 +139,22 @@ export type ExecutableContract = Readonly<{
   capabilityIds: readonly string[]
 }>
 
+export type ExecutableReleasePayload = Readonly<{
+  releaseId: string
+  projectionSchemaVersion: 1
+  componentContractSetId: string
+  tokenContractId: string
+  sourceBaselines: Readonly<{
+    componentContract: string
+    tokenContract: string
+  }>
+  projection: ExecutableContract
+}>
+
+export type ExecutableRelease = Readonly<ExecutableReleasePayload & {
+  sha256: string
+}>
+
 export type ExecutableContractSource = Readonly<{
   componentContracts: LoadedComponentContracts
   tokenContract: ExecutableTokenContractAuthority
