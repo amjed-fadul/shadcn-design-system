@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "sheet-knowledge",
+  "subject": { "kind": "component", "id": "sheet" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Extends Dialog to display content that complements the main screen content.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.sheet.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Sheet for content that complements the main content of the screen.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.sheet.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Choose the side where the sheet appears.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.sheet.docs"] }
+    }
+  ]
+}

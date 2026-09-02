@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "accordion-card-knowledge",
+  "subject": { "kind": "pattern", "id": "accordion-card" },
+  "guidanceStatus": {
+    "purpose": "available",
+    "whenToUse": "available",
+    "howToUse": "available"
+  },
+  "purpose": {
+    "statement": "A grouped expandable-content treatment that presents an Accordion inside a Card.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.accordion.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use this pattern when grouped sections should be presented as expandable content inside a Card.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.accordion.docs"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Wrap the Accordion in a Card component.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.accordion.docs"] }
+    }
+  ],
+  "roles": [
+    { "subject": { "kind": "component", "id": "accordion" }, "role": "expandable sections" },
+    { "subject": { "kind": "component", "id": "card" }, "role": "grouped content surface" }
+  ]
+}

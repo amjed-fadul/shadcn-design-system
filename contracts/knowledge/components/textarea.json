@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "textarea-knowledge",
+  "subject": { "kind": "component", "id": "textarea" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays a textarea or a component that looks like a textarea.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.textarea.docs"] }
+  },
+  "options": [
+    {
+      "statement": "Use the disabled option to disable the textarea.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.textarea.docs"] }
+    }
+  ]
+}

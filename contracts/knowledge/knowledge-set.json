@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "shadcn-radix-knowledge-001",
+  "referenceFile": "contracts/knowledge/references.json",
+  "componentFiles": [
+    "contracts/knowledge/components/accordion.json",
+    "contracts/knowledge/components/badge.json",
+    "contracts/knowledge/components/button.json",
+    "contracts/knowledge/components/card.json",
+    "contracts/knowledge/components/checkbox.json",
+    "contracts/knowledge/components/dialog.json",
+    "contracts/knowledge/components/dropdown-menu.json",
+    "contracts/knowledge/components/input.json",
+    "contracts/knowledge/components/label.json",
+    "contracts/knowledge/components/scroll-area.json",
+    "contracts/knowledge/components/select.json",
+    "contracts/knowledge/components/separator.json",
+    "contracts/knowledge/components/sheet.json",
+    "contracts/knowledge/components/sidebar.json",
+    "contracts/knowledge/components/skeleton.json",
+    "contracts/knowledge/components/table.json",
+    "contracts/knowledge/components/tabs.json",
+    "contracts/knowledge/components/textarea.json",
+    "contracts/knowledge/components/tooltip.json"
+  ],
+  "patternFiles": [
+    "contracts/knowledge/patterns/accordion-card.json",
+    "contracts/knowledge/patterns/dialog-with-actions.json",
+    "contracts/knowledge/patterns/table-with-row-actions.json",
+    "contracts/knowledge/patterns/textarea-with-submit.json",
+    "contracts/knowledge/patterns/tooltip-for-disabled-action.json"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "badge-knowledge",
+  "subject": { "kind": "component", "id": "badge" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays a badge or a component that looks like a badge.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.badge.docs"] }
+  },
+  "options": [
+    {
+      "statement": "Use the variant option to change the variant of the badge.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.badge.docs"] }
+    }
+  ]
+}

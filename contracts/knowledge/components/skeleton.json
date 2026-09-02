@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "skeleton-knowledge",
+  "subject": { "kind": "component", "id": "skeleton" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available"
+  },
+  "whatItIs": {
+    "statement": "A placeholder shown while content is loading.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.skeleton.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use a Skeleton to show a placeholder while content is loading.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.skeleton.docs"] }
+    }
+  ]
+}

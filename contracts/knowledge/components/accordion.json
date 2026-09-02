@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "accordion-knowledge",
+  "subject": { "kind": "component", "id": "accordion" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A vertically stacked set of interactive headings that each reveal a section of content.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.accordion.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Use AccordionItem with AccordionTrigger and AccordionContent for each section.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.accordion.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use multiple to allow multiple items to be open at the same time.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.accordion.docs"] }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "button-knowledge",
+  "subject": { "kind": "component", "id": "button" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "whenNotToUse": "available",
+    "howToUse": "available",
+    "options": "available",
+    "writing": "available",
+    "useInstead": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays a button or a component that looks like a button.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use a button when the control triggers an action or event, such as submitting a form, opening a dialog, cancelling an action, or deleting an item.",
+      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+    }
+  ],
+  "whenNotToUse": [
+    {
+      "statement": "Do not use a button for navigation; match the visual treatment and role to the link function.",
+      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "For a link-shaped navigation control, use the buttonVariants helper with a plain link element instead of Button.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs", "canonical.button.source"] }
+    },
+    {
+      "statement": "Give the button an accessible label; text content is the default accessible name.",
+      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use the size option to change the size of the button.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs"] }
+    },
+    {
+      "statement": "When placing an icon before or after the label, use the documented icon-position marker so the component can apply the corresponding spacing.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs", "canonical.button.source"] }
+    }
+  ],
+  "writing": [
+    {
+      "statement": "Keep a toggle button's label unchanged when its pressed state changes.",
+      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+    }
+  ],
+  "useInstead": [
+    {
+      "target": { "kind": "component", "id": "link" },
+      "guidance": {
+        "statement": "When the element navigates rather than triggers an action, use a link.",
+        "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg", "shadcn.button.docs"] }
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "card-knowledge",
+  "subject": { "kind": "component", "id": "card" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays a card with header, content, and footer.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.card.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Use the documented Card anatomy to organize header, content, and footer regions.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.card.docs"] }
+    }
+  ]
+}

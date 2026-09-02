@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "table-with-row-actions-knowledge",
+  "subject": { "kind": "pattern", "id": "table-with-row-actions" },
+  "guidanceStatus": {
+    "purpose": "available",
+    "whenToUse": "available",
+    "howToUse": "available"
+  },
+  "purpose": {
+    "statement": "A table showing actions for each row using a DropdownMenu component.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.table.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use this pattern when each table row needs an action menu.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.table.docs"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Use DropdownMenu for actions for each row.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.table.docs"] }
+    }
+  ],
+  "roles": [
+    { "subject": { "kind": "component", "id": "table" }, "role": "tabular data surface" },
+    { "subject": { "kind": "component", "id": "dropdown-menu" }, "role": "row action menu" },
+    { "subject": { "kind": "component", "id": "button" }, "role": "row menu trigger" }
+  ]
+}

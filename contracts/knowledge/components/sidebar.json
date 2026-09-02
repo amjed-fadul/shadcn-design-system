@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "sidebar-knowledge",
+  "subject": { "kind": "component", "id": "sidebar" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A composable, themeable, and customizable sidebar.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.sidebar.docs"] }
+  },
+  "options": [
+    {
+      "statement": "Use the collapsible icon mode when the sidebar should collapse to icons.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.sidebar.docs"] }
+    }
+  ]
+}

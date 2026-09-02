@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "tooltip-knowledge",
+  "subject": { "kind": "component", "id": "tooltip" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available"
+  },
+  "whatItIs": {
+    "statement": "A popup that displays information related to an element when the element receives keyboard focus or the user hovers over it.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tooltip.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use a tooltip to display information related to an element on keyboard focus or mouse hover.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tooltip.docs"] }
+    }
+  ]
+}

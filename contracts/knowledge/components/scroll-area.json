@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "scroll-area-knowledge",
+  "subject": { "kind": "component", "id": "scroll-area" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Augments native scroll functionality for custom, cross-browser styling.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.scroll-area.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Use ScrollArea with scrollable content; the docs demonstrate pairing it with ScrollBar.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.scroll-area.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use ScrollBar with horizontal orientation for horizontal scrolling.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.scroll-area.docs"] }
+    }
+  ]
+}

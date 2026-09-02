@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "tooltip-for-disabled-action-knowledge",
+  "subject": { "kind": "pattern", "id": "tooltip-for-disabled-action" },
+  "guidanceStatus": {
+    "purpose": "available",
+    "whenToUse": "available",
+    "howToUse": "available"
+  },
+  "purpose": {
+    "statement": "A disabled-button interaction that exposes tooltip information through a wrapper.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tooltip.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use this pattern when a disabled button needs tooltip content.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tooltip.docs"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Wrap a disabled Button with a span to show a tooltip.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tooltip.docs"] }
+    }
+  ],
+  "roles": [
+    { "subject": { "kind": "component", "id": "tooltip" }, "role": "supplemental information" },
+    { "subject": { "kind": "component", "id": "button" }, "role": "disabled action control" }
+  ]
+}

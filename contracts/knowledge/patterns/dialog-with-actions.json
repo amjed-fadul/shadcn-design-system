@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "dialog-with-actions-knowledge",
+  "subject": { "kind": "pattern", "id": "dialog-with-actions" },
+  "guidanceStatus": {
+    "purpose": "available",
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "whenNotToUse": "unresolved",
+    "howToUse": "available"
+  },
+  "purpose": {
+    "statement": "A Dialog composition that uses a trigger, content, a header with title and description, and a footer for actions.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+  },
+  "whatItIs": {
+    "statement": "A dialog flow with a dialog surface, a trigger/action control, and footer action roles.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use this pattern when an interaction is presented in a Dialog and needs follow-up controls in the documented footer action area.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Use the documented Dialog composition: an opening trigger, dialog content, a header with title and description, and a footer for actions.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+    },
+    {
+      "statement": "Use Button for the opening control or for custom action and close controls in the Dialog examples.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+    }
+  ],
+  "roles": [
+    {
+      "subject": { "kind": "component", "id": "dialog" },
+      "role": "dialog surface",
+      "guidance": {
+        "statement": "The Dialog provides the overlaid surface for this pattern.",
+        "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs", "radix.dialog.docs"] }
+      }
+    },
+    {
+      "subject": { "kind": "component", "id": "button" },
+      "role": "trigger/action control",
+      "guidance": {
+        "statement": "The Dialog examples use a Button as the opening control and as a custom action or close control.",
+        "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+      }
+    },
+    {
+      "subject": { "kind": "component", "id": "button" },
+      "role": "footer action",
+      "guidance": {
+        "statement": "The footer role is an action area; Button is the documented control used in the Dialog examples.",
+        "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+      }
+    }
+  ]
+}

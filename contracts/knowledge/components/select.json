@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "select-knowledge",
+  "subject": { "kind": "component", "id": "select" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "whenNotToUse": "unresolved",
+    "howToUse": "available",
+    "options": "available",
+    "writing": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays a list of options for the user to pick from, triggered by a button.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.select.docs", "radix.select.docs"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Select when the user needs to choose a value from a predefined collection of options.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.select.docs", "radix.select.docs"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Select with a trigger and value plus content containing the available items.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.select.docs", "radix.select.docs", "canonical.select.source"] }
+    },
+    {
+      "statement": "Use groups, labels, and separators to organize items when the option set needs structure.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.select.docs", "radix.select.docs"] }
+    },
+    {
+      "statement": "Preserve the component's managed focus, keyboard navigation, and typeahead behavior when using it.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.select.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use a custom placeholder when no value has been selected.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.select.docs", "shadcn.select.docs"] }
+    },
+    {
+      "statement": "Use the documented positioning option when the selected item needs a different relationship to the trigger.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.select.docs", "radix.select.docs"] }
+    }
+  ],
+  "writing": [
+    {
+      "statement": "Provide a visual and accessible label for the select.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.select.docs"] }
+    }
+  ]
+}

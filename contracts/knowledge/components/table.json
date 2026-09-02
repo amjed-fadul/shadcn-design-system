@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "table-knowledge",
+  "subject": { "kind": "component", "id": "table" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A responsive table.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.table.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Use the documented Table anatomy to organize a caption, header, body, rows, heads, and cells.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.table.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use TableFooter to add a footer to the table.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.table.docs"] }
+    },
+    {
+      "statement": "Use a DropdownMenu for row actions when a table needs actions per row.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.table.docs"] }
+    }
+  ]
+}

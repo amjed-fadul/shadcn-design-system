@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "dropdown-menu-knowledge",
+  "subject": { "kind": "component", "id": "dropdown-menu" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A menu of actions or functions triggered by a button.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dropdown-menu.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Use labels and separators to organize menu items.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dropdown-menu.docs"] }
+    },
+    {
+      "statement": "Use DropdownMenuSub to nest secondary actions.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dropdown-menu.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use DropdownMenuCheckboxItem for toggles.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dropdown-menu.docs"] }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "tabs-knowledge",
+  "subject": { "kind": "component", "id": "tabs" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A set of layered sections of content, known as tab panels, that are displayed one at a time.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tabs.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Use TabsList with TabsTrigger and TabsContent to organize tab panels.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tabs.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use the line variant when the tab list needs the documented line style.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.tabs.docs"] }
+    }
+  ]
+}

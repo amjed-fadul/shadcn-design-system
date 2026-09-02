@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "input-knowledge",
+  "subject": { "kind": "component", "id": "input" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A text input component for forms and user data entry with built-in styling and accessibility features.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.input.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Use Field, FieldLabel, and FieldDescription to create an input with a label and description.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.input.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use the disabled option to disable the input.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.input.docs"] }
+    },
+    {
+      "statement": "Use the aria-invalid option to mark the input as invalid.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.input.docs"] }
+    }
+  ]
+}

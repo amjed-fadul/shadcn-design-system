@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "checkbox-knowledge",
+  "subject": { "kind": "component", "id": "checkbox" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A control that allows the user to toggle between checked and not checked.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.checkbox.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Pair the checkbox with Field and FieldLabel for layout and labeling.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.checkbox.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Preserve the checkbox's keyboard interaction when using it.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.checkbox.docs"] }
+    }
+  ]
+}
