@@ -13,10 +13,6 @@
       "kind": "canonical-source",
       "source": "src/components/ui/sidebar.tsx@a2cc82dbfd31c8f75a326946cf9fe87389d334d0"
     },
-    "declaration": {
-      "kind": "inherited-interface",
-      "source": "react-intrinsic and radix.separator.root declarations"
-    },
     "tokens": {
       "kind": "token-contract",
       "source": "shadcn-radix-token-contract-001"

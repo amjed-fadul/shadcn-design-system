@@ -13,10 +13,6 @@
       "kind": "canonical-source",
       "source": "src/components/ui/scroll-area.tsx@d509c2fccf31621c4461f7264c2f62a4e32c1492"
     },
-    "declaration": {
-      "kind": "inherited-interface",
-      "source": "radix.scroll-area"
-    },
     "tokens": {
       "kind": "token-contract",
       "source": "shadcn-radix-token-contract-001"
