@@ -15,6 +15,7 @@ export type {
   ExecutableConditionalApi,
   ExecutableContract,
   ExecutableContractSource,
+  ExecutableDerivedTokenRule,
   ExecutableEvent,
   ExecutableExport,
   ExecutableProp,

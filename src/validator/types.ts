@@ -55,6 +55,7 @@ export type AuthoredNode =
 
 export type AuthoredTokenUse = Readonly<{
   tokenId: string
+  viaDerivedRule?: Readonly<{ id: string; parameter: AuthoredValue }>
   nodeId?: string
   location: SourceLocation
 }>
@@ -85,6 +86,12 @@ export type ExecutableEvent = Readonly<{
   required: boolean
   payload?: StructuredPropType
   origin: "local" | "inherited"
+}>
+
+export type ExecutableDerivedTokenRule = Readonly<{
+  id: string
+  baseTokenId: string
+  parameter: Readonly<{ name: string; type: string; minimum?: number }>
 }>
 
 export type ExecutableApiShape = Readonly<{
@@ -127,6 +134,7 @@ export type ExecutableContract = Readonly<{
   tokenSourceBaselineCommit: string
   exports: Readonly<Record<string, ExecutableExport>>
   tokenIds: readonly string[]
+  derivedTokenRules: readonly ExecutableDerivedTokenRule[]
   derivedTokenRuleIds: readonly string[]
   capabilityIds: readonly string[]
 }>
@@ -141,7 +149,7 @@ export type ExecutableTokenContractAuthority = Readonly<Pick<TokenContract, "sou
   id: string
   status: "candidate" | "approved"
   tokens: readonly Readonly<{ id: string }>[]
-  derivedRules: readonly Readonly<{ id: string }>[]
+  derivedRules: readonly ExecutableDerivedTokenRule[]
 }>
 
 export type ProjectionErrorCode =

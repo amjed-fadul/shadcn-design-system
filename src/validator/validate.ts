@@ -2,6 +2,7 @@ import { isStructuredPropTypeAssignable } from "../contracts/components/invarian
 import type { StructuredPropType } from "../contracts/components/types"
 import type {
   AuthoredNode,
+  AuthoredTokenUse,
   AuthoredUi,
   AuthoredValue,
   ExecutableApiShape,
@@ -255,9 +256,41 @@ function validateProps(node: Extract<AuthoredNode, { kind: "component" }>, compo
   }
 
   for (const prop of props.values()) {
-    if (prop.availability === "available" && prop.required && !(prop.name in node.props)) {
+    const authored = prop.name === "children" ? prop.name in node.props || node.children.length > 0 : prop.name in node.props
+    if (prop.availability === "available" && prop.required && !authored) {
       errors.push(error("INVALID_PROP", `Required prop ${node.exportName}.${prop.name} is missing.`, nodeTarget(node), { kind: "required-prop", propName: prop.name, type: prop.type }))
     }
+  }
+}
+
+function validateTokenUse(token: AuthoredTokenUse, contract: ExecutableContract, errors: ValidationError[]) {
+  const target = tokenTarget(token.tokenId, token.location)
+  if (!contract.tokenIds.includes(token.tokenId)) {
+    errors.push(error("INVALID_TOKEN", `Token ${token.tokenId} is not in the approved token vocabulary.`, target, { kind: "token" }, token.tokenId))
+  }
+
+  const viaDerivedRule = token.viaDerivedRule
+  if (!viaDerivedRule) return
+  const rule = contract.derivedTokenRules.find((candidate) => candidate.id === viaDerivedRule.id)
+  if (!rule) {
+    errors.push(error("INVALID_DERIVED_TOKEN_RULE", `Derived token rule ${viaDerivedRule.id} is not in the approved Phase 2 rule vocabulary.`, target, { kind: "derived-token-rule", ruleId: viaDerivedRule.id }, viaDerivedRule.id))
+    return
+  }
+  if (rule.baseTokenId !== token.tokenId) {
+    errors.push(error("INVALID_DERIVED_TOKEN_RULE", `Derived token rule ${rule.id} applies to ${rule.baseTokenId}, not ${token.tokenId}.`, target, { kind: "derived-token-rule", ruleId: rule.id }, token.tokenId))
+    return
+  }
+  if (rule.parameter.type !== "number") {
+    errors.push(error("UNRESOLVED_FACT", `Derived token rule ${rule.id} has an unsupported parameter type: ${rule.parameter.type}.`, target, { kind: "resolved-value", type: { kind: "number" } }, receivedValue(viaDerivedRule.parameter)))
+    return
+  }
+  if (viaDerivedRule.parameter.kind !== "literal") {
+    errors.push(error("UNRESOLVED_FACT", `The parameter for derived token rule ${rule.id} cannot be established from the authored input.`, target, { kind: "resolved-value", type: { kind: "number" } }, receivedValue(viaDerivedRule.parameter)))
+    return
+  }
+  const parameter = viaDerivedRule.parameter.value
+  if (typeof parameter !== "number" || (rule.parameter.minimum !== undefined && parameter < rule.parameter.minimum)) {
+    errors.push(error("INVALID_DERIVED_TOKEN_PARAMETER", `Derived token rule ${rule.id} does not accept the authored parameter.`, target, { kind: "derived-token-parameter", ruleId: rule.id, baseTokenId: rule.baseTokenId, type: { kind: "number" }, ...(rule.parameter.minimum !== undefined ? { minimum: rule.parameter.minimum } : {}) }, parameter))
   }
 }
 
@@ -342,9 +375,7 @@ export function validateAuthoredUi(input: AuthoredUi, contract: ExecutableContra
   const errors: ValidationError[] = []
   validateNode(input.root, contract, new Set(), errors)
   for (const token of input.tokenUses ?? []) {
-    if (!contract.tokenIds.includes(token.tokenId)) {
-      errors.push(error("INVALID_TOKEN", `Token ${token.tokenId} is not in the approved token vocabulary.`, tokenTarget(token.tokenId, token.location), { kind: "token" }, token.tokenId))
-    }
+    validateTokenUse(token, contract, errors)
   }
   errors.sort((left, right) => compareText(left.target.location.path, right.target.location.path) || compareText(left.code, right.code) || compareText(left.message, right.message))
   return Object.freeze({ ok: errors.length === 0, errors: Object.freeze(errors) })

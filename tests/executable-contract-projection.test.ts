@@ -29,6 +29,7 @@ describe("executable contract projection", () => {
     ])
     expect(contract.tokenIds).toContain("color.primary")
     expect(contract.derivedTokenRuleIds).toContain("spacing.multiplier")
+    expect(contract.derivedTokenRules).toEqual([{ id: "spacing.multiplier", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number", minimum: 0 } }])
   })
 
   test("projects Accordion's single and multiple conditional API shapes", () => {

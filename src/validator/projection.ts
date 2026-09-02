@@ -216,6 +216,11 @@ export function projectExecutableContract(source: ExecutableContractSource): Exe
     tokenSourceBaselineCommit: tokenContract.sourceBaselineCommit,
     exports,
     tokenIds: [...new Set(tokenContract.tokens.map((token) => token.id))].sort(compareText),
+    derivedTokenRules: [...new Map(tokenContract.derivedRules.map((rule) => [rule.id, {
+      id: rule.id,
+      baseTokenId: rule.baseTokenId,
+      parameter: { name: rule.parameter.name, type: rule.parameter.type, minimum: rule.parameter.minimum },
+    }])).values()].sort((left, right) => compareText(left.id, right.id)),
     derivedTokenRuleIds: [...new Set(tokenContract.derivedRules.map((rule) => rule.id))].sort(compareText),
     capabilityIds: capabilities,
   }

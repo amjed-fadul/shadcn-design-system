@@ -8,6 +8,8 @@ export type ValidationErrorCode =
   | "INVALID_PROP_VALUE"
   | "CONDITIONAL_API_VIOLATION"
   | "INVALID_TOKEN"
+  | "INVALID_DERIVED_TOKEN_RULE"
+  | "INVALID_DERIVED_TOKEN_PARAMETER"
   | "SLOT_VIOLATION"
   | "CAPABILITY_VIOLATION"
   | "UNSUPPORTED_HARD_CONSTRAINT"
@@ -32,6 +34,8 @@ export type ExpectedFact =
   | Readonly<{ kind: "slot-child"; min: number; max: number }>
   | Readonly<{ kind: "capability"; capability: string }>
   | Readonly<{ kind: "unsupported-hard-constraint"; constraint: string }>
+  | Readonly<{ kind: "derived-token-rule"; ruleId: string }>
+  | Readonly<{ kind: "derived-token-parameter"; ruleId: string; baseTokenId: string; type: StructuredPropType; minimum?: number }>
   | Readonly<{ kind: "token" }>
   | Readonly<{ kind: "event"; payload?: StructuredPropType }>
   | Readonly<{ kind: "resolved-value"; type: StructuredPropType }>
