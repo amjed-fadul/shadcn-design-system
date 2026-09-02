@@ -21,7 +21,7 @@ describe("Button component contract", () => {
   test("reconciles source identity and public exports", () => {
     const seed = JSON.parse(readFileSync(join(root, "provenance/seed-components.json"), "utf8")).components.button
     expect(contractSet.familyCount).toBe(19)
-    expect(contractSet.status).toBe("candidate")
+    expect(["candidate", "approved"]).toContain(contractSet.status)
     expect(contractSet.familyFiles).toContain("contracts/components/families/button.json")
     expect(button.id).toBe("button")
     expect(button.source).toMatchObject({ canonicalPath: seed.canonicalPath, canonicalBlobSha: seed.canonicalBlobSha, implementationKind: seed.implementationKind, upstreamPath: seed.upstreamPath, upstreamBlobSha: seed.upstreamBlobSha })

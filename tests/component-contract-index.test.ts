@@ -40,7 +40,7 @@ describe("component contract loader and derived index", () => {
   test("loads exactly the canonical 19 families and every manifest interface", () => {
     const loaded = loadComponentContracts()
 
-    expect(loaded.contractSet.status).toBe("candidate")
+    expect(["candidate", "approved"]).toContain(loaded.contractSet.status)
     expect(loaded.contractSet.familyCount).toBe(19)
     expect(loaded.contractSet.familyFiles).toHaveLength(19)
     expect(loaded.families).toHaveLength(19)
@@ -48,6 +48,23 @@ describe("component contract loader and derived index", () => {
     expect(new Set(loaded.families.map((family) => family.id)).size).toBe(19)
     expect(new Set(loaded.interfaces.map((contract) => contract.id)).size).toBe(loaded.interfaces.length)
     expect(loaded.families.map((family) => family.id)).toEqual(manifest.familyFiles.map((path) => path.split("/").at(-1)!.replace(/\.json$/, "")))
+  })
+
+  test("accepts both component contract lifecycle states", () => {
+    for (const status of ["candidate", "approved"] as const) {
+      const loaded = loadComponentContracts(memorySource((artifacts) => {
+        const contractSet = artifacts.get(manifestPath) as ComponentContractSet
+        contractSet.status = status
+      }))
+      expect(loaded.contractSet.status).toBe(status)
+    }
+  })
+
+  test("rejects an unknown component contract lifecycle state", () => {
+    expect(() => loadComponentContracts(memorySource((artifacts) => {
+      const contractSet = artifacts.get(manifestPath) as unknown as { status: string }
+      contractSet.status = "retired"
+    }))).toThrow("COMPONENT_CONTRACT_SCHEMA_INVALID")
   })
 
   test("preserves helper, hook, and component classifications without promoting non-JSX exports", () => {

@@ -692,7 +692,7 @@ function independentAudit(artifacts: { families: AnyRecord[]; interfaces: AnyRec
   const familyIds = artifacts.families.map((family) => family.id).sort()
   if (JSON.stringify(familyIds) !== JSON.stringify(expectedFamilies)) errors.push("contract set does not contain exactly the 19 expected families")
   if (artifacts.families.length !== 19) errors.push(`expected 19 family artifacts, found ${artifacts.families.length}`)
-  if (readJson(join(root, "contracts/components/component-contract-set.json")).status !== "candidate") errors.push("component contract set is no longer candidate")
+  if (!["candidate", "approved"].includes(readJson(join(root, "contracts/components/component-contract-set.json")).status)) errors.push("component contract set has an invalid lifecycle status")
   errors.push(...directDeclarationErrors(artifacts.interfaces))
   errors.push(...directSourceErrors(artifacts.families, artifacts.interfaces))
 

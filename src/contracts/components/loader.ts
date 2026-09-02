@@ -9,6 +9,7 @@ import type { ComponentContractSet, ComponentFamilyContract, ComponentInvariantA
 
 const contractSetPath = "contracts/components/component-contract-set.json"
 const indexPath = "contracts/components/index.json"
+const componentContractStatuses = new Set<ComponentContractSet["status"]>(["candidate", "approved"])
 
 export type ComponentContractArtifactSource = {
   readJson(path: string): unknown
@@ -187,7 +188,7 @@ function loadContracts({
     throw new ComponentContractLoadError("COMPONENT_CONTRACT_ARTIFACT_INVALID", "Contract set familyCount must equal familyFiles length.", configuredContractSetPath)
   }
   rejectInvariantErrors(configuredContractSetPath, invariantDocumentErrors(contractSet))
-  if (contractSet.status !== "candidate") throw new ComponentContractLoadError("COMPONENT_CONTRACT_ARTIFACT_INVALID", "Only candidate component contracts may be loaded.", configuredContractSetPath)
+  if (!componentContractStatuses.has(contractSet.status)) throw new ComponentContractLoadError("COMPONENT_CONTRACT_ARTIFACT_INVALID", `Unsupported component contract lifecycle status: ${contractSet.status}.`, configuredContractSetPath)
   rejectInvariantErrors(configuredContractSetPath, [...(contractSetReconciler?.(contractSet) ?? [])])
   requireUnique(contractSet.familyFiles, "Family manifest", configuredContractSetPath)
   requireUnique(contractSet.interfaceFiles, "Inherited-interface manifest", configuredContractSetPath)

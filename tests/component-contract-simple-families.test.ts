@@ -47,7 +47,7 @@ function authority(families: ComponentFamilyContract[], interfaces: InheritedInt
 
 describe("simple/native-oriented component contracts", () => {
   test("preserves the frozen Task 3 subset within the expanded family set", () => {
-    expect(contractSet.status).toBe("candidate")
+    expect(["candidate", "approved"]).toContain(contractSet.status)
     expect(contractSet.familyCount).toBe(19)
     const frozenFiles = ["button", ...familyIds].map((id) => `contracts/components/families/${id}.json`).sort()
     expect(contractSet.familyFiles.filter((file) => frozenFiles.includes(file)).sort()).toEqual(frozenFiles)

@@ -54,7 +54,9 @@ describe("component contract JSON Schemas", () => {
     const malformedDerivedAttribute = structuredClone(derivedAttribute)
     malformedDerivedAttribute.exports[0].component.rendering.nodes[0].dataAttributes[0].source = "literal"
     expect(validate(familySchema, malformedDerivedAttribute)).toBe(false)
-    expect(validate(contractSetSchema, { schemaVersion: 1, id: "contracts", status: "candidate", designSystemId: "example", sourceBaselineCommit: "a".repeat(40), tokenContractId: "tokens", familyCount: 2, familyFiles: ["contracts/components/families/example.json"], interfaceFiles: ["contracts/components/interfaces/html.example.json"] })).toBe(true)
+    for (const status of ["candidate", "approved"]) {
+      expect(validate(contractSetSchema, { schemaVersion: 1, id: "contracts", status, designSystemId: "example", sourceBaselineCommit: "a".repeat(40), tokenContractId: "tokens", familyCount: 2, familyFiles: ["contracts/components/families/example.json"], interfaceFiles: ["contracts/components/interfaces/html.example.json"] })).toBe(true)
+    }
   })
 
   test("accepts an evidence-backed node-targeted portal boundary", () => {
