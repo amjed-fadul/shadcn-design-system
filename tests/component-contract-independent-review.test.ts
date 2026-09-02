@@ -57,13 +57,13 @@ type DeclarationContext = {
 }
 
 type DeclarationProgram = {
+  program: ts.Program
   checker: ts.TypeChecker
-  sourceFile: ts.SourceFile
 }
 
 const sourceCache = new Map<string, { sourceFile: ts.SourceFile; sourceText: string }>()
 const declarationCache = new Map<string, DeclarationContext | undefined>()
-const declarationProgramCache = new Map<string, DeclarationProgram | undefined>()
+let declarationProgramCache: DeclarationProgram | undefined
 
 function readJson(path: string): any {
   return JSON.parse(readFileSync(path, "utf8"))
@@ -438,20 +438,8 @@ function sourceDeclarationContext(artifact: AnyRecord): DeclarationContext | und
   const cacheKey = `${declarationPath}:${artifact.source.symbol}`
   if (declarationCache.has(cacheKey)) return declarationCache.get(cacheKey)
   const absolutePath = resolve(root, declarationPath)
-  let programContext = declarationProgramCache.get(declarationPath)
-  if (!programContext && !declarationProgramCache.has(declarationPath)) {
-    const program = ts.createProgram([absolutePath], {
-      module: ts.ModuleKind.CommonJS,
-      moduleResolution: ts.ModuleResolutionKind.NodeJs,
-      skipLibCheck: true,
-      target: ts.ScriptTarget.ES2022,
-    })
-    const sourceFile = program.getSourceFile(absolutePath)
-    programContext = sourceFile ? { checker: program.getTypeChecker(), sourceFile } : undefined
-    declarationProgramCache.set(declarationPath, programContext)
-  }
-  const sourceFile = programContext?.sourceFile
-  const checker = programContext?.checker
+  const sourceFile = declarationProgramCache?.program.getSourceFile(absolutePath)
+  const checker = declarationProgramCache?.checker
   if (!sourceFile) {
     declarationCache.set(cacheKey, undefined)
     return undefined
@@ -501,8 +489,22 @@ function stringLiteralValues(type: ts.Type): string[] {
   return type.isStringLiteral() ? [type.value] : []
 }
 
+function createDeclarationProgram(interfaces: AnyRecord[]): DeclarationProgram {
+  const declarationPaths = [...new Set(interfaces.map((artifact) => artifact.source?.declarationPath))]
+    .filter((path): path is string => typeof path === "string")
+    .map((path) => resolve(root, path))
+  const program = ts.createProgram(declarationPaths, {
+    module: ts.ModuleKind.CommonJS,
+    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    skipLibCheck: true,
+    target: ts.ScriptTarget.ES2022,
+  })
+  return { program, checker: program.getTypeChecker() }
+}
+
 function directDeclarationErrors(interfaces: AnyRecord[]): string[] {
   const errors: string[] = []
+  if (!declarationProgramCache) declarationProgramCache = createDeclarationProgram(interfaces)
   for (const artifact of interfaces) {
     const declarationPath = resolve(root, artifact.source.declarationPath)
     if (!existsSync(declarationPath)) errors.push(`${artifact.id}: declaration file cannot be read`)
@@ -753,6 +755,8 @@ function findUnreferencedEvidence(): string[] {
 
   return records
 }
+
+declarationProgramCache = createDeclarationProgram(loadArtifacts().interfaces)
 
 describe("Phase 3 Task 10 independent review", () => {
   test("has no unreferenced evidence records", () => {
