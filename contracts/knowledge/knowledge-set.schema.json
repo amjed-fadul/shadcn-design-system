@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adc.local/contracts/knowledge/knowledge-set.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "referenceFile", "componentFiles", "patternFiles"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "referenceFile": { "type": "string", "minLength": 1 },
+    "componentFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "patternFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  }
+}

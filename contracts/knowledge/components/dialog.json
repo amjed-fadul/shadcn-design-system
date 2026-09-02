@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "dialog-knowledge",
+  "subject": { "kind": "component", "id": "dialog" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "whenNotToUse": "unresolved",
+    "howToUse": "available",
+    "options": "available",
+    "writing": "available"
+  },
+  "whatItIs": {
+    "statement": "A window overlaid on the primary window or another dialog window, rendering the content underneath inert.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs", "radix.dialog.docs", "w3c.dialog.apg"] }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use a dialog when content should be presented in an overlaid window while the content underneath is inert.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.dialog.docs", "w3c.dialog.apg"] }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose a Dialog with a trigger and content, with a header containing a title and description and a footer for actions.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs"] }
+    },
+    {
+      "statement": "Provide an accessible dialog title; a description is optional and should describe the dialog when the content is simple enough to be announced as a single message.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.dialog.docs", "w3c.dialog.apg"] }
+    },
+    {
+      "statement": "Keep a visible button that closes the dialog in the dialog's tab sequence.",
+      "basis": { "kind": "source-derived", "referenceIds": ["w3c.dialog.apg"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Set showCloseButton to false when the default close control should be hidden.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.dialog.docs", "canonical.dialog.source"] }
+    }
+  ],
+  "writing": [
+    {
+      "statement": "Give the dialog a visible title; use a description when it can be understood without requiring the listener to reconstruct complex structure.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.dialog.docs", "w3c.dialog.apg"] }
+    }
+  ]
+}

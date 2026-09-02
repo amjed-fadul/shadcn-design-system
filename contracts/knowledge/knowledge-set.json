@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "shadcn-radix-knowledge-001",
+  "referenceFile": "contracts/knowledge/references.json",
+  "componentFiles": [
+    "contracts/knowledge/components/button.json",
+    "contracts/knowledge/components/dialog.json",
+    "contracts/knowledge/components/select.json"
+  ],
+  "patternFiles": [
+    "contracts/knowledge/patterns/dialog-with-actions.json"
+  ]
+}

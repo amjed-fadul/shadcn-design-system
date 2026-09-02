@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adc.local/contracts/knowledge/component-knowledge.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "subject", "guidanceStatus"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "const": "component" },
+        "id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "guidanceStatus": { "$ref": "#/$defs/guidanceStatus" },
+    "whatItIs": { "$ref": "#/$defs/claim" },
+    "whenToUse": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "whenNotToUse": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "howToUse": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "options": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "writing": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "useInstead": { "type": "array", "items": { "$ref": "#/$defs/related" } },
+    "related": { "type": "array", "items": { "$ref": "#/$defs/related" } }
+  },
+  "$defs": {
+    "guidanceStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "purpose": { "enum": ["available", "unresolved"] },
+        "whatItIs": { "enum": ["available", "unresolved"] },
+        "whenToUse": { "enum": ["available", "unresolved"] },
+        "whenNotToUse": { "enum": ["available", "unresolved"] },
+        "howToUse": { "enum": ["available", "unresolved"] },
+        "options": { "enum": ["available", "unresolved"] },
+        "writing": { "enum": ["available", "unresolved"] },
+        "useInstead": { "enum": ["available", "unresolved"] },
+        "related": { "enum": ["available", "unresolved"] }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "basis"],
+      "properties": {
+        "statement": { "type": "string", "minLength": 1 },
+        "basis": { "$ref": "#/$defs/basis" }
+      }
+    },
+    "basis": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "referenceIds"],
+          "properties": {
+            "kind": { "const": "source-derived" },
+            "referenceIds": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "authoredBy", "revision", "date"],
+          "properties": {
+            "kind": { "const": "ds-owner-authored" },
+            "authoredBy": { "type": "string", "minLength": 1 },
+            "revision": { "type": "string", "minLength": 1 },
+            "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }
+          }
+        }
+      ]
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "enum": ["component", "pattern"] },
+        "id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "related": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "guidance"],
+      "properties": {
+        "target": { "$ref": "#/$defs/subject" },
+        "guidance": { "$ref": "#/$defs/claim" }
+      }
+    }
+  }
+}
