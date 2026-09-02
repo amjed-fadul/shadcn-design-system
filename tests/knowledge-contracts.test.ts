@@ -319,6 +319,13 @@ describe("canonical knowledge vertical slice", () => {
     }
   })
 
+  test("uses shadcn Radix references for the original vertical-slice components", () => {
+    const references = new Map(loadKnowledge().references.references.map((reference) => [reference.id, reference.locator]))
+
+    expect(references.get("shadcn.dialog.docs")).toBe("https://ui.shadcn.com/docs/components/radix/dialog")
+    expect(references.get("shadcn.select.docs")).toBe("https://ui.shadcn.com/docs/components/radix/select")
+  })
+
   test("canonical query exposes all components and patterns through separate entrypoints", () => {
     expect(listComponentKnowledge()).toHaveLength(19)
     expect(listPatternKnowledge().map((entry) => entry.subject.id)).toEqual([

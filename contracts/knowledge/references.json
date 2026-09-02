@@ -45,7 +45,7 @@
       "id": "shadcn.dialog.docs",
       "kind": "official-documentation",
       "title": "Dialog - shadcn/ui",
-      "locator": "https://ui.shadcn.com/docs/components/base/dialog",
+      "locator": "https://ui.shadcn.com/docs/components/radix/dialog",
       "locatorHint": "Dialog; Usage; Composition; Custom Close Button; No Close Button",
       "accessedOn": "2026-09-02"
     },
@@ -85,7 +85,7 @@
       "id": "shadcn.select.docs",
       "kind": "official-documentation",
       "title": "Select - shadcn/ui",
-      "locator": "https://ui.shadcn.com/docs/components/base/select",
+      "locator": "https://ui.shadcn.com/docs/components/radix/select",
       "locatorHint": "Select; Usage; Composition; Groups; Scrollable; Invalid",
       "accessedOn": "2026-09-02"
     },
