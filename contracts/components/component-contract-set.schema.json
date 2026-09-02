@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adc.local/contracts/components/component-contract-set.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "id", "status", "designSystemId", "sourceBaselineCommit", "tokenContractId", "familyCount", "familyFiles", "interfaceFiles"],
+  "properties": {
+    "schemaVersion": { "const": 1 }, "id": { "type": "string", "minLength": 1 }, "status": { "enum": ["candidate", "approved"] }, "designSystemId": { "type": "string", "minLength": 1 }, "sourceBaselineCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }, "tokenContractId": { "type": "string", "minLength": 1 }, "familyCount": { "type": "integer", "minimum": 0 }, "familyFiles": { "type": "array", "items": { "type": "string" } }, "interfaceFiles": { "type": "array", "items": { "type": "string" } }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "contractSetId": "shadcn-radix-component-contracts-001",
+  "familyCount": 19,
+  "families": [
+    { "familyId": "accordion", "components": ["Accordion", "AccordionContent", "AccordionItem", "AccordionTrigger"], "hooks": [], "helpers": [] },
+    { "familyId": "badge", "components": ["Badge"], "hooks": [], "helpers": ["badgeVariants"] },
+    { "familyId": "button", "components": ["Button"], "hooks": [], "helpers": ["buttonVariants"] },
+    { "familyId": "card", "components": ["Card", "CardAction", "CardContent", "CardDescription", "CardFooter", "CardHeader", "CardTitle"], "hooks": [], "helpers": [] },
+    { "familyId": "checkbox", "components": ["Checkbox"], "hooks": [], "helpers": [] },
+    { "familyId": "dialog", "components": ["Dialog", "DialogClose", "DialogContent", "DialogDescription", "DialogFooter", "DialogHeader", "DialogOverlay", "DialogPortal", "DialogTitle", "DialogTrigger"], "hooks": [], "helpers": [] },
+    { "familyId": "dropdown-menu", "components": ["DropdownMenu", "DropdownMenuCheckboxItem", "DropdownMenuContent", "DropdownMenuGroup", "DropdownMenuItem", "DropdownMenuLabel", "DropdownMenuPortal", "DropdownMenuRadioGroup", "DropdownMenuRadioItem", "DropdownMenuSeparator", "DropdownMenuShortcut", "DropdownMenuSub", "DropdownMenuSubContent", "DropdownMenuSubTrigger", "DropdownMenuTrigger"], "hooks": [], "helpers": [] },
+    { "familyId": "input", "components": ["Input"], "hooks": [], "helpers": [] },
+    { "familyId": "label", "components": ["Label"], "hooks": [], "helpers": [] },
+    { "familyId": "scroll-area", "components": ["ScrollArea", "ScrollBar"], "hooks": [], "helpers": [] },
+    { "familyId": "select", "components": ["Select", "SelectContent", "SelectGroup", "SelectItem", "SelectLabel", "SelectScrollDownButton", "SelectScrollUpButton", "SelectSeparator", "SelectTrigger", "SelectValue"], "hooks": [], "helpers": [] },
+    { "familyId": "separator", "components": ["Separator"], "hooks": [], "helpers": [] },
+    { "familyId": "sheet", "components": ["Sheet", "SheetClose", "SheetContent", "SheetDescription", "SheetFooter", "SheetHeader", "SheetTitle", "SheetTrigger"], "hooks": [], "helpers": [] },
+    { "familyId": "sidebar", "components": ["Sidebar", "SidebarContent", "SidebarFooter", "SidebarGroup", "SidebarGroupAction", "SidebarGroupContent", "SidebarGroupLabel", "SidebarHeader", "SidebarInput", "SidebarInset", "SidebarMenu", "SidebarMenuAction", "SidebarMenuBadge", "SidebarMenuButton", "SidebarMenuItem", "SidebarMenuSkeleton", "SidebarMenuSub", "SidebarMenuSubButton", "SidebarMenuSubItem", "SidebarProvider", "SidebarRail", "SidebarSeparator", "SidebarTrigger"], "hooks": ["useSidebar"], "helpers": [] },
+    { "familyId": "skeleton", "components": ["Skeleton"], "hooks": [], "helpers": [] },
+    { "familyId": "table", "components": ["Table", "TableBody", "TableCaption", "TableCell", "TableFooter", "TableHead", "TableHeader", "TableRow"], "hooks": [], "helpers": [] },
+    { "familyId": "tabs", "components": ["Tabs", "TabsContent", "TabsList", "TabsTrigger"], "hooks": [], "helpers": ["tabsListVariants"] },
+    { "familyId": "textarea", "components": ["Textarea"], "hooks": [], "helpers": [] },
+    { "familyId": "tooltip", "components": ["Tooltip", "TooltipContent", "TooltipProvider", "TooltipTrigger"], "hooks": [], "helpers": [] }
+  ]
+}

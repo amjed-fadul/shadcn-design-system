@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "id": "scroll-area",
+  "source": {
+    "canonicalPath": "src/components/ui/scroll-area.tsx",
+    "canonicalBlobSha": "d509c2fccf31621c4461f7264c2f62a4e32c1492",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/scroll-area.tsx",
+    "upstreamBlobSha": "9f45d3bb9f75cc74b3f297da6e7caa137e112e7a"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/scroll-area.tsx@d509c2fccf31621c4461f7264c2f62a4e32c1492"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "ScrollArea",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.scroll-area.root"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.scroll-area.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "scroll-area",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "viewport",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "scrollbar",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "corner",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "viewport",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.scroll-area.viewport"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "scroll-area-viewport",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "scrollbar",
+              "host": {
+                "kind": "component-export",
+                "exportName": "ScrollBar"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "corner",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.scroll-area.corner"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    },
+    {
+      "name": "ScrollBar",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.scroll-area.scrollbar"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [
+          {
+            "propName": "orientation",
+            "value": "vertical",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.border",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "scrollbar",
+          "publicPropsTargetNodeId": "scrollbar",
+          "nodes": [
+            {
+              "id": "scrollbar",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.scroll-area.scrollbar"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "scroll-area-scrollbar",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-orientation",
+                  "source": "prop",
+                  "prop": "orientation",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "thumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "thumb",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.scroll-area.thumb"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "scroll-area-thumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    }
+  ],
+  "unresolved": []
+}

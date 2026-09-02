@@ -11,6 +11,7 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "components:verify": "vitest run --testTimeout=60000 tests/component-contract-*.test.ts tests/component-contract-runtime-evidence.test.tsx",
     "tokens:verify": "vitest run tests/token-contract-*.test.ts",
     "snapshot:verify": "vitest run tests/snapshot-integrity.test.ts"
   },
