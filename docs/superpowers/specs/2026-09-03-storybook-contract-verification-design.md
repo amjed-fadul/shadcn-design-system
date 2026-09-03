@@ -1,6 +1,6 @@
 # Storybook Contract Verification Design
 
-**Status:** Proposed for implementation planning after user review  
+**Status:** Implemented
 **Date:** 2026-09-03  
 **Repository:** `amjed-fadul/shadcn-design-system`
 
@@ -20,9 +20,11 @@ The goal is to make it easy to inspect what a contracted component actually rend
 
 The repository is a React 18 + Vite 7 + TypeScript design-system package with Tailwind CSS, Vitest, and 19 approved component families. Components live under `src/components/ui`, while factual contracts and validators live separately under `contracts` and `src/contracts`.
 
-Storybook is not currently installed.
+At the time of this design, Storybook was not installed.
 
 The current stack is compatible with Storybook's React/Vite framework. Storybook's current React/Vite documentation requires React >=16.8 and Vite >=5. The repository uses React 18.3.1 and Vite 7.3.6. Storybook's Vitest integration requires a Vite-based Storybook and Vitest >=3; the repository uses Vitest 3.2.7.
+
+**Implementation note:** Vitest 3 uses `@vitest/browser@3.2.7` with Playwright and Chromium. Ordinary unit tests are capped at `maxWorkers=1` because Storybook dependency overhead exposed parallel 5-second timeout flakiness under Node `22.18.0`. GitHub Ubuntu CI installs Chromium with `--with-deps`; PR #7 Ubuntu Baseline verification passed.
 
 ## Core Decision
 

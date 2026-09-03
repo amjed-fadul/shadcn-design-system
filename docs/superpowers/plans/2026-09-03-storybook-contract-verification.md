@@ -69,7 +69,7 @@ npm install --save-dev --save-exact \
   storybook@10.5.10 \
   @storybook/react-vite@10.5.10 \
   @storybook/addon-vitest@10.5.10 \
-  @vitest/browser-playwright@3.2.7 \
+  @vitest/browser@3.2.7 \
   playwright@1.58.2
 ```
 
@@ -129,7 +129,7 @@ export default preview
 
 - [ ] **Step 4: Isolate Storybook browser tests without changing the meaning of existing tests.**
 
-Create `vitest.config.ts` by merging the existing `vite.config.ts`. Define a `storybook` project using `storybookTest({ configDir: path.join(dirname, ".storybook") })`, `@vitest/browser-playwright`, headless Chromium, and `.storybook/vitest.setup.ts`.
+Create `vitest.config.ts` by merging the existing `vite.config.ts`. Define a `storybook` project using `storybookTest({ configDir: path.join(dirname, ".storybook") })`, `@vitest/browser` with the Playwright provider, headless Chromium, and `.storybook/vitest.setup.ts`.
 
 The setup file must apply preview annotations through `setProjectAnnotations` from `@storybook/react-vite`.
 
@@ -289,7 +289,7 @@ Do not start Task 2.
 ```bash
 rm -rf node_modules storybook-static
 npm ci --ignore-scripts
-npx playwright install chromium
+npx playwright install --with-deps chromium
 npm run typecheck
 npm run test
 npm run components:verify
