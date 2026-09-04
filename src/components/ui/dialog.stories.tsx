@@ -43,9 +43,23 @@ export const Default: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Open profile" }))
     const body = within(document.body)
     const dialog = body.getByRole("dialog", { name: "Edit profile" })
+    const overlay = document.body.querySelector<HTMLElement>('[data-slot="dialog-overlay"]')
+
+    await expect(overlay).not.toBeNull()
+    const entryAnimation = overlay!.getAnimations().find((animation) => animation instanceof CSSAnimation && animation.animationName === "enter")
+    await expect(entryAnimation).toBeDefined()
+    const entryOpacityKeyframes = (entryAnimation!.effect as KeyframeEffect).getKeyframes().map((keyframe) => keyframe.opacity)
 
     await expect(dialog).toBeVisible()
     await userEvent.click(within(dialog).getByRole("button", { name: "Close" }))
+
+    const exitOverlay = document.body.querySelector<HTMLElement>('[data-slot="dialog-overlay"]')
+    await expect(exitOverlay).not.toBeNull()
+    const exitAnimation = exitOverlay!.getAnimations().find((animation) => animation instanceof CSSAnimation && animation.animationName === "exit")
+    await expect(exitAnimation).toBeDefined()
+    const exitOpacityKeyframes = (exitAnimation!.effect as KeyframeEffect).getKeyframes().map((keyframe) => keyframe.opacity)
+
     await expect(body.queryByRole("dialog", { name: "Edit profile" })).not.toBeInTheDocument()
+    await expect({ entry: entryOpacityKeyframes, exit: exitOpacityKeyframes }).toEqual({ entry: ["0", "1"], exit: ["1", "0"] })
   },
 }
