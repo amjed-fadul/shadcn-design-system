@@ -25,7 +25,7 @@ describe("Button component contract", () => {
     expect(contractSet.familyFiles).toContain("contracts/components/families/button.json")
     expect(button.id).toBe("button")
     expect(button.source).toMatchObject({ canonicalPath: seed.canonicalPath, canonicalBlobSha: seed.canonicalBlobSha, implementationKind: seed.implementationKind, upstreamPath: seed.upstreamPath, upstreamBlobSha: seed.upstreamBlobSha })
-    expect(readCanonicalSourceBlobSha(sourcePath)).toBe("1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc")
+    expect(readCanonicalSourceBlobSha(sourcePath)).toBe("1e177a299e0bc587fb7a7675514cdc56ad50f009")
     expect(button.source.canonicalBlobSha).toBe(seed.canonicalBlobSha)
     expect(listModuleExports(sourcePath).map((item) => item.name).sort()).toEqual(["Button", "buttonVariants"])
     expect(button.exports.map((item) => [item.name, item.kind, item.authorableJsx]).sort()).toEqual([["Button", "component", true], ["buttonVariants", "helper", false]])

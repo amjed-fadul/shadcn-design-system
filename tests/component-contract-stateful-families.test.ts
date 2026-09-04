@@ -304,6 +304,12 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const rootComponent = scrollArea.exports.find((entry) => entry.name === "ScrollArea")!.component!
     const barComponent = scrollArea.exports.find((entry) => entry.name === "ScrollBar")!.component!
     expect(tree(rootComponent.rendering).nodes.find((node) => node.id === "root")!.children.map((child) => child.nodeId)).toEqual(["viewport", "scrollbar", "corner"])
+    expect(rootComponent.accessibility).toEqual([{
+      feature: "scrollable viewport keyboard focusability",
+      owner: "component",
+      mechanism: "tabIndex=0 on internal Radix viewport",
+      evidenceRefs: ["source"],
+    }])
     expect(barComponent.inheritedPropDefaults).toEqual([{ propName: "orientation", value: "vertical", evidenceRefs: ["source"] }])
     expect(tree(barComponent.rendering).nodes.find((node) => node.id === "scrollbar")!.children.map((child) => child.nodeId)).toEqual(["thumb"])
     expect(validateComponentFamilyInvariants(scrollArea, authority())).toEqual([])

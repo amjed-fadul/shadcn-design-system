@@ -148,7 +148,9 @@ describe("Studio V1 core component foundation", () => {
     )
 
     expect(container.querySelector('[data-slot="scroll-area"]')).not.toBeNull()
-    expect(container.querySelector('[data-slot="scroll-area-viewport"]')).not.toBeNull()
+    const viewport = container.querySelector('[data-slot="scroll-area-viewport"]')
+    expect(viewport).not.toBeNull()
+    expect(viewport?.getAttribute("tabindex")).toBe("0")
     expect(container.querySelector('[data-slot="scroll-area-scrollbar"]')).not.toBeNull()
   })
 })

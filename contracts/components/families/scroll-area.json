@@ -3,7 +3,7 @@
   "id": "scroll-area",
   "source": {
     "canonicalPath": "src/components/ui/scroll-area.tsx",
-    "canonicalBlobSha": "d509c2fccf31621c4461f7264c2f62a4e32c1492",
+    "canonicalBlobSha": "a985bb3d696610aa61b0f27cb179af28be24302f",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/scroll-area.tsx",
     "upstreamBlobSha": "9f45d3bb9f75cc74b3f297da6e7caa137e112e7a"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/scroll-area.tsx@d509c2fccf31621c4461f7264c2f62a4e32c1492"
+      "source": "src/components/ui/scroll-area.tsx@a985bb3d696610aa61b0f27cb179af28be24302f"
     },
     "tokens": {
       "kind": "token-contract",
@@ -146,7 +146,16 @@
           ],
           "portalBoundaries": []
         },
-        "accessibility": []
+        "accessibility": [
+          {
+            "feature": "scrollable viewport keyboard focusability",
+            "owner": "component",
+            "mechanism": "tabIndex=0 on internal Radix viewport",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
       }
     },
     {

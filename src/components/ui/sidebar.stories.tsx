@@ -25,6 +25,7 @@ const meta = {
   component: Sidebar,
   parameters: {
     layout: "fullscreen",
+    providesDocumentLandmarks: true,
   },
 } satisfies Meta<typeof Sidebar>
 
@@ -35,7 +36,7 @@ type Story = StoryObj<typeof meta>
 export const Desktop: Story = {
   render: () => (
     <SidebarProvider defaultOpen>
-      <Sidebar>
+      <Sidebar role="navigation" aria-label="Workspace navigation">
         <SidebarHeader>
           <div className="px-2 text-sm font-semibold">Acme workspace</div>
         </SidebarHeader>
@@ -72,11 +73,11 @@ export const Desktop: Story = {
           <SidebarTrigger />
           <h1 className="text-sm font-semibold">Overview</h1>
         </header>
-        <main className="p-6">
+        <div className="p-6">
           <p className="text-sm text-muted-foreground">
             Review workspace activity and settings from the navigation.
           </p>
-        </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   ),

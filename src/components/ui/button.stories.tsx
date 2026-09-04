@@ -88,6 +88,16 @@ export const Variants: Story = {
   ),
 }
 
+export const DestructiveDark: Story = {
+  globals: {
+    theme: "dark",
+  },
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => <Button variant="destructive">Destructive</Button>,
+}
+
 export const Sizes: Story = {
   parameters: {
     controls: { disable: true },

@@ -62,3 +62,31 @@ export const Variants: Story = {
     </div>
   ),
 }
+
+export const DestructiveLinkLight: Story = {
+  globals: {
+    theme: "light",
+  },
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => (
+    <Badge asChild variant="destructive">
+      <a href="#destructive-light">Destructive</a>
+    </Badge>
+  ),
+}
+
+export const DestructiveDark: Story = {
+  globals: {
+    theme: "dark",
+  },
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => (
+    <Badge asChild variant="destructive">
+      <a href="#destructive-dark">Destructive</a>
+    </Badge>
+  ),
+}

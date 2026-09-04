@@ -3215,6 +3215,17 @@
               }
             },
             {
+              "tokenId": "color.background",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ],
+              "when": {
+                "propName": "variant",
+                "equals": "destructive"
+              }
+            },
+            {
               "tokenId": "color.border",
               "evidenceRefs": [
                 "source",
@@ -6219,6 +6230,17 @@
             },
             {
               "tokenId": "color.destructive",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ],
+              "when": {
+                "propName": "variant",
+                "equals": "destructive"
+              }
+            },
+            {
+              "tokenId": "color.background",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -127041,5 +127063,5 @@
       "sidebar.context"
     ]
   },
-  "sha256": "0cec81d404ab37243b9b31c9a732eadb99296f557b0facce6f0f6017be682472"
+  "sha256": "6fbcb712844038e72eba522288cab0356c0226cd6308e80e77addc0209acab53"
 }
