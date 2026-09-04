@@ -3,7 +3,7 @@
   "id": "sidebar",
   "source": {
     "canonicalPath": "src/components/ui/sidebar.tsx",
-    "canonicalBlobSha": "a2cc82dbfd31c8f75a326946cf9fe87389d334d0",
+    "canonicalBlobSha": "cd31eb5d13aa36aecb3be7e9066918f8fb7a877a",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
     "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sidebar.tsx@a2cc82dbfd31c8f75a326946cf9fe87389d334d0"
+      "source": "src/components/ui/sidebar.tsx@cd31eb5d13aa36aecb3be7e9066918f8fb7a877a"
     },
     "tokens": {
       "kind": "token-contract",
@@ -1642,6 +1642,13 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {
@@ -2194,6 +2201,13 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {
@@ -2500,6 +2514,13 @@
           },
           {
             "tokenId": "color.sidebar-accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -3155,6 +3176,13 @@
           },
           {
             "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
             "evidenceRefs": [
               "source",
               "tokens"

@@ -50785,6 +50785,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "color.ring",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -69636,6 +69643,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "color.ring",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -75192,6 +75206,13 @@
                 "propName": "size",
                 "equals": "lg"
               },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.ring",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -85946,6 +85967,13 @@
             },
             {
               "tokenId": "font-size.xs",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.ring",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -126666,5 +126694,5 @@
       "sidebar.context"
     ]
   },
-  "sha256": "e403fa46ccf35744029582371cf8838a1a9d9b5f3c0b906b48052743dacf3547"
+  "sha256": "dda6f4340d2b252ebeede847bdb42b02b16f545e50bc76c02321d9ce9f52c88a"
 }
