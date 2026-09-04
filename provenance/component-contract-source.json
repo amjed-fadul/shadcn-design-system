@@ -5,7 +5,7 @@
   },
   "familySource": {
     "path": "provenance/seed-components.json",
-    "blobSha": "b5397fdf1284aa20afe1830e911248a0bb806c23",
+    "blobSha": "2d21f91c164eb17815823c738ff88b39cda5fddc",
     "familyCount": 19,
     "familyIds": [
       "accordion",
@@ -33,7 +33,7 @@
     "id": "shadcn-radix-token-contract-001",
     "status": "approved",
     "path": "contracts/tokens/token-contract.json",
-    "blobSha": "230f0da8d00ee20a0e4d8de0a2fde0054e58b21f"
+    "blobSha": "ce317330e888d3b1561bb45fafc4aed6a571cbf8"
   },
   "packages": {
     "react": {

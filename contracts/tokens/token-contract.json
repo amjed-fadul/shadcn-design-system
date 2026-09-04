@@ -65,8 +65,7 @@
       "baseTokenId": "spacing.unit",
       "parameter": {
         "name": "multiplier",
-        "type": "number",
-        "minimum": 0
+        "type": "number"
       },
       "expression": "calc(var(--spacing) * <multiplier>)",
       "tailwindSyntax": "--spacing(<multiplier>)",

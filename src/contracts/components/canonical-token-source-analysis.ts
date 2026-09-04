@@ -14,7 +14,17 @@ for (const [utility, token] of [["rounded-sm", "radius.sm"], ["rounded-md", "rad
 const approvedTokenIds = new Set(tokenContract.tokens.map((token) => token.id))
 const contractedNamespaces = new Set(tokenContract.coverage.contracted)
 const tokenCategory = new Map(tokenContract.tokens.map((token) => [token.id, token.category]))
-const spacingUtility = /^(?:size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|space-x|space-y|inset|inset-x|inset-y|top|right|bottom|left)-([0-9]+(?:\.[0-9]+)?)$/
+const spacingUtility = /^(-?)(size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|space-x|space-y|inset|inset-x|inset-y|top|right|bottom|left)-([0-9]+(?:\.[0-9]+)?)$/
+const negativeSpacingNamespaces = new Set([
+  "m", "mx", "my", "mt", "mr", "mb", "ml",
+  "space-x", "space-y",
+  "inset", "inset-x", "inset-y", "top", "right", "bottom", "left",
+])
+function spacingMultiplier(utility: string): number | undefined {
+  const spacing = utility.match(spacingUtility)
+  if (!spacing || (spacing[1] === "-" && !negativeSpacingNamespaces.has(spacing[2]))) return undefined
+  return (spacing[1] === "-" ? -1 : 1) * Number(spacing[3])
+}
 const analyzer = createTokenSourceAnalyzer({
   classMergeFunctionNames: ["cn"],
   recipeFunctionNames: ["cva"],
@@ -32,8 +42,8 @@ const analyzer = createTokenSourceAnalyzer({
   resolveUtility: (utility) => {
     const tokenId = direct.get(utility)
     if (tokenId && approvedTokenIds.has(tokenId)) return { tokenId }
-    const spacing = utility.match(spacingUtility)
-    return spacing ? { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: Number(spacing[1]) } } : undefined
+    const multiplier = spacingMultiplier(utility)
+    return multiplier !== undefined ? { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier } } : undefined
   },
 })
 
@@ -58,7 +68,7 @@ function contractedNamespaceFor(utility: string): string | undefined {
   if (/^(?:bg|text|border|ring|outline|decoration|fill|stroke)-/.test(utility)) return "color"
   if (/^rounded-/.test(utility)) return "radius"
   if (/^font-/.test(utility)) return /^font-(?:thin|extralight|light|normal|medium|semibold|bold|extrabold|black)$/.test(utility) ? "font-weight" : "font-family"
-  if (/^leading-/.test(utility)) return "line-height"; if (/^tracking-/.test(utility)) return "letter-spacing"; if (/^shadow-/.test(utility)) return "shadow"; if (spacingUtility.test(utility)) return "spacing"
+  if (/^leading-/.test(utility)) return "line-height"; if (/^tracking-/.test(utility)) return "letter-spacing"; if (/^shadow-/.test(utility)) return "shadow"; if (spacingMultiplier(utility) !== undefined) return "spacing"
 }
 const rawColor = (utility: string) => /^(?:bg|text|border|ring|outline|decoration|fill|stroke)-(?:black|white|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(?:-(?:50|100|200|300|400|500|600|700|800|900|950))?$/.test(utility)
 const recognizedNoToken = (utility: string, namespace: string | undefined) => /-\[[^\]]+\]$/.test(utility) || /-(?:inherit|initial|unset|revert|revert-layer)$/.test(utility) || (namespace === "color" && /-current$/.test(utility)) || utility === "leading-none" || utility === "rounded-full" || utility === "shadow-none"
@@ -69,7 +79,7 @@ export function auditComponentTokenCoverage(sourcePath: string): TokenCoverageFi
   for (const source of analyzeComponentTokenSource(sourcePath).resolved) for (const rawUtility of source.classNames.split(/\s+/).filter(Boolean)) {
     const utility = normalizedUtility(rawUtility); const tokenId = direct.get(utility); const namespace = contractedNamespaceFor(utility)
     if (tokenId && approvedTokenIds.has(tokenId)) findings.push({ utility, classification: "resolved-approved-token", tokenId, namespace: tokenCategory.get(tokenId) })
-    else if (spacingUtility.test(utility) && approvedTokenIds.has("spacing.unit")) findings.push({ utility, classification: "resolved-approved-token", tokenId: "spacing.unit", namespace: "spacing" })
+    else if (spacingMultiplier(utility) !== undefined && approvedTokenIds.has("spacing.unit")) findings.push({ utility, classification: "resolved-approved-token", tokenId: "spacing.unit", namespace: "spacing" })
     else if (rawColor(utility) || notContractedUtilities.has(utility) || /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility)) findings.push({ utility, classification: "known-not-contracted-namespace", namespace: rawColor(utility) || /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility) ? "primitive-color" : "border-width" })
     else if (recognizedNoToken(utility, namespace)) findings.push({ utility, classification: "recognized-no-approved-token", namespace })
     else if (implementationUtilities.has(utility) || utility.startsWith("data-") || utility.startsWith("has-") || utility.startsWith("in-data-")) findings.push({ utility, classification: "known-non-token-implementation" })

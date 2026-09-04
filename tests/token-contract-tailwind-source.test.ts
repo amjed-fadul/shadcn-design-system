@@ -56,6 +56,7 @@ describe("pinned Tailwind theme token source", () => {
             path: string
             sha256: string
             bareValueMarker: string
+            negativeBareValueMarker: string
             resolverMarker: string
             semantics: string
           }
@@ -67,10 +68,12 @@ describe("pinned Tailwind theme token source", () => {
 
     expect(createHash("sha256").update(source).digest("hex")).toBe(evidence.sha256)
     expect(source.toString("utf8")).toContain(evidence.bareValueMarker)
+    expect(source.toString("utf8")).toContain(evidence.negativeBareValueMarker)
     expect(source.toString("utf8")).toContain(evidence.resolverMarker)
     expect(evidence.bareValueMarker).toBe('handleBareValue:({value:K})=>!e.resolve(null,["--spacing"])||!Q(K)?null:`--spacing(${K})`')
+    expect(evidence.negativeBareValueMarker).toBe('handleNegativeBareValue:({value:K})=>!e.resolve(null,["--spacing"])||!Q(K)?null:`--spacing(-${K})`')
     expect(evidence.resolverMarker).toBe('d=`calc(${f} * ${l.value.value})`')
-    expect(evidence.semantics).toBe("The compiler maps a numeric bare utility value to --spacing(<multiplier>) when --spacing resolves, and resolves spacing values as calc(<resolved --spacing> * <multiplier>).")
+    expect(evidence.semantics).toBe("The compiler maps numeric bare utility values to --spacing(<multiplier>) when --spacing resolves. For utilities registered with supportsNegative, negative bare values map to --spacing(-<multiplier>), preserving the sign. Spacing values resolve as calc(<resolved --spacing> * <multiplier>).")
   })
 
   test("reconciles every contracted Tailwind value to @theme default only", () => {

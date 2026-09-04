@@ -7,11 +7,11 @@ function Card({ className, size = "default", ...props }: React.ComponentProps<"d
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-header" className={cn("grid gap-1.5 p-4", className)} {...props} />
+  return <div data-slot="card-header" className={cn("grid gap-1.5 p-4 group-data-[size=sm]/card:p-3", className)} {...props} />
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-title" className={cn("font-heading text-base font-medium", className)} {...props} />
+  return <div data-slot="card-title" className={cn("font-heading text-base font-medium group-data-[size=sm]/card:text-sm", className)} {...props} />
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
@@ -23,11 +23,11 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-content" className={cn("px-4 pb-4", className)} {...props} />
+  return <div data-slot="card-content" className={cn("px-4 pb-4 group-data-[size=sm]/card:px-3 group-data-[size=sm]/card:pb-3", className)} {...props} />
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-footer" className={cn("flex items-center border-t bg-muted/50 p-4", className)} {...props} />
+  return <div data-slot="card-footer" className={cn("flex items-center border-t bg-muted/50 p-4 group-data-[size=sm]/card:p-3", className)} {...props} />
 }
 
 export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent }

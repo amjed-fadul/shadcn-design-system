@@ -36,7 +36,7 @@ describe("Phase 2 Tailwind contract scope", () => {
       id: "spacing.multiplier",
       category: "spacing",
       baseTokenId: "spacing.unit",
-      parameter: { name: "multiplier", type: "number", minimum: 0 },
+      parameter: { name: "multiplier", type: "number" },
       expression: "calc(var(--spacing) * <multiplier>)",
       tailwindSyntax: "--spacing(<multiplier>)",
       producesTokenIds: false,

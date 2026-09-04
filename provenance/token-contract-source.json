@@ -25,8 +25,9 @@
         "path": "node_modules/tailwindcss/dist/lib.mjs",
         "sha256": "8ebfd51c44d6cca0ef675007e97e6aa918944df2b662c2d7bfa50fdfaa98bb64",
         "bareValueMarker": "handleBareValue:({value:K})=>!e.resolve(null,[\"--spacing\"])||!Q(K)?null:`--spacing(${K})`",
+        "negativeBareValueMarker": "handleNegativeBareValue:({value:K})=>!e.resolve(null,[\"--spacing\"])||!Q(K)?null:`--spacing(-${K})`",
         "resolverMarker": "d=`calc(${f} * ${l.value.value})`",
-        "semantics": "The compiler maps a numeric bare utility value to --spacing(<multiplier>) when --spacing resolves, and resolves spacing values as calc(<resolved --spacing> * <multiplier>)."
+        "semantics": "The compiler maps numeric bare utility values to --spacing(<multiplier>) when --spacing resolves. For utilities registered with supportsNegative, negative bare values map to --spacing(-<multiplier>), preserving the sign. Spacing values resolve as calc(<resolved --spacing> * <multiplier>)."
       }
     }
   }

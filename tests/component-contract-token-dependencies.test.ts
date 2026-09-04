@@ -25,9 +25,9 @@ function sourcePath(familyId: string) {
   return join(root, "src/components/ui", `${familyId}.tsx`)
 }
 
-function normalized(dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>) {
+function normalized(dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "sourceContext" | "viaDerivedRule">>) {
   return dependencies
-    .map(({ tokenId, when, viaDerivedRule }) => ({ tokenId, ...(when ? { when } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) }))
+    .map(({ tokenId, when, sourceContext, viaDerivedRule }) => ({ tokenId, ...(when ? { when } : {}), ...(sourceContext ? { sourceContext } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) }))
     .filter((dependency, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(dependency)) === index)
     .sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)))
 }

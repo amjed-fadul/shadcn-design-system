@@ -332,7 +332,15 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
     const tokenDependencyKeys = new Set<string>()
     for (const token of component.tokenDependencies) {
       hasEvidence(errors, token.evidenceRefs, family.evidence, `Token dependency ${entry.name}.${token.tokenId}`)
-      const key = JSON.stringify({ tokenId: token.tokenId, ...(token.when ? { when: token.when } : {}), ...(token.viaDerivedRule ? { viaDerivedRule: token.viaDerivedRule } : {}) })
+      if (token.sourceContext) {
+        const applicabilityIsValid = Array.isArray(token.sourceContext.applicability) && token.sourceContext.applicability.every((modifier) => typeof modifier === "string" && modifier.length > 0)
+        const targetIsValid = token.sourceContext.target === undefined || (token.sourceContext.target.kind === "pseudo-element" && (token.sourceContext.target.name === "after" || token.sourceContext.target.name === "before"))
+        if (!applicabilityIsValid) errors.push(`Component ${entry.name} token dependency ${token.tokenId} has invalid source context applicability.`)
+        if (!targetIsValid) errors.push(`Component ${entry.name} token dependency ${token.tokenId} has invalid source context target.`)
+        if (applicabilityIsValid && token.sourceContext.applicability.length === 0 && token.sourceContext.target === undefined) errors.push(`Component ${entry.name} token dependency ${token.tokenId} has empty source context.`)
+      }
+      const normalizedSourceContext = token.sourceContext && Array.isArray(token.sourceContext.applicability) ? { applicability: [...token.sourceContext.applicability], ...(token.sourceContext.target ? { target: { kind: token.sourceContext.target.kind, name: token.sourceContext.target.name } } : {}) } : token.sourceContext
+      const key = JSON.stringify({ tokenId: token.tokenId, ...(token.when ? { when: token.when } : {}), ...(normalizedSourceContext ? { sourceContext: normalizedSourceContext } : {}), ...(token.viaDerivedRule ? { viaDerivedRule: token.viaDerivedRule } : {}) })
       if (tokenDependencyKeys.has(key)) errors.push(`Component ${entry.name} has duplicate token dependency: ${token.tokenId}.`)
       tokenDependencyKeys.add(key)
       if (!authority.tokenIds.has(token.tokenId)) errors.push(`Component ${entry.name} references unknown token: ${token.tokenId}.`)

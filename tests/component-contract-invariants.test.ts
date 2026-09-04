@@ -70,6 +70,37 @@ describe("component contract semantic invariants", () => {
     expect(() => assertComponentFamilyInvariants(validFamily(), authority)).not.toThrow()
   })
 
+  test("uses source context in token dependency identity and rejects an empty context", () => {
+    const distinct = changed((family: any) => {
+      const dependency = family.exports[0].component.tokenDependencies[0]
+      dependency.sourceContext = { applicability: ["group-data-[state=open]/item"] }
+      family.exports[0].component.tokenDependencies.push({
+        ...structuredClone(dependency),
+        sourceContext: { applicability: [], target: { kind: "pseudo-element", name: "after" } },
+      })
+    })
+    expect(validateComponentFamilyInvariants(distinct, authority)).toEqual([])
+
+    const duplicate = structuredClone(distinct)
+    duplicate.exports[0].component!.tokenDependencies.push(structuredClone(duplicate.exports[0].component!.tokenDependencies[0]))
+    expect(validateComponentFamilyInvariants(duplicate, authority)).toContain("Component Example has duplicate token dependency: color.primary.")
+
+    const reorderedDuplicate = changed((family: any) => {
+      const dependency = family.exports[0].component.tokenDependencies[0]
+      dependency.sourceContext = { applicability: [], target: { kind: "pseudo-element", name: "after" } }
+      family.exports[0].component.tokenDependencies.push({
+        ...structuredClone(dependency),
+        sourceContext: { target: { name: "after", kind: "pseudo-element" }, applicability: [] },
+      })
+    })
+    expect(validateComponentFamilyInvariants(reorderedDuplicate, authority)).toContain("Component Example has duplicate token dependency: color.primary.")
+
+    const empty = changed((family: any) => {
+      family.exports[0].component.tokenDependencies[0].sourceContext = { applicability: [] }
+    })
+    expect(validateComponentFamilyInvariants(empty, authority)).toContain("Component Example token dependency color.primary has empty source context.")
+  })
+
   test("accepts a portal boundary targeting a reachable render node", () => {
     expect(validateComponentFamilyInvariants(withPortalBoundary(), authority)).toEqual([])
   })

@@ -3,8 +3,10 @@ import { describe, expect, test } from "vitest"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import type { StructuredPropType } from "../src/contracts/components/types"
 import { getTokenContract } from "../src/contracts/tokens/contract"
-import { projectExecutableContract, validateAuthoredUi, type ValidationError } from "../src/validator"
+import type { ValidationError } from "../src/validator/errors"
+import { projectExecutableContract } from "../src/validator/projection"
 import type { AuthoredNode, AuthoredUi, AuthoredValue, ExecutableComponent, ExecutableExport, JsonValue } from "../src/validator/types"
+import { validateAuthoredUi } from "../src/validator/validate"
 
 const contract = projectExecutableContract({
   componentContracts: loadComponentContracts(),
@@ -184,18 +186,32 @@ describe("Phase 5 executable validator coverage across all 19 Phase 3 families",
     expect(validateAuthoredUi(invalid, contract).errors[0]).toMatchObject({ code: "INVALID_DERIVED_TOKEN_RULE" })
   })
 
-  test("fails closed for unresolved or out-of-range derived token parameters", () => {
+  test("fails closed for an unresolved derived token parameter", () => {
     const unresolvedParameter: AuthoredValue = { kind: "expression", expression: "multiplier" }
     const expression = {
       root: component("button", "Button"),
       tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: unresolvedParameter }, location: { path: "button-Button.tokenUses[0]" } }],
     }
-    const negative = {
-      root: component("button", "Button"),
-      tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: literal(-1) }, location: { path: "button-Button.tokenUses[0]" } }],
-    }
-
     expect(validateAuthoredUi(expression, contract).errors[0]).toMatchObject({ code: "UNRESOLVED_FACT" })
-    expect(validateAuthoredUi(negative, contract).errors[0]).toMatchObject({ code: "INVALID_DERIVED_TOKEN_PARAMETER" })
+  })
+
+  test("accepts signed finite derived token multipliers", () => {
+    for (const multiplier of [-1, 2]) {
+      const finite = {
+        root: component("button", "Button"),
+        tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: literal(multiplier) }, location: { path: "button-Button.tokenUses[0]" } }],
+      }
+      expect(validateAuthoredUi(finite, contract), String(multiplier)).toEqual({ ok: true, errors: [] })
+    }
+  })
+
+  test("fails closed for nonfinite derived token multipliers", () => {
+    for (const multiplier of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      const nonfinite = {
+        root: component("button", "Button"),
+        tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: literal(multiplier) }, location: { path: "button-Button.tokenUses[0]" } }],
+      }
+      expect(validateAuthoredUi(nonfinite, contract).errors[0], String(multiplier)).toMatchObject({ code: "INVALID_DERIVED_TOKEN_PARAMETER" })
+    }
   })
 })

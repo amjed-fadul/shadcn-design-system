@@ -47,6 +47,21 @@ describe("token contract JSON Schema", () => {
     expect(validate(validContract())).toBe(true)
   })
 
+  test("accepts the approved signed spacing multiplier rule without a lower bound", () => {
+    const contract: any = validContract()
+    contract.derivedRules = [{
+      id: "spacing.multiplier",
+      category: "spacing",
+      baseTokenId: "spacing.unit",
+      parameter: { name: "multiplier", type: "number" },
+      expression: "calc(var(--spacing) * <multiplier>)",
+      tailwindSyntax: "--spacing(<multiplier>)",
+      producesTokenIds: false,
+    }]
+
+    expect(validate(contract)).toBe(true)
+  })
+
   test.each([
     ["unknown top-level property", (contract: Record<string, unknown>) => ({ ...contract, unexpected: true })],
     ["invalid token ID", (contract: any) => ({ ...contract, tokens: [{ ...contract.tokens[0], id: "background" }] })],
@@ -54,7 +69,8 @@ describe("token contract JSON Schema", () => {
     ["unknown category", (contract: any) => ({ ...contract, tokens: [{ ...contract.tokens[0], category: "palette" }] })],
     ["mode token without dark", (contract: any) => ({ ...contract, tokens: [{ ...contract.tokens[0], value: { kind: "modes", values: { light: "oklch(1 0 0)" } } }] })],
     ["literal value with an illegal extra field", (contract: any) => ({ ...contract, tokens: [{ ...contract.tokens[0], category: "radius", id: "radius.sm", value: { kind: "literal", value: "0.25rem", invalid: true } }] })],
-    ["derived rule with wrong producesTokenIds value", (contract: any) => ({ ...contract, derivedRules: [{ id: "spacing.multiplier", category: "spacing", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number", minimum: 0 }, expression: "calc(var(--spacing) * <multiplier>)", tailwindSyntax: "--spacing(<multiplier>)", producesTokenIds: true }] })],
+    ["legacy nonnegative spacing bound", (contract: any) => ({ ...contract, derivedRules: [{ id: "spacing.multiplier", category: "spacing", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number", minimum: 0 }, expression: "calc(var(--spacing) * <multiplier>)", tailwindSyntax: "--spacing(<multiplier>)", producesTokenIds: false }] })],
+    ["derived rule with wrong producesTokenIds value", (contract: any) => ({ ...contract, derivedRules: [{ id: "spacing.multiplier", category: "spacing", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number" }, expression: "calc(var(--spacing) * <multiplier>)", tailwindSyntax: "--spacing(<multiplier>)", producesTokenIds: true }] })],
   ])("rejects a contract with %s", (_description, mutate) => {
     // Each mutation models untrusted JSON at the runtime boundary.
     const malformed = mutate(validContract() as unknown as Record<string, unknown>)

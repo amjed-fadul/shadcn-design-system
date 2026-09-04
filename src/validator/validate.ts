@@ -289,7 +289,7 @@ function validateTokenUse(token: AuthoredTokenUse, contract: ExecutableContract,
     return
   }
   const parameter = viaDerivedRule.parameter.value
-  if (typeof parameter !== "number" || (rule.parameter.minimum !== undefined && parameter < rule.parameter.minimum)) {
+  if (typeof parameter !== "number" || !Number.isFinite(parameter) || (rule.parameter.minimum !== undefined && parameter < rule.parameter.minimum)) {
     errors.push(error("INVALID_DERIVED_TOKEN_PARAMETER", `Derived token rule ${rule.id} does not accept the authored parameter.`, target, { kind: "derived-token-parameter", ruleId: rule.id, baseTokenId: rule.baseTokenId, type: { kind: "number" }, ...(rule.parameter.minimum !== undefined ? { minimum: rule.parameter.minimum } : {}) }, parameter))
   }
 }

@@ -90,9 +90,20 @@
       "type": "object", "additionalProperties": false, "required": ["propName", "evidenceRefs"],
       "properties": { "propName": { "type": "string" }, "payload": { "$ref": "#/$defs/structured" }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     },
+    "tokenSourceContext": {
+      "type": "object", "additionalProperties": false, "required": ["applicability"],
+      "properties": {
+        "applicability": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "target": { "type": "object", "additionalProperties": false, "required": ["kind", "name"], "properties": { "kind": { "const": "pseudo-element" }, "name": { "enum": ["after", "before"] } } }
+      },
+      "anyOf": [
+        { "properties": { "applicability": { "type": "array", "minItems": 1 } } },
+        { "required": ["target"], "properties": { "target": { "type": "object" } } }
+      ]
+    },
     "token": {
       "type": "object", "additionalProperties": false, "required": ["tokenId", "evidenceRefs"],
-      "properties": { "tokenId": { "type": "string" }, "when": { "$ref": "#/$defs/apiCondition" }, "viaDerivedRule": { "type": "object", "additionalProperties": false, "required": ["id", "multiplier"], "properties": { "id": { "type": "string" }, "multiplier": { "type": "number" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
+      "properties": { "tokenId": { "type": "string" }, "when": { "$ref": "#/$defs/apiCondition" }, "sourceContext": { "$ref": "#/$defs/tokenSourceContext" }, "viaDerivedRule": { "type": "object", "additionalProperties": false, "required": ["id", "multiplier"], "properties": { "id": { "type": "string" }, "multiplier": { "type": "number" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     },
     "inheritedPropDefault": {
       "type": "object", "additionalProperties": false, "required": ["propName", "value", "evidenceRefs"],

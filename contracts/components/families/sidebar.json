@@ -265,6 +265,22 @@
           },
           {
             "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[collapsible=offcanvas]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 2
@@ -837,7 +853,95 @@
             ]
           },
           {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[side=right]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.sidebar",
+            "sourceContext": {
+              "applicability": [
+                "hover",
+                "group-data-[collapsible=offcanvas]"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[side=left]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "[[data-side=left][data-collapsible=offcanvas]_&]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "[[data-side=right][data-collapsible=offcanvas]_&]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1645,6 +1749,24 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -2521,6 +2643,24 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "evidenceRefs": [
               "source",
               "tokens"

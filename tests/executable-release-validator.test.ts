@@ -125,6 +125,11 @@ describe("production validator against immutable release", () => {
         viaDerivedRule: { id: "spacing.multiplier", parameter: literal(2) },
         location: { path: "page.tokens.spacing.unit" },
       },
+      {
+        tokenId: "spacing.unit",
+        viaDerivedRule: { id: "spacing.multiplier", parameter: literal(-1) },
+        location: { path: "page.tokens.spacing.unit.negative" },
+      },
     ]))
 
     expect(result).toEqual({ ok: true, errors: [] })

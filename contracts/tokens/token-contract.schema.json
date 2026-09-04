@@ -101,8 +101,8 @@
       "properties": {
         "id": { "const": "spacing.multiplier" }, "category": { "const": "spacing" }, "baseTokenId": { "const": "spacing.unit" },
         "parameter": {
-          "type": "object", "additionalProperties": false, "required": ["name", "type", "minimum"],
-          "properties": { "name": { "const": "multiplier" }, "type": { "const": "number" }, "minimum": { "const": 0 } }
+          "type": "object", "additionalProperties": false, "required": ["name", "type"],
+          "properties": { "name": { "const": "multiplier" }, "type": { "const": "number" } }
         },
         "expression": { "const": "calc(var(--spacing) * <multiplier>)" }, "tailwindSyntax": { "const": "--spacing(<multiplier>)" }, "producesTokenIds": { "const": false }
       }

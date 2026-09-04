@@ -16,7 +16,7 @@ function validContract(): TokenContract {
     sourceProvenancePath: "provenance/token-contract-source.json",
     modes: ["light", "dark"],
     coverage: { contracted: ["color", "spacing"], representedElsewhere: [], notContracted: [] },
-    derivedRules: [{ id: "spacing.multiplier", category: "spacing", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number", minimum: 0 }, expression: "calc(var(--spacing) * <multiplier>)", tailwindSyntax: "--spacing(<multiplier>)", producesTokenIds: false }],
+    derivedRules: [{ id: "spacing.multiplier", category: "spacing", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number" }, expression: "calc(var(--spacing) * <multiplier>)", tailwindSyntax: "--spacing(<multiplier>)", producesTokenIds: false }],
     tokens: [
       { id: "color.background", category: "color", sourceId: "canonical-theme", binding: { cssVariable: "--background" }, value: { kind: "modes", values: { light: "white", dark: "black" } } },
       { id: "spacing.unit", category: "spacing", sourceId: "tailwind-theme", binding: { cssVariable: "--spacing" }, value: { kind: "literal", value: "0.25rem" } },

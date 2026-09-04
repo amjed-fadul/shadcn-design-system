@@ -425,7 +425,7 @@ function directTokenEvidence(text: string, tokenIds: Set<string>): Set<string> {
     } else if (category === "shadow") {
       found = hasClass(`shadow-${name}`)
     } else if (category === "spacing") {
-      found = /(?:^|[^A-Za-z0-9_-])(?:[a-z-]+:)*(?:p|px|py|pt|pb|pl|pr|m|mx|my|mt|mb|ml|mr|gap|space-[xy]|inset|top|right|bottom|left|h|w|size|translate)-(?:\d+(?:\.\d+)?|\[[^\]]+\]|\([^)]*\))(?:$|[^A-Za-z0-9_-])/.test(text)
+      found = /(?:^|[^A-Za-z0-9_-])(?:[A-Za-z0-9_./=&\[\]-]+:)*(?:(?:size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|space-x|space-y|inset|inset-x|inset-y|top|right|bottom|left)-\d+(?:\.\d+)?|-(?:m|mx|my|mt|mr|mb|ml|space-x|space-y|inset|inset-x|inset-y|top|right|bottom|left)-\d+(?:\.\d+)?)(?:$|[^A-Za-z0-9_-])/.test(text)
     }
     if (found) result.add(tokenId)
   }
@@ -771,6 +771,17 @@ describe("Phase 3 Task 10 independent review", () => {
     const testSource = readFileSync(__filename, "utf8")
     expect(testSource).not.toMatch(/src\/contracts\/components\/(?:canonical|render|inherited|.*analysis|.*reconciliation)/)
     expect(testSource).not.toMatch(/component-(?:source|token)-analysis/)
+  })
+
+  test("independently recognizes only supported signed numeric spacing evidence", () => {
+    const spacingOnly = new Set(["spacing.unit"])
+
+    for (const utility of ["right-1", "-mx-1", "after:-inset-2", "group-data-[orientation=vertical]/tabs:after:-right-1"]) {
+      expect(directTokenEvidence(utility, spacingOnly), utility).toEqual(spacingOnly)
+    }
+    for (const utility of ["-translate-x-1/2", "-rotate-45", "bottom-[-5px]", "-size-1", "-h-1", "-p-1", "-gap-1"]) {
+      expect(directTokenEvidence(utility, spacingOnly), utility).toEqual(new Set())
+    }
   })
 
   test("fails on adversarial omissions and mutations", () => {

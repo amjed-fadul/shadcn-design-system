@@ -72,7 +72,6 @@ export type DerivedTokenRule = {
   parameter: {
     name: "multiplier"
     type: "number"
-    minimum: 0
   }
   expression: "calc(var(--spacing) * <multiplier>)"
   tailwindSyntax: "--spacing(<multiplier>)"

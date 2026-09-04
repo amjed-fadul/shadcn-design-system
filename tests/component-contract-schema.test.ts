@@ -105,6 +105,36 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, malformed)).toBe(false)
   })
 
+  test("accepts closed token source context and rejects empty or malformed context", () => {
+    const contextual = validFamily()
+    contextual.exports[0].component.tokenDependencies.push({
+      tokenId: "spacing.unit",
+      sourceContext: {
+        applicability: ["group-data-[orientation=vertical]/tabs"],
+        target: { kind: "pseudo-element", name: "after" },
+      },
+      evidenceRefs: ["source"],
+    })
+    contextual.exports[0].component.tokenDependencies.push({
+      tokenId: "spacing.unit",
+      sourceContext: { applicability: [], target: { kind: "pseudo-element", name: "before" } },
+      evidenceRefs: ["source"],
+    })
+    expect(validate(familySchema, contextual)).toBe(true)
+
+    for (const sourceContext of [
+      { applicability: [] },
+      { applicability: [""] },
+      { applicability: ["group-data-[state=open]"], target: { kind: "element", name: "after" } },
+      { applicability: ["group-data-[state=open]"], target: { kind: "pseudo-element", name: "marker" } },
+      { applicability: ["group-data-[state=open]"], unknown: true },
+    ]) {
+      const malformed = validFamily()
+      malformed.exports[0].component.tokenDependencies.push({ tokenId: "spacing.unit", sourceContext, evidenceRefs: ["source"] })
+      expect(validate(familySchema, malformed), JSON.stringify(sourceContext)).toBe(false)
+    }
+  })
+
   test.each([
     ["unknown structured property", (value: any) => ({ ...value, unknown: true })],
     ["invalid export kind", (value: any) => ({ ...value, exports: [{ ...value.exports[0], kind: "widget" }] })],

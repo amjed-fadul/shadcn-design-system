@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import ts from "typescript"
 
-import type { SourceExpressionIdentity, TokenDependency } from "./types"
+import type { SourceExpressionIdentity, TokenDependency, TokenDependencySourceContext } from "./types"
 
 export type ClassSource = { classNames: string; propName?: string; equals?: string }
 export type UnresolvedClassSource = SourceExpressionIdentity & { reason: string }
@@ -22,6 +22,97 @@ export type TokenSourceAnalyzerConfig = Readonly<{
 
 type Scope = { recipes: Map<string, ts.CallExpression>; publicClassBindings: Set<string> }
 type SourceFunction = ts.FunctionDeclaration | ts.ArrowFunction
+type ComparableTokenDependency = Pick<TokenDependency, "tokenId" | "when" | "sourceContext" | "viaDerivedRule">
+
+const pseudoElementTargets = new Set(["after", "before"])
+const groupDataModifier = /^group-data-\[.+\](?:\/[^/:\s]+)?$/
+const arbitraryDataAncestorModifier = /^\[(?:\[data-[^\[\]]+\])+_&\]$/
+
+function sourceContextError(rawUtility: string, reason: string): never {
+  throw new Error(`Unsupported token source context in ${JSON.stringify(rawUtility)}: ${reason}`)
+}
+
+function hasSourceContextHint(rawUtility: string) {
+  return /(?:^|:)group-data-/.test(rawUtility) || /(?:^|:)\[\[data-/.test(rawUtility) || /(?:^|:)(?:after|before):/.test(rawUtility)
+}
+
+function splitTopLevelModifiers(rawUtility: string): { segments: string[]; malformed?: string } {
+  const segments: string[] = []
+  const closing: string[] = []
+  let start = 0
+  let quote: "'" | '"' | undefined
+  let escaped = false
+  for (let index = 0; index < rawUtility.length; index += 1) {
+    const character = rawUtility[index]
+    if (escaped) { escaped = false; continue }
+    if (character === "\\") { escaped = true; continue }
+    if (quote) {
+      if (character === quote) quote = undefined
+      continue
+    }
+    if (character === "'" || character === '"') { quote = character; continue }
+    if (character === "[") { closing.push("]"); continue }
+    if (character === "(") { closing.push(")"); continue }
+    if (character === "{") { closing.push("}"); continue }
+    if (character === "]" || character === ")" || character === "}") {
+      if (closing.at(-1) !== character) return { segments: [], malformed: `unbalanced ${character}` }
+      closing.pop()
+      continue
+    }
+    if (character === ":" && closing.length === 0) {
+      segments.push(rawUtility.slice(start, index))
+      start = index + 1
+    }
+  }
+  if (quote) return { segments: [], malformed: "unterminated quote" }
+  if (closing.length > 0) return { segments: [], malformed: `unclosed ${closing.at(-1)}` }
+  if (escaped) return { segments: [], malformed: "trailing escape" }
+  segments.push(rawUtility.slice(start))
+  return { segments }
+}
+
+function normalizeUtility(rawUtility: string): string {
+  return rawUtility.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
+}
+
+function utilityWithSourceContext(rawUtility: string): { utility: string; sourceContext?: TokenDependencySourceContext } {
+  const split = splitTopLevelModifiers(rawUtility)
+  if (split.malformed) {
+    if (hasSourceContextHint(rawUtility)) sourceContextError(rawUtility, split.malformed)
+    return { utility: normalizeUtility(rawUtility) }
+  }
+  const utility = normalizeUtility(split.segments.at(-1) ?? "")
+  const modifiers = split.segments.slice(0, -1)
+  const supportedAncestor = (modifier: string) => groupDataModifier.test(modifier) || arbitraryDataAncestorModifier.test(modifier)
+  const looksLikeSupportedAncestor = (modifier: string) => modifier.startsWith("group-data-") || modifier.startsWith("[[data-")
+  for (const modifier of modifiers) {
+    if (looksLikeSupportedAncestor(modifier) && !supportedAncestor(modifier)) sourceContextError(rawUtility, `unsupported ancestor modifier ${JSON.stringify(modifier)}`)
+  }
+  const activated = modifiers.some((modifier) => pseudoElementTargets.has(modifier) || supportedAncestor(modifier))
+  if (!activated) return { utility }
+  if (split.segments.some((segment) => segment.length === 0)) sourceContextError(rawUtility, "empty modifier or utility segment")
+
+  const applicability: string[] = []
+  let target: TokenDependencySourceContext["target"]
+  for (const modifier of modifiers) {
+    if (!pseudoElementTargets.has(modifier)) { applicability.push(modifier); continue }
+    if (target) sourceContextError(rawUtility, "multiple pseudo-element targets")
+    target = { kind: "pseudo-element", name: modifier as "after" | "before" }
+  }
+  return {
+    utility,
+    sourceContext: { applicability, ...(target ? { target } : {}) },
+  }
+}
+
+function comparableTokenDependency({ tokenId, when, sourceContext, viaDerivedRule }: ComparableTokenDependency) {
+  return {
+    tokenId,
+    ...(when ? { when: { propName: when.propName, equals: when.equals } } : {}),
+    ...(sourceContext ? { sourceContext: { applicability: [...sourceContext.applicability], ...(sourceContext.target ? { target: { kind: sourceContext.target.kind, name: sourceContext.target.name } } : {}) } } : {}),
+    ...(viaDerivedRule ? { viaDerivedRule: { id: viaDerivedRule.id, multiplier: viaDerivedRule.multiplier } } : {}),
+  }
+}
 
 function unique<T>(items: T[]) { return items.filter((item, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(item)) === index) }
 function propertyName(property: ts.PropertyAssignment, file: ts.SourceFile) { return ts.isStringLiteral(property.name) || ts.isNumericLiteral(property.name) ? property.name.text : property.name.getText(file) }
@@ -145,13 +236,13 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     return { resolved: unique(output.resolved), unresolved: unique(output.unresolved) }
   }
   const analyzeTailwindTokenDependencies = (classNames: string, evidenceRefs: string[] = ["source"]): TokenDependency[] => unique(classNames.split(/\s+/).filter(Boolean).flatMap((rawUtility) => {
-    const utility = rawUtility.split(":").at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
+    const { utility, sourceContext } = utilityWithSourceContext(rawUtility)
     const resolution = config.resolveUtility(utility)
-    return resolution ? [{ ...resolution, evidenceRefs }] : []
+    return resolution ? [{ ...resolution, ...(sourceContext ? { sourceContext } : {}), evidenceRefs }] : []
   }))
   const dependencies = (sourcePath: string, exportName?: string) => unique(analyze(sourcePath, exportName).resolved.flatMap((recipe) => analyzeTailwindTokenDependencies(recipe.classNames).map((dependency) => recipe.propName && recipe.equals ? { ...dependency, when: { propName: recipe.propName, equals: recipe.equals } } : dependency)))
-  const key = ({ tokenId, when, viaDerivedRule }: Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">) => JSON.stringify({ tokenId, ...(when ? { when } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) })
-  const compare = (sourcePath: string, dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>, exportName?: string, includeUnresolved = true, analysis = analyze(sourcePath, exportName)) => {
+  const key = (dependency: ComparableTokenDependency) => JSON.stringify(comparableTokenDependency(dependency))
+  const compare = (sourcePath: string, dependencies: ComparableTokenDependency[], exportName?: string, includeUnresolved = true, analysis = analyze(sourcePath, exportName)) => {
     const expected = new Set((exportName ? dependenciesForExport(sourcePath, exportName) : dependenciesForSource(sourcePath)).map(key)); const actual = new Set(dependencies.map(key)); const suffix = exportName ? ` for ${exportName}` : ""
     return [...(includeUnresolved ? analysis.unresolved.map((item) => `Unresolved class evidence at ${sourcePath}:${item.start}: ${item.reason} (${item.sourceText})`) : []), ...[...expected].filter((value) => !actual.has(value)).map((value) => `Missing source token dependency${suffix}: ${value}`), ...[...actual].filter((value) => !expected.has(value)).map((value) => `Invented token dependency${suffix}: ${value}`)]
   }
@@ -163,7 +254,7 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     analyzeComponentTokenSourceForExport: (sourcePath: string, exportName: string) => analyze(sourcePath, exportName),
     analyzeComponentTokenDependencies: dependenciesForSource,
     analyzeComponentTokenDependenciesForExport: dependenciesForExport,
-    compareComponentTokenDependencies: (sourcePath: string, contract: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>, includeUnresolved = true) => compare(sourcePath, contract, undefined, includeUnresolved),
-    compareComponentTokenDependenciesForExport: (sourcePath: string, exportName: string, contract: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>, includeUnresolved = true, analysis = analyze(sourcePath, exportName)) => compare(sourcePath, contract, exportName, includeUnresolved, analysis),
+    compareComponentTokenDependencies: (sourcePath: string, contract: ComparableTokenDependency[], includeUnresolved = true) => compare(sourcePath, contract, undefined, includeUnresolved),
+    compareComponentTokenDependenciesForExport: (sourcePath: string, exportName: string, contract: ComparableTokenDependency[], includeUnresolved = true, analysis = analyze(sourcePath, exportName)) => compare(sourcePath, contract, exportName, includeUnresolved, analysis),
   }
 }

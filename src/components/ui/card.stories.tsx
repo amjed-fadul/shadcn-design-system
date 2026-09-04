@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { expect, within } from "storybook/test"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -62,4 +63,54 @@ export const CompleteComposition: Story = {
       </CardFooter>
     </Card>
   ),
+}
+
+export const SizeComparison: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-start gap-6">
+      {(["default", "sm"] as const).map((size) => (
+        <section key={size} aria-label={`${size} card`} className="w-80">
+          <p className="mb-2 text-sm text-muted-foreground">{size}</p>
+          <Card size={size}>
+            <CardHeader>
+              <CardTitle>Weekly usage</CardTitle>
+              <CardDescription>Your team&apos;s activity.</CardDescription>
+              <CardAction><button type="button">Report</button></CardAction>
+            </CardHeader>
+            <CardContent>84% of your monthly allowance</CardContent>
+            <CardFooter>Updated a few moments ago</CardFooter>
+          </Card>
+        </section>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const styles = (size: "default" | "sm") => {
+      const region = canvas.getByRole("region", { name: `${size} card` })
+      const part = (slot: string) => getComputedStyle(region.querySelector<HTMLElement>(`[data-slot="${slot}"]`)!)
+      return {
+        headerPadding: part("card-header").padding,
+        headerGap: part("card-header").gap,
+        contentPadding: part("card-content").padding,
+        footerPadding: part("card-footer").padding,
+        titleFontSize: part("card-title").fontSize,
+        titleLineHeight: part("card-title").lineHeight,
+        descriptionFontSize: part("card-description").fontSize,
+      }
+    }
+
+    // Pinned Nova reduces the shared spacing from 4 to 3 units and the title
+    // from text-base to text-sm. Keep this derivative's default layout intact.
+    await expect({ default: styles("default"), sm: styles("sm") }).toEqual({
+      default: {
+        headerPadding: "16px", headerGap: "6px", contentPadding: "0px 16px 16px",
+        footerPadding: "16px", titleFontSize: "16px", titleLineHeight: "24px", descriptionFontSize: "14px",
+      },
+      sm: {
+        headerPadding: "12px", headerGap: "6px", contentPadding: "0px 12px 12px",
+        footerPadding: "12px", titleFontSize: "14px", titleLineHeight: "20px", descriptionFontSize: "14px",
+      },
+    })
+  },
 }
