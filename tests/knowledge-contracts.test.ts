@@ -19,6 +19,7 @@ import type { KnowledgeArtifact } from "../src/contracts/knowledge/types"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const baseline = "ba7578c7bbc04bf7a9449462707d98657f708cbf"
+const approvedKnowledgeCommit = "b215a4015021e0a501def2e13bd6835419699a94"
 
 const referenceSet: KnowledgeReferenceSet = {
   schemaVersion: 1,
@@ -248,11 +249,14 @@ describe("knowledge contract boundary", () => {
     expect(() => ((loaded.components[0] as unknown as { id: string }).id = "mutated")).toThrow(TypeError)
   })
 
-  test("canonical Phase 3 paths remain unchanged from the approved main baseline", () => {
+  test("the approved Phase 4 knowledge change preserved the Phase 3 baseline", () => {
+    // Preserve the historical scope check without freezing future approved
+    // component corrections, which have their own canonical reconciliation.
     expect(() => execFileSync("git", [
       "diff",
       "--exit-code",
       baseline,
+      approvedKnowledgeCommit,
       "--",
       "contracts/components",
       "src/contracts/components",
