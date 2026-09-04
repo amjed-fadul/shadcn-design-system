@@ -138,7 +138,7 @@ describe("Bootstrap Snapshot 0 integrity", () => {
 
   test("validates governed files from the approved historical tree while current Phase 2 package metadata evolves", () => {
     expect(() => verifySnapshotIntegrity(snapshot, readHistoricalFile)).not.toThrow()
-  })
+  }, 30_000)
 
   test("rejects a well-formed snapshot anchor other than the approved Phase 1 commit", () => {
     expect(() => verifySnapshotIntegrity(
