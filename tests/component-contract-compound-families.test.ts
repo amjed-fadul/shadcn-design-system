@@ -28,7 +28,7 @@ function tree(rendering: RenderingFact): RenderingTree {
 
 const expectedInterfaces = [
   ["radix.select.root", "select", "Root", ["open", "defaultOpen", "value", "defaultValue"], ["onOpenChange", "onValueChange"]],
-  ["radix.select.trigger", "select", "Trigger", ["asChild"], []],
+  ["radix.select.trigger", "select", "Trigger", ["asChild", "id", "aria-label", "aria-labelledby"], []],
   ["radix.select.value", "select", "Value", ["placeholder", "asChild"], []],
   ["radix.select.content", "select", "Content", ["position", "forceMount", "asChild"], []],
   ["radix.select.group", "select", "Group", ["asChild"], []],
@@ -228,7 +228,7 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
         expect.objectContaining({ id: "close", host: { kind: "component-export", exportName: expect.stringContaining("Close") } }),
       ]))
     }
-    expect(dialog.exports.find(({ name }) => name === "DialogContent")!.component!.localProps).toEqual([{ name: "showCloseButton", required: false, type: { kind: "boolean" }, default: true, evidenceRefs: ["source"] }])
+    expect(dialog.exports.find(({ name }) => name === "DialogContent")!.component!.localProps).toEqual([{ name: "showCloseButton", required: false, type: { kind: "boolean" }, default: true, evidenceRefs: ["source"] }, { name: "portalContainer", required: false, type: { kind: "union", members: [{ kind: "typescript", typeText: "Element" }, { kind: "typescript", typeText: "DocumentFragment" }] }, typeText: "Element | DocumentFragment", evidenceRefs: ["source", "declaration"] }])
     expect(sheet.exports.find(({ name }) => name === "SheetContent")!.component!.localProps).toEqual(expect.arrayContaining([{ name: "side", required: false, type: { kind: "enum", values: ["top", "right", "bottom", "left"] }, default: "right", evidenceRefs: ["source"] }]))
     expect(validateComponentFamilyInvariants(dialog, authority())).toEqual([])
     expect(validateComponentFamilyInvariants(sheet, authority())).toEqual([])

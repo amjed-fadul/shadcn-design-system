@@ -3,7 +3,7 @@
   "id": "dialog",
   "source": {
     "canonicalPath": "src/components/ui/dialog.tsx",
-    "canonicalBlobSha": "8b9c275722af0717e9bbb005df13ed9831717538",
+    "canonicalBlobSha": "4f7b6b5c59eae5959a8f49959e5b5e8681d7b75f",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dialog.tsx",
     "upstreamBlobSha": "da9bc058324e4a676a1b9eedd86290a8d4f2213f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dialog.tsx@8b9c275722af0717e9bbb005df13ed9831717538"
+      "source": "src/components/ui/dialog.tsx@4f7b6b5c59eae5959a8f49959e5b5e8681d7b75f"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -184,6 +184,28 @@
             "default": true,
             "evidenceRefs": [
               "source"
+            ]
+          },
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "union",
+              "members": [
+                {
+                  "kind": "typescript",
+                  "typeText": "Element"
+                },
+                {
+                  "kind": "typescript",
+                  "typeText": "DocumentFragment"
+                }
+              ]
+            },
+            "typeText": "Element | DocumentFragment",
+            "evidenceRefs": [
+              "source",
+              "declaration"
             ]
           }
         ],

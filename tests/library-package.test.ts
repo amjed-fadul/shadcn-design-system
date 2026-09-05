@@ -18,7 +18,7 @@ beforeAll(() => {
 describe("library package boundary", () => {
   test("exposes every approved component export without exposing internal utilities", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "index.js"))
-    const release = readJson("provenance/releases/shadcn-radix-release-001.json")
+    const release = readJson("provenance/releases/shadcn-radix-release-002.json")
     const names = Object.values(release.projection.exports).map((entry) => (entry as { name: string }).name)
     expect(Object.keys(library).sort()).toEqual(names.sort())
     expect(names).toHaveLength(107)
@@ -29,7 +29,7 @@ describe("library package boundary", () => {
   test("ships complete immutable contracts and the unchanged executable release", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "release.js"))
     expect(Object.keys(library).sort()).toEqual(["getComponentContracts", "getExecutableRelease", "getTokenContract"])
-    expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-001.json"))
+    expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-002.json"))
     const components = library.getComponentContracts()
     expect(components.contractSet).toEqual(readJson("contracts/components/component-contract-set.json"))
     expect(components.families).toHaveLength(19)
@@ -84,16 +84,24 @@ describe("library package boundary", () => {
 
   test("public declarations resolve and reject invalid usage without repository aliases", () => {
     const manifest = readJson("package.json")
-    expect(manifest.version).toBe("0.0.0-release.1")
+    expect(manifest.version).toBe("0.0.0-release.2")
     expect(Object.keys(manifest.exports).sort()).toEqual([".", "./release", "./styles.css"])
     const probe = path.join(root, "library-type-probe.tsx")
     const validSource = `
-      import { Button, Tabs, DialogContent } from "@adc/shadcn-design-system";
+      import { Button, Tabs, DialogContent, SelectContent, SelectTrigger } from "@adc/shadcn-design-system";
       import { getExecutableRelease, getTokenContract } from "@adc/shadcn-design-system/release";
       import type { ComponentProps } from "react";
       const button = <Button variant="outline" size="sm">OK</Button>;
       const tabs = <Tabs defaultValue="one" onValueChange={(value: string) => value.toUpperCase()} />;
       const dialog: ComponentProps<typeof DialogContent> = { showCloseButton: false };
+      const labeledTrigger = <SelectTrigger id="view" aria-label="View" aria-labelledby="view-label" />;
+      // @ts-expect-error inherited native id must be a string
+      const invalidTriggerId = <SelectTrigger id={42} />;
+      const dialogHost = <DialogContent portalContainer={document.createElement("div")} />;
+      const selectFragment = <SelectContent portalContainer={document.createDocumentFragment()} />;
+      const dialogDefault = <DialogContent portalContainer={undefined} />;
+      // @ts-expect-error portal containers are DOM objects, never selector strings
+      const invalidHost = <SelectContent portalContainer="#page" />;
       const releaseId: string = getExecutableRelease().releaseId;
       const tokenId: string = getTokenContract().tokens[0].id;
       // @ts-expect-error unsupported Button variant must be rejected
@@ -125,7 +133,7 @@ describe("library package boundary", () => {
           expect(specifier.text).toMatch(/^(react|react-dom)(\/|$)/)
         }
       }
-      if (name === "index.js") expect(text).not.toContain("shadcn-radix-release-001")
+      if (name === "index.js") expect(text).not.toContain("shadcn-radix-release-002")
     }
     const manifest = readJson("package.json")
     expect(manifest.peerDependencies).toEqual({ react: "18.3.1", "react-dom": "18.3.1" })

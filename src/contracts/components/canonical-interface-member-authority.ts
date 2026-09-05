@@ -49,7 +49,7 @@ export const canonicalInterfaceMemberAuthority: Readonly<Record<string, { props:
   "radix.select.scroll-down-button": { props: ["asChild"], events: [] },
   "radix.select.scroll-up-button": { props: ["asChild"], events: [] },
   "radix.select.separator": { props: ["asChild"], events: [] },
-  "radix.select.trigger": { props: ["asChild"], events: [] },
+  "radix.select.trigger": { props: ["asChild", "id", "aria-label", "aria-labelledby"], events: [] },
   "radix.select.value": { props: ["placeholder", "asChild"], events: [] },
   "radix.select.viewport": { props: ["nonce", "asChild"], events: [] },
   "radix.tabs.content": { props: ["value", "forceMount"], events: [] },

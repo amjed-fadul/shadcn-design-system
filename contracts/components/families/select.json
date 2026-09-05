@@ -3,7 +3,7 @@
   "id": "select",
   "source": {
     "canonicalPath": "src/components/ui/select.tsx",
-    "canonicalBlobSha": "a18203c391b82e6c74cb9965e3ad850cd4543b25",
+    "canonicalBlobSha": "21dfa68abbd3ba800588a24dfc173898216504e4",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/select.tsx",
     "upstreamBlobSha": "f576bf455da400681c62e9f5a80a95315ee52172"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/select.tsx@a18203c391b82e6c74cb9965e3ad850cd4543b25"
+      "source": "src/components/ui/select.tsx@21dfa68abbd3ba800588a24dfc173898216504e4"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -107,7 +107,30 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "union",
+              "members": [
+                {
+                  "kind": "typescript",
+                  "typeText": "Element"
+                },
+                {
+                  "kind": "typescript",
+                  "typeText": "DocumentFragment"
+                }
+              ]
+            },
+            "typeText": "Element | DocumentFragment",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
         "inherits": [
           "radix.select.content"
         ],

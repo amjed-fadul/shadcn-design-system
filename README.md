@@ -25,7 +25,7 @@ npm run build:library
 npm run test:library
 ```
 
-The private package version is `0.0.0-release.1`. The separate `dist-library/`
+The private package version is `0.0.0-release.2`. The separate `dist-library/`
 output contains ES modules, compiled CSS with embedded fonts, TypeScript
 declarations, and bundled dependency notices. The existing app and Storybook
 builds remain available. The public API has exactly three entrypoints:
@@ -50,7 +50,14 @@ Import the stylesheet once at the application entrypoint. Consumers do not
 need Tailwind to compile the design system. The stylesheet includes the
 existing global base/reset rules, light tokens, `.dark` overrides, approved
 component utilities, animations, and fonts. Place `.dark` on the document root
-so portaled content inherits the same theme.
+so default body portals inherit the same theme.
+
+DialogContent and SelectContent accept an optional `portalContainer` with the
+pinned Portal type `Element | DocumentFragment`. Pass the Canvas-owned overlay
+DOM host to place their internal portals there. Omission keeps the original body
+default. This is an environment value, never a selector string or an agent-authored
+semantic prop. Keep the container inside the intended direction/theme scope.
+Use the package public compound exports together so they share bundled contexts.
 
 React and React DOM are exact `18.3.1` peers and build externals, including
 their subpaths. The first Canvas compatibility inspection was read-only:
@@ -65,8 +72,9 @@ React Server Component support is not established.
 
 The build checks component/release reconciliation, frozen implementation inputs,
 resolved dependency CSS/fonts, and actual build dependency coverage before reporting
-success. The package remains a candidate: isolated consumer proof is Task 6.3;
-final acceptance is Task 6.4.
+success. The accepted release001 artifact remains immutable. Release002 adds the bounded
+Canvas portal-container API; its exact artifact and verification evidence are
+recorded in docs/CANVAS-PORTAL-RELEASE-002.md.
 
 ## Release and candidate identity (Task 6.2)
 
@@ -75,11 +83,11 @@ Use Node `22.18.0` and npm `10.9.3` for all commands. With Volta:
 ```sh
 volta run --node 22.18.0 --npm 10.9.3 npm run release:generate
 volta run --node 22.18.0 --npm 10.9.3 npm run build:library
-volta run --node 22.18.0 --npm 10.9.3 npm run candidate:generate -- --output /tmp/release-001-candidate
+volta run --node 22.18.0 --npm 10.9.3 npm run candidate:generate -- --output /tmp/release-002-candidate
 ```
 
 `release:generate` is an explicit reconciliation operation: it updates the same
-release-001, but aborts if the executable projection changes. Use it only when
+active release-002, but aborts if the executable projection changes. Use it only when
 reconciling reviewed source/build changes. `candidate:generate` verifies frozen
 release inputs, builds into a fresh temporary output directory, runs `npm pack
 --ignore-scripts`, and writes the tarball plus `distribution-manifest.json` to a
@@ -109,8 +117,8 @@ file. Verification requires those retained expectations:
 ```sh
 volta run --node 22.18.0 --npm 10.9.3 npm run release:verify -- --release-sha256 "$REVIEWED_RELEASE_SHA256"
 volta run --node 22.18.0 --npm 10.9.3 npm run candidate:verify -- \
-  --manifest /tmp/release-001-candidate/distribution-manifest.json \
-  --tarball /tmp/release-001-candidate/adc-shadcn-design-system-0.0.0-release.1.tgz \
+  --manifest /tmp/release-002-candidate/distribution-manifest.json \
+  --tarball /tmp/release-002-candidate/adc-shadcn-design-system-0.0.0-release.2.tgz \
   --manifest-sha256 "$RETAINED_MANIFEST_SHA256"
 volta run --node 22.18.0 --npm 10.9.3 npm run test:identity
 ```
@@ -131,4 +139,4 @@ its packed-file inventory and independent rebuild detect modified package data.
 The release never hashes itself, generated library files, tarballs, distribution
 manifests, or acceptance records. The external manifest hashes the resulting
 packed bytes and stays outside the package. This establishes candidate evidence
-only; it creates no release-002 or final Canvas acceptance record.
+only; it does not publish a package or create a final Canvas acceptance record.

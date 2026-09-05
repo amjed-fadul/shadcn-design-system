@@ -75,6 +75,7 @@ export function discoverImplementationInputs(root: string): string[] {
       if (resolution && !resolution.isExternalLibraryImport && !resolution.resolvedFileName.includes("/node_modules/")) add(resolution.resolvedFileName)
       else if (specifier.startsWith(".") || specifier.startsWith("@/")) {
         const asset = specifier.startsWith("@/") ? path.join(root, "src", specifier.slice(2)) : path.resolve(path.dirname(full), specifier)
+        if (normalized(root, asset) === EXECUTABLE_RELEASE_PATH) return // generated release data is never its own implementation input
         if (existsSync(asset)) add(asset)
         else throw new Error(`INPUT_UNRESOLVED: ${file} -> ${specifier}`)
       }
@@ -141,8 +142,7 @@ export function verifyRepositoryRelease(root: string, expectedReleaseSha256?: st
   // also mandatory in library-data.ts, before Vite emits packaged release data.
   const release = loadExecutableRelease(raw, { expectedProjection: raw.projection, requirePackageIdentity: true })
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
-  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.1" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
-  if (readdirSync(path.join(root, "provenance/releases")).some(file => /release-002/.test(file))) throw new Error("UNEXPECTED_RELEASE_002")
+  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.2" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
   verifyImplementationManifest(root, release.implementationInputs)
   return release
 }
