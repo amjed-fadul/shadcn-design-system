@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
 import { describe, expect, test } from "vitest"
+import ts from "typescript"
+import { findDelegatedSourceFunction } from "../src/contracts/components/delegated-host-source-analysis"
 
 import contractSet from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
@@ -237,7 +239,12 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const { canonicalPath, canonicalBlobSha, implementationKind, upstreamPath, upstreamBlobSha } = seed
     expect(contract!.source).toMatchObject({ canonicalPath, canonicalBlobSha, implementationKind, upstreamPath, upstreamBlobSha })
     expect(contract!.source.canonicalBlobSha).toBe(readCanonicalSourceBlobSha(source))
-    expect(contract!.exports.map(({ name, kind, authorableJsx }) => [name, kind, authorableJsx]).sort()).toEqual(listModuleExports(source).map(({ name, declarationKind }) => [name, declarationKind === "FunctionDeclaration" ? "component" : "helper", declarationKind === "FunctionDeclaration"]).sort())
+    const sourceFile = ts.createSourceFile(source, readFileSync(source, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+    const exports = listModuleExports(source).map(({ name }) => {
+      const isComponent = Boolean(findDelegatedSourceFunction(sourceFile, name))
+      return [name, isComponent ? "component" : "helper", isComponent]
+    })
+    expect(contract!.exports.map(({ name, kind, authorableJsx }) => [name, kind, authorableJsx]).sort()).toEqual(exports.sort())
   })
 
   test.each(expectedInterfaceFacts)("derives %s facts from its pinned declaration", (id, packageName, symbol, props, events) => {

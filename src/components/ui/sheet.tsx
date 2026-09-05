@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) { return <SheetPrimitive.Root data-slot="sheet" {...props} /> }
-function SheetTrigger({ ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) { return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} /> }
+const SheetTrigger = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Trigger>, React.ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>>(({ ...props }, ref) => <SheetPrimitive.Trigger ref={ref} data-slot="sheet-trigger" {...props} />)
+SheetTrigger.displayName = "SheetTrigger"
 function SheetClose({ ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) { return <SheetPrimitive.Close data-slot="sheet-close" {...props} /> }
 function SheetPortal({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) { return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} /> }
 const SheetOverlay = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Overlay>, React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>>(({ className, ...props }, ref) => <SheetPrimitive.Overlay ref={ref} data-slot="sheet-overlay" className={cn("fixed inset-0 z-50 bg-black/50", className)} {...props} />)

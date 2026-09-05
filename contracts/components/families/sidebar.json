@@ -3,7 +3,7 @@
   "id": "sidebar",
   "source": {
     "canonicalPath": "src/components/ui/sidebar.tsx",
-    "canonicalBlobSha": "cd31eb5d13aa36aecb3be7e9066918f8fb7a877a",
+    "canonicalBlobSha": "8e7f876e56f80fff979b9aab8fc7b201bd779a09",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
     "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sidebar.tsx@cd31eb5d13aa36aecb3be7e9066918f8fb7a877a"
+      "source": "src/components/ui/sidebar.tsx@8e7f876e56f80fff979b9aab8fc7b201bd779a09"
     },
     "tokens": {
       "kind": "token-contract",
@@ -2126,7 +2126,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "unresolved",
+            "refForwarding": "supported",
             "evidenceRefs": [
               "source"
             ]
@@ -2578,7 +2578,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "unresolved",
+            "refForwarding": "supported",
             "evidenceRefs": [
               "source"
             ]

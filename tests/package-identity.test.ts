@@ -187,10 +187,17 @@ describe("release package input identity", () => {
     expect(release.documentSchemaVersion).toBe(1)
     expect(release.packageIdentity).toEqual(packageIdentity(root))
   })
-  test("reconciliation keeps release-001 and the exact committed executable projection", () => {
+  test("reconciliation keeps release-001 with only the six reviewed ref facts changed", () => {
     const old = JSON.parse(execFileSync("git", ["show", "765e2d7786142cb3ed9f9ae56ebbc8c5e07614d2:provenance/releases/shadcn-radix-release-001.json"], { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }))
     const release = verifyRepositoryRelease(root)
-    expect(release.projection).toEqual(old.projection)
+    const expected = structuredClone(old.projection)
+    for (const [family, name] of [["button", "Button"], ["dialog", "DialogTrigger"], ["sidebar", "SidebarMenuButton"], ["sidebar", "SidebarMenuAction"], ["dropdown-menu", "DropdownMenuTrigger"], ["sheet", "SheetTrigger"]]) {
+      const slots = expected.exports[`${family}\0${name}`].component.slots
+      expect(slots).toHaveLength(1)
+      expect(slots[0].refForwarding).toBe("unresolved")
+      slots[0].refForwarding = "supported"
+    }
+    expect(release.projection).toEqual(expected)
     expect(release.projectionSchemaVersion).toBe(old.projectionSchemaVersion)
     expect(release.releaseId).toBe("shadcn-radix-release-001")
     const { sha256, ...payload } = release

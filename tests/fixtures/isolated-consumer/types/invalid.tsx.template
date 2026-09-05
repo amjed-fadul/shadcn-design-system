@@ -1,0 +1,7 @@
+import { Button, Card, Tabs, Dialog, ScrollArea } from '@adc/shadcn-design-system'
+export const badVariant = <Button variant="invented" />
+export const badCardSize = <Card size="huge" />
+export const badTabsCallback = <Tabs onValueChange={(value: number) => value} />
+export const badDialogCallback = <Dialog onOpenChange={(value: string) => value} />
+export const badScrollType = <ScrollArea type="sideways" />
+export const badButtonCallback = <Button onClick={(value: number) => value} />

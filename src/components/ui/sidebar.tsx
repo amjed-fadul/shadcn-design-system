@@ -231,7 +231,13 @@ const sidebarMenuButtonVariants = cva(
   }
 )
 
-function SidebarMenuButton({
+const SidebarMenuButton = React.forwardRef<HTMLButtonElement,
+  React.ComponentPropsWithoutRef<"button"> & {
+    asChild?: boolean
+    isActive?: boolean
+    tooltip?: string | React.ComponentProps<typeof TooltipContent>
+  } & VariantProps<typeof sidebarMenuButtonVariants>
+>(({
   asChild = false,
   isActive = false,
   variant = "default",
@@ -239,24 +245,22 @@ function SidebarMenuButton({
   tooltip,
   className,
   ...props
-}: React.ComponentProps<"button"> & {
-  asChild?: boolean
-  isActive?: boolean
-  tooltip?: string | React.ComponentProps<typeof TooltipContent>
-} & VariantProps<typeof sidebarMenuButtonVariants>) {
+}, ref) => {
   const Comp = asChild ? Slot.Root : "button"
   const { isMobile, state } = useSidebar()
-  const button = <Comp data-sidebar="menu-button" data-slot="sidebar-menu-button" data-size={size} data-active={isActive} className={cn(sidebarMenuButtonVariants({ variant, size }), className)} {...props} />
+  const button = <Comp ref={ref} data-sidebar="menu-button" data-slot="sidebar-menu-button" data-size={size} data-active={isActive} className={cn(sidebarMenuButtonVariants({ variant, size }), className)} {...props} />
 
   if (!tooltip) return button
   const tooltipProps = typeof tooltip === "string" ? { children: tooltip } : tooltip
   return <Tooltip><TooltipTrigger asChild>{button}</TooltipTrigger><TooltipContent side="right" align="center" hidden={state !== "collapsed" || isMobile} {...tooltipProps} /></Tooltip>
-}
+})
+SidebarMenuButton.displayName = "SidebarMenuButton"
 
-function SidebarMenuAction({ className, asChild = false, showOnHover = false, ...props }: React.ComponentProps<"button"> & { asChild?: boolean; showOnHover?: boolean }) {
+const SidebarMenuAction = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<"button"> & { asChild?: boolean; showOnHover?: boolean }>(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
   const Comp = asChild ? Slot.Root : "button"
-  return <Comp data-sidebar="menu-action" data-slot="sidebar-menu-action" className={cn("absolute right-1 top-1.5 flex size-5 items-center justify-center rounded-md outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0", showOnHover && "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-active/menu-button:text-sidebar-accent-foreground aria-expanded:opacity-100 md:opacity-0", className)} {...props} />
-}
+  return <Comp ref={ref} data-sidebar="menu-action" data-slot="sidebar-menu-action" className={cn("absolute right-1 top-1.5 flex size-5 items-center justify-center rounded-md outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0", showOnHover && "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-active/menu-button:text-sidebar-accent-foreground aria-expanded:opacity-100 md:opacity-0", className)} {...props} />
+})
+SidebarMenuAction.displayName = "SidebarMenuAction"
 
 function SidebarMenuBadge({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-sidebar="menu-badge" data-slot="sidebar-menu-badge" className={cn("flex items-center justify-center tabular-nums select-none group-data-[collapsible=icon]:hidden", className)} {...props} />

@@ -90,12 +90,13 @@ function declarationExposesProp(contract: InheritedInterfaceContract, propName: 
   }
 }
 const asChildSlot = { propName: "asChild", default: false, replacesHost: true, childCardinality: { min: 0, max: 1 }, forwardsProps: true, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" as const, evidenceRefs: ["source", "declaration"] }
+const slotFor = (name: string) => ["DialogTrigger", "DropdownMenuTrigger", "SheetTrigger"].includes(name) ? { ...asChildSlot, refForwarding: "supported" as const } : asChildSlot
 function asChildSlotErrors(contract: ComponentFamilyContract) {
   const errors: string[] = []
   for (const entry of contract.exports) {
     if (!entry.component) continue
     const supportsAsChild = entry.component.inherits.some((interfaceId) => declarationExposesProp(inherited(interfaceId), "asChild"))
-    if (JSON.stringify(entry.component.slots) !== JSON.stringify(supportsAsChild ? [asChildSlot] : [])) errors.push(`Component ${entry.name} has Slot facts that do not match its pinned asChild declaration.`)
+    if (JSON.stringify(entry.component.slots) !== JSON.stringify(supportsAsChild ? [slotFor(entry.name)] : [])) errors.push(`Component ${entry.name} has Slot facts that do not match its pinned asChild declaration.`)
   }
   return errors
 }
@@ -147,7 +148,7 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
     for (const entry of contract.exports) {
       if (!entry.component) continue
       const supportsAsChild = entry.component.inherits.some((interfaceId) => declarationExposesProp(inherited(interfaceId), "asChild"))
-      expect(entry.component.slots).toEqual(supportsAsChild ? [asChildSlot] : [])
+      expect(entry.component.slots).toEqual(supportsAsChild ? [slotFor(entry.name)] : [])
     }
     expect(asChildSlotErrors(contract)).toEqual([])
   })

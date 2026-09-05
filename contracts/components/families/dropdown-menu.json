@@ -3,7 +3,7 @@
   "id": "dropdown-menu",
   "source": {
     "canonicalPath": "src/components/ui/dropdown-menu.tsx",
-    "canonicalBlobSha": "963a17ac0994fa6f042a6ef637b8e243114899b5",
+    "canonicalBlobSha": "0f9e680f16fadefcb54b0b84427861379e8817d6",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dropdown-menu.tsx",
     "upstreamBlobSha": "01a12bdc321ee20bab46e48748b4d8ff94058b04"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dropdown-menu.tsx@963a17ac0994fa6f042a6ef637b8e243114899b5"
+      "source": "src/components/ui/dropdown-menu.tsx@0f9e680f16fadefcb54b0b84427861379e8817d6"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -1848,7 +1848,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "unresolved",
+            "refForwarding": "supported",
             "evidenceRefs": [
               "source",
               "declaration"

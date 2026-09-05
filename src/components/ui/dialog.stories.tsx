@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, userEvent, within, waitFor } from "storybook/test"
+
+import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import {
   Dialog,
@@ -61,5 +64,25 @@ export const Default: Story = {
 
     await expect(body.queryByRole("dialog", { name: "Edit profile" })).not.toBeInTheDocument()
     await expect({ entry: entryOpacityKeyframes, exit: exitOpacityKeyframes }).toEqual({ entry: ["0", "1"], exit: ["1", "0"] })
+  },
+}
+
+export const ComposedTrigger: Story = {
+  render: () => (
+    <TooltipProvider><Dialog><Tooltip>
+      <TooltipTrigger asChild><DialogTrigger asChild><Button variant="outline">Open composed dialog</Button></DialogTrigger></TooltipTrigger>
+      <TooltipContent>Open dialog settings</TooltipContent>
+      <DialogContent><DialogTitle>Composed dialog</DialogTitle><DialogDescription>React 18 trigger composition.</DialogDescription></DialogContent>
+    </Tooltip></Dialog></TooltipProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole("button", { name: "Open composed dialog" })
+    await userEvent.click(trigger)
+    await within(document.body).findByRole("dialog")
+    await userEvent.keyboard("{Escape}")
+    await waitFor(() => expect(within(document.body).queryByRole("dialog")).not.toBeInTheDocument())
+    await waitFor(() => expect(trigger).toHaveFocus())
+    await userEvent.keyboard("{Escape}")
+    await waitFor(() => expect(within(document.body).queryByRole("tooltip")).not.toBeInTheDocument())
   },
 }

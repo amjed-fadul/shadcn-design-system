@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url"
 import path from "node:path"
 import { beforeAll, describe, expect, test } from "vitest"
 import ts from "typescript"
+import { createElement, isValidElement } from "react"
 import type { TokenContract } from "../src/contracts/tokens/types"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
@@ -21,7 +22,7 @@ describe("library package boundary", () => {
     const names = Object.values(release.projection.exports).map((entry) => (entry as { name: string }).name)
     expect(Object.keys(library).sort()).toEqual(names.sort())
     expect(names).toHaveLength(107)
-    expect(library.Button).toBeTypeOf("function")
+    expect(isValidElement(createElement(library.Button))).toBe(true)
     expect(library.useSidebar).toBeTypeOf("function")
   })
 

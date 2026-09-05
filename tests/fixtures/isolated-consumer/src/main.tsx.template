@@ -1,0 +1,48 @@
+import { useState, version } from 'react'
+import { createRoot } from 'react-dom/client'
+import * as library from '@adc/shadcn-design-system'
+import { Button, Card, CardHeader, CardTitle, CardContent, Tabs, TabsList, TabsTrigger, TabsContent, Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, ScrollArea, SidebarProvider, useSidebar, buttonVariants, SidebarMenuButton, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, TooltipProvider, Tooltip, TooltipTrigger } from '@adc/shadcn-design-system'
+import { getExecutableRelease, getComponentContracts, getTokenContract } from '@adc/shadcn-design-system/release'
+import '@adc/shadcn-design-system/styles.css'
+
+function HookProbe() {
+  const { open, toggleSidebar, isMobile } = useSidebar()
+  return <Button id="hook-button" variant="outline" onClick={toggleSidebar}>Sidebar {open ? 'open' : 'closed'} / {isMobile ? 'mobile' : 'desktop'}</Button>
+}
+function App() {
+  const [count, setCount] = useState(0)
+  const [dark, setDark] = useState(false)
+  return <main>
+    <h1>Independent package consumer</h1>
+    <Button id="theme-button" variant="outline" onClick={() => {
+      document.documentElement.classList.toggle('dark', !dark)
+      setDark(!dark)
+    }}>Switch to {dark ? 'light' : 'dark'}</Button>
+    <Card id="card" style={{ width: 420 }}>
+      <CardHeader id="card-header"><CardTitle>Packaged components</CardTitle></CardHeader>
+      <CardContent>
+        <Button id="count-button" onClick={() => setCount(value => value + 1)}>Clicked {count}</Button>
+        <Tabs defaultValue="one">
+          <TabsList id="tab-list"><TabsTrigger id="tab-one" value="one">First</TabsTrigger><TabsTrigger id="tab-two" value="two">Second</TabsTrigger></TabsList>
+          <TabsContent value="one">First panel</TabsContent><TabsContent value="two">Second panel</TabsContent>
+        </Tabs>
+        <Dialog><DialogTrigger id="dialog-trigger" className={buttonVariants({ variant: 'outline' })}>Open dialog</DialogTrigger>
+          <DialogContent id="dialog"><DialogHeader><DialogTitle>Packaged portal</DialogTitle><DialogDescription>Portal inherits the root theme.</DialogDescription></DialogHeader><Button>Dialog action</Button></DialogContent>
+        </Dialog>
+        <ScrollArea id="scroll-area" style={{ height: 120, width: 320 }}>
+          {Array.from({ length: 60 }, (_, index) => <p key={index}>Scrollable item {index + 1}</p>)}
+        </ScrollArea>
+      </CardContent>
+    </Card>
+    <SidebarProvider><div><HookProbe />
+      <TooltipProvider><Tooltip><DropdownMenu><TooltipTrigger asChild ref={node => node?.setAttribute("data-composed-ref", "received")}><DropdownMenuTrigger asChild><SidebarMenuButton id="sidebar-dropdown-trigger">Workspace actions</SidebarMenuButton></DropdownMenuTrigger></TooltipTrigger>
+        <DropdownMenuContent><DropdownMenuItem>Workspace settings</DropdownMenuItem></DropdownMenuContent>
+      </DropdownMenu></Tooltip></TooltipProvider>
+    </div></SidebarProvider>
+    <Dialog><DialogTrigger asChild><Button id="composed-dialog-trigger" variant="outline">Open Button-composed dialog</Button></DialogTrigger>
+      <DialogContent id="composed-dialog"><DialogHeader><DialogTitle>Button composition regression</DialogTitle><DialogDescription>Escape must return focus to the Button trigger.</DialogDescription></DialogHeader><Button>Composed dialog action</Button></DialogContent>
+    </Dialog>
+    <output id="release-data" hidden>{JSON.stringify({ reactVersion: version, exports: Object.keys(library).sort(), release: getExecutableRelease(), components: getComponentContracts(), tokens: getTokenContract() })}</output>
+  </main>
+}
+createRoot(document.getElementById('root')!).render(<App />)

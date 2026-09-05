@@ -3,7 +3,7 @@
   "id": "sheet",
   "source": {
     "canonicalPath": "src/components/ui/sheet.tsx",
-    "canonicalBlobSha": "660fdc011d46e48e0ce5a033fa9beac28f042589",
+    "canonicalBlobSha": "c3d3afa31f063f1f46dceb1bc61c67477d52455d",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sheet.tsx",
     "upstreamBlobSha": "28f34f894ea37e24b46056fd040bc46ae8b5902e"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sheet.tsx@660fdc011d46e48e0ce5a033fa9beac28f042589"
+      "source": "src/components/ui/sheet.tsx@c3d3afa31f063f1f46dceb1bc61c67477d52455d"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -841,7 +841,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "unresolved",
+            "refForwarding": "supported",
             "evidenceRefs": [
               "source",
               "declaration"

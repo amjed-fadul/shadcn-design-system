@@ -58,8 +58,8 @@
     },
     {
       "path": "contracts/components/families/button.json",
-      "gitBlob": "b6931afcdee8789232928c2378c8f91c281265ff",
-      "sha256": "aa944f7a10d064b01425e265f25203fe1157267b02f29087d07c1da94f408ce3"
+      "gitBlob": "f83b649a4b358907c36d796f58663f7600590de4",
+      "sha256": "784b3fb079bb68b70bc2e6003c0a4776d498d2ae518c9f23b14a302e1c32358d"
     },
     {
       "path": "contracts/components/families/card.json",
@@ -73,13 +73,13 @@
     },
     {
       "path": "contracts/components/families/dialog.json",
-      "gitBlob": "6640c8dc411fae03985364a17a2c7e0f5dc52032",
-      "sha256": "b7dc4f4466ad3bb88d772bd6d816198c7d54f5c877d1e23704f0e240ffa70f12"
+      "gitBlob": "6ec4e386b01e0181744205d684fe2d5a3abddcc6",
+      "sha256": "6242e5b7fa99a3d34d088cbd3b3e2c2a4abd346a4f56c9a07ad95729582d70d9"
     },
     {
       "path": "contracts/components/families/dropdown-menu.json",
-      "gitBlob": "f4af9fcf1cdacdd0ade60f3722aae20018f0a9ba",
-      "sha256": "f2939e07175cfe85e665ac2254c798627e5f5115cecba44ed4c4593cf0219edc"
+      "gitBlob": "da446c917bb8fb6ba1e634b1f99bdb1839759f97",
+      "sha256": "c86e4c7435617095cf6e2b980ffa39215334983bec01b956fc11c21216c86fe9"
     },
     {
       "path": "contracts/components/families/input.json",
@@ -108,13 +108,13 @@
     },
     {
       "path": "contracts/components/families/sheet.json",
-      "gitBlob": "4d67054eabccd0aa1a1e6d4de37f9c7e3aa28127",
-      "sha256": "f4cc9802b3e34dcad4960ab2410d8696fba41326cb60cb9a6d388db77649b7a7"
+      "gitBlob": "2a554f08121318ab10002a50f7fe108b3ad928c4",
+      "sha256": "3ae860a12504e57e2d0a78a041657b529f0376337f268b3a5ffa86765e99ec4e"
     },
     {
       "path": "contracts/components/families/sidebar.json",
-      "gitBlob": "8f153f708280b6e5b6237663f9e18ff75e7b236b",
-      "sha256": "d86c30a0bb51471643dcaef2748001565bc2511790e80a0bea9ec60c70b0c382"
+      "gitBlob": "f4cc379f1b88481bdabc5fb04eac63f4919b2d96",
+      "sha256": "50a2bc32f953cff411859b5d4b80df80889c5ef917efd75e42bd490aac748b3f"
     },
     {
       "path": "contracts/components/families/skeleton.json",
@@ -138,8 +138,8 @@
     },
     {
       "path": "contracts/components/families/tooltip.json",
-      "gitBlob": "22e6d82764f404c2ad099470d8b3de1c51b84cbf",
-      "sha256": "ec644b094d24f26051e8c45c0665351c7aeb482c60e06b49df357ff3820f068d"
+      "gitBlob": "b7a67693647988933f026ae0a119d51585cb478b",
+      "sha256": "166c94298f0e200f268b8d310acb976be3e59ae327ef583d572505d9365a47db"
     },
     {
       "path": "contracts/components/index.json",
@@ -713,13 +713,13 @@
     },
     {
       "path": "provenance/component-contract-source.json",
-      "gitBlob": "7373c8e50bc865d92caeb6027cc36d3c6bc15f30",
-      "sha256": "a6faf8a10c2abb7cf35ab88ec0fd6a05f114cdeb669767300a2cbb9c7c43ce47"
+      "gitBlob": "7e178534601c60cde42d8b160541a9bc301dc1ce",
+      "sha256": "11ed9edc9f72573112b245b2e7f45b45c93dcfa455139336863386bcc43b5032"
     },
     {
       "path": "provenance/seed-components.json",
-      "gitBlob": "d9de31297870bdc46bbbe2d7886dff9240c23666",
-      "sha256": "1fd75d02bf61ead998d346b1db4ebc207cf9a16370f59d60b4326780fa4dc9e9"
+      "gitBlob": "3e8eede2b023cca687363dcb9ad318c7d5163599",
+      "sha256": "789cd7bfac959dfe69498f39704f6ad0b964caedb30fcd226c989fe346b8d964"
     },
     {
       "path": "provenance/token-contract-source.json",
@@ -798,8 +798,8 @@
     },
     {
       "path": "src/components/ui/button.tsx",
-      "gitBlob": "1e177a299e0bc587fb7a7675514cdc56ad50f009",
-      "sha256": "c3df490aa6f194b4d0200cb243f4f2c175fe80f1a66db6bb399ea74b30daa34d"
+      "gitBlob": "caf37b313a7688b22189fc681d04920ae877601b",
+      "sha256": "7b35cf50a1e9add212bfd96fb3644caf33639847c1b87372f49b08aae02829a6"
     },
     {
       "path": "src/components/ui/card.tsx",
@@ -813,13 +813,13 @@
     },
     {
       "path": "src/components/ui/dialog.tsx",
-      "gitBlob": "9bb2a7bfa035ad54ca16c80896985ad59c5094c7",
-      "sha256": "d5de0fb2298ab5aeb82088a56e3d5e7317bf9002be75488459c8a4c762bbd441"
+      "gitBlob": "8b9c275722af0717e9bbb005df13ed9831717538",
+      "sha256": "ab4791a085a429757e10bf3d9e7c72041ff0742590ca03c0c7b6b0883c11d9b3"
     },
     {
       "path": "src/components/ui/dropdown-menu.tsx",
-      "gitBlob": "963a17ac0994fa6f042a6ef637b8e243114899b5",
-      "sha256": "fc410b8a994cbbcb6cea179712dbdab7648f80e45ee2fbd0542824d44336cdd0"
+      "gitBlob": "0f9e680f16fadefcb54b0b84427861379e8817d6",
+      "sha256": "4632c3febfb3552e1e4c222298f7ae67641d14ac7649cb53e6457539d8213c60"
     },
     {
       "path": "src/components/ui/input.tsx",
@@ -848,13 +848,13 @@
     },
     {
       "path": "src/components/ui/sheet.tsx",
-      "gitBlob": "660fdc011d46e48e0ce5a033fa9beac28f042589",
-      "sha256": "c6385b411a6fe9f30b3a273fd78b4c879eede8edc143f75e9086b6b346c4f5ac"
+      "gitBlob": "c3d3afa31f063f1f46dceb1bc61c67477d52455d",
+      "sha256": "e38ccf713ede1d15ef1d636a15aa0f5fc4b4f89bc1c5663e64657f042923ce03"
     },
     {
       "path": "src/components/ui/sidebar.tsx",
-      "gitBlob": "cd31eb5d13aa36aecb3be7e9066918f8fb7a877a",
-      "sha256": "f05ca3f51517d559503b1185ef85a7f7c780203cbd274ada8d730ca350ea3b0a"
+      "gitBlob": "8e7f876e56f80fff979b9aab8fc7b201bd779a09",
+      "sha256": "ae55c482674efe371db44fee2dc8823fe3e037db08dc34d77e270cff6d34808d"
     },
     {
       "path": "src/components/ui/skeleton.tsx",
@@ -878,8 +878,8 @@
     },
     {
       "path": "src/components/ui/tooltip.tsx",
-      "gitBlob": "f0005df95e52a85122de5fc59e41af694ddff6a1",
-      "sha256": "5cb9cea968badf73c89f3dc10900831c14383d749886132d39bd7dd76d4cad9e"
+      "gitBlob": "a628cee5b006b12c153b5fa21f80d4ea8a9fb286",
+      "sha256": "51c404df20f7ebc99a06a6c6c83916ec3df60bb72a4081130a67f1c46b5aa830"
     },
     {
       "path": "src/contracts/components/canonical-interface-member-authority.ts",
@@ -913,8 +913,8 @@
     },
     {
       "path": "src/contracts/components/delegated-host-source-analysis.ts",
-      "gitBlob": "83d093ca0e7450f3537187b4d39c5c4479896959",
-      "sha256": "5ad1ea97275714c45a644b57d26b12910360a4712cefc6b1afd6602cc116313d"
+      "gitBlob": "cf35192bac6532dd03b5f8659776e9b7f175a885",
+      "sha256": "92576021f8516be4b708927904c473e440272a984c07e40a4082fc1dd59f9b93"
     },
     {
       "path": "src/contracts/components/inherited-interface-source-analysis.ts",
@@ -7103,7 +7103,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source"
               ]
@@ -27106,7 +27106,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source",
                 "declaration"
@@ -28549,7 +28549,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source",
                 "declaration"
@@ -38630,7 +38630,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source",
                 "declaration"
@@ -70766,7 +70766,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source"
               ]
@@ -76216,7 +76216,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source"
               ]
@@ -128106,5 +128106,5 @@
       "sidebar.context"
     ]
   },
-  "sha256": "5444a204b28cc8a5046a8e2d2357140dd13e1a75ea8be1ea4b5e0814d6e3d73f"
+  "sha256": "97eb857c7de37fbb88793f7f28cc3a684e2f644b30c51867b471e842d0d86697"
 }
