@@ -39,11 +39,11 @@ function expectedIds(category: keyof typeof names): string[] {
 
 describe("pinned Tailwind theme token source", () => {
   test("pins Tailwind 4.3.3 and the installed theme.css integrity", () => {
-    const packageJson = JSON.parse(readFileSync(packagePath, "utf8")) as { dependencies: Record<string, string> }
+    const packageJson = JSON.parse(readFileSync(packagePath, "utf8")) as { devDependencies: Record<string, string> }
     const provenance = JSON.parse(readFileSync(provenancePath, "utf8")) as { sources: { tailwindTheme: { version: string, themeCssSha256: string } } }
     const themeCss = readFileSync(themePath)
 
-    expect(packageJson.dependencies.tailwindcss).toBe("4.3.3")
+    expect(packageJson.devDependencies.tailwindcss).toBe("4.3.3")
     expect(provenance.sources.tailwindTheme.version).toBe("4.3.3")
     expect(createHash("sha256").update(themeCss).digest("hex")).toBe(provenance.sources.tailwindTheme.themeCssSha256)
   })
