@@ -63,11 +63,72 @@ families together; a consumer's separately imported Radix primitives do not
 share the bundled context. This boundary targets client React applications;
 React Server Component support is not established.
 
-The build checks existing component/release reconciliation, the canonical
-stylesheet blob, and the pinned Tailwind theme/compiler hashes before emitting
-output. Verification of the full resolved CSS/font input chain, including
-shadcn, tw-animate-css, and Geist, remains part of Task 6.2. It does not change approved
-source files or `release-001`. Task 6.1 establishes the package surface only:
-source/artifact identity binding (6.2), an isolated tarball consumer proof
-(6.3), and final release verification (6.4) remain outstanding. No final
-installable tarball or distribution identity is produced at this stage.
+The build checks component/release reconciliation, frozen implementation inputs,
+resolved dependency CSS/fonts, and actual build dependency coverage before reporting
+success. The package remains a candidate: isolated consumer proof is Task 6.3;
+final acceptance is Task 6.4.
+
+## Release and candidate identity (Task 6.2)
+
+Use Node `22.18.0` and npm `10.9.3` for all commands. With Volta:
+
+```sh
+volta run --node 22.18.0 --npm 10.9.3 npm run release:generate
+volta run --node 22.18.0 --npm 10.9.3 npm run build:library
+volta run --node 22.18.0 --npm 10.9.3 npm run candidate:generate -- --output /tmp/release-001-candidate
+```
+
+`release:generate` is an explicit reconciliation operation: it updates the same
+release-001, but aborts if the executable projection changes. Use it only when
+reconciling reviewed source/build changes. `candidate:generate` verifies frozen
+release inputs, builds into a fresh temporary output directory, runs `npm pack
+--ignore-scripts`, and writes the tarball plus `distribution-manifest.json` to a
+new external directory. It refuses to overwrite candidate evidence.
+
+The release document has its own `documentSchemaVersion: 1`, independent of the
+unchanged `projectionSchemaVersion: 1`. It contains package name/version/public
+entrypoints and sorted implementation input paths, content SHA-256 digests, and
+Git blob identities (null for installed dependency CSS/font files). Git blob IDs
+identify the actual input bytes, including reviewed uncommitted edits; they are
+not claims that those bytes have been committed.
+
+Local code dependencies are derived through TypeScript module resolution from
+the public declaration and build entrypoints. Script and contract/provenance
+authority directories are enumerated for runtime-selected data. CSS imports,
+font URLs, and their package export metadata form a separately traversed graph.
+Build filesystem reads, Vite module/watch lists, and TypeScript declaration
+sources must fit that frozen manifest. Compiler IPC files use a fresh private
+scratch directory and are treated as generated outputs. Other installed build
+and runtime dependency code is identified through the pinned lockfile; the
+build-tool versions are also checked against it.
+
+Keep the generator's printed manifest digest independently of the candidate
+files. Keep the reviewed release payload digest independently of the release
+file. Verification requires those retained expectations:
+
+```sh
+volta run --node 22.18.0 --npm 10.9.3 npm run release:verify -- --release-sha256 "$REVIEWED_RELEASE_SHA256"
+volta run --node 22.18.0 --npm 10.9.3 npm run candidate:verify -- \
+  --manifest /tmp/release-001-candidate/distribution-manifest.json \
+  --tarball /tmp/release-001-candidate/adc-shadcn-design-system-0.0.0-release.1.tgz \
+  --manifest-sha256 "$RETAINED_MANIFEST_SHA256"
+volta run --node 22.18.0 --npm 10.9.3 npm run test:identity
+```
+
+Do not obtain verification expectations by rehashing the files being verified.
+The verifier never refreshes the release, manifest, or candidate tarball. It
+rebuilds producer outputs in a temporary directory and independently compares
+all packed paths, sizes, and file hashes to the existing candidate. No consumer
+application is installed or exercised.
+
+The external manifest has `schemaVersion`, release ID/payload SHA-256, package
+name/version, Node/npm/platform/architecture/build-tool versions, tarball
+filename/SHA-256/npm SHA-512 integrity, and a sorted file inventory of path, size,
+and SHA-256. It contains no self digest. Its retained external digest detects
+manifest edits; its release reference detects coordinated source/release edits;
+its packed-file inventory and independent rebuild detect modified package data.
+
+The release never hashes itself, generated library files, tarballs, distribution
+manifests, or acceptance records. The external manifest hashes the resulting
+packed bytes and stays outside the package. This establishes candidate evidence
+only; it creates no release-002 or final Canvas acceptance record.

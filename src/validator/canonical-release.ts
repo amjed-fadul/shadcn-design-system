@@ -12,7 +12,7 @@ const approvedSource: ExecutableContractSource = {
   tokenContract: getTokenContract(),
 }
 const approvedProjection = projectExecutableContract(approvedSource)
-const executableRelease = loadExecutableRelease(executableReleaseArtifact, { expectedProjection: approvedProjection })
+const executableRelease = loadExecutableRelease(executableReleaseArtifact, { expectedProjection: approvedProjection, requirePackageIdentity: true })
 
 /** Returns the one immutable release used by production validation. */
 export function getExecutableRelease(): ExecutableRelease {

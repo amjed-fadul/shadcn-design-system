@@ -18,7 +18,12 @@
     "tokens:verify": "vitest run --project=unit tests/token-contract-*.test.ts",
     "snapshot:verify": "vitest run --project=unit tests/snapshot-integrity.test.ts",
     "build:library": "node scripts/build-library.mjs",
-    "test:library": "vitest run --project=unit --maxWorkers=1 tests/library-package.test.ts"
+    "test:library": "vitest run --project=unit --maxWorkers=1 tests/library-package.test.ts",
+    "release:generate": "node scripts/run-release-generation.mjs",
+    "release:verify": "node scripts/package-candidate.mjs release-verify",
+    "candidate:generate": "node scripts/package-candidate.mjs generate",
+    "candidate:verify": "node scripts/package-candidate.mjs verify",
+    "test:identity": "vitest run --project=unit --maxWorkers=1 tests/package-identity.test.ts tests/distribution-identity.test.ts"
   },
   "dependencies": {
     "class-variance-authority": "0.7.1",
