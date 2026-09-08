@@ -10,18 +10,34 @@ import type { TokenContract } from "../src/contracts/tokens/types"
 const root = fileURLToPath(new URL("../", import.meta.url))
 const output = path.join(root, "dist-library")
 const readJson = (file: string) => JSON.parse(readFileSync(path.join(root, file), "utf8"))
+const contractedExportNames = () => {
+  const contractSet = readJson("contracts/components/component-contract-set.json")
+  return contractSet.familyFiles.flatMap((file: string) =>
+    readJson(file).exports.map((entry: { name: string }) => entry.name)
+  )
+}
 
-beforeAll(() => {
-  execFileSync("npm", ["run", "build:library"], { cwd: root, stdio: "pipe", timeout: 120_000 })
-}, 130_000)
+describe("published library entrypoint", () => {
+  test("exposes all 108 contracted public exports including Switch", async () => {
+    const library = await import("../src/package/index")
+    const names = contractedExportNames()
+    expect(Object.keys(library).sort()).toEqual(names.sort())
+    expect(names).toHaveLength(108)
+    expect(Object.hasOwn(library, "Switch")).toBe(true)
+  })
+})
 
 describe("library package boundary", () => {
+  beforeAll(() => {
+    execFileSync("npm", ["run", "build:library"], { cwd: root, stdio: "pipe", timeout: 120_000 })
+  }, 130_000)
+
   test("exposes every approved component export without exposing internal utilities", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "index.js"))
-    const release = readJson("provenance/releases/shadcn-radix-release-002.json")
-    const names = Object.values(release.projection.exports).map((entry) => (entry as { name: string }).name)
+    const names = contractedExportNames()
     expect(Object.keys(library).sort()).toEqual(names.sort())
-    expect(names).toHaveLength(107)
+    expect(names).toHaveLength(108)
+    expect(Object.hasOwn(library, "Switch")).toBe(true)
     expect(isValidElement(createElement(library.Button))).toBe(true)
     expect(library.useSidebar).toBeTypeOf("function")
   })
