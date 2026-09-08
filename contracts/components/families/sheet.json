@@ -3,7 +3,7 @@
   "id": "sheet",
   "source": {
     "canonicalPath": "src/components/ui/sheet.tsx",
-    "canonicalBlobSha": "faa7d7fe79e12e200fd861f3459295e0e0e66795",
+    "canonicalBlobSha": "01a27ad277d03a640f11a4ea256e576fa2030f44",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sheet.tsx",
     "upstreamBlobSha": "28f34f894ea37e24b46056fd040bc46ae8b5902e"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sheet.tsx@faa7d7fe79e12e200fd861f3459295e0e0e66795"
+      "source": "src/components/ui/sheet.tsx@01a27ad277d03a640f11a4ea256e576fa2030f44"
     },
     "declaration": {
       "kind": "inherited-interface",
