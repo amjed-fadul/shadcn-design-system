@@ -16,7 +16,7 @@ describe("release002 environment-owned portal containers", () => {
     const previousBytes = readFileSync(previousPath, "utf8")
     expect(previousBytes).toBe(execFileSync("git", ["show", `293ff10:${previousPath}`], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }))
     const previous = JSON.parse(previousBytes)
-    const current = getExecutableRelease()
+    const current = JSON.parse(readFileSync("provenance/releases/shadcn-radix-release-002.json", "utf8")) as ReturnType<typeof getExecutableRelease>
     expect(current.releaseId).toBe("shadcn-radix-release-002")
     expect(current.packageIdentity?.version).toBe("0.0.0-release.2")
     const projection = structuredClone(current.projection)

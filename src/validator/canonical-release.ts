@@ -1,4 +1,4 @@
-import executableReleaseArtifact from "../../provenance/releases/shadcn-radix-release-002.json"
+import executableReleaseArtifact from "../../provenance/releases/shadcn-radix-release-003.json"
 
 import { loadComponentContracts } from "../contracts/components/canonical-loader"
 import { getTokenContract } from "../contracts/tokens/contract"

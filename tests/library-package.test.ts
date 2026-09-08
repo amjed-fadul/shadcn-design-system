@@ -45,7 +45,7 @@ describe("library package boundary", () => {
   test("ships complete immutable contracts and the unchanged executable release", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "release.js"))
     expect(Object.keys(library).sort()).toEqual(["getComponentContracts", "getExecutableRelease", "getTokenContract"])
-    expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-002.json"))
+    expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-003.json"))
     const components = library.getComponentContracts()
     expect(components.contractSet).toEqual(readJson("contracts/components/component-contract-set.json"))
     expect(components.families).toHaveLength(20)
@@ -100,7 +100,7 @@ describe("library package boundary", () => {
 
   test("public declarations resolve and reject invalid usage without repository aliases", () => {
     const manifest = readJson("package.json")
-    expect(manifest.version).toBe("0.0.0-release.2")
+    expect(manifest.version).toBe("0.0.0-release.3")
     expect(Object.keys(manifest.exports).sort()).toEqual([".", "./release", "./styles.css"])
     const probe = path.join(root, "library-type-probe.tsx")
     const validSource = `
@@ -149,7 +149,7 @@ describe("library package boundary", () => {
           expect(specifier.text).toMatch(/^(react|react-dom)(\/|$)/)
         }
       }
-      if (name === "index.js") expect(text).not.toContain("shadcn-radix-release-002")
+      if (name === "index.js") expect(text).not.toContain("shadcn-radix-release-003")
     }
     const manifest = readJson("package.json")
     expect(manifest.peerDependencies).toEqual({ react: "18.3.1", "react-dom": "18.3.1" })
