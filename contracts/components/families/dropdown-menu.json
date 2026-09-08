@@ -3,7 +3,7 @@
   "id": "dropdown-menu",
   "source": {
     "canonicalPath": "src/components/ui/dropdown-menu.tsx",
-    "canonicalBlobSha": "0f9e680f16fadefcb54b0b84427861379e8817d6",
+    "canonicalBlobSha": "5945315b32dee98227d1caef0efb7e25308924bb",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dropdown-menu.tsx",
     "upstreamBlobSha": "01a12bdc321ee20bab46e48748b4d8ff94058b04"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dropdown-menu.tsx@0f9e680f16fadefcb54b0b84427861379e8817d6"
+      "source": "src/components/ui/dropdown-menu.tsx@5945315b32dee98227d1caef0efb7e25308924bb"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -339,7 +339,30 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "union",
+              "members": [
+                {
+                  "kind": "typescript",
+                  "typeText": "Element"
+                },
+                {
+                  "kind": "typescript",
+                  "typeText": "DocumentFragment"
+                }
+              ]
+            },
+            "typeText": "Element | DocumentFragment",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
         "inherits": [
           "radix.dropdown-menu.content"
         ],

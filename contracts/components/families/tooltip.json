@@ -3,7 +3,7 @@
   "id": "tooltip",
   "source": {
     "canonicalPath": "src/components/ui/tooltip.tsx",
-    "canonicalBlobSha": "a628cee5b006b12c153b5fa21f80d4ea8a9fb286",
+    "canonicalBlobSha": "b7f3aeed533efe5e5a7f4c7edd19c739de34cbe0",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/tooltip.tsx",
     "upstreamBlobSha": "5dbba467c3adeb802a19b01dbfd967a9d5c10d41"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/tooltip.tsx@a628cee5b006b12c153b5fa21f80d4ea8a9fb286"
+      "source": "src/components/ui/tooltip.tsx@b7f3aeed533efe5e5a7f4c7edd19c739de34cbe0"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -214,7 +214,30 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "union",
+              "members": [
+                {
+                  "kind": "typescript",
+                  "typeText": "Element"
+                },
+                {
+                  "kind": "typescript",
+                  "typeText": "DocumentFragment"
+                }
+              ]
+            },
+            "typeText": "Element | DocumentFragment",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
         "inherits": [
           "radix.tooltip.content"
         ],

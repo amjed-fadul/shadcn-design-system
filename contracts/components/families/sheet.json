@@ -3,7 +3,7 @@
   "id": "sheet",
   "source": {
     "canonicalPath": "src/components/ui/sheet.tsx",
-    "canonicalBlobSha": "c3d3afa31f063f1f46dceb1bc61c67477d52455d",
+    "canonicalBlobSha": "faa7d7fe79e12e200fd861f3459295e0e0e66795",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sheet.tsx",
     "upstreamBlobSha": "28f34f894ea37e24b46056fd040bc46ae8b5902e"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sheet.tsx@c3d3afa31f063f1f46dceb1bc61c67477d52455d"
+      "source": "src/components/ui/sheet.tsx@faa7d7fe79e12e200fd861f3459295e0e0e66795"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -201,6 +201,28 @@
             "default": true,
             "evidenceRefs": [
               "source"
+            ]
+          },
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "union",
+              "members": [
+                {
+                  "kind": "typescript",
+                  "typeText": "Element"
+                },
+                {
+                  "kind": "typescript",
+                  "typeText": "DocumentFragment"
+                }
+              ]
+            },
+            "typeText": "Element | DocumentFragment",
+            "evidenceRefs": [
+              "source",
+              "declaration"
             ]
           }
         ],
