@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "id": "switch",
+  "source": {
+    "canonicalPath": "src/components/ui/switch.tsx",
+    "canonicalBlobSha": "91b3deb8aaefa9b35bb5ff9806b0148e0e7df699",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/switch.tsx",
+    "upstreamBlobSha": "c30f1be5fad35e6d9b3bc67c3613ee91b70c2542"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/switch.tsx@91b3deb8aaefa9b35bb5ff9806b0148e0e7df699"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.switch.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Switch",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "sm",
+                "default"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "radix.switch.root"
+        ],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "checked",
+            "controlledProp": "checked",
+            "defaultProp": "defaultChecked",
+            "changeEventProp": "onCheckedChange",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 6
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.switch.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "switch",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-size",
+                  "source": "prop",
+                  "prop": "size",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "thumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "thumb",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "switch-thumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": []
+      }
+    }
+  ],
+  "unresolved": []
+}

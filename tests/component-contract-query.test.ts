@@ -14,7 +14,7 @@ import {
 
 describe("component contract query API", () => {
   test("uses exact family, export, and interface identifiers", () => {
-    expect(getComponentContractSet().familyCount).toBe(19)
+    expect(getComponentContractSet().familyCount).toBe(20)
     expect(getComponentFamily("button").id).toBe("button")
     expect(lookupComponentExport("button", "Button")).toMatchObject({ name: "Button", kind: "component", authorableJsx: true })
     expect(lookupComponentExport("button", "buttonVariants")).toMatchObject({ name: "buttonVariants", kind: "helper", authorableJsx: false })

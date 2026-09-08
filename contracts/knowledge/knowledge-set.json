@@ -18,6 +18,7 @@
     "contracts/knowledge/components/sheet.json",
     "contracts/knowledge/components/sidebar.json",
     "contracts/knowledge/components/skeleton.json",
+    "contracts/knowledge/components/switch.json",
     "contracts/knowledge/components/table.json",
     "contracts/knowledge/components/tabs.json",
     "contracts/knowledge/components/textarea.json",

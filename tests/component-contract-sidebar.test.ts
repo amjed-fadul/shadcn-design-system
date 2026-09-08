@@ -42,9 +42,9 @@ function authority() {
 }
 
 describe("Sidebar component family contract", () => {
-  test("registers Sidebar as the nineteenth and final family", () => {
-    expect(contractSet.familyCount).toBe(19)
-    expect(contractSet.familyFiles).toHaveLength(19)
+  test("registers Sidebar within the approved family set", () => {
+    expect(contractSet.familyCount).toBe(20)
+    expect(contractSet.familyFiles).toHaveLength(20)
     expect(contractSet.familyFiles).toContain("contracts/components/families/sidebar.json")
   })
 

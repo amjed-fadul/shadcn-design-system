@@ -17,7 +17,7 @@ const root = fileURLToPath(new URL("../", import.meta.url))
 const contractSet = contractSetJson as ComponentContractSet
 const expectedFamilyIds = [
   "accordion", "badge", "button", "card", "checkbox", "dialog", "dropdown-menu", "input", "label",
-  "scroll-area", "select", "separator", "sheet", "sidebar", "skeleton", "table", "tabs", "textarea", "tooltip",
+  "scroll-area", "select", "separator", "sheet", "sidebar", "skeleton", "switch", "table", "tabs", "textarea", "tooltip",
 ]
 
 type SeedComponent = {
@@ -148,7 +148,7 @@ function analyzeIntrinsic(tag: keyof React.JSX.IntrinsicElements) {
 }
 
 describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
-  test("registers exactly the 19 seed families and no extra family artifact", () => {
+  test("registers exactly the 20 seed families and no extra family artifact", () => {
     const actualFamilyFiles = readdirSync(join(root, "contracts/components/families"))
       .filter((file) => file.endsWith(".json"))
       .map((file) => `contracts/components/families/${file}`)
@@ -156,13 +156,13 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
     const registeredFamilyIds = families.map((family) => family.id).sort()
     const seedFamilyIds = Object.keys(seed.components).sort()
 
-    expect(contractSet.familyCount).toBe(19)
-    expect(contractSet.familyFiles).toHaveLength(19)
-    expect(new Set(contractSet.familyFiles).size).toBe(19)
+    expect(contractSet.familyCount).toBe(20)
+    expect(contractSet.familyFiles).toHaveLength(20)
+    expect(new Set(contractSet.familyFiles).size).toBe(20)
     expect(actualFamilyFiles).toEqual(contractSet.familyFiles.slice().sort())
     expect(registeredFamilyIds).toEqual(expectedFamilyIds.slice().sort())
     expect(registeredFamilyIds).toEqual(seedFamilyIds)
-    expect(families).toHaveLength(19)
+    expect(families).toHaveLength(20)
   })
 
   test("reconciles every public export classification with canonical source", () => {
@@ -196,7 +196,7 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
       .filter((file) => file.endsWith(".json"))
       .map((file) => `contracts/components/interfaces/${file}`)
       .sort()
-    expect(contractSet.interfaceFiles).toHaveLength(77)
+    expect(contractSet.interfaceFiles).toHaveLength(78)
     expect(new Set(contractSet.interfaceFiles).size).toBe(contractSet.interfaceFiles.length)
     expect(actualInterfaceFiles).toEqual(contractSet.interfaceFiles.slice().sort())
     expect(new Set(interfaces.map((item) => item.id)).size).toBe(interfaces.length)

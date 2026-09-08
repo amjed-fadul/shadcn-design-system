@@ -5,8 +5,8 @@
   },
   "familySource": {
     "path": "provenance/seed-components.json",
-    "blobSha": "32fa33784e430cb5f0dc78804338967037a89779",
-    "familyCount": 19,
+    "blobSha": "8cfe2dd68beb308ed2efca12fb1c2a646e8a2684",
+    "familyCount": 20,
     "familyIds": [
       "accordion",
       "badge",
@@ -23,6 +23,7 @@
       "sheet",
       "sidebar",
       "skeleton",
+      "switch",
       "table",
       "tabs",
       "textarea",

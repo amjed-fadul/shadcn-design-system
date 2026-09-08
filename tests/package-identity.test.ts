@@ -179,10 +179,10 @@ describe("release package input identity", () => {
   test("maps the approved package name, version and exact public entrypoints", () => {
     expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.2", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
   })
-  test("canonical release binds all 19 components, shared utilities, mobile hook and build inputs", () => {
+  test("canonical release binds all 20 components, shared utilities, mobile hook and build inputs", () => {
     const release = verifyRepositoryRelease(root)
     const paths = release.implementationInputs!.map(entry => entry.path)
-    expect(paths.filter(file => /^src\/components\/ui\/.*\.tsx$/.test(file))).toHaveLength(19)
+    expect(paths.filter(file => /^src\/components\/ui\/.*\.tsx$/.test(file))).toHaveLength(20)
     expect(paths).toEqual(expect.arrayContaining(["src/lib/utils.ts", "src/hooks/use-mobile.ts", "src/index.css", "scripts/library-data.ts", "scripts/build-library.mjs", "vite.library.config.ts", "tsconfig.library.json", "package-lock.json", "components.json"]))
     expect(release.documentSchemaVersion).toBe(1)
     expect(release.packageIdentity).toEqual(packageIdentity(root))

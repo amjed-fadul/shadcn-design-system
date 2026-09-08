@@ -37,15 +37,15 @@ function memorySource(mutator?: (artifacts: Map<string, unknown>) => void): Comp
 }
 
 describe("component contract loader and derived index", () => {
-  test("loads exactly the canonical 19 families and every manifest interface", () => {
+  test("loads exactly the canonical 20 families and every manifest interface", () => {
     const loaded = loadComponentContracts()
 
     expect(["candidate", "approved"]).toContain(loaded.contractSet.status)
-    expect(loaded.contractSet.familyCount).toBe(19)
-    expect(loaded.contractSet.familyFiles).toHaveLength(19)
-    expect(loaded.families).toHaveLength(19)
+    expect(loaded.contractSet.familyCount).toBe(20)
+    expect(loaded.contractSet.familyFiles).toHaveLength(20)
+    expect(loaded.families).toHaveLength(20)
     expect(loaded.interfaces).toHaveLength(manifest.interfaceFiles.length)
-    expect(new Set(loaded.families.map((family) => family.id)).size).toBe(19)
+    expect(new Set(loaded.families.map((family) => family.id)).size).toBe(20)
     expect(new Set(loaded.interfaces.map((contract) => contract.id)).size).toBe(loaded.interfaces.length)
     expect(loaded.families.map((family) => family.id)).toEqual(manifest.familyFiles.map((path) => path.split("/").at(-1)!.replace(/\.json$/, "")))
   })

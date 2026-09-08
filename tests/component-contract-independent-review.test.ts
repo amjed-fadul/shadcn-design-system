@@ -25,6 +25,7 @@ const expectedFamilies = [
   "sheet",
   "sidebar",
   "skeleton",
+  "switch",
   "table",
   "tabs",
   "textarea",
@@ -692,8 +693,8 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
 function independentAudit(artifacts: { families: AnyRecord[]; interfaces: AnyRecord[] }): string[] {
   const errors: string[] = []
   const familyIds = artifacts.families.map((family) => family.id).sort()
-  if (JSON.stringify(familyIds) !== JSON.stringify(expectedFamilies)) errors.push("contract set does not contain exactly the 19 expected families")
-  if (artifacts.families.length !== 19) errors.push(`expected 19 family artifacts, found ${artifacts.families.length}`)
+  if (JSON.stringify(familyIds) !== JSON.stringify(expectedFamilies)) errors.push("contract set does not contain exactly the 20 expected families")
+  if (artifacts.families.length !== 20) errors.push(`expected 20 family artifacts, found ${artifacts.families.length}`)
   if (!["candidate", "approved"].includes(readJson(join(root, "contracts/components/component-contract-set.json")).status)) errors.push("component contract set has an invalid lifecycle status")
   errors.push(...directDeclarationErrors(artifacts.interfaces))
   errors.push(...directSourceErrors(artifacts.families, artifacts.interfaces))
@@ -763,7 +764,7 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(findUnreferencedEvidence()).toEqual([])
   })
 
-  test("audits all 19 families through direct AST and declaration access", () => {
+  test("audits all 20 families through direct AST and declaration access", () => {
     expect(independentAudit(loadArtifacts())).toEqual([])
   })
 

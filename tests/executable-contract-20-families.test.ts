@@ -29,6 +29,7 @@ const familyIds = [
   "sheet",
   "sidebar",
   "skeleton",
+  "switch",
   "table",
   "tabs",
   "textarea",
@@ -116,7 +117,7 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
-describe("Phase 5 executable validator coverage across all 19 Phase 3 families", () => {
+describe("Phase 5 executable validator coverage across all 20 Phase 3 families", () => {
   test("projects and resolves every authorable Phase 3 export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
     const authorable = Object.values(contract.exports).filter((entry) => entry.authorableJsx && entry.kind === "component")
@@ -124,7 +125,7 @@ describe("Phase 5 executable validator coverage across all 19 Phase 3 families",
     const hardConstraints = Object.values(contract.exports).flatMap((entry) => entry.component?.composition.hardConstraints ?? [])
 
     expect([...projectedFamilies].sort()).toEqual([...familyIds].sort())
-    expect(authorable).toHaveLength(103)
+    expect(authorable).toHaveLength(104)
     expect(nonAuthorable).toHaveLength(4)
     expect(hardConstraints).toEqual([])
     for (const entry of authorable) {

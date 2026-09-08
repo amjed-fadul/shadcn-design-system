@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "switch-knowledge",
+  "subject": { "kind": "component", "id": "switch" },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A control that allows the user to toggle between on and off.",
+    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.switch.docs"] }
+  },
+  "howToUse": [
+    {
+      "statement": "Pair the switch with Field and FieldLabel for layout and labeling.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.switch.docs"] }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Preserve the switch's keyboard interaction when using it.",
+      "basis": { "kind": "source-derived", "referenceIds": ["radix.switch.docs"] }
+    }
+  ]
+}

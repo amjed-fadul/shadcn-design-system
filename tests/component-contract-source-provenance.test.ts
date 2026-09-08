@@ -22,6 +22,7 @@ const expectedFamilyIds = [
   "sheet",
   "sidebar",
   "skeleton",
+  "switch",
   "table",
   "tabs",
   "textarea",
@@ -59,7 +60,7 @@ describe("Phase 3 component-contract source provenance", () => {
       familySource: {
         path: "provenance/seed-components.json",
         blobSha: gitBlobSha("provenance/seed-components.json"),
-        familyCount: 19,
+        familyCount: 20,
         familyIds: expectedFamilyIds,
       },
       tokenContract: {
@@ -78,7 +79,7 @@ describe("Phase 3 component-contract source provenance", () => {
     })
 
     expect(familyIds).toEqual(expectedFamilyIds)
-    expect(familyIds).toHaveLength(19)
+    expect(familyIds).toHaveLength(20)
     expect(provenance.familySource.familyIds).toEqual(familyIds)
     expect(provenance.familySource.blobSha).toBe(gitBlobSha(provenance.familySource.path))
 

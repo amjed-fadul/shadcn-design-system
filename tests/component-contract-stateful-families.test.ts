@@ -272,6 +272,19 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     expect(validateComponentFamilyInvariants(checkbox, authority())).toEqual([])
   })
 
+  test("models Switch's authoritative checked state and automatic thumb", () => {
+    const switchFamily = family("switch")!
+    const component = switchFamily.exports[0].component!
+    expect(component.inherits).toEqual(["radix.switch.root"])
+    expect(component.localProps).toEqual([{ name: "size", required: false, type: { kind: "enum", values: ["sm", "default"] }, default: "default", evidenceRefs: ["source"] }])
+    expect(component.stateChannels).toEqual([{ name: "checked", controlledProp: "checked", defaultProp: "defaultChecked", changeEventProp: "onCheckedChange", evidenceRefs: ["source", "declaration"] }])
+    expect(tree(component.rendering).nodes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "root", host: { kind: "inherited-interface", interfaceId: "radix.switch.root" }, receivesPublicProps: true, children: [expect.objectContaining({ nodeId: "thumb" })] }),
+      expect.objectContaining({ id: "thumb", host: { kind: "unresolved" }, receivesPublicProps: false }),
+    ]))
+    expect(validateComponentFamilyInvariants(switchFamily, authority())).toEqual([])
+  })
+
   test("models Tabs' source-owned defaults and inherited value state", () => {
     const tabs = family("tabs")!
     const rootComponent = tabs.exports.find((entry) => entry.name === "Tabs")!.component!

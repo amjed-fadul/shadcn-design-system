@@ -34,7 +34,7 @@ const canonicalSource: ComponentContractArtifactSource = {
 
 function canonicalContractSetErrors(contractSet: ComponentContractSet): string[] {
   const errors: string[] = []
-  if (contractSet.familyCount !== 19 || contractSet.familyFiles.length !== 19) errors.push("The component contract set must contain exactly 19 families.")
+  if (contractSet.familyCount !== 20 || contractSet.familyFiles.length !== 20) errors.push("The component contract set must contain exactly 20 families.")
   const actual = [...contractSet.familyFiles].sort()
   const expected = [...canonicalFamilyFiles].sort()
   if (actual.length !== expected.length || actual.some((path, index) => path !== expected[index])) errors.push("Family manifest does not match the canonical Phase 3 family scope.")

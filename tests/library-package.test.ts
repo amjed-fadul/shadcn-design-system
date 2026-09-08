@@ -32,7 +32,7 @@ describe("library package boundary", () => {
     expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-002.json"))
     const components = library.getComponentContracts()
     expect(components.contractSet).toEqual(readJson("contracts/components/component-contract-set.json"))
-    expect(components.families).toHaveLength(19)
+    expect(components.families).toHaveLength(20)
     for (const file of components.contractSet.familyFiles) {
       expect(components.families).toContainEqual(readJson(file))
     }

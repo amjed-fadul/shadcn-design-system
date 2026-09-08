@@ -20,7 +20,7 @@ const sourcePath = join(root, "src/components/ui/button.tsx")
 describe("Button component contract", () => {
   test("reconciles source identity and public exports", () => {
     const seed = JSON.parse(readFileSync(join(root, "provenance/seed-components.json"), "utf8")).components.button
-    expect(contractSet.familyCount).toBe(19)
+    expect(contractSet.familyCount).toBe(20)
     expect(["candidate", "approved"]).toContain(contractSet.status)
     expect(contractSet.familyFiles).toContain("contracts/components/families/button.json")
     expect(button.id).toBe("button")

@@ -266,7 +266,7 @@ describe("knowledge contract boundary", () => {
 })
 
 describe("canonical knowledge vertical slice", () => {
-  test("lists all 19 component knowledge subjects and the canonical patterns", () => {
+  test("lists all 20 component knowledge subjects and the canonical patterns", () => {
     const loaded = loadKnowledge()
     const componentIds = [
       "accordion",
@@ -284,6 +284,7 @@ describe("canonical knowledge vertical slice", () => {
       "sheet",
       "sidebar",
       "skeleton",
+      "switch",
       "table",
       "tabs",
       "textarea",
@@ -344,7 +345,7 @@ describe("canonical knowledge vertical slice", () => {
   })
 
   test("canonical query exposes all components and patterns through separate entrypoints", () => {
-    expect(listComponentKnowledge()).toHaveLength(19)
+    expect(listComponentKnowledge()).toHaveLength(20)
     expect(listPatternKnowledge().map((entry) => entry.subject.id)).toEqual([
       "accordion-card",
       "dialog-with-actions",

@@ -52,6 +52,7 @@ export const canonicalInterfaceMemberAuthority: Readonly<Record<string, { props:
   "radix.select.trigger": { props: ["asChild", "id", "aria-label", "aria-labelledby"], events: [] },
   "radix.select.value": { props: ["placeholder", "asChild"], events: [] },
   "radix.select.viewport": { props: ["nonce", "asChild"], events: [] },
+  "radix.switch.root": { props: ["checked", "defaultChecked", "required"], events: ["onCheckedChange"] },
   "radix.tabs.content": { props: ["value", "forceMount"], events: [] },
   "radix.tabs.list": { props: ["loop"], events: [] },
   "radix.tabs.root": { props: ["value", "defaultValue", "orientation", "activationMode"], events: ["onValueChange"] },
