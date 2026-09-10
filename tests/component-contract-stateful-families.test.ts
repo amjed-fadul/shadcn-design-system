@@ -39,7 +39,7 @@ function interfaceContract(id: string) {
 }
 
 const expectedInterfaceFacts = [
-  ["radix.checkbox.root", "checkbox", "Root", ["checked", "defaultChecked", "required"], ["onCheckedChange"]],
+  ["radix.checkbox.root", "checkbox", "Root", ["checked", "defaultChecked", "required", "id"], ["onCheckedChange"]],
   ["radix.checkbox.indicator", "checkbox", "Indicator", ["forceMount"], []],
   ["radix.tabs.root", "tabs", "Root", ["value", "defaultValue", "orientation", "activationMode"], ["onValueChange"]],
   ["radix.tabs.list", "tabs", "List", ["loop"], []],

@@ -10,7 +10,7 @@ export const canonicalInterfaceMemberAuthority: Readonly<Record<string, { props:
   "radix.accordion.item": { props: ["disabled", "value"], events: [] },
   "radix.accordion.trigger": { props: [], events: [] },
   "radix.checkbox.indicator": { props: ["forceMount"], events: [] },
-  "radix.checkbox.root": { props: ["checked", "defaultChecked", "required"], events: ["onCheckedChange"] },
+  "radix.checkbox.root": { props: ["checked", "defaultChecked", "required", "id"], events: ["onCheckedChange"] },
   "radix.dialog.close": { props: ["asChild"], events: [] },
   "radix.dialog.content": { props: ["forceMount", "asChild"], events: [] },
   "radix.dialog.description": { props: ["asChild"], events: [] },
