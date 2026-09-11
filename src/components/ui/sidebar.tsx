@@ -25,15 +25,21 @@ type SidebarContextValue = {
   setOpenMobile: (open: boolean | ((open: boolean) => boolean)) => void
   isMobile: boolean
   toggleSidebar: () => void
-  activeTriggerRef: React.MutableRefObject<HTMLButtonElement | null>
 }
 
 const SidebarContext = React.createContext<SidebarContextValue | null>(null)
+const SidebarRuntimeContext = React.createContext<React.MutableRefObject<HTMLButtonElement | null> | null>(null)
 const SidebarRenderContext = React.createContext<{ side: "left" | "right"; state: "expanded" | "collapsed" }>({ side: "left", state: "expanded" })
 
 function useSidebar() {
   const context = React.useContext(SidebarContext)
   if (!context) throw new Error("useSidebar must be used within a SidebarProvider.")
+  return context
+}
+
+function useSidebarRuntime() {
+  const context = React.useContext(SidebarRuntimeContext)
+  if (!context) throw new Error("Sidebar runtime must be used within a SidebarProvider.")
   return context
 }
 
@@ -88,21 +94,23 @@ function SidebarProvider({
 
   const state = open ? "expanded" : "collapsed"
   const contextValue = React.useMemo<SidebarContextValue>(
-    () => ({ state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, activeTriggerRef }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, activeTriggerRef]
+    () => ({ state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar }),
+    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
   )
 
   return (
     <SidebarContext.Provider value={contextValue}>
-      <div
-        data-slot="sidebar-wrapper"
-        data-mobile={isMobile || undefined}
-        style={{ "--sidebar-width": SIDEBAR_WIDTH, "--sidebar-width-icon": SIDEBAR_WIDTH_ICON, ...style } as React.CSSProperties}
-        className={cn("group/sidebar-wrapper relative flex h-full min-h-0 w-full has-data-[variant=inset]:bg-sidebar", className)}
-        {...props}
-      >
-        {children}
-      </div>
+      <SidebarRuntimeContext.Provider value={activeTriggerRef}>
+        <div
+          data-slot="sidebar-wrapper"
+          data-mobile={isMobile || undefined}
+          style={{ "--sidebar-width": SIDEBAR_WIDTH, "--sidebar-width-icon": SIDEBAR_WIDTH_ICON, ...style } as React.CSSProperties}
+          className={cn("group/sidebar-wrapper relative flex h-full min-h-0 w-full has-data-[variant=inset]:bg-sidebar", className)}
+          {...props}
+        >
+          {children}
+        </div>
+      </SidebarRuntimeContext.Provider>
     </SidebarContext.Provider>
   )
 }
@@ -123,7 +131,8 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
   portalContainer?: React.ComponentProps<typeof SheetContent>["portalContainer"]
 }) {
-  const { isMobile, state, openMobile, setOpenMobile, activeTriggerRef } = useSidebar()
+  const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const activeTriggerRef = useSidebarRuntime()
   const effectiveState = collapsible === "none" ? "expanded" : state
   const flowSpacer = <div data-slot="sidebar-flow-spacer" data-state={effectiveState} data-collapsible={effectiveState === "collapsed" ? collapsible : ""} data-side={side} className={cn("h-full shrink-0 w-(--sidebar-width) data-[collapsible=offcanvas]:w-0 data-[collapsible=icon]:w-(--sidebar-width-icon) data-[side=left]:order-first rtl:data-[side=left]:order-last data-[side=right]:order-last rtl:data-[side=right]:order-first", (variant === "floating" || variant === "inset") && "data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+--spacing(4))]")} />
 
@@ -178,13 +187,15 @@ function Sidebar({
 }
 
 const SidebarTrigger = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>>(({ className, onClick, ...props }, forwardedRef) => {
-  const { toggleSidebar, activeTriggerRef } = useSidebar()
+  const { toggleSidebar } = useSidebar()
+  const activeTriggerRef = useSidebarRuntime()
   return <Button ref={forwardedRef} data-sidebar="trigger" data-slot="sidebar-trigger" variant="ghost" size="icon-sm" className={className} onClick={(event) => { onClick?.(event); if (event.defaultPrevented) return; activeTriggerRef.current = event.currentTarget; toggleSidebar() }} {...props}><PanelLeft className="size-4" /><span className="sr-only">Toggle Sidebar</span></Button>
 })
 SidebarTrigger.displayName = "SidebarTrigger"
 
 function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
-  const { toggleSidebar } = useSidebar()
+  const { isMobile, toggleSidebar } = useSidebar()
+  if (isMobile) return null
   return <button data-sidebar="rail" data-slot="sidebar-rail" aria-label="Toggle Sidebar" tabIndex={-1} onClick={toggleSidebar} title="Toggle Sidebar" className={cn("absolute inset-y-0 z-20 flex w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] ltr:-translate-x-1/2 rtl:-translate-x-1/2 in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize [[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sidebar [[data-side=left][data-collapsible=offcanvas]_&]:-right-2 [[data-side=right][data-collapsible=offcanvas]_&]:-left-2", className)} {...props} />
 }
 

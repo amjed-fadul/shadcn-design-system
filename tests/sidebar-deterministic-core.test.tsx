@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSkeleton,
   SidebarProvider,
+  SidebarRail,
   SidebarTrigger,
   useSidebar,
 } from "../src/components/ui/sidebar"
@@ -252,6 +253,51 @@ describe("Sidebar deterministic core", () => {
     }
     const container = render(<SidebarProvider isMobile defaultOpen defaultOpenMobile={false}><Probe /></SidebarProvider>)
     expect(container.querySelector("output")?.textContent).toBe("true/false/true")
+  })
+
+  test("keeps focus-restoration internals out of the public useSidebar result", () => {
+    function Probe() {
+      return <output>{Object.keys(useSidebar()).sort().join(",")}</output>
+    }
+
+    const container = render(<SidebarProvider><Probe /></SidebarProvider>)
+
+    expect(container.querySelector("output")?.textContent).toBe("isMobile,open,openMobile,setOpen,setOpenMobile,state,toggleSidebar")
+  })
+
+  test("renders Rail only for the explicit desktop presentation regardless of browser width", () => {
+    const originalWidth = window.innerWidth
+    function RailProbe() {
+      const [isMobile, setIsMobile] = useState(false)
+      const [, setRevision] = useState(0)
+      return <>
+        <button data-testid="presentation" onClick={() => setIsMobile((value) => !value)}>Change presentation</button>
+        <button data-testid="rerender" onClick={() => setRevision((value) => value + 1)}>Rerender</button>
+        <SidebarProvider isMobile={isMobile} defaultOpenMobile>
+          <Sidebar><SidebarRail /></Sidebar>
+        </SidebarProvider>
+      </>
+    }
+
+    try {
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: 500 })
+      const container = render(<RailProbe />)
+      const presentation = container.querySelector('[data-testid="presentation"]')!
+      const rerender = container.querySelector('[data-testid="rerender"]')!
+
+      expect(container.querySelector('[data-slot="sidebar-rail"]')).not.toBeNull()
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: 1440 })
+      click(rerender)
+      expect(container.querySelector('[data-slot="sidebar-rail"]')).not.toBeNull()
+
+      click(presentation)
+      expect(document.body.querySelector('[data-slot="sidebar-rail"]')).toBeNull()
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: 500 })
+      click(rerender)
+      expect(document.body.querySelector('[data-slot="sidebar-rail"]')).toBeNull()
+    } finally {
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: originalWidth })
+    }
   })
 })
 
