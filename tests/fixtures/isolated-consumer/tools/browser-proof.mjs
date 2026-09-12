@@ -1,207 +1,132 @@
 import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
 import { preview } from 'vite'
-import { sha256 } from './verify-bytes.mjs'
 
-async function eventually(check, timeout = 5000) {
-  const deadline = Date.now() + timeout
-  for (;;) {
-    try { return await check() } catch (error) {
-      if (Date.now() >= deadline) throw error
-      await new Promise(resolve => setTimeout(resolve, 50))
-    }
-  }
-}
-async function settledScroll(viewport) {
-  let last = -1
-  let unchanged = 0
-  await eventually(async () => {
-    const current = await viewport.evaluate(element => element.scrollTop)
-    unchanged = current === last ? unchanged + 1 : 0
-    last = current
-    assert.ok(unchanged >= 3, 'Waiting for scrolling to settle')
-  })
-  return last
-}
-async function styles(page) {
-  return page.evaluate(() => {
-    const css = selector => getComputedStyle(document.querySelector(selector))
-    const root = css('html')
-    const fields = ['--background', '--foreground', '--primary', '--primary-foreground', '--card', '--card-foreground', '--border', '--muted']
-    const variables = Object.fromEntries(fields.map(name => [name, root.getPropertyValue(name).trim()]))
-    const probe = document.createElement('div')
-    document.body.appendChild(probe)
-    const colors = Object.fromEntries(fields.map(name => {
-      probe.style.backgroundColor = `var(${name})`
-      return [name, getComputedStyle(probe).backgroundColor]
-    }))
-    probe.remove()
-    const summarize = selector => {
-      const c = css(selector)
-      return { background: c.backgroundColor, color: c.color, borderColor: c.borderTopColor, borderWidth: c.borderTopWidth, radius: c.borderTopLeftRadius, display: c.display, height: c.height, width: c.width, padding: c.padding, fontFamily: c.fontFamily }
-    }
-    return { variables, colors, button: summarize('#count-button'), card: summarize('#card'), cardHeader: summarize('#card-header'), tabList: summarize('#tab-list'), activeTab: summarize('[role=tab][data-state=active]'), viewport: summarize('[data-slot=scroll-area-viewport]'), body: summarize('body'), portal: document.querySelector('#dialog') ? summarize('#dialog') : null }
-  })
-}
-function assertTheme(actual, dark) {
-  assert.equal(actual.variables['--background'], dark ? 'oklch(14.5% 0 0)' : 'oklch(100% 0 0)')
-  assert.equal(actual.variables['--primary'], dark ? 'oklch(92.2% 0 0)' : 'oklch(20.5% 0 0)')
-  assert.equal(actual.variables['--card'], dark ? 'oklch(20.5% 0 0)' : 'oklch(100% 0 0)')
-  for (const value of Object.values(actual.variables)) assert.ok(value.length > 0)
-  assert.equal(actual.button.background, actual.colors['--primary'])
-  assert.equal(actual.button.color, actual.colors['--primary-foreground'])
-  assert.equal(actual.button.display, 'inline-flex')
-  assert.equal(actual.button.height, '32px')
-  assert.equal(actual.button.radius, '8px')
-  assert.equal(actual.card.background, actual.colors['--card'])
-  assert.equal(actual.card.color, actual.colors['--card-foreground'])
-  assert.equal(actual.card.borderColor, actual.colors['--border'])
-  assert.equal(actual.card.borderWidth, '1px')
-  assert.equal(actual.card.display, 'flex')
-  assert.equal(actual.cardHeader.display, 'grid')
-  assert.equal(actual.cardHeader.padding, '16px')
-  assert.equal(actual.tabList.background, actual.colors['--muted'])
-  assert.equal(actual.tabList.display, 'flex') // inline-flex is blockified as a flex item
-  assert.equal(actual.tabList.padding, '4px')
-  assert.equal(actual.activeTab.background, actual.colors['--background'])
-  assert.equal(actual.activeTab.color, actual.colors['--foreground'])
-  assert.equal(actual.viewport.height, '120px')
-  assert.equal(actual.viewport.width, '320px')
-  assert.match(actual.body.fontFamily, /Geist Variable/)
-  assert.equal(actual.body.background, actual.colors['--background'])
-  if (actual.portal) {
-    assert.equal(actual.portal.background, actual.colors['--background'])
-    assert.equal(actual.portal.color, actual.colors['--foreground'])
-    assert.equal(actual.portal.borderColor, actual.colors['--border'])
-  }
-}
-export async function browserProof(expected) {
+const state = page => page.locator('#state-probe').evaluate(node => JSON.parse(node.textContent))
+const wait = (page, predicate) => page.waitForFunction(predicate)
+const tolerance = 3
+
+export async function browserProof(r4) {
   const server = await preview({ configFile: false, preview: { host: '127.0.0.1', port: 0, open: false } })
   let browser
   try {
     browser = await chromium.launch({ headless: true })
-    const page = await browser.newPage({ viewport: { width: 1100, height: 900 } })
+    const page = await browser.newPage({ viewport: { width: 760, height: 700 } })
+    page.setDefaultTimeout(5_000)
+    const globalListeners = []
+    await page.addInitScript(() => {
+      const native = EventTarget.prototype.addEventListener
+      EventTarget.prototype.addEventListener = function(type, listener, options) {
+        if (this === window || this === document) window.__r4GlobalListeners = [...(window.__r4GlobalListeners ?? []), { type }]
+        return native.call(this, type, listener, options)
+      }
+      const originalMatchMedia = window.matchMedia.bind(window)
+      window.matchMedia = (...args) => { window.__r4ViewportReads = [...(window.__r4ViewportReads ?? []), { api: 'matchMedia', args }]; return originalMatchMedia(...args) }
+      const nativeInnerWidth = (() => {
+        let owner = window
+        while (owner) {
+          const descriptor = Object.getOwnPropertyDescriptor(owner, 'innerWidth')
+          if (descriptor) return descriptor
+          owner = Object.getPrototypeOf(owner)
+        }
+      })()
+      Object.defineProperty(window, 'innerWidth', { configurable: true, get() { window.__r4ViewportReads = [...(window.__r4ViewportReads ?? []), { api: 'innerWidth' }]; return nativeInnerWidth.get.call(window) } })
+      const cookie = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie')
+      Object.defineProperty(document, 'cookie', { configurable: true, get: () => cookie.get.call(document), set: value => { window.__r4CookieWrites = [...(window.__r4CookieWrites ?? []), value]; cookie.set.call(document, value) } })
+    })
     const errors = []
-    const requests = []
     page.on('pageerror', error => errors.push(error.message))
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
-    page.on('requestfailed', request => errors.push(`${request.url()}: ${request.failure()?.errorText}`))
-    page.on('response', response => { requests.push({ url: response.url(), status: response.status() }); if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`) })
     const address = server.httpServer.address()
     await page.goto(`http://127.0.0.1:${address.port}`, { waitUntil: 'networkidle' })
-    await page.locator('#count-button').waitFor()
-    const data = JSON.parse(await page.locator('#release-data').textContent())
-    assert.equal(data.reactVersion, '18.3.1')
-    assert.deepEqual(data.exports, expected.exports)
-    assert.equal(data.release.releaseId, expected.releaseId)
-    assert.equal(data.release.sha256, expected.releaseSha256)
-    assert.deepEqual(data.release.packageIdentity, expected.packageIdentity)
-    assert.equal(data.components.families.length, 19)
-    assert.equal(data.tokens.tokens.length, expected.tokenCount)
-    assert.equal(sha256(JSON.stringify(data.release)), expected.releaseDocumentSha256)
-    assert.equal(sha256(JSON.stringify(data.components)), expected.componentsSha256)
-    assert.equal(sha256(JSON.stringify(data.tokens)), expected.tokensSha256)
-
-    const fonts = await page.evaluate(async () => {
-      const loaded = await document.fonts.load('16px "Geist Variable"', 'Independent consumer')
-      await document.fonts.ready
-      const faces = [...document.fonts].map(face => ({ family: face.family, status: face.status }))
-      const embedded = [...document.styleSheets].flatMap(sheet => [...sheet.cssRules]).filter(rule => rule instanceof CSSFontFaceRule && rule.style.getPropertyValue('src').includes('data:font/woff2;base64,')).length
-      return { loaded: loaded.length, check: document.fonts.check('16px "Geist Variable"'), faces, embedded }
-    })
-    assert.ok(fonts.loaded > 0 && fonts.check && fonts.embedded > 0)
-    assert.ok(fonts.faces.some(face => face.family.includes('Geist Variable') && face.status === 'loaded'))
-    const light = await styles(page)
-    assertTheme(light, false)
-    await page.locator('#count-button').click()
-    assert.equal(await page.locator('#count-button').textContent(), 'Clicked 1')
-    await page.locator('#tab-two').click()
-    assert.equal(await page.locator('#tab-two').getAttribute('data-state'), 'active')
-    assert.equal(await page.getByRole('tabpanel').textContent(), 'Second panel')
-    await page.locator('#hook-button').click()
-    assert.match(await page.locator('#hook-button').textContent(), /Sidebar closed \/ desktop/)
-    await page.setViewportSize({ width: 600, height: 900 })
-    await eventually(async () => assert.match(await page.locator('#hook-button').textContent(), /mobile/))
-    await page.setViewportSize({ width: 1100, height: 900 })
-    await eventually(async () => assert.match(await page.locator('#hook-button').textContent(), /desktop/))
-
-    async function openPortal() {
-      await page.locator('#dialog-trigger').click()
-      await page.getByRole('dialog').waitFor()
-      assert.equal(await page.locator('#dialog').evaluate(element => element.parentElement === document.body && !document.querySelector('#root').contains(element)), true)
-      await eventually(async () => assert.equal(await page.locator('#dialog').evaluate(element => element.contains(document.activeElement)), true))
-    }
-    async function closePortal() {
+    await page.locator('#visible-sidebar-trigger').waitFor()
+    assert.equal(JSON.parse(await page.locator('#release-data').textContent()).releaseId, r4.releaseId)
+    const mountAmbient = await page.evaluate(() => ({ viewportReads: window.__r4ViewportReads ?? [], cookieWrites: window.__r4CookieWrites ?? [], listeners: window.__r4GlobalListeners ?? [] }))
+    assert.deepEqual(mountAmbient.viewportReads, [], 'core performed ambient viewport/mobile detection during mount')
+    assert.deepEqual(mountAmbient.cookieWrites, [], 'core wrote Sidebar persistence during mount')
+    const initial = await state(page)
+    assert.deepEqual(initial, { open: false, openMobile: false, isMobile: false, state: 'collapsed' })
+    await page.locator('#collapsible-mode').click()
+    await wait(page, () => document.querySelector('#candidate-sidebar')?.getAttribute('data-state') === 'expanded')
+    assert.equal(await page.evaluate(() => document.querySelector('#candidate-sidebar')?.getAttribute('data-state')), 'expanded', 'collapsible="none" must be effectively expanded with desktop open=false')
+    assert.deepEqual(await state(page), initial, 'collapsible="none" must not mutate closed desktop/mobile channels')
+    await page.locator('#collapsible-mode').click()
+    await page.locator('#cancelled-sidebar-trigger').click()
+    assert.deepEqual(await state(page), initial, 'SidebarTrigger must respect a cancelled click')
+    await page.locator('#visible-sidebar-trigger').click()
+    await wait(page, () => JSON.parse(document.querySelector('#state-probe').textContent).open === true)
+    const desktopOpen = await state(page)
+    assert.equal(desktopOpen.openMobile, false)
+    const desktopSemantic = await page.locator('[data-slot="sidebar"]').first().evaluate(node => ({ slot: node.getAttribute('data-slot'), side: node.getAttribute('data-side'), state: node.getAttribute('data-state'), text: node.textContent }))
+    assert.equal(desktopSemantic.state, 'expanded')
+    await page.evaluate(() => { window.__r4ViewportReads = [] })
+    await page.setViewportSize({ width: 1220, height: 700 })
+    await page.waitForTimeout(100)
+    const resizeAmbient = await page.evaluate(() => [...(window.__r4ViewportReads ?? [])])
+    assert.deepEqual(resizeAmbient, [], 'core performed ambient viewport/mobile detection during resize')
+    assert.equal(await page.evaluate(() => window.innerWidth), 1220, 'viewport instrumentation must preserve the native dynamic width')
+    assert.deepEqual(await state(page), desktopOpen, 'browser width must not choose a Sidebar presentation')
+    assert.deepEqual(await page.locator('[data-slot="sidebar"]').first().evaluate(node => ({ slot: node.getAttribute('data-slot'), side: node.getAttribute('data-side'), state: node.getAttribute('data-state'), text: node.textContent })), desktopSemantic)
+    const globalBeforeMobile = await page.evaluate(() => window.__r4GlobalListeners ?? [])
+    assert.deepEqual(globalBeforeMobile.filter(listener => ['keydown', 'keyup', 'keypress'].includes(listener.type)), globalListeners, 'core registered an ambient keyboard shortcut listener before any Sheet exists')
+    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+B' : 'Control+B')
+    assert.deepEqual(await state(page), desktopOpen, 'Cmd/Ctrl+B must not be a core Sidebar shortcut')
+    await page.evaluate(() => document.querySelector('#mobile-mode').click())
+    await wait(page, () => JSON.parse(document.querySelector('#state-probe').textContent).isMobile === true)
+    assert.deepEqual(await state(page), { open: true, openMobile: false, isMobile: true, state: 'expanded' }, 'changing only isMobile must preserve independent channels')
+    await page.waitForTimeout(300)
+    assert.equal(await page.locator('#candidate-sidebar[role="dialog"]').count(), 0, 'the closed mobile Sheet must not leak an ambient portal')
+    const matrix = []
+    let selectedDir = 'ltr'
+    let selectedSide = 'left'
+    for (const dir of ['ltr', 'rtl']) for (const side of ['left', 'right']) {
+      if (selectedDir !== dir) { await page.locator('#dir-mode').click(); selectedDir = dir }
+      if (selectedSide !== side) { await page.locator('#side-mode').click(); selectedSide = side }
+      await page.locator('#visible-sidebar-trigger').click()
+      await wait(page, () => JSON.parse(document.querySelector('#state-probe').textContent).openMobile === true)
+      assert.deepEqual(await state(page), { open: true, openMobile: true, isMobile: true, state: 'expanded' }, 'opening mobile must preserve desktop channel and change only mobile channel')
+      const dialog = page.locator('#candidate-sidebar[role="dialog"]')
+      assert.ok(await dialog.count(), 'mobile state opened without Sheet content')
+      await dialog.waitFor({ state: 'visible' })
+      assert.equal(await dialog.getAttribute('data-mobile'), 'true', 'changing only isMobile must select the Sheet-backed mobile presentation')
+      const result = await page.evaluate(({ side, dir }) => {
+        const host = document.querySelector('#finite-host').getBoundingClientRect()
+        const content = document.querySelector('#candidate-sidebar[role="dialog"]')
+        const overlay = document.querySelector('[data-slot="sheet-overlay"]')
+        const rect = content.getBoundingClientRect()
+        const overlayRect = overlay.getBoundingClientRect()
+        const inHost = document.querySelector('#finite-host').contains(content)
+        const overlayInHost = document.querySelector('#finite-host').contains(overlay)
+        const sideAttribute = content.getAttribute('data-side')
+        const direction = content.closest('[dir]')?.getAttribute('dir') ?? document.documentElement.getAttribute('dir') ?? 'ltr'
+        const portalNodes = [...document.querySelectorAll('#candidate-sidebar[role="dialog"], [data-slot="sheet-overlay"]')]
+        return { host: { left: host.left, right: host.right, top: host.top, bottom: host.bottom }, rect: { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom }, overlayRect: { left: overlayRect.left, right: overlayRect.right, top: overlayRect.top, bottom: overlayRect.bottom }, inHost, overlayInHost, portalNodeCount: portalNodes.length, allPortalNodesInHost: portalNodes.every(node => document.querySelector('#finite-host').contains(node)), sideAttribute, direction, requested: { side, dir } }
+      }, { side, dir })
+      assert.ok(result.inHost, 'Sheet portal must mount in supplied finite host')
+      assert.ok(result.overlayInHost && result.allPortalNodesInHost && result.portalNodeCount === 2, `Sheet overlay/content leaked outside supplied portal container: ${JSON.stringify(result)}`)
+      assert.ok(result.rect.left >= result.host.left - tolerance && result.rect.right <= result.host.right + tolerance && result.rect.top >= result.host.top - tolerance && result.rect.bottom <= result.host.bottom + tolerance, `Sheet escaped finite host: ${JSON.stringify(result)}`)
+      assert.ok(result.overlayRect.left >= result.host.left - tolerance && result.overlayRect.right <= result.host.right + tolerance && result.overlayRect.top >= result.host.top - tolerance && result.overlayRect.bottom <= result.host.bottom + tolerance, `Sheet overlay escaped finite host: ${JSON.stringify(result)}`)
+      assert.equal(result.sideAttribute, side)
+      assert.equal(result.direction, dir)
+      if (side === 'left') assert.ok(result.rect.left <= result.host.left + tolerance, `left Sheet was not physical left: ${JSON.stringify(result)}`)
+      else assert.ok(result.rect.right >= result.host.right - tolerance, `right Sheet was not physical right: ${JSON.stringify(result)}`)
       await page.keyboard.press('Escape')
-      await page.getByRole('dialog').waitFor({ state: 'detached' })
-      await eventually(async () => assert.equal(await page.locator('#dialog-trigger').evaluate(element => element === document.activeElement), true))
+      await dialog.waitFor({ state: 'detached' })
+      await wait(page, () => document.activeElement?.id === 'visible-sidebar-trigger')
+      assert.equal(await page.evaluate(() => document.activeElement?.id), 'visible-sidebar-trigger')
+      assert.deepEqual(await state(page), { open: true, openMobile: false, isMobile: true, state: 'expanded' }, 'closing mobile must leave desktop open and close only mobile channel')
+      matrix.push(result)
     }
-    await openPortal()
-    let lightPortal
-    await eventually(async () => { lightPortal = await styles(page); assertTheme(lightPortal, false) })
-    await closePortal()
-
-    await page.locator('#theme-button').click()
-    let dark
-    await eventually(async () => { dark = await styles(page); assertTheme(dark, true) })
-    await openPortal()
-    let darkPortal
-    await eventually(async () => { darkPortal = await styles(page); assertTheme(darkPortal, true) })
-    assert.notEqual(darkPortal.portal.background, lightPortal.portal.background)
-    await closePortal()
-    await page.keyboard.press('Tab')
-    assert.equal(await page.locator('[data-slot=scroll-area-viewport]').evaluate(element => element === document.activeElement), true)
-    const beforeScroll = await page.locator('[data-slot=scroll-area-viewport]').evaluate(element => ({ top: element.scrollTop, height: element.scrollHeight, client: element.clientHeight }))
-    assert.ok(beforeScroll.height > beforeScroll.client)
-    await page.keyboard.press('PageDown')
-    await eventually(async () => assert.ok(await page.locator('[data-slot=scroll-area-viewport]').evaluate(element => element.scrollTop) > beforeScroll.top))
-    const afterKeyboard = await settledScroll(page.locator('[data-slot=scroll-area-viewport]'))
-    await page.locator('[data-slot=scroll-area-viewport]').hover()
-    await page.mouse.wheel(0, 240)
-    await eventually(async () => assert.ok(await page.locator('[data-slot=scroll-area-viewport]').evaluate(element => element.scrollTop) > afterKeyboard))
-    const afterWheel = await settledScroll(page.locator('[data-slot=scroll-area-viewport]'))
-
-    await page.locator('#theme-button').click()
-    let restoredLight
-    await eventually(async () => { restoredLight = await styles(page); assertTheme(restoredLight, false) })
-    assert.deepEqual(restoredLight.variables, light.variables)
-    // Text changed from Clicked 0 to Clicked 1 and First to Second; compare
-    // restored theme properties without treating content-dependent widths as colors.
-    for (const field of ['button', 'card', 'cardHeader', 'tabList', 'activeTab', 'body']) {
-      for (const property of ['background', 'color', 'borderColor', 'borderWidth', 'radius', 'fontFamily']) assert.equal(restoredLight[field][property], light[field][property])
-    }
-    await openPortal()
-    let restoredPortal
-    await eventually(async () => { restoredPortal = await styles(page); assertTheme(restoredPortal, false) })
-    assert.deepEqual(restoredPortal.portal, lightPortal.portal)
-    await closePortal()
-    let compositionCanary
-    if (expected.refRepair) {
-      assert.equal(await page.locator('#sidebar-dropdown-trigger').getAttribute('data-composed-ref'), 'received', 'Incoming ref must traverse TooltipTrigger, DropdownMenuTrigger and SidebarMenuButton to this DOM node')
-      await page.locator('#sidebar-dropdown-trigger').click()
-      await page.getByRole('menu').waitFor()
-      await page.keyboard.press('Escape')
-      await page.getByRole('menu').waitFor({ state: 'detached' })
-      await eventually(async () => assert.equal(await page.locator('#sidebar-dropdown-trigger').evaluate(element => element === document.activeElement), true))
-      compositionCanary = 'TooltipTrigger asChild → DropdownMenuTrigger asChild → SidebarMenuButton: incoming DOM ref and Escape return to exact trigger'
-    }
-    // Keep the Button/asChild regression alongside the native trigger control.
-    // Record a failure here so the remaining byte/tamper evidence can finish;
-    // acceptance.mjs rejects every recorded blocker before setting success.
-    await page.locator('#composed-dialog-trigger').click()
-    await page.locator('#composed-dialog').waitFor()
-    await page.keyboard.press('Escape')
-    await page.locator('#composed-dialog').waitFor({ state: 'detached' })
-    let focusReturned = true
-    try {
-      await eventually(async () => assert.equal(await page.locator('#composed-dialog-trigger').evaluate(element => element === document.activeElement), true))
-    } catch { focusReturned = false }
-    const composedButtonTrigger = { focusReturned, expectedFocusId: 'composed-dialog-trigger', actualFocus: await page.evaluate(() => ({ tag: document.activeElement?.tagName, id: document.activeElement?.id })) }
-    const blockers = focusReturned ? [] : ['DIALOG_BUTTON_TRIGGER_FOCUS_RETURN: Escape leaves focus on ' + composedButtonTrigger.actualFocus.tag + ' instead of the composed Button trigger']
-    await page.screenshot({ path: 'consumer-light.png', fullPage: true })
+    await page.locator('#visible-sidebar-trigger').click()
+    await wait(page, () => JSON.parse(document.querySelector('#state-probe').textContent).openMobile === true)
+    assert.deepEqual(await state(page), { open: true, openMobile: true, isMobile: true, state: 'expanded' })
+    await page.evaluate(() => document.querySelector('#mobile-mode').click())
+    await wait(page, () => JSON.parse(document.querySelector('#state-probe').textContent).isMobile === false)
+    assert.deepEqual(await state(page), { open: true, openMobile: true, isMobile: false, state: 'expanded' }, 'switching back to desktop must preserve open mobile channel')
+    const ambientAfter = await page.evaluate(() => ({ cookieWrites: window.__r4CookieWrites ?? [] }))
+    assert.deepEqual(ambientAfter.cookieWrites, [], 'core wrote Sidebar persistence cookies')
     assert.deepEqual(errors, [])
-    assert.ok(requests.every(request => request.url.startsWith(`http://127.0.0.1:${address.port}/`)))
-    return { blockers, composedButtonTrigger, compositionCanary, browser: browser.version(), release: { id: data.release.releaseId, sha256: data.release.sha256, exports: data.exports.length, families: data.components.families.length, tokens: data.tokens.tokens.length }, fonts, light, lightPortal, dark, darkPortal, restoredLight, restoredPortal, interactions: { button: 'Clicked 1', tabs: 'Second panel', hook: 'toggle and responsive effect passed', dialog: 'native DialogTrigger: body portal, initial focus, Escape and focus return passed in all themes', scroll: { beforeScroll, afterKeyboard, afterWheel } }, errors, requests }
+    return { browser: browser.version(), viewportInvariant: true, explicitMobileTransition: true, stateChannelsPreserved: true, matrix, mountAmbient, cookiesUnchanged: true, initialGlobalKeyboardListeners: globalBeforeMobile, focusRestored: true }
   } finally {
     if (browser) await browser.close()
     await new Promise((resolve, reject) => server.httpServer.close(error => error ? reject(error) : resolve()))

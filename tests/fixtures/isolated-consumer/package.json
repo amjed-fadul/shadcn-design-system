@@ -9,7 +9,7 @@
     "verify": "node tools/acceptance.mjs"
   },
   "dependencies": {
-    "@adc/shadcn-design-system": "file:candidate/adc-shadcn-design-system-0.0.0-release.1.tgz",
+    "@adc/shadcn-design-system": "file:/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },

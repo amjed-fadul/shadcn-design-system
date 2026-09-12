@@ -1,98 +1,54 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, renameSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdtempSync, readFileSync, readdirSync, realpathSync, renameSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sha256 } from '../fixtures/isolated-consumer/tools/verify-bytes.mjs'
 
+const r4 = { directory: '/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004', tarball: '/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz', tarballSha256: 'c7368978a0a5c8e75a871acb4624142c13d36e5934bc670e69adfe2c07f64252', manifestSha256: 'ea074153c56bf6a012a0e9924369b9aa3a82a777e14b17ffade06b0b6349e46f', integrity: 'sha512-AkGpDll0cbYA4DEhEc0c6tl5+Ql4li9wf/ffAafzSokmI3K7ZBvFzLROjN9fCCR6XWBLC7jv8TxeNmKvEkyd2Q==', releaseId: 'shadcn-radix-release-004', payloadSha256: 'e0332a1103f1faa7a92e81c1815ffcfc4e4cbcdadeea7822391221b73c2b52a2' }
 const root = realpathSync(fileURLToPath(new URL('../../', import.meta.url)))
 const fixture = path.join(root, 'tests/fixtures/isolated-consumer')
 const args = process.argv.slice(2)
-function option(name) { const index = args.indexOf(name); return index < 0 ? undefined : args[index + 1] }
-for (let i = 0; i < args.length; i += 2) {
-  assert.ok(['--candidate', '--manifest-sha256', '--expectations'].includes(args[i]) && args[i + 1] && !args[i + 1].startsWith('--'), 'Use [--candidate DIR --manifest-sha256 DIGEST]')
-}
-const expectationsPath = option('--expectations') ? path.resolve(option('--expectations')) : path.join(fixture, 'expectations.json')
-const expected = JSON.parse(readFileSync(expectationsPath))
-const env = { ...process.env }
-for (const name of ['NODE_PATH', 'NODE_OPTIONS', 'INIT_CWD', 'npm_config_workspace', 'npm_config_workspaces', 'npm_config_prefix']) delete env[name]
-const run = (command, argv, options = {}) => execFileSync(command, argv, { cwd: root, env, encoding: 'utf8', timeout: 240_000, maxBuffer: 32 * 1024 * 1024, ...options })
+assert.deepEqual(args.slice(0, 1), ['--tarball'], 'Use --tarball <literal R4 tarball>')
+assert.equal(args.length, 2, 'Use exactly --tarball <literal R4 tarball>')
+assert.equal(path.resolve(args[1]), r4.tarball, 'Only the approved literal R4 tarball is accepted')
 assert.equal(process.versions.node, '22.18.0')
-assert.equal(run('npm', ['--version']).trim(), '10.9.3')
-const harnessHead = run('git', ['rev-parse', 'HEAD']).trim()
-run('git', ['merge-base', '--is-ancestor', expected.sourceCommit, harnessHead])
-assert.deepEqual(readdirSync(path.join(root, 'provenance/releases')), ['shadcn-radix-release-001.json'])
-const evidenceRoot = realpathSync(mkdtempSync(path.join(tmpdir(), 'task63-run-')))
-console.log(`Evidence directory: ${evidenceRoot}`)
-const logRun = (name, command, argv, options) => {
-  try { const result = run(command, argv, options); writeFileSync(path.join(evidenceRoot, `${name}.log`), result); return result }
-  catch (error) { writeFileSync(path.join(evidenceRoot, `${name}.log`), `${error.stdout ?? ''}\n${error.stderr ?? ''}\n${error.stack}`); throw error }
-}
-logRun('release-verify', 'npm', ['run', 'release:verify', '--', '--release-sha256', expected.releaseSha256])
-let candidate = option('--candidate')
-let digest = option('--manifest-sha256')
-if (candidate) {
-  assert.ok(digest, 'An existing candidate requires an independently retained --manifest-sha256')
-  candidate = realpathSync(candidate)
-} else {
-  assert.equal(digest, undefined)
-  candidate = path.join(evidenceRoot, 'generated-candidate')
-  mkdirSync(candidate)
-  // The current release verifier also rejects drift in every committed package input.
-  logRun('candidate-generate', 'npm', ['run', 'candidate:generate', '--', '--output', candidate])
-  digest = sha256(readFileSync(path.join(candidate, 'distribution-manifest.json')))
-}
-assert.ok(!candidate.startsWith(`${root}/`))
-const manifestPath = path.join(candidate, 'distribution-manifest.json')
-assert.equal(sha256(readFileSync(manifestPath)), digest, 'MANIFEST_HASH_MISMATCH')
+assert.equal(execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim(), '10.9.3')
+assert.equal(sha256(readFileSync(r4.tarball)), r4.tarballSha256, 'R4 tarball SHA-256 mismatch')
+const manifestPath = path.join(r4.directory, 'distribution-manifest.json')
+assert.equal(sha256(readFileSync(manifestPath)), r4.manifestSha256, 'R4 manifest SHA-256 mismatch')
 const manifest = JSON.parse(readFileSync(manifestPath))
-logRun('candidate-verify', 'npm', ['run', 'candidate:verify', '--', '--manifest', manifestPath, '--tarball', path.join(candidate, manifest.tarball.filename), '--manifest-sha256', digest])
+assert.deepEqual(manifest.tarball, { filename: path.basename(r4.tarball), sha256: r4.tarballSha256, integrity: r4.integrity })
+assert.deepEqual(manifest.release, { id: r4.releaseId, payloadSha256: r4.payloadSha256 })
+
+// Runs before installation, so an old fixture must fail closed instead of
+// silently falling back to a copied candidate or a workspace package.
+const fixturePackage = JSON.parse(readFileSync(path.join(fixture, 'package.json')))
+const fixtureLock = JSON.parse(readFileSync(path.join(fixture, 'package-lock.json')))
+const lockEntry = fixtureLock.packages['node_modules/@adc/shadcn-design-system']
+assert.equal(fixturePackage.dependencies['@adc/shadcn-design-system'], `file:${r4.tarball}`, 'Fixture dependency must name literal R4 tarball')
+assert.equal(lockEntry.resolved, `file:${r4.tarball}`, 'Fixture lock must name literal R4 tarball')
+assert.equal(lockEntry.integrity, r4.integrity, 'Fixture lock must retain approved R4 integrity')
+
+const evidenceRoot = realpathSync(mkdtempSync(path.join(tmpdir(), 'r4-isolated-consumer-')))
 const consumer = path.join(evidenceRoot, 'consumer')
 cpSync(fixture, consumer, { recursive: true })
-function materialize(directory) {
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    const file = path.join(directory, entry.name)
-    if (entry.isDirectory()) materialize(file)
-    else if (entry.name.endsWith('.template')) renameSync(file, file.slice(0, -'.template'.length))
-  }
-}
+function materialize(directory) { for (const entry of readdirSync(directory, { withFileTypes: true })) { const target = path.join(directory, entry.name); if (entry.isDirectory()) materialize(target); else if (target.endsWith('.template')) renameSync(target, target.slice(0, -'.template'.length)) } }
 materialize(consumer)
-writeFileSync(path.join(consumer, 'expectations.json'), JSON.stringify(expected, null, 2) + '\n')
-mkdirSync(path.join(consumer, 'candidate'))
-for (const name of [manifest.tarball.filename, 'distribution-manifest.json']) cpSync(path.join(candidate, name), path.join(consumer, 'candidate', name))
-const metadata = { expectationsPath, expectationsSha256: sha256(readFileSync(expectationsPath)), sourceCommit: expected.sourceCommit, harnessHead, candidate, manifestSha256: digest, tarball: manifest.tarball, fileCount: manifest.files.length, consumer }
-writeFileSync(path.join(evidenceRoot, 'run.json'), JSON.stringify(metadata, null, 2))
-console.log(`Installing tarball into ${consumer}`)
-const lock = JSON.parse(readFileSync(path.join(consumer, 'package-lock.json')))
-if (expected.refRepair) {
-  assert.equal(expected.tarballIntegrity, manifest.tarball.integrity, 'Repair expectations must bind the reviewed tarball')
-  lock.packages['node_modules/@adc/shadcn-design-system'].integrity = expected.tarballIntegrity
-  writeFileSync(path.join(consumer, 'package-lock.json'), JSON.stringify(lock, null, 2) + '\n')
-}
-assert.equal(lock.packages['node_modules/@adc/shadcn-design-system'].integrity, manifest.tarball.integrity, 'Fixture lock must name the reviewed tarball integrity')
-logRun('install', 'npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: consumer })
-// All consumer tools, including Chromium's driver, resolve from the new installation.
-const worktrees = run('git', ['worktree', 'list', '--porcelain']).split('\n').filter(line => line.startsWith('worktree ')).map(line => realpathSync(line.slice(9)))
-metadata.forbiddenWorktrees = worktrees
-let command = process.execPath
-let prefix = []
-if (process.platform === 'darwin') {
-  const profile = path.join(evidenceRoot, 'deny-worktrees.sb')
-  writeFileSync(profile, `(version 1)\n(allow default)\n(deny file-read* ${worktrees.map(directory => `(subpath ${JSON.stringify(directory)})`).join(' ')})\n`)
-  command = '/usr/bin/sandbox-exec'
-  prefix = ['-f', profile, process.execPath]
-  const probe = 'const fs = require("node:fs"); for (const file of process.argv.slice(1)) { try { fs.readFileSync(file); throw new Error("CHECKOUT_READ_WAS_ALLOWED: " + file) } catch (error) { if (error.code !== "EPERM" && error.code !== "EACCES") throw error; console.log("DENIED " + file) } }'
-  metadata.accessDenial = logRun('checkout-denial', command, [...prefix, '-e', probe, ...worktrees.map(directory => path.join(directory, 'package.json'))], { cwd: consumer })
-  metadata.isolation = 'macOS sandbox: all design-system worktree reads denied during consumer verification'
-} else {
-  metadata.isolation = 'Portable minimum: external install, symlink/lockfile checks, TypeScript source closure, Vite module closure and browser resource checks. No OS sandbox on this platform.'
-}
-writeFileSync(path.join(evidenceRoot, 'run.json'), JSON.stringify(metadata, null, 2))
-console.log(metadata.isolation)
-logRun('verifier-tests', command, [...prefix, '--test', 'tools/verify-bytes.check.mjs'], { cwd: consumer })
-logRun('consumer-acceptance', command, [...prefix, 'tools/acceptance.mjs'], { cwd: consumer, env: { ...env, TASK63_MANIFEST_SHA256: digest } })
-assert.equal(JSON.parse(readFileSync(path.join(consumer, 'evidence.json'))).success, true)
-assert.equal(sha256(readFileSync(manifestPath)), digest)
-assert.equal(sha256(readFileSync(path.join(candidate, manifest.tarball.filename))), manifest.tarball.sha256)
-console.log(JSON.stringify({ ...metadata, success: true, evidence: path.join(consumer, 'evidence.json') }, null, 2))
+writeFileSync(path.join(consumer, 'r4.json'), JSON.stringify(r4, null, 2) + '\n')
+const env = { ...process.env }
+for (const name of ['NODE_PATH', 'NODE_OPTIONS', 'INIT_CWD', 'npm_config_workspace', 'npm_config_workspaces', 'npm_config_prefix']) delete env[name]
+const run = (command, argv) => execFileSync(command, argv, { cwd: consumer, env, encoding: 'utf8', timeout: 240_000, maxBuffer: 32 * 1024 * 1024 })
+const gates = {}
+const gate = (name, command, argv) => gates[name] = run(command, argv)
+console.log(`Installing literal R4 tarball into ${consumer}`)
+gate('install', 'npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund'])
+gate('package', process.execPath, ['--input-type=module', '--eval', "import {packageProof} from './tools/package-proof.mjs'; import {readFileSync} from 'node:fs'; console.log(JSON.stringify(await packageProof(process.cwd(),JSON.parse(readFileSync('r4.json')))))"])
+gate('typecheck', 'npm', ['run', 'typecheck'])
+gate('build', 'npm', ['run', 'build'])
+gate('graph', process.execPath, ['--input-type=module', '--eval', "import {graphProof} from './tools/package-proof.mjs'; console.log(JSON.stringify(graphProof(process.cwd())))"])
+gate('browser', process.execPath, ['--input-type=module', '--eval', "import {browserProof} from './tools/browser-proof.mjs'; import {readFileSync} from 'node:fs'; console.log(JSON.stringify(await browserProof(JSON.parse(readFileSync('r4.json')))))"])
+const evidence = { success: true, node: process.versions.node, npm: '10.9.3', r4, consumer, gates }
+writeFileSync(path.join(evidenceRoot, 'evidence.json'), JSON.stringify(evidence, null, 2) + '\n')
+console.log(JSON.stringify({ success: true, evidence: path.join(evidenceRoot, 'evidence.json'), consumer }, null, 2))

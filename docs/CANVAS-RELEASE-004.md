@@ -135,3 +135,16 @@ The earlier controller run reached 757 passing tests but failed four module
 setup suites with `PROJECTION_MISMATCH` from the then-active R3 canonical
 binding. That result is superseded by this correction's active R4 binding and
 final producer verification; it does not describe the final R4 handoff.
+
+## Isolated consumer proof
+
+- Command: `node tests/isolated-consumer/run.mjs --tarball /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz`
+- Result: pass (Node 22.18.0; Chromium 145.0.7632.6; React/ReactDOM: 18.3.1 / 18.3.1).
+- Literal installed tarball: `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz`; tarball SHA-256: `c7368978a0a5c8e75a871acb4624142c13d36e5934bc670e69adfe2c07f64252`; npm integrity: `sha512-AkGpDll0cbYA4DEhEc0c6tl5+Ql4li9wf/ffAafzSokmI3K7ZBvFzLROjN9fCCR6XWBLC7jv8TxeNmKvEkyd2Q==`.
+- Installed package/release: `@adc/shadcn-design-system@0.0.0-release.4`; `shadcn-radix-release-004`; payload SHA-256 `e0332a1103f1faa7a92e81c1815ffcfc4e4cbcdadeea7822391221b73c2b52a2`.
+- Root, stylesheet, and release imports resolved from temporary consumer `node_modules/@adc/shadcn-design-system/dist-library`; source aliases and workspace links were rejected. One physical single React runtime and one physical single ReactDOM runtime resolved for both consumer and package.
+- Browser-width invariance: pass. At 760px and 1220px, explicit `isMobile={false}` retained identical inline/desktop semantic output and state.
+- Presentation transition/state channels: pass. With `collapsible="offcanvas"` fixed, changing only `isMobile` selected the Sheet-backed mobile presentation. Desktop `open` and mobile `openMobile` remained independent through mobile open/close and the transition back to desktop with mobile still open. Separately, explicit desktop `open=false` with `collapsible="none"` rendered effectively expanded without mutating either channel.
+- Finite transformed-host portal matrix: pass. LTR left, LTR right, RTL left, RTL right each mounted Sheet overlay and content only under the supplied portal container. Host `(0,24)-(700,524)` contained content rects: left `(2,26)-(290,522)` and right `(410,26)-(698,522)` in both directions; overlay and content were both finite-host-contained with no document-body or other-host leak. Physical side and direction matched every case.
+- focus restoration: pass; Escape returned `document.activeElement` to `#visible-sidebar-trigger` in all four cases.
+- cookie/global shortcut absence: pass; ambient viewport detection: absent, mount-time persistence: absent, no core cookie writes occurred, no initial document/window keyboard shortcut listener was registered, and Cmd/Ctrl+B did not change Sidebar state.
