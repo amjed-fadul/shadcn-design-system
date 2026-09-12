@@ -758,8 +758,8 @@
     },
     {
       "path": "scripts/build-library.mjs",
-      "gitBlob": "1bf4ee199f3432bb8041483933ac71c4131d9340",
-      "sha256": "cd806beaffc69d990e78ee55512423fcefc904ab216bd3da4d97ea7dd117e48d"
+      "gitBlob": "7bed86b4363f024a8fe735577eba6f9e67a665bd",
+      "sha256": "68cd651e10aa1290930e50b21d9f55e508473d2cd9201ed43dccd70f4d31d93f"
     },
     {
       "path": "scripts/css-inputs.ts",
@@ -788,8 +788,8 @@
     },
     {
       "path": "scripts/package-candidate.mjs",
-      "gitBlob": "4215076dfac0fb5307d7fafbcf37bf69257db7b8",
-      "sha256": "58a41a7e0ff2d2143fb7e0e6ea09497f28b12ea0d5b75f5d0f5728ef8e03259d"
+      "gitBlob": "7e840bcb343fb5570c48e97968e134ca3759f3fb",
+      "sha256": "8a819e4d229c4efc1e96f1d62d27365ee25f044bbf4cd2b40b11ce9d604945aa"
     },
     {
       "path": "scripts/release-inputs.ts",
@@ -128575,5 +128575,5 @@
       "sidebar.context"
     ]
   },
-  "sha256": "9f9c4bdab33ce7ac4604c1f1a7834edd1e296458d4bda10eedf33185d677eca9"
+  "sha256": "395535ac8540dde4dd96ca04f9ece6d22371fcdf21d7c0f35e7beb74488eab3f"
 }

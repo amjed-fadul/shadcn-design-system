@@ -7,16 +7,16 @@ local; no package publication or Git push occurred.
 ## Exact distribution
 
 - Release: `shadcn-radix-release-004`
-- Source commit: `b656c37f600cc8d6ac47379b17a2b858ec5d0571`
+- Source commit: `876ff9cb84caba6b19326bf0c6d08564cc76960d`
 - Source branch: `codex/sidebar-release004`
 - Package: `@adc/shadcn-design-system@0.0.0-release.4`
-- Release payload SHA-256: `9f9c4bdab33ce7ac4604c1f1a7834edd1e296458d4bda10eedf33185d677eca9`
+- Release payload SHA-256: `395535ac8540dde4dd96ca04f9ece6d22371fcdf21d7c0f35e7beb74488eab3f`
 - Artifact: `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz`
 - Candidate path: `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004`
-- Tarball SHA-256: `c62460faccdad81c56f769e57a959b2a0b8d609acad29da792cb246596709cfc`
-- npm integrity: `sha512-NR7jj0FqHFQ1lUJ14Cb6F6nDyZ8RGP5W7fAY7yr1QAhXodn8rrfgp0dQYEaQsl4MS8HhNZE10/YJKCU2d49UVw==`
+- Tarball SHA-256: `c65c476fa042740e42a28d48ad75e916eed4ca30290b82c7ef015ec2aca8c15d`
+- npm integrity: `sha512-stti0tyEFQkCxaeMwsd47oNMXdq3A6FG+t9IZ61MA+8hVjPxU0YBqYD2TcmN6ZpNcrzDeXv3o823whE6fv0deA==`
 - Manifest: `provenance/distributions/shadcn-radix-release-004.distribution.json`, copied byte-for-byte from the external candidate directory's `distribution-manifest.json`
-- Manifest SHA-256: `95f894c8d6176ba5224e8cbc075daac8dc17bf91e5d25a1d1689fb0725f21b38`
+- Manifest SHA-256: `b7907b575c362ba36be5faa588a20440138e0714f2db2c9e85c13782ed6c0bd7`
 - Packed files: 35; public entrypoints: 3; root exports: 108; families: 20.
 - Executable implementation inputs: 208.
 - Toolchain: Node 22.18.0, npm 10.9.3, Vite 7.3.6, TypeScript 5.5.4, Rollup 4.63.1, esbuild 0.28.2.
@@ -49,8 +49,9 @@ contract projection. The executable release exports the `sidebar.context`
 provider capability from `SidebarProvider` and requires it from `Sidebar`.
 Public package exports remain `.`, `./styles.css`, and `./release`.
 
-The R4 package was regenerated once after the fix in the external candidate
-directory. A fresh build in `/tmp/shadcn-r4-fresh-fix` produced the same tarball SHA-256,
+The R4 package was regenerated once after the cleanup in the external candidate
+directory. Independent fresh builds in `/tmp/shadcn-r4-cleanup-a` and
+`/tmp/shadcn-r4-cleanup-b` produced the same tarball SHA-256,
 manifest SHA-256, npm integrity, payload SHA-256, and 35-file inventory without
 overwriting the approved candidate.
 
@@ -59,9 +60,9 @@ overwriting the approved candidate.
 - TDD RED: `npm run test:identity` failed with 2 expected new R4-presence failures and 40 passing tests; `npm run test:library` failed with 1 expected new R4-candidate failure and 9 passing tests. No R4 record, manifest, or candidate existed at RED.
 - `npm run release:generate` produced the R4 release record and preserved R3 bytes.
 - `npm run release:generate` independently inspected the accepted external R3 tarball and extracted `package/dist-library/release.js` before and after generation; both literal identities matched and the command failed closed on mismatch.
-- `npm run release:verify -- --release-sha256 9f9c4bdab33ce7ac4604c1f1a7834edd1e296458d4bda10eedf33185d677eca9` passed.
+- `npm run release:verify -- --release-sha256 395535ac8540dde4dd96ca04f9ece6d22371fcdf21d7c0f35e7beb74488eab3f` passed.
 - `npm run candidate:generate -- --output /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004` passed with the values above.
-- `npm run candidate:verify -- --manifest /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/distribution-manifest.json --tarball /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz --manifest-sha256 95f894c8d6176ba5224e8cbc075daac8dc17bf91e5d25a1d1689fb0725f21b38` passed against a fresh rebuild.
+- `npm run candidate:verify -- --manifest /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/distribution-manifest.json --tarball /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz --manifest-sha256 b7907b575c362ba36be5faa588a20440138e0714f2db2c9e85c13782ed6c0bd7` passed against a fresh rebuild.
 - Candidate verification compared fresh rebuilt tarball bytes, SHA-256, and npm SRI to the approved candidate in addition to comparing the packed inventory.
 - `npm run components:verify` passed 469 tests across 19 files.
 - `npm run tokens:verify` passed 87 tests across 9 files.
