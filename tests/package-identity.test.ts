@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto"
-import { execFileSync } from "node:child_process"
+import { execFile, execFileSync } from "node:child_process"
 import { copyFileSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
+import { promisify } from "node:util"
 import { afterEach, describe, expect, test } from "vitest"
 import { createImplementationManifest, verifyImplementationManifest, assertReachedInputs, packageIdentity, verifyRepositoryRelease } from "../scripts/release-inputs"
 import { hashExecutableReleasePayload } from "../src/validator/release"
@@ -53,6 +54,7 @@ async function readR3ArchiveIdentity(tarball = r3Tarball) {
 }
 
 const sha512 = (bytes: Buffer) => `sha512-${createHash("sha512").update(bytes).digest("base64")}`
+const runFile = promisify(execFile)
 
 describe("release package input identity", () => {
   test("discovers imports and sorts normalized paths deterministically with byte identities", () => {
@@ -135,7 +137,7 @@ describe("release package input identity", () => {
     expect([...observer.reads]).toEqual(expect.arrayContaining([path.join(directory, "dynamic/unknown.json"), path.join(directory, "dynamic/open-sync.json"), path.join(directory, "dynamic/open-callback.json"), path.join(directory, "dynamic/open-promise.json"), path.join(directory, "dynamic/stream.json"), path.join(directory, "src/shared.ts"), path.join(directory, "package.json")]))
     expect(() => assertReachedInputs(directory, manifest, [...observer.reads])).toThrow(/UNBOUND_INPUT/)
   })
-  test.each(["vite.library.config.ts", "scripts/release-inputs.ts"])("a real producer build rejects an omitted runtime input read by %s", injectionFile => {
+  test.each(["vite.library.config.ts", "scripts/release-inputs.ts"])("a real producer build rejects an omitted runtime input read by %s", async injectionFile => {
     const directory = mkdtempSync(path.join(tmpdir(), "release-build-coverage-")); temporary.push(directory)
     const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-003.json"), "utf8"))
     for (const entry of raw.implementationInputs) {
@@ -156,7 +158,7 @@ describe("release package input identity", () => {
     mkdirSync(path.join(directory, "provenance/releases"), { recursive: true })
     writeFileSync(path.join(directory, "provenance/releases/shadcn-radix-release-003.json"), JSON.stringify(raw))
     try {
-      execFileSync(process.execPath, ["scripts/build-library.mjs"], { cwd: directory, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024, stdio: "pipe" })
+      await runFile(process.execPath, ["scripts/build-library.mjs"], { cwd: directory, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
       throw new Error("Build unexpectedly accepted the omitted input")
     } catch (error) {
       expect(String((error as { stderr?: string }).stderr)).toMatch(/UNBOUND_INPUT: unlisted-build-data.json/)
@@ -208,30 +210,29 @@ describe("release package input identity", () => {
     expect(existsSync(r3Tarball)).toBe(true)
     const before = await readR3ArchiveIdentity()
     expect(before).toEqual({ tarballSha256: r3TarballSha256, payloadSha256: r3PayloadSha256 })
-    execFileSync(process.execPath, [path.join(root, "scripts/run-release-generation.mjs")], { cwd: root, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
+    await runFile(process.execPath, [path.join(root, "scripts/run-release-generation.mjs")], { cwd: root, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
     const after = await readR3ArchiveIdentity()
     expect(after).toEqual(before)
   }, 180_000)
-  test("fails closed when the accepted R3 archive is not the retained artifact", () => {
+  test("fails closed when the accepted R3 archive is not the retained artifact", async () => {
     const directory = mkdtempSync(path.join(tmpdir(), "r3-artifact-override-")); temporary.push(directory)
     const tarball = path.join(directory, path.basename(r3Tarball))
     copyFileSync(r3Tarball, tarball)
     const mutated = Buffer.from(readFileSync(tarball)); mutated[0] ^= 1; writeFileSync(tarball, mutated)
     try {
-      execFileSync(process.execPath, [path.join(root, "scripts/run-release-generation.mjs")], {
+      await runFile(process.execPath, [path.join(root, "scripts/run-release-generation.mjs")], {
         cwd: root,
         env: { ...process.env, ADC_R3_ARTIFACT_DIRECTORY: directory },
         encoding: "utf8",
         timeout: 120_000,
         maxBuffer: 16 * 1024 * 1024,
-        stdio: "pipe",
       })
       throw new Error("R3 override unexpectedly accepted")
     } catch (error) {
       expect(String((error as { stderr?: string }).stderr)).toMatch(/R3_ARTIFACT_MISMATCH.*before/)
     }
   }, 30_000)
-  test("candidate verification rejects fresh tarball byte drift even when inventory is unchanged", () => {
+  test("candidate verification rejects fresh tarball byte drift even when inventory is unchanged", async () => {
     const directory = mkdtempSync(path.join(tmpdir(), "r4-tarball-drift-")); temporary.push(directory)
     const sourceManifest = JSON.parse(readFileSync(r4DistributionManifest, "utf8"))
     const original = readFileSync(path.join(r4ArtifactDirectory, sourceManifest.tarball.filename))
@@ -244,12 +245,11 @@ describe("release package input identity", () => {
     const manifestBytes = Buffer.from(`${JSON.stringify(sourceManifest, null, 2)}\n`)
     writeFileSync(manifestPath, manifestBytes)
     try {
-      execFileSync(process.execPath, [path.join(root, "scripts/package-candidate.mjs"), "verify", "--manifest", manifestPath, "--tarball", tarballPath, "--manifest-sha256", createHash("sha256").update(manifestBytes).digest("hex")], {
+      await runFile(process.execPath, [path.join(root, "scripts/package-candidate.mjs"), "verify", "--manifest", manifestPath, "--tarball", tarballPath, "--manifest-sha256", createHash("sha256").update(manifestBytes).digest("hex")], {
         cwd: root,
         encoding: "utf8",
         timeout: 240_000,
         maxBuffer: 16 * 1024 * 1024,
-        stdio: "pipe",
       })
       throw new Error("Fresh tarball byte drift unexpectedly accepted")
     } catch (error) {
