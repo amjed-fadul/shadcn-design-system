@@ -33,7 +33,7 @@ function toolchain() {
   return { node, npm, platform: process.platform, arch: process.arch, tools }
 }
 function packBuild() {
-  const stage = mkdtempSync(path.join(tmpdir(), "release-001-build-"))
+  const stage = mkdtempSync(path.join(tmpdir(), "release-004-build-"))
   try {
     execFileSync(process.execPath, [path.join(root, "scripts/build-library.mjs"), "--out-dir", path.join(stage, "dist-library")], { cwd: root, stdio: "pipe", timeout: 180_000, maxBuffer: 16 * 1024 * 1024 })
     for (const file of readdirSync(root)) if (file === "package.json" || /^(README|LICEN[CS]E|COPYING)(\.|$)/i.test(file)) cpSync(path.join(root, file), path.join(stage, file))

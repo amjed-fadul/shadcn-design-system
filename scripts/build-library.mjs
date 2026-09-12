@@ -16,7 +16,7 @@ const outputFlag = process.argv.indexOf("--out-dir")
 const output = outputFlag < 0 ? path.join(root, "dist-library") : path.resolve(process.argv[outputFlag + 1])
 // Compiler IPC files are generated outputs. Use a fresh private scratch
 // directory so unrelated pre-existing temporary files cannot become inputs.
-const scratch = mkdtempSync(path.join(tmpdir(), "release-001-compiler-"))
+const scratch = mkdtempSync(path.join(tmpdir(), "release-004-compiler-"))
 const previousTmpdir = process.env.TMPDIR
 process.env.TMPDIR = scratch
 const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-004.json")
@@ -31,7 +31,6 @@ const rawRelease = JSON.parse(readFileSync(selectedReleasePath, "utf8"))
 const sourceData = {
   componentContracts: componentAuthority.loadComponentContracts(),
   tokenContract: tokenAuthority.getTokenContract(),
-  executableRelease: rawRelease,
 }
 const expectedProjection = projectionApi.projectExecutableContract({ componentContracts: sourceData.componentContracts, tokenContract: sourceData.tokenContract })
 const release = releaseApi.loadExecutableRelease(rawRelease, { expectedProjection, expectedReleaseId: rawRelease.releaseId, requirePackageIdentity: true })
@@ -68,14 +67,6 @@ try {
       name: "release-input-coverage",
       generateBundle() {
         reached.push(...this.getModuleIds(), ...this.getWatchFiles())
-      },
-    }, {
-      name: "candidate-release-data",
-      enforce: "post",
-      transform(code, id) {
-        if (!id.includes("virtual:shadcn-package-data") || rawRelease.releaseId === sourceData.executableRelease.releaseId) return
-        const serialized = `export const executableRelease = JSON.parse(${JSON.stringify(JSON.stringify(release))});`
-        return code.replace(/export const executableRelease = JSON\.parse\([\s\S]*?\);/, serialized)
       },
     }],
   })
