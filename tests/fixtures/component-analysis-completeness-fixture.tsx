@@ -64,6 +64,10 @@ function UnsupportedSpreadFixture(props: Record<string, unknown>) {
   return <Primitive.Root {...compute()} data-state={condition ? "open" : tone} {...props} />
 }
 
+function UnsupportedConditionalPresenceFixture({ flag }: { flag: boolean }) {
+  return <Primitive.Root data-state={flag || undefined} />
+}
+
 function UnrelatedSpreadFixture() {
   return <Primitive.Root {...unrelated} />
 }
@@ -115,4 +119,4 @@ function UnsupportedReturnConditionFixture({ condition, mode, ...rest }: { condi
   return <Primitive.Fallback {...rest} />
 }
 
-export { ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+export { ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedConditionalPresenceFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

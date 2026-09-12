@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { ComponentType } from "react"
 import { expect, userEvent, waitFor, within } from "storybook/test"
 
 import {
@@ -32,6 +33,21 @@ const meta = {
 export default meta
 
 type Story = StoryObj<typeof meta>
+type ExplicitStoryArgs = {
+  isMobile: boolean
+  open: boolean
+  openMobile: boolean
+  side: "left" | "right"
+  variant: "sidebar" | "floating" | "inset"
+  collapsible: "offcanvas" | "icon" | "none"
+}
+type ExplicitStory = StoryObj<ExplicitStoryArgs>
+
+const finiteHost = (Story: ComponentType) => (
+  <div style={{ position: "relative", width: 960, height: 640, overflow: "hidden", transform: "translateZ(0)" }}>
+    <Story />
+  </div>
+)
 
 export const Desktop: Story = {
   render: () => (
@@ -91,6 +107,45 @@ export const Desktop: Story = {
     await expect(sidebar).toHaveAttribute("data-state", "collapsed")
     await userEvent.click(trigger)
     await expect(sidebar).toHaveAttribute("data-state", "expanded")
+  },
+}
+
+export const ExplicitInputs: ExplicitStory = {
+  args: {
+    isMobile: false,
+    open: true,
+    openMobile: false,
+    side: "left",
+    variant: "sidebar",
+    collapsible: "offcanvas",
+  },
+  argTypes: {
+    isMobile: { control: "boolean" },
+    open: { control: "boolean" },
+    openMobile: { control: "boolean" },
+    side: { control: "inline-radio", options: ["left", "right"] },
+    variant: { control: "inline-radio", options: ["sidebar", "floating", "inset"] },
+    collapsible: { control: "inline-radio", options: ["offcanvas", "icon", "none"] },
+  },
+  decorators: [finiteHost],
+  render: ({ isMobile, open, openMobile, side, variant, collapsible }) => (
+    <SidebarProvider isMobile={isMobile} open={open} onOpenChange={() => {}} openMobile={openMobile} onOpenMobileChange={() => {}}>
+      <Sidebar role="navigation" aria-label="Controlled navigation" side={side} variant={variant} collapsible={collapsible}>
+        <SidebarContent>Explicit desktop presentation</SidebarContent>
+      </Sidebar>
+      <SidebarInset><SidebarTrigger /></SidebarInset>
+    </SidebarProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const originalWidth = window.innerWidth
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: 500 })
+    try {
+      const sidebar = canvasElement.querySelector('[data-slot="sidebar"]')
+      await expect(sidebar).not.toHaveAttribute("data-mobile")
+      await expect(sidebar).toHaveAttribute("data-state", "expanded")
+    } finally {
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: originalWidth })
+    }
   },
 }
 

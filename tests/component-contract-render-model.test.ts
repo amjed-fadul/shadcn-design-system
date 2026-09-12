@@ -75,23 +75,9 @@ describe("generic render-model alternatives and factual aliases", () => {
 
     expect(sidebarTree.unresolved).toEqual([])
     expect(sidebarTree.alternatives).toEqual([
-      { when: { propName: "collapsible", equals: "none" }, root: expect.objectContaining({ tag: "div" }) },
-      { when: { source: "state", name: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Sheet" }) },
-      {
-        otherwise: true,
-        root: expect.objectContaining({
-          tag: "div",
-          dataAttributes: expect.arrayContaining([
-            expect.objectContaining({
-              name: "data-collapsible",
-              source: "conditional-value",
-              condition: { source: "state", name: "state", equals: "collapsed" },
-              whenTrue: { source: "prop", name: "collapsible" },
-              whenFalse: { source: "literal", value: "" },
-            }),
-          ]),
-        }),
-      },
+      { when: { propName: "collapsible", equals: "none" }, root: expect.objectContaining({ tag: "SidebarRenderContext.Provider" }) },
+      { when: { source: "state", name: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "SidebarRenderContext.Provider" }) },
+      { otherwise: true, root: expect.objectContaining({ tag: "SidebarRenderContext.Provider" }) },
     ])
     expect(menuButtonTree.unresolved).toEqual([])
     expect(menuButtonTree.alternatives).toEqual([
@@ -107,6 +93,51 @@ describe("generic render-model alternatives and factual aliases", () => {
         }),
       },
     ])
+  })
+
+  test("models Sidebar's explicit mobile attribute values and rail absence without evaluating state", () => {
+    const providerTree = sourceAnalysis.analyzeJsxRenderTree(sidebar, "SidebarProvider")
+    const sidebarTree = sourceAnalysis.analyzeJsxRenderTree(sidebar, "Sidebar")
+    const railTree = sourceAnalysis.analyzeJsxRenderTree(sidebar, "SidebarRail")
+
+    expect(providerTree.unresolved).toEqual([])
+    expect(providerTree.root?.children[0]?.children[0]?.dataAttributes).toEqual(expect.arrayContaining([
+      {
+        name: "data-mobile",
+        source: "derived-condition",
+        condition: { propName: "isMobile", truthiness: "truthy" },
+      },
+    ]))
+    expect(sidebarTree.unresolved).toEqual([])
+    expect(sidebarTree.alternatives?.[1]?.root.children[0]?.children[0]?.dataAttributes).toEqual(expect.arrayContaining([
+      {
+        name: "data-state",
+        source: "conditional-value",
+        condition: { source: "state", name: "openMobile", truthiness: "truthy" },
+        whenTrue: { source: "literal", value: "expanded" },
+        whenFalse: { source: "literal", value: "collapsed" },
+      },
+      {
+        name: "data-collapsible",
+        source: "conditional-value",
+        condition: { source: "state", name: "openMobile", truthiness: "truthy" },
+        whenTrue: { source: "literal", value: "" },
+        whenFalse: { source: "prop", name: "collapsible" },
+      },
+    ]))
+    expect(railTree).toMatchObject({
+      alternatives: [
+        { when: { source: "state", name: "isMobile", truthiness: "falsy" }, root: expect.objectContaining({ tag: "button" }) },
+      ],
+      unresolved: [],
+    })
+  })
+
+  test("keeps non-mobile conditional data attribute presence unresolved", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "UnsupportedConditionalPresenceFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-state: flag || undefined"])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-state", source: "unresolved", expression: "flag || undefined" }])
   })
 
   test("compares each alternative independently instead of collapsing source branches", () => {

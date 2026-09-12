@@ -83,7 +83,7 @@ export type JsxRenderAlternative = ({ when: JsxRenderCondition; otherwise?: neve
 export type JsxSourceUnresolvedFinding = SourceExpressionIdentity & { reason: string }
 export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; unresolved: string[]; unresolvedFindings: JsxSourceUnresolvedFinding[] }
 type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment"> }
-type JsxScope = { aliases: Map<string, JsxRenderNode>; hostAliases: Map<string, JsxHost>; derivedSpreads: Map<string, JsxDerivedSpread> }
+type JsxScope = { aliases: Map<string, JsxRenderNode>; hostAliases: Map<string, JsxHost>; derivedSpreads: Map<string, JsxDerivedSpread>; stateBindings: Set<string> }
 type JsxUnresolved = { messages: string[]; findings: JsxSourceUnresolvedFinding[] }
 
 function recordUnresolved(unresolved: JsxUnresolved, node: ts.Node, file: ts.SourceFile, reason: string) {
@@ -135,12 +135,20 @@ function renderValue(expression: ts.Expression, publicBindings: Set<string>): Js
   return undefined
 }
 
-function conditionalValue(expression: ts.Expression, publicBindings: Set<string>) {
+function conditionalValue(expression: ts.Expression, publicBindings: Set<string>, stateBindings: Set<string>) {
   if (!ts.isConditionalExpression(expression)) return undefined
-  const condition = derivedCondition(expression.condition, publicBindings)
+  const truthiness = truthinessCondition(expression.condition, publicBindings)
+  const condition = truthiness && ("propName" in truthiness || stateBindings.has(truthiness.name)) ? truthiness : derivedCondition(expression.condition, publicBindings)
   const whenTrue = renderValue(expression.whenTrue, publicBindings)
   const whenFalse = renderValue(expression.whenFalse, publicBindings)
   return condition && whenTrue && whenFalse ? { condition, whenTrue, whenFalse } : undefined
+}
+
+function conditionalAttributePresence(expression: ts.Expression, publicBindings: Set<string>, stateBindings: Set<string>) {
+  if (!ts.isBinaryExpression(expression) || expression.operatorToken.kind !== ts.SyntaxKind.BarBarToken) return undefined
+  if (!ts.isIdentifier(expression.right) || expression.right.text !== "undefined") return undefined
+  const condition = truthinessCondition(expression.left, publicBindings)
+  return condition && ("propName" in condition || stateBindings.has(condition.name)) ? condition : undefined
 }
 
 function tracedPropSpread(expression: ts.Expression, publicBindings: Set<string>): JsxDerivedSpread | undefined {
@@ -182,7 +190,7 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
         dataAttributes.push(publicBindings.has(expression.text) ? { name: property.name.text, source: "prop", prop: expression.text } : { name: property.name.text, source: "primitive-state", prop: expression.text })
         continue
       }
-      const values = expression && conditionalValue(expression, publicBindings)
+      const values = expression && conditionalValue(expression, publicBindings, scope.stateBindings)
       if (values) {
         dataAttributes.push({ name: property.name.text, source: "conditional-value", ...values })
         continue
@@ -190,6 +198,11 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
       const condition = expression && derivedCondition(expression, publicBindings)
       if (condition) {
         dataAttributes.push({ name: property.name.text, source: "derived-condition", condition })
+        continue
+      }
+      const presenceCondition = property.name.text === "data-mobile" && expression && conditionalAttributePresence(expression, publicBindings, scope.stateBindings)
+      if (presenceCondition) {
+        dataAttributes.push({ name: property.name.text, source: "derived-condition", condition: presenceCondition })
         continue
       }
       const expressionText = expression?.getText(file)
@@ -246,10 +259,11 @@ function jsxNode(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.JsxFragment
   return { ...name, ...(resolvedHost ? { resolvedHost } : {}), portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved, scope), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings, scope) : [] }
 }
 
-type ReturnedJsx = { expression: ts.Expression; when?: JsxRenderCondition; otherwise?: true }
+type ReturnedJsx = { expression?: ts.Expression; absent?: true; when?: JsxRenderCondition; otherwise?: true }
 
 function directReturns(statement: ts.Statement, condition: JsxRenderCondition | undefined, results: ReturnedJsx[]) {
-  if (ts.isReturnStatement(statement) && statement.expression) results.push({ expression: statement.expression, ...(condition ? { when: condition } : {}) })
+  if (ts.isReturnStatement(statement) && statement.expression?.kind === ts.SyntaxKind.NullKeyword && condition) results.push({ absent: true, when: condition })
+  else if (ts.isReturnStatement(statement) && statement.expression) results.push({ expression: statement.expression, ...(condition ? { when: condition } : {}) })
   else if (ts.isBlock(statement)) for (const child of statement.statements) directReturns(child, condition, results)
 }
 
@@ -272,15 +286,18 @@ function returnedJsx(functionDeclaration: SourceFunction, file: ts.SourceFile, p
     } else directReturns(statement, undefined, results)
   }
   if (hasUnsupportedReturnCondition) return results.filter((result) => result.when)
-  if (results.length === 2 && results[0].when && "truthiness" in results[0].when && !results[1].when) results[1].when = { ...results[0].when, truthiness: results[0].when.truthiness === "truthy" ? "falsy" : "truthy" }
-  if (results.length > 1) for (const result of results) if (!result.when) result.otherwise = true
-  return results
+  if (results.length === 2 && results[0].absent && results[0].when && "truthiness" in results[0].when && !results[1].when) results[1].when = { ...results[0].when, truthiness: results[0].when.truthiness === "truthy" ? "falsy" : "truthy" }
+  const rendered = results.filter((result): result is ReturnedJsx & { expression: ts.Expression } => Boolean(result.expression))
+  if (rendered.length === 2 && rendered[0].when && "truthiness" in rendered[0].when && !rendered[1].when) rendered[1].when = { ...rendered[0].when, truthiness: rendered[0].when.truthiness === "truthy" ? "falsy" : "truthy" }
+  if (rendered.length > 1) for (const result of rendered) if (!result.when) result.otherwise = true
+  return rendered
 }
 
 function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved) {
-  const scope: JsxScope = { aliases: new Map(), hostAliases: new Map(), derivedSpreads: new Map() }
+  const scope: JsxScope = { aliases: new Map(), hostAliases: new Map(), derivedSpreads: new Map(), stateBindings: new Set() }
   const visit = (node: ts.Node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
+      scope.stateBindings.add(node.name.text)
       if (ts.isJsxElement(node.initializer) || ts.isJsxSelfClosingElement(node.initializer) || ts.isJsxFragment(node.initializer)) {
         const nodes = jsxExpressionChildren(node.initializer, file, unresolved, publicBindings, scope)
         if (nodes.length === 1) scope.aliases.set(node.name.text, nodes[0])
@@ -290,7 +307,7 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
         const spread = tracedPropSpread(node.initializer, publicBindings)
         if (spread) scope.derivedSpreads.set(node.name.text, spread)
       }
-    }
+    } else if (ts.isVariableDeclaration(node) && ts.isObjectBindingPattern(node.name)) for (const element of node.name.elements) if (ts.isIdentifier(element.name)) scope.stateBindings.add(element.name.text)
     if (!ts.isFunctionLike(node) || node === functionDeclaration) ts.forEachChild(node, visit)
   }
   if (functionDeclaration.body) ts.forEachChild(functionDeclaration.body, visit)
