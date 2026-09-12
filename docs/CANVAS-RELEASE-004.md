@@ -4,7 +4,7 @@ Prepared as one external candidate for the user-approved Canvas integration.
 Release 003 and its accepted distribution bytes remain unchanged. This work is
 local; no package publication or Git push occurred.
 
-## Exact distribution
+## Final exact distribution
 
 - Release: `shadcn-radix-release-004`
 - Source commit: `876ff9cb84caba6b19326bf0c6d08564cc76960d`
@@ -91,7 +91,15 @@ Passed: 3 focused tests; 41 tests skipped by the name filter. The fail-closed
 mutation and fresh-byte-drift cases both rejected their deliberately forged
 inputs.
 
-Independent post-fix archive comparison:
+Historical superseded R4 candidate values from fix round 1 (not the final
+identity in the section above):
+
+- Superseded payload SHA-256: `9f9c4bdab33ce7ac4604c1f1a7834edd1e296458d4bda10eedf33185d677eca9`
+- Superseded tarball SHA-256: `c62460faccdad81c56f769e57a959b2a0b8d609acad29da792cb246596709cfc`
+- Superseded npm integrity: `sha512-NR7jj0FqHFQ1lUJ14Cb6F6nDyZ8RGP5W7fAY7yr1QAhXodn8rrfgp0dQYEaQsl4MS8HhNZE10/YJKCU2d49UVw==`
+- Superseded manifest SHA-256: `95f894c8d6176ba5224e8cbc075daac8dc17bf91e5d25a1d1689fb0725f21b38`
+
+Historical fix-round-1 archive comparison (superseded):
 
 ```text
 cmp -s /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/distribution-manifest.json provenance/distributions/shadcn-radix-release-004.distribution.json
@@ -106,3 +114,11 @@ Fix commit: `b656c37f600cc8d6ac47379b17a2b858ec5d0571`.
 
 This is the bounded release-004 producer gate. It does not establish the
 isolated consumer or Canvas integration; those remain Task 4 checks.
+
+## Controller final verification note
+
+The controller’s final `npm test` reached 757 passing tests but failed four
+pre-existing module-setup suites with `PROJECTION_MISMATCH` from the unchanged
+`src/validator/canonical-release.ts`. The other gates, library build, and
+Storybook verification passed. This note records the controller result; it does
+not change the final R4 identity or the unchanged R3 scope.
