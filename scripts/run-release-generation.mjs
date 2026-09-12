@@ -57,7 +57,7 @@ if (packageIdentity.version !== "0.0.0-release.4") throw new Error("R4 package v
 const release = releaseApi.createExecutableRelease({
   componentContracts: componentAuthority.loadComponentContracts(),
   tokenContract: tokenAuthority.getTokenContract(),
-}, releaseId, { packageIdentity, implementationInputs: inputs.createImplementationManifest(root) })
+}, releaseId, { packageIdentity, implementationInputs: inputs.createImplementationManifest(root, { generatedReleasePath: path.relative(root, releasePath) }) })
 const previousR3 = readFileSync(r3Path)
 writeFileSync(releasePath, `${JSON.stringify(release, null, 2)}\n`, "utf8")
 if (!previousR3.equals(readFileSync(r3Path))) throw new Error("R3 release record changed during R4 generation")

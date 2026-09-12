@@ -39,6 +39,15 @@ function fixture() {
 }
 afterEach(() => { for (const directory of temporary.splice(0)) rmSync(directory, { recursive: true, force: true }) })
 
+function releaseOutputFixture(importedReleasePath: string) {
+  const { directory, put } = fixture()
+  put("package.json", JSON.stringify({ name: "@adc/shadcn-design-system", version: "0.0.0-release.4", exports: { ".": { import: "./dist-library/index.js" }, "./styles.css": "./dist-library/styles.css", "./release": { import: "./dist-library/release.js" } } }))
+  put("tsconfig.json", JSON.stringify({ compilerOptions: { moduleResolution: "Bundler", module: "ESNext", resolveJsonModule: true } }))
+  put(importedReleasePath, "{}")
+  put("src/shared.ts", `import release from "../${importedReleasePath}"\nexport const value = release`)
+  return { directory, put }
+}
+
 async function readR3ArchiveIdentity(tarball = r3Tarball) {
   const releaseSource = execFileSync("tar", ["-xOf", tarball, "package/dist-library/release.js"], { maxBuffer: 16 * 1024 * 1024 })
   const directory = mkdtempSync(path.join(tmpdir(), "r3-release-inspection-")); temporary.push(directory)
@@ -171,6 +180,35 @@ describe("release package input identity", () => {
     expect(paths).not.toContain("provenance/releases/shadcn-radix-release-003.json")
     expect(paths.some(file => /dist-library|\.tgz$|distribution-manifest/.test(file))).toBe(false)
     expect(paths).toContain("contracts/tokens/token-contract.json")
+  })
+  test("excludes only the exact generated release output from a Release 004 input manifest", () => {
+    const target = "provenance/releases/shadcn-radix-release-004.json"
+    const { directory } = releaseOutputFixture(target)
+
+    const paths = createImplementationManifest(directory, { generatedReleasePath: target }).map(entry => entry.path)
+
+    expect(paths).not.toContain(target)
+    expect(paths).toContain("src/shared.ts")
+  })
+  test("does not exclude a different release record from the generated Release 004 manifest", () => {
+    const target = "provenance/releases/shadcn-radix-release-004.json"
+    const { directory } = releaseOutputFixture("provenance/releases/shadcn-radix-release-003.json")
+
+    expect(() => createImplementationManifest(directory, { generatedReleasePath: target })).toThrow("CIRCULAR_INPUT: provenance/releases/shadcn-radix-release-003.json")
+  })
+  test("does not exclude an unrelated file in the releases directory", () => {
+    const target = "provenance/releases/shadcn-radix-release-004.json"
+    const { directory } = releaseOutputFixture("provenance/releases/release-notes.json")
+
+    expect(() => createImplementationManifest(directory, { generatedReleasePath: target })).toThrow("CIRCULAR_INPUT: provenance/releases/release-notes.json")
+  })
+  test("keeps normal unbound-input protection after excluding the generated release output", () => {
+    const target = "provenance/releases/shadcn-radix-release-004.json"
+    const { directory, put } = releaseOutputFixture(target)
+    const manifest = createImplementationManifest(directory, { generatedReleasePath: target })
+    put("unbound.ts", "export const unbound = true")
+
+    expect(() => assertReachedInputs(directory, manifest, [path.join(directory, "unbound.ts")], [], { generatedReleasePath: target })).toThrow("UNBOUND_INPUT: unbound.ts")
   })
   test("rejects circular identity entries even when their release hash is recomputed", () => {
     const { directory, put } = fixture()
