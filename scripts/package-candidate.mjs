@@ -85,6 +85,13 @@ if (command === "release-verify") {
   const tarballBytes = readFileSync(tarballPath)
   if (!/^[0-9a-f]{64}$/.test(expectedManifestSha256) || identity.sha256(manifestBytes) !== expectedManifestSha256) throw new Error("MANIFEST_HASH_MISMATCH: independently retained digest required")
   const rebuilt = packBuild()
+  const approvedTarballSha256 = identity.sha256(tarballBytes)
+  const rebuiltTarballSha256 = identity.sha256(rebuilt.bytes)
+  const approvedIntegrity = `sha512-${hash512(tarballBytes)}`
+  const rebuiltIntegrity = `sha512-${hash512(rebuilt.bytes)}`
+  if (approvedTarballSha256 !== rebuiltTarballSha256) throw new Error(`FRESH_TARBALL_SHA256_MISMATCH: approved ${approvedTarballSha256}, rebuilt ${rebuiltTarballSha256}`)
+  if (approvedIntegrity !== rebuiltIntegrity) throw new Error(`FRESH_TARBALL_INTEGRITY_MISMATCH: approved ${approvedIntegrity}, rebuilt ${rebuiltIntegrity}`)
+  if (!Buffer.from(tarballBytes).equals(rebuilt.bytes)) throw new Error("FRESH_TARBALL_BYTES_MISMATCH")
   distribution.verifyDistributionManifest({ manifestBytes, expectedManifestSha256, tarballBytes, tarballFilename: path.basename(tarballPath), release, toolchain: buildToolchain, expectedInventory: rebuilt.inventory })
   candidateRelease()
   console.log(`Verified existing candidate, external manifest and fresh build: ${release.releaseId}, ${rebuilt.inventory.length} packed files. No expectations refreshed.`)

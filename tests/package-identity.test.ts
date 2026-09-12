@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto"
 import { execFileSync } from "node:child_process"
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
+import { copyFileSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
+import { pathToFileURL } from "node:url"
 import { afterEach, describe, expect, test } from "vitest"
 import { createImplementationManifest, verifyImplementationManifest, assertReachedInputs, packageIdentity, verifyRepositoryRelease } from "../scripts/release-inputs"
 import { hashExecutableReleasePayload } from "../src/validator/release"
@@ -14,6 +15,8 @@ const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amj
 const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0-release.3.tgz")
 const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
 const r4DistributionManifest = path.join(r4ArtifactDirectory, "distribution-manifest.json")
+const r3TarballSha256 = "bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629"
+const r3PayloadSha256 = "5ffd25a9bac4fb44f8e826243323b20b93fb51a93db19b14b6d71089b545105b"
 function fixture() {
   const directory = mkdtempSync(path.join(tmpdir(), "release-input-test-")); temporary.push(directory)
   const put = (file: string, text: string) => { mkdirSync(path.dirname(path.join(directory, file)), { recursive: true }); writeFileSync(path.join(directory, file), text) }
@@ -34,6 +37,22 @@ function fixture() {
   return { directory, put }
 }
 afterEach(() => { for (const directory of temporary.splice(0)) rmSync(directory, { recursive: true, force: true }) })
+
+async function readR3ArchiveIdentity(tarball = r3Tarball) {
+  const releaseSource = execFileSync("tar", ["-xOf", tarball, "package/dist-library/release.js"], { maxBuffer: 16 * 1024 * 1024 })
+  const directory = mkdtempSync(path.join(tmpdir(), "r3-release-inspection-")); temporary.push(directory)
+  const releasePath = path.join(directory, "release.mjs")
+  writeFileSync(releasePath, releaseSource)
+  const library = await import(/* @vite-ignore */ `${pathToFileURL(releasePath).href}?inspection=${Date.now()}`)
+  const release = library.getExecutableRelease()
+  const { sha256: _sha256, ...payload } = release
+  return {
+    tarballSha256: createHash("sha256").update(readFileSync(tarball)).digest("hex"),
+    payloadSha256: hashExecutableReleasePayload(payload),
+  }
+}
+
+const sha512 = (bytes: Buffer) => `sha512-${createHash("sha512").update(bytes).digest("base64")}`
 
 describe("release package input identity", () => {
   test("discovers imports and sorts normalized paths deterministically with byte identities", () => {
@@ -185,10 +204,58 @@ describe("release package input identity", () => {
   test("maps the approved package name, version and exact public entrypoints", () => {
     expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.4", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
   })
-  test("preserves the accepted R3 tarball identity across candidate generation", () => {
+  test("preserves the accepted R3 tarball and extracted release payload across release generation", async () => {
     expect(existsSync(r3Tarball)).toBe(true)
-    expect(createHash("sha256").update(readFileSync(r3Tarball)).digest("hex")).toBe("bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629")
-  })
+    const before = await readR3ArchiveIdentity()
+    expect(before).toEqual({ tarballSha256: r3TarballSha256, payloadSha256: r3PayloadSha256 })
+    execFileSync(process.execPath, [path.join(root, "scripts/run-release-generation.mjs")], { cwd: root, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
+    const after = await readR3ArchiveIdentity()
+    expect(after).toEqual(before)
+  }, 180_000)
+  test("fails closed when the accepted R3 archive is not the retained artifact", () => {
+    const directory = mkdtempSync(path.join(tmpdir(), "r3-artifact-override-")); temporary.push(directory)
+    const tarball = path.join(directory, path.basename(r3Tarball))
+    copyFileSync(r3Tarball, tarball)
+    const mutated = Buffer.from(readFileSync(tarball)); mutated[0] ^= 1; writeFileSync(tarball, mutated)
+    try {
+      execFileSync(process.execPath, [path.join(root, "scripts/run-release-generation.mjs")], {
+        cwd: root,
+        env: { ...process.env, ADC_R3_ARTIFACT_DIRECTORY: directory },
+        encoding: "utf8",
+        timeout: 120_000,
+        maxBuffer: 16 * 1024 * 1024,
+        stdio: "pipe",
+      })
+      throw new Error("R3 override unexpectedly accepted")
+    } catch (error) {
+      expect(String((error as { stderr?: string }).stderr)).toMatch(/R3_ARTIFACT_MISMATCH.*before/)
+    }
+  }, 30_000)
+  test("candidate verification rejects fresh tarball byte drift even when inventory is unchanged", () => {
+    const directory = mkdtempSync(path.join(tmpdir(), "r4-tarball-drift-")); temporary.push(directory)
+    const sourceManifest = JSON.parse(readFileSync(r4DistributionManifest, "utf8"))
+    const original = readFileSync(path.join(r4ArtifactDirectory, sourceManifest.tarball.filename))
+    const forgedTarball = Buffer.from(original); forgedTarball[9] = forgedTarball[9] === 255 ? 0 : forgedTarball[9] + 1
+    const tarballPath = path.join(directory, sourceManifest.tarball.filename)
+    writeFileSync(tarballPath, forgedTarball)
+    sourceManifest.tarball.sha256 = createHash("sha256").update(forgedTarball).digest("hex")
+    sourceManifest.tarball.integrity = sha512(forgedTarball)
+    const manifestPath = path.join(directory, "distribution-manifest.json")
+    const manifestBytes = Buffer.from(`${JSON.stringify(sourceManifest, null, 2)}\n`)
+    writeFileSync(manifestPath, manifestBytes)
+    try {
+      execFileSync(process.execPath, [path.join(root, "scripts/package-candidate.mjs"), "verify", "--manifest", manifestPath, "--tarball", tarballPath, "--manifest-sha256", createHash("sha256").update(manifestBytes).digest("hex")], {
+        cwd: root,
+        encoding: "utf8",
+        timeout: 240_000,
+        maxBuffer: 16 * 1024 * 1024,
+        stdio: "pipe",
+      })
+      throw new Error("Fresh tarball byte drift unexpectedly accepted")
+    } catch (error) {
+      expect(String((error as { stderr?: string }).stderr)).toMatch(/FRESH_TARBALL_(?:BYTES|SHA256|INTEGRITY)_MISMATCH/)
+    }
+  }, 240_000)
   test("requires a separately identified R4 release, external candidate, and complete handoff", () => {
     const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-004.json")
     const handoffPath = path.join(root, "docs/CANVAS-RELEASE-004.md")
@@ -215,6 +282,11 @@ describe("release package input identity", () => {
     expect(handoff).toContain(manifest.tarball.integrity)
     expect(handoff).toContain(r4ArtifactDirectory)
     expect(handoff).toMatch(/Source commit: `[0-9a-f]{40}`/)
+    expect(handoff).toMatch(/Release 003 unchanged: `true`/)
+    expect(handoff).toContain(`Release 003 tarball SHA-256 before: \`${r3TarballSha256}\``)
+    expect(handoff).toContain(`Release 003 tarball SHA-256 after: \`${r3TarballSha256}\``)
+    expect(handoff).toContain(`Release 003 release.js payload SHA-256 before: \`${r3PayloadSha256}\``)
+    expect(handoff).toContain(`Release 003 release.js payload SHA-256 after: \`${r3PayloadSha256}\``)
   })
   test("immutable R3 release records all 20 components, shared utilities, mobile hook and build inputs", () => {
     const release = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-003.json"), "utf8"))

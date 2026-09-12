@@ -8,6 +8,7 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest"
 import ts from "typescript"
 import { createElement, isValidElement } from "react"
 import type { TokenContract } from "../src/contracts/tokens/types"
+import { hashExecutableReleasePayload } from "../src/validator/release"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
@@ -94,7 +95,11 @@ describe("immutable Release 003 package artifact verification", () => {
   test("ships the R3 executable release and frozen contract data", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "release.js"))
     expect(Object.keys(library).sort()).toEqual(["getComponentContracts", "getExecutableRelease", "getTokenContract"])
-    expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-003.json"))
+    const archiveRelease = library.getExecutableRelease()
+    expect(archiveRelease).toEqual(readJson("provenance/releases/shadcn-radix-release-003.json"))
+    const { sha256: _sha256, ...archivePayload } = archiveRelease
+    expect(archiveRelease.releaseId).toBe("shadcn-radix-release-003")
+    expect(hashExecutableReleasePayload(archivePayload)).toBe(r3PayloadSha256)
     const components = library.getComponentContracts()
     expect(components.contractSet.id).toBe("shadcn-radix-component-contracts-001")
     expect(components.families).toHaveLength(20)

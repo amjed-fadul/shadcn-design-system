@@ -788,8 +788,8 @@
     },
     {
       "path": "scripts/package-candidate.mjs",
-      "gitBlob": "9dc1de99458b409ef12a609c550d5959b653111d",
-      "sha256": "27a100c084dce2d5a65eb8ee696105b07d9f09a348623aabe9e1d8ee3b1dfef4"
+      "gitBlob": "4215076dfac0fb5307d7fafbcf37bf69257db7b8",
+      "sha256": "58a41a7e0ff2d2143fb7e0e6ea09497f28b12ea0d5b75f5d0f5728ef8e03259d"
     },
     {
       "path": "scripts/release-inputs.ts",
@@ -798,8 +798,8 @@
     },
     {
       "path": "scripts/run-release-generation.mjs",
-      "gitBlob": "c4670ae598aa53fdcf9a1cc72ce8ad28722da063",
-      "sha256": "172fa403bfb92b736bdc1d93f16f5d594c975dcd014a807eb15ac9685685e883"
+      "gitBlob": "75b0f3514865291edf088d1ac7748ae62fc17381",
+      "sha256": "5b84cf5f1601d4bd9158733ba84c2bd83790eba534064a5f189ce8b492f6f266"
     },
     {
       "path": "src/components/ui/accordion.tsx",
@@ -128575,5 +128575,5 @@
       "sidebar.context"
     ]
   },
-  "sha256": "9cdbf7909f7de5a2f72a329c4b0a1ebd1d28ebf235ba471fb05000637423b8d8"
+  "sha256": "9f9c4bdab33ce7ac4604c1f1a7834edd1e296458d4bda10eedf33185d677eca9"
 }
