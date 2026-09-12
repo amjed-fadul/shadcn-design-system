@@ -11,6 +11,10 @@ import { describe, expect, test } from "vitest"
 
 const canonicalReleasePath = resolve(import.meta.dirname, "../src/validator/canonical-release.ts")
 
+type MutableRelease = {
+  -readonly [Key in keyof ExecutableRelease]: ExecutableRelease[Key]
+}
+
 function approvedProjection() {
   return projectExecutableContract({
     componentContracts: loadComponentContracts(),
@@ -33,7 +37,7 @@ describe("Release 004 active canonical binding", () => {
   })
 
   test("rejects a hash-valid tampered Release 004 projection against canonical source", () => {
-    const candidate = structuredClone(release004Artifact) as ExecutableRelease
+    const candidate = structuredClone(release004Artifact) as MutableRelease
     candidate.projection = { ...candidate.projection, tokenIds: [...candidate.projection.tokenIds, "forged.token"] }
     const { sha256: _sha256, ...payload } = candidate
     candidate.sha256 = hashExecutableReleasePayload(payload)

@@ -793,13 +793,13 @@
     },
     {
       "path": "scripts/release-inputs.ts",
-      "gitBlob": "9f7f277b0fdec4b6430310ed79e84b9f5baaa231",
-      "sha256": "53d71f92a7a6c1708be90712228167317eaf33a7566c9a783d306b7f132b4953"
+      "gitBlob": "9858a8dac2176347ae4cec34f55db29f66a9ba23",
+      "sha256": "6ef4cff01a9e5efb99d85d2b8832e24f3506f35a54b2c2d4ebd15b0d8d0a5c1f"
     },
     {
       "path": "scripts/run-release-generation.mjs",
-      "gitBlob": "75b0f3514865291edf088d1ac7748ae62fc17381",
-      "sha256": "5b84cf5f1601d4bd9158733ba84c2bd83790eba534064a5f189ce8b492f6f266"
+      "gitBlob": "ce62cda0421e73438698ed67b9ad535ec5762dad",
+      "sha256": "3b616e949e8cf8ce7f62bb2f999108f1a5c104b2f5244ba34d1b913cae05f572"
     },
     {
       "path": "src/components/ui/accordion.tsx",
@@ -1013,8 +1013,8 @@
     },
     {
       "path": "src/validator/canonical-release.ts",
-      "gitBlob": "fcfd8abaa5b10bac3fb74885429170807d9e5308",
-      "sha256": "da957e66d72200d92aaeacc4a3192e2e99b28adf1fa8a7432906ff79f6ad3f90"
+      "gitBlob": "fa055b10e002f6f1a25d8ba74708799c9a1c1229",
+      "sha256": "1820a37c0f44fb87550567675eadd5fa1a85e655c867bbaefc21f01fd2e7f033"
     },
     {
       "path": "src/validator/errors.ts",
@@ -128575,5 +128575,5 @@
       "sidebar.context"
     ]
   },
-  "sha256": "395535ac8540dde4dd96ca04f9ece6d22371fcdf21d7c0f35e7beb74488eab3f"
+  "sha256": "e0332a1103f1faa7a92e81c1815ffcfc4e4cbcdadeea7822391221b73c2b52a2"
 }

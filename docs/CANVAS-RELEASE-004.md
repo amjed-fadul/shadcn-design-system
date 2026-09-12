@@ -7,25 +7,39 @@ local; no package publication or Git push occurred.
 ## Final exact distribution
 
 - Release: `shadcn-radix-release-004`
-- Source commit: `876ff9cb84caba6b19326bf0c6d08564cc76960d`
+- Source commit: `0d480b49ec9c499628d8a3e32b3a56386ac2b13d`
 - Source branch: `codex/sidebar-release004`
 - Package: `@adc/shadcn-design-system@0.0.0-release.4`
-- Release payload SHA-256: `395535ac8540dde4dd96ca04f9ece6d22371fcdf21d7c0f35e7beb74488eab3f`
+- Release payload SHA-256: `e0332a1103f1faa7a92e81c1815ffcfc4e4cbcdadeea7822391221b73c2b52a2`
 - Artifact: `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz`
 - Candidate path: `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004`
-- Tarball SHA-256: `c65c476fa042740e42a28d48ad75e916eed4ca30290b82c7ef015ec2aca8c15d`
-- npm integrity: `sha512-stti0tyEFQkCxaeMwsd47oNMXdq3A6FG+t9IZ61MA+8hVjPxU0YBqYD2TcmN6ZpNcrzDeXv3o823whE6fv0deA==`
+- Tarball SHA-256: `c7368978a0a5c8e75a871acb4624142c13d36e5934bc670e69adfe2c07f64252`
+- npm integrity: `sha512-AkGpDll0cbYA4DEhEc0c6tl5+Ql4li9wf/ffAafzSokmI3K7ZBvFzLROjN9fCCR6XWBLC7jv8TxeNmKvEkyd2Q==`
 - Manifest: `provenance/distributions/shadcn-radix-release-004.distribution.json`, copied byte-for-byte from the external candidate directory's `distribution-manifest.json`
-- Manifest SHA-256: `b7907b575c362ba36be5faa588a20440138e0714f2db2c9e85c13782ed6c0bd7`
+- Manifest SHA-256: `ea074153c56bf6a012a0e9924369b9aa3a82a777e14b17ffade06b0b6349e46f`
 - Packed files: 35; public entrypoints: 3; root exports: 108; families: 20.
 - Executable implementation inputs: 208.
 - Toolchain: Node 22.18.0, npm 10.9.3, Vite 7.3.6, TypeScript 5.5.4, Rollup 4.63.1, esbuild 0.28.2.
 - React and React DOM peers remain exactly 18.3.1.
 
 The source commit is the committed producer/input snapshot used to reproduce
-the candidate. The generated release record and distribution manifest are
-excluded from their own implementation-input identity, so recording them after
-the source snapshot does not create a circular release hash.
+the candidate. The release-input guard receives the exact R4 generated-output
+path, excludes only that self-output, and still rejects other release records
+and unbound inputs. The generated release record and distribution manifest are
+therefore excluded from their own implementation-input identity without
+weakening input coverage.
+
+## Superseded prior R4 handoff
+
+The following identity was superseded by the active-R4 binding and
+release-aware self-output correction. It is historical only and is not the
+final handoff above:
+
+- Source commit: `876ff9cb84caba6b19326bf0c6d08564cc76960d`
+- Payload SHA-256: `395535ac8540dde4dd96ca04f9ece6d22371fcdf21d7c0f35e7beb74488eab3f`
+- Tarball SHA-256: `c65c476fa042740e42a28d48ad75e916eed4ca30290b82c7ef015ec2aca8c15d`
+- npm integrity: `sha512-stti0tyEFQkCxaeMwsd47oNMXdq3A6FG+t9IZ61MA+8hVjPxU0YBqYD2TcmN6ZpNcrzDeXv3o823whE6fv0deA==`
+- Manifest SHA-256: `b7907b575c362ba36be5faa588a20440138e0714f2db2c9e85c13782ed6c0bd7`
 
 ## R3 preservation
 
@@ -49,20 +63,20 @@ contract projection. The executable release exports the `sidebar.context`
 provider capability from `SidebarProvider` and requires it from `Sidebar`.
 Public package exports remain `.`, `./styles.css`, and `./release`.
 
-The R4 package was regenerated once after the cleanup in the external candidate
-directory. Independent fresh builds in `/tmp/shadcn-r4-cleanup-a` and
-`/tmp/shadcn-r4-cleanup-b` produced the same tarball SHA-256,
-manifest SHA-256, npm integrity, payload SHA-256, and 35-file inventory without
-overwriting the approved candidate.
+The active canonical validator loads R4 and derives its expected projection
+from canonical component and token sources. It rejects a hash-valid tampered R4
+projection. A fresh second candidate reproduced this approved candidate's
+tarball SHA-256, manifest SHA-256, npm integrity, payload SHA-256, and 35-file
+inventory without overwriting the approved candidate.
 
 ## Verification evidence
 
 - TDD RED: `npm run test:identity` failed with 2 expected new R4-presence failures and 40 passing tests; `npm run test:library` failed with 1 expected new R4-candidate failure and 9 passing tests. No R4 record, manifest, or candidate existed at RED.
 - `npm run release:generate` produced the R4 release record and preserved R3 bytes.
 - `npm run release:generate` independently inspected the accepted external R3 tarball and extracted `package/dist-library/release.js` before and after generation; both literal identities matched and the command failed closed on mismatch.
-- `npm run release:verify -- --release-sha256 395535ac8540dde4dd96ca04f9ece6d22371fcdf21d7c0f35e7beb74488eab3f` passed.
+- `npm run release:verify -- --release-sha256 e0332a1103f1faa7a92e81c1815ffcfc4e4cbcdadeea7822391221b73c2b52a2` passed.
 - `npm run candidate:generate -- --output /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004` passed with the values above.
-- `npm run candidate:verify -- --manifest /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/distribution-manifest.json --tarball /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz --manifest-sha256 b7907b575c362ba36be5faa588a20440138e0714f2db2c9e85c13782ed6c0bd7` passed against a fresh rebuild.
+- `npm run candidate:verify -- --manifest /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/distribution-manifest.json --tarball /Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz --manifest-sha256 ea074153c56bf6a012a0e9924369b9aa3a82a777e14b17ffade06b0b6349e46f` passed against a fresh rebuild.
 - Candidate verification compared fresh rebuilt tarball bytes, SHA-256, and npm SRI to the approved candidate in addition to comparing the packed inventory.
 - `npm run components:verify` passed 469 tests across 19 files.
 - `npm run tokens:verify` passed 87 tests across 9 files.
@@ -115,10 +129,9 @@ Fix commit: `b656c37f600cc8d6ac47379b17a2b858ec5d0571`.
 This is the bounded release-004 producer gate. It does not establish the
 isolated consumer or Canvas integration; those remain Task 4 checks.
 
-## Controller final verification note
+## Historical controller verification note (superseded)
 
-The controller’s final `npm test` reached 757 passing tests but failed four
-pre-existing module-setup suites with `PROJECTION_MISMATCH` from the unchanged
-`src/validator/canonical-release.ts`. The other gates, library build, and
-Storybook verification passed. This note records the controller result; it does
-not change the final R4 identity or the unchanged R3 scope.
+The earlier controller run reached 757 passing tests but failed four module
+setup suites with `PROJECTION_MISMATCH` from the then-active R3 canonical
+binding. That result is superseded by this correction's active R4 binding and
+final producer verification; it does not describe the final R4 handoff.
