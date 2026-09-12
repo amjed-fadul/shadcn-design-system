@@ -3,8 +3,6 @@ import { describe, expect, test } from "vitest"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import { getTokenContract } from "../src/contracts/tokens/contract"
 import {
-  EXECUTABLE_RELEASE_ID,
-  EXECUTABLE_RELEASE_PATH,
   canonicalExecutableReleasePayload,
   createExecutableRelease,
   hashExecutableReleasePayload,
@@ -62,8 +60,7 @@ describe("immutable executable release", () => {
   test("loads the versioned canonical release artifact through the production entrypoint", () => {
     const release = getExecutableRelease()
 
-    expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-003.json")
-    expect(release.releaseId).toBe(EXECUTABLE_RELEASE_ID)
+    expect(release.releaseId).toBe("shadcn-radix-release-004")
     expect(release.componentContractSetId).toBe("shadcn-radix-component-contracts-001")
     expect(release.tokenContractId).toBe("shadcn-radix-token-contract-001")
     expect(release.projectionSchemaVersion).toBe(1)

@@ -231,6 +231,9 @@ describe("production validator against immutable release", () => {
     const candidate = cloneRelease(release)
     candidate.projection = { ...candidate.projection, tokenIds: [...candidate.projection.tokenIds, "forged.token"] }
 
-    expect(() => loadExecutableRelease(candidate, { expectedProjection: release.projection })).toThrowError(/PROJECTION_MISMATCH|HASH_MISMATCH/)
+    expect(() => loadExecutableRelease(candidate, {
+      expectedProjection: release.projection,
+      expectedReleaseId: "shadcn-radix-release-004",
+    })).toThrowError(/PROJECTION_MISMATCH|HASH_MISMATCH/)
   })
 })
