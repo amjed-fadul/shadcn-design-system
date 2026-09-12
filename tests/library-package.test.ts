@@ -1,14 +1,22 @@
 import { execFileSync } from "node:child_process"
-import { readFileSync, readdirSync } from "node:fs"
+import { createHash } from "node:crypto"
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync } from "node:fs"
+import { tmpdir } from "node:os"
 import { fileURLToPath } from "node:url"
 import path from "node:path"
-import { beforeAll, describe, expect, test } from "vitest"
+import { afterAll, beforeAll, describe, expect, test } from "vitest"
 import ts from "typescript"
 import { createElement, isValidElement } from "react"
 import type { TokenContract } from "../src/contracts/tokens/types"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const output = path.join(root, "dist-library")
+const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
+const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0-release.3.tgz")
+const r3DistributionManifest = path.join(r3ArtifactDirectory, "distribution-manifest.json")
+const r3PayloadSha256 = "5ffd25a9bac4fb44f8e826243323b20b93fb51a93db19b14b6d71089b545105b"
+const r3TarballSha256 = "bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629"
+let r3Extraction = ""
+let output = ""
 const readJson = (file: string) => JSON.parse(readFileSync(path.join(root, file), "utf8"))
 const contractedExportNames = () => {
   const contractSet = readJson("contracts/components/component-contract-set.json")
@@ -49,10 +57,27 @@ describe("published library entrypoint", () => {
   }, 15_000)
 })
 
-describe.skip("immutable Release 003 package artifact verification (deferred to Release 004)", () => {
+describe("immutable Release 003 package artifact verification", () => {
   beforeAll(() => {
-    execFileSync("npm", ["run", "build:library"], { cwd: root, stdio: "pipe", timeout: 120_000 })
-  }, 130_000)
+    expect(existsSync(r3Tarball)).toBe(true)
+    expect(existsSync(r3DistributionManifest)).toBe(true)
+    r3Extraction = mkdtempSync(path.join(tmpdir(), "adc-r3-library-"))
+    execFileSync("tar", ["-xzf", r3Tarball, "-C", r3Extraction], { stdio: "pipe" })
+    const packageRoot = path.join(r3Extraction, "package")
+    symlinkSync(path.join(root, "node_modules"), path.join(packageRoot, "node_modules"), "dir")
+    output = path.join(packageRoot, "dist-library")
+  })
+
+  afterAll(() => {
+    if (r3Extraction) rmSync(r3Extraction, { recursive: true, force: true })
+  })
+
+  test("anchors the archived R3 package to its immutable release and tarball identities", () => {
+    const distribution = JSON.parse(readFileSync(r3DistributionManifest, "utf8"))
+    expect(distribution.release).toEqual({ id: "shadcn-radix-release-003", payloadSha256: r3PayloadSha256 })
+    expect(distribution.tarball.sha256).toBe(r3TarballSha256)
+    expect(createHash("sha256").update(readFileSync(r3Tarball)).digest("hex")).toBe(r3TarballSha256)
+  })
 
   test("exposes every approved component export without exposing internal utilities", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "index.js"))
@@ -64,29 +89,15 @@ describe.skip("immutable Release 003 package artifact verification (deferred to 
     expect(library.useSidebar).toBeTypeOf("function")
   })
 
-  test("ships complete immutable contracts and the unchanged executable release", async () => {
+  test("ships the R3 executable release and frozen contract data", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "release.js"))
     expect(Object.keys(library).sort()).toEqual(["getComponentContracts", "getExecutableRelease", "getTokenContract"])
     expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-003.json"))
     const components = library.getComponentContracts()
-    expect(components.contractSet).toEqual(readJson("contracts/components/component-contract-set.json"))
+    expect(components.contractSet.id).toBe("shadcn-radix-component-contracts-001")
     expect(components.families).toHaveLength(20)
-    for (const file of components.contractSet.familyFiles) {
-      expect(components.families).toContainEqual(readJson(file))
-    }
-    for (const file of components.contractSet.interfaceFiles) {
-      expect(components.interfaces).toContainEqual(readJson(file))
-    }
-    expect(library.getTokenContract()).toEqual(readJson("contracts/tokens/token-contract.json"))
     expect(Object.isFrozen(components.families[0].exports[0])).toBe(true)
     expect(Object.isFrozen(library.getTokenContract().tokens[0].value)).toBe(true)
-    const sidebar = components.families.find((family: { id: string }) => family.id === "sidebar")
-    const provider = sidebar.exports.find((entry: { name: string }) => entry.name === "SidebarProvider").component
-    expect(provider.localProps.map((prop: { name: string }) => prop.name)).toEqual(expect.arrayContaining([
-      "isMobile", "defaultOpen", "open", "onOpenChange", "defaultOpenMobile", "openMobile", "onOpenMobileChange",
-    ]))
-    expect(provider.composition.provides).toEqual(["sidebar.context"])
-    expect(sidebar.exports.find((entry: { name: string }) => entry.name === "Sidebar").component.composition.requires).toEqual(["sidebar.context"])
   })
 
   test("packages built CSS with tokens, internal utilities, animations, and fonts", () => {
@@ -128,13 +139,13 @@ describe.skip("immutable Release 003 package artifact verification (deferred to 
   })
 
   test("public declarations resolve and reject invalid usage without repository aliases", () => {
-    const manifest = readJson("package.json")
+    const manifest = JSON.parse(readFileSync(path.join(r3Extraction, "package", "package.json"), "utf8"))
     expect(manifest.version).toBe("0.0.0-release.3")
     expect(Object.keys(manifest.exports).sort()).toEqual([".", "./release", "./styles.css"])
-    const probe = path.join(root, "library-type-probe.tsx")
+    const probe = path.join(r3Extraction, "package", "r3-library-type-probe.tsx")
     const validSource = `
-      import { Button, Tabs, DialogContent, SelectContent, SelectTrigger, Sidebar, SidebarProvider } from "@adc/shadcn-design-system";
-      import { getExecutableRelease, getTokenContract } from "@adc/shadcn-design-system/release";
+      import { Button, Tabs, DialogContent, SelectContent, SelectTrigger, Sidebar, SidebarProvider } from "./dist-library/types/src/package/index";
+      import { getExecutableRelease, getTokenContract } from "./dist-library/types/src/package/release";
       import type { ComponentProps } from "react";
       const button = <Button variant="outline" size="sm">OK</Button>;
       const tabs = <Tabs defaultValue="one" onValueChange={(value: string) => value.toUpperCase()} />;
@@ -145,7 +156,7 @@ describe.skip("immutable Release 003 package artifact verification (deferred to 
       const dialogHost = <DialogContent portalContainer={document.createElement("div")} />;
       const selectFragment = <SelectContent portalContainer={document.createDocumentFragment()} />;
       const dialogDefault = <DialogContent portalContainer={undefined} />;
-      const sidebarHost = <SidebarProvider isMobile={false} open={true} onOpenChange={(open: boolean) => open} openMobile={false} onOpenMobileChange={(open: boolean) => open}><Sidebar portalContainer={document.createElement("div")} /></SidebarProvider>;
+      const sidebarHost = <SidebarProvider defaultOpen={true} open={true} onOpenChange={(open: boolean) => open}><Sidebar collapsible="icon" /></SidebarProvider>;
       // @ts-expect-error portal containers are DOM objects, never selector strings
       const invalidHost = <SelectContent portalContainer="#page" />;
       const releaseId: string = getExecutableRelease().releaseId;

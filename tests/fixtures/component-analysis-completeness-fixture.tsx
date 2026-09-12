@@ -6,6 +6,7 @@ declare const cvaClasses: string
 declare const condition: boolean
 declare const tone: string
 declare const compute: { (): Record<string, unknown>; (value: unknown): unknown }
+declare const computeSomething: () => boolean
 declare const dynamicChild: unknown
 declare const dynamicVariants: Record<string, unknown>
 declare const Primitive: any
@@ -68,6 +69,22 @@ function UnsupportedConditionalPresenceFixture({ flag }: { flag: boolean }) {
   return <Primitive.Root data-state={flag || undefined} />
 }
 
+function ArbitraryLocalConditionalValueFixture() {
+  const flag = computeSomething()
+  return <Primitive.Root data-state={flag ? "a" : "b"} />
+}
+
+function ArbitraryLocalConditionalArmFixture({ enabled }: { enabled: boolean }) {
+  const value = computeSomething()
+  return <Primitive.Root data-state={enabled ? value : ""} />
+}
+
+function ArbitraryLocalReturnFixture() {
+  const flag = computeSomething()
+  if (flag) return <Primitive.Root />
+  return <Primitive.Fallback />
+}
+
 function UnrelatedSpreadFixture() {
   return <Primitive.Root {...unrelated} />
 }
@@ -89,16 +106,19 @@ function UnsupportedDerivedAttributeFixture({ mode = "a", ...rest }: { mode?: "a
   return <Primitive.Root data-match={compute(mode)} {...rest} />
 }
 
-function ConditionalRootFixture({ collapsible, ...rest }: { collapsible: "none" | "offcanvas" }) {
-  const isMobile = condition
+function ConditionalRootFixture({ collapsible, isMobile, ...rest }: { collapsible: "none" | "offcanvas"; isMobile: boolean }) {
   if (collapsible === "none") return <div {...rest} />
   if (isMobile) return <Primitive.Sheet {...rest} />
   return <div {...rest} />
 }
 
-function ConditionalValueFixture({ collapsible, ...rest }: { collapsible: string }) {
-  const state = tone
+function ConditionalValueFixture({ collapsible, state, ...rest }: { collapsible: string; state: string }) {
   return <Primitive.Root data-collapsible={state === "collapsed" ? collapsible : ""} {...rest} />
+}
+
+function ArbitraryLocalEqualityFixture() {
+  const state = tone
+  return <Primitive.Root data-collapsible={state === "collapsed" ? "a" : ""} />
 }
 
 function JsxAliasFixture({ tooltip, ...rest }: { tooltip?: string | Record<string, unknown> }) {
@@ -119,4 +139,4 @@ function UnsupportedReturnConditionFixture({ condition, mode, ...rest }: { condi
   return <Primitive.Fallback {...rest} />
 }
 
-export { ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedConditionalPresenceFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+export { ArbitraryLocalConditionalArmFixture, ArbitraryLocalConditionalValueFixture, ArbitraryLocalEqualityFixture, ArbitraryLocalReturnFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedConditionalPresenceFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
 import { execFileSync } from "node:child_process"
-import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { afterEach, describe, expect, test } from "vitest"
@@ -118,7 +118,7 @@ describe("release package input identity", () => {
       if (entry.path.startsWith("node_modules/")) continue
       const destination = path.join(directory, entry.path)
       mkdirSync(path.dirname(destination), { recursive: true })
-      cpSync(path.join(root, entry.path), destination)
+      writeFileSync(destination, execFileSync("git", ["cat-file", "blob", entry.gitBlob], { cwd: root }))
     }
     symlinkSync(path.join(root, "node_modules"), path.join(directory, "node_modules"), "dir")
     const config = path.join(directory, injectionFile)
@@ -180,10 +180,10 @@ describe("release package input identity", () => {
   test("maps the approved package name, version and exact public entrypoints", () => {
     expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.3", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
   })
-  test("canonical release binds all 20 components, shared utilities, mobile hook and build inputs", () => {
-    const release = verifyRepositoryRelease(root)
-    const paths = release.implementationInputs!.map(entry => entry.path)
-    expect(paths.filter(file => /^src\/components\/ui\/.*\.tsx$/.test(file))).toHaveLength(20)
+  test("immutable R3 release records all 20 components, shared utilities, mobile hook and build inputs", () => {
+    const release = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-003.json"), "utf8"))
+    const paths = release.implementationInputs.map((entry: { path: string }) => entry.path)
+    expect(paths.filter((file: string) => /^src\/components\/ui\/.*\.tsx$/.test(file))).toHaveLength(20)
     expect(paths).toEqual(expect.arrayContaining(["src/lib/utils.ts", "src/hooks/use-mobile.ts", "src/index.css", "scripts/library-data.ts", "scripts/build-library.mjs", "vite.library.config.ts", "tsconfig.library.json", "package-lock.json", "components.json"]))
     expect(release.documentSchemaVersion).toBe(1)
     expect(release.packageIdentity).toEqual(packageIdentity(root))

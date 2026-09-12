@@ -14,7 +14,7 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(tree.unresolved).toEqual([])
     expect(tree.alternatives).toEqual([
       { when: { propName: "collapsible", equals: "none" }, root: expect.objectContaining({ tag: "div", receivesPublicProps: true }) },
-      { when: { source: "state", name: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Primitive.Sheet", receivesPublicProps: true }) },
+      { when: { propName: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Primitive.Sheet", receivesPublicProps: true }) },
       { otherwise: true, root: expect.objectContaining({ tag: "div", receivesPublicProps: true }) },
     ])
   })
@@ -27,7 +27,7 @@ describe("generic render-model alternatives and factual aliases", () => {
       {
         name: "data-collapsible",
         source: "conditional-value",
-        condition: { source: "state", name: "state", equals: "collapsed" },
+        condition: { propName: "state", equals: "collapsed" },
         whenTrue: { source: "prop", name: "collapsible" },
         whenFalse: { source: "literal", value: "" },
       },
@@ -140,6 +140,34 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(tree.root?.dataAttributes).toEqual([{ name: "data-state", source: "unresolved", expression: "flag || undefined" }])
   })
 
+  test("does not reclassify arbitrary initialized locals as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalConditionalValueFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-state: flag ? \"a\" : \"b\""])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-state", source: "unresolved", expression: "flag ? \"a\" : \"b\"" }])
+  })
+
+  test("does not reclassify arbitrary initialized locals in conditional value arms as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalConditionalArmFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-state: enabled ? value : \"\""])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-state", source: "unresolved", expression: "enabled ? value : \"\"" }])
+  })
+
+  test("does not reclassify arbitrary initialized locals in return branches as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalReturnFixture")
+
+    expect(tree.unresolved).toEqual(expect.arrayContaining(["Unsupported return condition: flag"]))
+    expect(tree.alternatives).toBeUndefined()
+  })
+
+  test("does not reclassify arbitrary initialized locals in equality conditions as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalEqualityFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-collapsible: state === \"collapsed\" ? \"a\" : \"\""])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-collapsible", source: "unresolved", expression: "state === \"collapsed\" ? \"a\" : \"\"" }])
+  })
+
   test("compares each alternative independently instead of collapsing source branches", () => {
     const source = sourceAnalysis.analyzeJsxRenderTree(fixture, "ConditionalRootFixture")
     const divBranch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], derivedSpreads: [], children: [] }], portalBoundaries: [] })
@@ -147,7 +175,7 @@ describe("generic render-model alternatives and factual aliases", () => {
     const rendering: Parameters<typeof sourceAnalysis.compareJsxRenderTree>[0] = {
       alternatives: [
         { when: { propName: "collapsible", equals: "none" }, rendering: divBranch("plain") },
-        { when: { source: "state", name: "isMobile", truthiness: "truthy" }, rendering: sheetBranch },
+        { when: { propName: "isMobile", truthiness: "truthy" }, rendering: sheetBranch },
         { otherwise: true as const, rendering: divBranch("desktop") },
       ],
     }

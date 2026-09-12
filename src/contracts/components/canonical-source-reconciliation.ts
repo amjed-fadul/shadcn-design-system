@@ -212,7 +212,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
         errors.push(`Component ${entry.name} token dependencies do not match source evidence.`)
       }
 
-      const sourceRendering = analyzeJsxRenderTree(path, entry.name)
+      const sourceRendering = analyzeJsxRenderTree(path, entry.name, canonicalRenderSourceAnalysisConventions)
       unresolved.push({
         topic: "jsx-rendering",
         scope: entry.name,
