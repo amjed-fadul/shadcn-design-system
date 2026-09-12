@@ -1,14 +1,19 @@
 import { createHash } from "node:crypto"
 import { execFileSync } from "node:child_process"
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { afterEach, describe, expect, test } from "vitest"
 import { createImplementationManifest, verifyImplementationManifest, assertReachedInputs, packageIdentity, verifyRepositoryRelease } from "../scripts/release-inputs"
 import { hashExecutableReleasePayload } from "../src/validator/release"
+import { loadExecutableRelease } from "../src/validator/release"
 
 const root = process.cwd()
 const temporary: string[] = []
+const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
+const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0-release.3.tgz")
+const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4DistributionManifest = path.join(r4ArtifactDirectory, "distribution-manifest.json")
 function fixture() {
   const directory = mkdtempSync(path.join(tmpdir(), "release-input-test-")); temporary.push(directory)
   const put = (file: string, text: string) => { mkdirSync(path.dirname(path.join(directory, file)), { recursive: true }); writeFileSync(path.join(directory, file), text) }
@@ -178,7 +183,38 @@ describe("release package input identity", () => {
     expect(verifyRepositoryRelease(directory).releaseId).toBe("shadcn-radix-release-003")
   })
   test("maps the approved package name, version and exact public entrypoints", () => {
-    expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.3", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
+    expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.4", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
+  })
+  test("preserves the accepted R3 tarball identity across candidate generation", () => {
+    expect(existsSync(r3Tarball)).toBe(true)
+    expect(createHash("sha256").update(readFileSync(r3Tarball)).digest("hex")).toBe("bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629")
+  })
+  test("requires a separately identified R4 release, external candidate, and complete handoff", () => {
+    const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-004.json")
+    const handoffPath = path.join(root, "docs/CANVAS-RELEASE-004.md")
+    expect(existsSync(releasePath)).toBe(true)
+    expect(existsSync(r4DistributionManifest)).toBe(true)
+    expect(existsSync(handoffPath)).toBe(true)
+    const release = JSON.parse(readFileSync(releasePath, "utf8"))
+    const manifest = JSON.parse(readFileSync(r4DistributionManifest, "utf8"))
+    const handoff = readFileSync(handoffPath, "utf8")
+    expect(loadExecutableRelease(release, { expectedProjection: release.projection, expectedReleaseId: "shadcn-radix-release-004", requirePackageIdentity: true })).toEqual(release)
+    expect(release.packageIdentity).toEqual({
+      name: "@adc/shadcn-design-system",
+      version: "0.0.0-release.4",
+      publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports,
+    })
+    expect(release.projection.exports["sidebar\0SidebarProvider"].component.composition.provides).toEqual(["sidebar.context"])
+    expect(release.projection.exports["sidebar\0Sidebar"].component.composition.requires).toEqual(["sidebar.context"])
+    expect(manifest.release).toEqual({ id: release.releaseId, payloadSha256: release.sha256 })
+    expect(manifest.package).toEqual({ name: release.packageIdentity.name, version: release.packageIdentity.version })
+    expect(handoff).toContain("shadcn-radix-release-004")
+    expect(handoff).toContain("0.0.0-release.4")
+    expect(handoff).toContain(release.sha256)
+    expect(handoff).toContain(manifest.tarball.sha256)
+    expect(handoff).toContain(manifest.tarball.integrity)
+    expect(handoff).toContain(r4ArtifactDirectory)
+    expect(handoff).toMatch(/Source commit: `[0-9a-f]{40}`/)
   })
   test("immutable R3 release records all 20 components, shared utilities, mobile hook and build inputs", () => {
     const release = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-003.json"), "utf8"))
@@ -186,7 +222,7 @@ describe("release package input identity", () => {
     expect(paths.filter((file: string) => /^src\/components\/ui\/.*\.tsx$/.test(file))).toHaveLength(20)
     expect(paths).toEqual(expect.arrayContaining(["src/lib/utils.ts", "src/hooks/use-mobile.ts", "src/index.css", "scripts/library-data.ts", "scripts/build-library.mjs", "vite.library.config.ts", "tsconfig.library.json", "package-lock.json", "components.json"]))
     expect(release.documentSchemaVersion).toBe(1)
-    expect(release.packageIdentity).toEqual(packageIdentity(root))
+    expect(release.packageIdentity).toEqual({ ...packageIdentity(root), version: "0.0.0-release.3" })
   })
   test("retained release-001 preserves the six reviewed ref facts", () => {
     const old = JSON.parse(execFileSync("git", ["show", "765e2d7786142cb3ed9f9ae56ebbc8c5e07614d2:provenance/releases/shadcn-radix-release-001.json"], { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }))

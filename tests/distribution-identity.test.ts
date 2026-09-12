@@ -9,6 +9,7 @@ import { generateDistributionManifest, packedInventory, verifyDistributionManife
 const digest = (data: string | Buffer) => createHash("sha256").update(data).digest("hex")
 const release = { releaseId: "shadcn-radix-release-001", sha256: "a".repeat(64), packageIdentity: { name: "@adc/shadcn-design-system", version: "0.0.0-release.1" } }
 const toolchain = { node: "22.18.0", npm: "10.9.3", platform: process.platform, arch: process.arch, tools: { vite: "7.3.6", typescript: "5.5.4" } }
+const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
 let directory: string
 let tarball: Buffer
 let manifest: any
@@ -32,6 +33,10 @@ beforeAll(() => {
 afterAll(() => rmSync(directory, { recursive: true, force: true }))
 
 describe("external distribution identity", () => {
+  test("retains the generated R4 manifest as the exact external candidate identity", () => {
+    const manifestPath = path.join(r4ArtifactDirectory, "distribution-manifest.json")
+    expect(readFileSync(manifestPath, "utf8")).toBe(readFileSync(path.join(process.cwd(), "provenance/distributions/shadcn-radix-release-004.distribution.json"), "utf8"))
+  })
   test("records the sorted actual packed-file inventory, tarball hash and npm integrity", () => {
     expect(inventory.map((entry: any) => entry.path)).toEqual(["dist-library/index.d.ts", "dist-library/index.js", "dist-library/release.js", "dist-library/styles.css", "package.json"])
     expect(inventory.find((entry: any) => entry.path === "dist-library/styles.css")).toEqual({ path: "dist-library/styles.css", size: 7, sha256: digest("body {}") })

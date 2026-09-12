@@ -15,6 +15,8 @@ const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0
 const r3DistributionManifest = path.join(r3ArtifactDirectory, "distribution-manifest.json")
 const r3PayloadSha256 = "5ffd25a9bac4fb44f8e826243323b20b93fb51a93db19b14b6d71089b545105b"
 const r3TarballSha256 = "bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629"
+const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4DistributionManifest = path.join(r4ArtifactDirectory, "distribution-manifest.json")
 let r3Extraction = ""
 let output = ""
 const readJson = (file: string) => JSON.parse(readFileSync(path.join(root, file), "utf8"))
@@ -202,6 +204,31 @@ describe("immutable Release 003 package artifact verification", () => {
     const notices = readFileSync(path.join(output, "THIRD_PARTY_LICENSES.txt"), "utf8")
     for (const name of ["@radix-ui/react-dialog", "lucide-react", "class-variance-authority", "@fontsource-variable/geist"]) {
       expect(notices).toContain(name)
+    }
+  })
+})
+
+describe("generated Release 004 package candidate", () => {
+  test("ships the new release identity and corrected Sidebar context projection", async () => {
+    expect(existsSync(r4DistributionManifest)).toBe(true)
+    const distribution = JSON.parse(readFileSync(r4DistributionManifest, "utf8"))
+    const tarball = path.join(r4ArtifactDirectory, distribution.tarball.filename)
+    expect(existsSync(tarball)).toBe(true)
+    const extraction = mkdtempSync(path.join(tmpdir(), "adc-r4-library-"))
+    try {
+      execFileSync("tar", ["-xzf", tarball, "-C", extraction], { stdio: "pipe" })
+      const packageRoot = path.join(extraction, "package")
+      const packageManifest = JSON.parse(readFileSync(path.join(packageRoot, "package.json"), "utf8"))
+      expect(packageManifest.name).toBe("@adc/shadcn-design-system")
+      expect(packageManifest.version).toBe("0.0.0-release.4")
+      const library = await import(/* @vite-ignore */ path.join(packageRoot, "dist-library/release.js"))
+      const release = library.getExecutableRelease()
+      expect(release.releaseId).toBe("shadcn-radix-release-004")
+      expect(release.sha256).toBe(distribution.release.payloadSha256)
+      expect(release.projection.exports["sidebar\0SidebarProvider"].component.composition.provides).toEqual(["sidebar.context"])
+      expect(release.projection.exports["sidebar\0Sidebar"].component.composition.requires).toEqual(["sidebar.context"])
+    } finally {
+      rmSync(extraction, { recursive: true, force: true })
     }
   })
 })
