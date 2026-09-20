@@ -60,7 +60,7 @@ export const Destructive: Story = {
 
 export const WithAction: Story = {
   render: () => (
-    <Alert className="pe-28">
+    <Alert>
       <CheckCircle2 />
       <AlertTitle>Changes saved</AlertTitle>
       <AlertDescription>Your settings are now up to date.</AlertDescription>
@@ -79,7 +79,7 @@ export const Rtl: Story = {
   },
   render: () => (
     <div dir="rtl">
-      <Alert className="pe-28">
+      <Alert>
         <Info />
         <AlertTitle>تم حفظ التغييرات</AlertTitle>
         <AlertDescription>تم تحديث إعداداتك بنجاح.</AlertDescription>
