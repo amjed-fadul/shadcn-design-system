@@ -3,7 +3,7 @@
   "id": "alert",
   "source": {
     "canonicalPath": "src/components/ui/alert.tsx",
-    "canonicalBlobSha": "b0242b2e2be24d9e7d409daca07bf541b71959a1",
+    "canonicalBlobSha": "db210633ba702b566014146e2ae9fb3a201ff61a",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/alert.tsx",
     "upstreamBlobSha": "e9aa02f381ef6e588cfb57696f76703c0f7c4ceb"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/alert.tsx@b0242b2e2be24d9e7d409daca07bf541b71959a1"
+      "source": "src/components/ui/alert.tsx@db210633ba702b566014146e2ae9fb3a201ff61a"
     },
     "tokens": {
       "kind": "token-contract",
@@ -88,6 +88,17 @@
           },
           {
             "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 28
+            },
             "evidenceRefs": [
               "source",
               "tokens"
