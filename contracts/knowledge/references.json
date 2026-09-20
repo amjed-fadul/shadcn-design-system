@@ -2,68 +2,6 @@
   "schemaVersion": 1,
   "references": [
     {
-      "id": "canonical.button.source",
-      "kind": "canonical-source",
-      "title": "Canonical Button source",
-      "locator": "src/components/ui/button.tsx#Button",
-      "locatorHint": "Button export; buttonVariants helper",
-      "accessedOn": "2026-09-02",
-      "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
-      "contentHash": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc"
-    },
-    {
-      "id": "canonical.dialog.source",
-      "kind": "canonical-source",
-      "title": "Canonical Dialog source",
-      "locator": "src/components/ui/dialog.tsx#Dialog",
-      "locatorHint": "Dialog exports; DialogContent; DialogFooter",
-      "accessedOn": "2026-09-02",
-      "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
-      "contentHash": "e51b829a56b094b0e0aa7c8552fdfab0c3cb368c"
-    },
-    {
-      "id": "canonical.select.source",
-      "kind": "canonical-source",
-      "title": "Canonical Select source",
-      "locator": "src/components/ui/select.tsx#Select",
-      "locatorHint": "Select exports; SelectTrigger; SelectContent",
-      "accessedOn": "2026-09-02",
-      "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
-      "contentHash": "a18203c391b82e6c74cb9965e3ad850cd4543b25"
-    },
-    {
-      "id": "radix.checkbox.docs",
-      "kind": "official-documentation",
-      "title": "Checkbox - Radix Primitives",
-      "locator": "https://www.radix-ui.com/primitives/docs/components/checkbox",
-      "locatorHint": "Features; Indeterminate; Accessibility; Keyboard Interactions",
-      "accessedOn": "2026-09-02"
-    },
-    {
-      "id": "radix.dialog.docs",
-      "kind": "official-documentation",
-      "title": "Dialog - Radix Primitives",
-      "locator": "https://www.radix-ui.com/primitives/docs/components/dialog",
-      "locatorHint": "Features; Anatomy; Accessibility; Keyboard Interactions; Title; Description",
-      "accessedOn": "2026-09-02"
-    },
-    {
-      "id": "radix.label.docs",
-      "kind": "official-documentation",
-      "title": "Label - Radix Primitives",
-      "locator": "https://www.radix-ui.com/primitives/docs/components/label",
-      "locatorHint": "Accessibility; htmlFor; Native label association",
-      "accessedOn": "2026-09-02"
-    },
-    {
-      "id": "radix.select.docs",
-      "kind": "official-documentation",
-      "title": "Select - Radix Primitives",
-      "locator": "https://www.radix-ui.com/primitives/docs/components/select",
-      "locatorHint": "Features; Anatomy; Accessibility; Keyboard Interactions; Labelling",
-      "accessedOn": "2026-09-02"
-    },
-    {
       "id": "shadcn.accordion.docs",
       "kind": "official-documentation",
       "title": "Accordion - shadcn/ui",
@@ -224,6 +162,38 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "radix.checkbox.docs",
+      "kind": "official-documentation",
+      "title": "Checkbox - Radix Primitives",
+      "locator": "https://www.radix-ui.com/primitives/docs/components/checkbox",
+      "locatorHint": "Features; Indeterminate; Accessibility; Keyboard Interactions",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "radix.label.docs",
+      "kind": "official-documentation",
+      "title": "Label - Radix Primitives",
+      "locator": "https://www.radix-ui.com/primitives/docs/components/label",
+      "locatorHint": "Accessibility; htmlFor; Native label association",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "radix.dialog.docs",
+      "kind": "official-documentation",
+      "title": "Dialog - Radix Primitives",
+      "locator": "https://www.radix-ui.com/primitives/docs/components/dialog",
+      "locatorHint": "Features; Anatomy; Accessibility; Keyboard Interactions; Title; Description",
+      "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "radix.select.docs",
+      "kind": "official-documentation",
+      "title": "Select - Radix Primitives",
+      "locator": "https://www.radix-ui.com/primitives/docs/components/select",
+      "locatorHint": "Features; Anatomy; Accessibility; Keyboard Interactions; Labelling",
+      "accessedOn": "2026-09-02"
+    },
+    {
       "id": "w3c.button.apg",
       "kind": "official-standard",
       "title": "Button Pattern | WAI-ARIA Authoring Practices Guide",
@@ -238,6 +208,36 @@
       "locator": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
       "locatorHint": "About This Pattern; Keyboard Interaction; Notes; WAI-ARIA Roles, States, and Properties",
       "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "canonical.button.source",
+      "kind": "canonical-source",
+      "title": "Canonical Button source",
+      "locator": "src/components/ui/button.tsx#Button",
+      "locatorHint": "Button export; buttonVariants helper",
+      "accessedOn": "2026-09-02",
+      "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
+      "contentHash": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc"
+    },
+    {
+      "id": "canonical.dialog.source",
+      "kind": "canonical-source",
+      "title": "Canonical Dialog source",
+      "locator": "src/components/ui/dialog.tsx#Dialog",
+      "locatorHint": "Dialog exports; DialogContent; DialogFooter",
+      "accessedOn": "2026-09-02",
+      "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
+      "contentHash": "e51b829a56b094b0e0aa7c8552fdfab0c3cb368c"
+    },
+    {
+      "id": "canonical.select.source",
+      "kind": "canonical-source",
+      "title": "Canonical Select source",
+      "locator": "src/components/ui/select.tsx#Select",
+      "locatorHint": "Select exports; SelectTrigger; SelectContent",
+      "accessedOn": "2026-09-02",
+      "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
+      "contentHash": "a18203c391b82e6c74cb9965e3ad850cd4543b25"
     }
   ]
 }
