@@ -1,0 +1,420 @@
+{
+  "schemaVersion": 1,
+  "id": "toggle",
+  "source": {
+    "canonicalPath": "src/components/ui/toggle.tsx",
+    "canonicalBlobSha": "de5328f19e85f2c6079531add1ff056eb59295b1",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/toggle.tsx",
+    "upstreamBlobSha": "37c743fa89e480f2cd7b7801cf1ae12db619e834"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/toggle.tsx@de5328f19e85f2c6079531add1ff056eb59295b1"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.toggle.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Toggle",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "outline"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "sm",
+                "lg"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "radix.toggle.root"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "pressed",
+            "controlledProp": "pressed",
+            "defaultProp": "defaultPressed",
+            "changeEventProp": "onPressedChange",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 9
+            },
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.toggle.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "toggle",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-variant",
+                  "source": "prop",
+                  "prop": "variant",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-size",
+                  "source": "prop",
+                  "prop": "size",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "toggle button semantics",
+            "owner": "component",
+            "mechanism": "Radix Toggle renders a button with aria-pressed and data-state on/off from the pressed state",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "feature": "icon-only accessible name",
+            "owner": "author",
+            "mechanism": "provide aria-label when the Toggle contains only an icon",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "type",
+            "value": "button",
+            "evidenceRefs": [
+              "declaration"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "toggleVariants",
+      "kind": "helper",
+      "authorableJsx": false,
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ],
+  "unresolved": []
+}
