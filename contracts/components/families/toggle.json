@@ -396,15 +396,7 @@
             ]
           }
         ],
-        "inheritedPropDefaults": [
-          {
-            "propName": "type",
-            "value": "button",
-            "evidenceRefs": [
-              "declaration"
-            ]
-          }
-        ]
+        "inheritedPropDefaults": []
       }
     },
     {
