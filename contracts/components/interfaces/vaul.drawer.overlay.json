@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "vaul.drawer.overlay",
+  "source": {
+    "kind": "package-declaration",
+    "package": "vaul",
+    "version": "1.1.2",
+    "declarationPath": "node_modules/vaul/dist/index.d.ts",
+    "declarationSha256": "e7441be68f390975c6155c805cea8f54cc1b7f3656b6b9440ecbbbd7753499e6",
+    "symbol": "Overlay"
+  },
+  "evidence": {
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "node_modules/vaul/dist/index.d.ts@e7441be68f390975c6155c805cea8f54cc1b7f3656b6b9440ecbbbd7753499e6"
+    }
+  },
+  "props": [],
+  "events": [],
+  "conditionalApi": [],
+  "unresolved": []
+}
