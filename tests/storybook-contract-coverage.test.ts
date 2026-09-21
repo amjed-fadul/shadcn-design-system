@@ -17,6 +17,7 @@ const expectedFamilyIds = [
   "button",
   "card",
   "checkbox",
+  "collapsible",
   "command",
   "dialog",
   "drawer",
@@ -48,7 +49,7 @@ const expectedFamilyIds = [
 ] as const
 
 describe("Storybook contract coverage", () => {
-  test("preserves the exact 37-family source and story manifests", () => {
+  test("preserves the exact 38-family source and story manifests", () => {
     const directoryEntries = readdirSync(storyDirectory)
     const actualComponentFiles = directoryEntries
       .filter(
@@ -66,7 +67,7 @@ describe("Storybook contract coverage", () => {
       .map((familyId) => `${familyId}.stories.tsx`)
       .sort()
 
-    expect(expectedFamilyIds).toHaveLength(37)
+    expect(expectedFamilyIds).toHaveLength(38)
     expect(actualComponentFiles).toEqual(expectedComponentFiles)
     expect(actualStoryFiles).toEqual(expectedStoryFiles)
   })

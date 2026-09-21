@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "collapsible-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "collapsible"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "An interactive component which expands or collapses a panel.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.collapsible.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Collapsible when secondary content or settings should be revealed on demand without navigating away.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.collapsible.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Collapsible with CollapsibleTrigger and CollapsibleContent; the trigger and content must remain inside the same Collapsible root.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.collapsible.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use open with onOpenChange for controlled state, or defaultOpen for an uncontrolled initial state.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.collapsible.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use disabled on Collapsible to disable the disclosure interaction.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.collapsible.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use forceMount on CollapsibleContent when the content must remain mounted for animation or integration needs.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.collapsible.docs"
+        ]
+      }
+    }
+  ]
+}

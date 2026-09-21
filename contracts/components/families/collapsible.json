@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "id": "collapsible",
+  "source": {
+    "canonicalPath": "src/components/ui/collapsible.tsx",
+    "canonicalBlobSha": "d7e32ed4872189829129ac7d9b38012253bd0f41",
+    "implementationKind": "upstream-wrapper",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/collapsible.tsx",
+    "upstreamBlobSha": "2f7a4e7fc64a8874373c1584646a63f28cd63c47"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/collapsible.tsx@d7e32ed4872189829129ac7d9b38012253bd0f41"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.collapsible.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Collapsible",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.collapsible.root"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [
+            "collapsible.context"
+          ],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "open",
+            "controlledProp": "open",
+            "defaultProp": "defaultOpen",
+            "changeEventProp": "onOpenChange",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.collapsible.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "collapsible",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "expand/collapse state",
+            "owner": "component",
+            "mechanism": "Radix Collapsible owns open/closed state and propagates it to trigger/content descendants",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "CollapsibleTrigger",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.collapsible.trigger"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [
+            "collapsible.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "trigger",
+          "publicPropsTargetNodeId": "trigger",
+          "nodes": [
+            {
+              "id": "trigger",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.collapsible.trigger"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "collapsible-trigger",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "disclosure trigger semantics",
+            "owner": "component",
+            "mechanism": "Radix Trigger renders a button and owns aria-expanded, aria-controls, disabled state, and open/closed data-state",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "CollapsibleContent",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.collapsible.content"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [
+            "collapsible.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "content",
+          "publicPropsTargetNodeId": "content",
+          "nodes": [
+            {
+              "id": "content",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.collapsible.content"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "collapsible-content",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "disclosure content relationship",
+            "owner": "component",
+            "mechanism": "Radix Content receives the generated content id referenced by the trigger and conditionally mounts from the open state unless forceMount is true",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    }
+  ],
+  "unresolved": []
+}
