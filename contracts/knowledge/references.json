@@ -34,6 +34,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.breadcrumb.docs",
+      "kind": "official-documentation",
+      "title": "Breadcrumb - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/breadcrumb",
+      "locatorHint": "Breadcrumb; Usage; Composition; Custom separator; Collapsed; Link component; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.button.docs",
       "kind": "official-documentation",
       "title": "Button - shadcn/ui",
