@@ -59,7 +59,7 @@ function expectedRadix(symbol: string, eventNames: string[] = []) {
     : []
 
   return {
-    props: full.props,
+    props: full.props.filter((prop) => !eventNames.includes(prop.name)),
     events,
     conditionalApi: full.conditionalApi,
   }
@@ -71,8 +71,8 @@ function schemaValid(schema: object, value: unknown) {
 
 function normalizeMachineSpecificTypePaths<T>(value: T): T {
   const normalized = JSON.stringify(value).replace(
-    /import\\\(\\\"[^\\\"]*\\/node_modules\\/(@radix-ui\\/rect\\/dist\\/index)\\\"\\\)/g,
-    'import("$1")'
+    /import\("[^"]*\/node_modules\/@radix-ui\/rect\/dist\/index"\)/g,
+    'import("@radix-ui/rect/dist/index")'
   )
   return JSON.parse(normalized) as T
 }
