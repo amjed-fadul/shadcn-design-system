@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "id": "spinner",
+  "source": {
+    "canonicalPath": "src/components/ui/spinner.tsx",
+    "canonicalBlobSha": "69fc59c84e0b2b6717d7e66ce3632dc444b31910",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/spinner.tsx",
+    "upstreamBlobSha": "2a91bf988618e87a3698133b0bd971a00ec3f61b"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/spinner.tsx@69fc59c84e0b2b6717d7e66ce3632dc444b31910"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Spinner",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "spinner",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "loading status semantics",
+            "owner": "component",
+            "mechanism": "rendered icon receives role=\"status\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "default accessible name",
+            "owner": "component",
+            "mechanism": "rendered icon receives aria-label=\"Loading\" unless overridden by forwarded props",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "role",
+            "value": "status",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "propName": "aria-label",
+            "value": "Loading",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "unresolved": [
+    {
+      "topic": "native SVG inherited interface",
+      "scope": "Spinner public props and rendered Lucide SVG host",
+      "reason": "Spinner accepts React.ComponentProps<\"svg\">, but release.4 does not yet register an html.svg inherited-interface contract. The interface must be generated from the pinned @types/react 18.3.3 declaration before release.5 cutover.",
+      "evidenceAttempted": [
+        "canonical Spinner source",
+        "existing release.4 inherited-interface registry",
+        "@types/react 18.3.3 declaration identity already pinned by existing intrinsic contracts"
+      ],
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ]
+}
