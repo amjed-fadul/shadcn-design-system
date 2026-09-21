@@ -82,7 +82,6 @@ export const IconsOnly: Story = {
             href="?page=1"
             text=""
             aria-label="Previous page"
-            size="icon"
           />
         </PaginationItem>
         <PaginationItem>
@@ -90,7 +89,6 @@ export const IconsOnly: Story = {
             href="?page=3"
             text=""
             aria-label="Next page"
-            size="icon"
           />
         </PaginationItem>
       </PaginationContent>
