@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "radix.alert-dialog.portal",
+  "source": {
+    "kind": "package-declaration",
+    "package": "@radix-ui/react-alert-dialog",
+    "version": "1.1.23",
+    "declarationPath": "node_modules/@radix-ui/react-alert-dialog/dist/index.d.ts",
+    "declarationSha256": "31c30cc54e8c3da37c8e2e40e5658471f65915df22d348990d1601901e8c9ff3",
+    "symbol": "Portal"
+  },
+  "evidence": {
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "node_modules/@radix-ui/react-alert-dialog/dist/index.d.ts@31c30cc54e8c3da37c8e2e40e5658471f65915df22d348990d1601901e8c9ff3"
+    }
+  },
+  "props": [
+    {
+      "name": "children",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Iterable<React.ReactNode>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactPortal"
+          }
+        ]
+      },
+      "typeText": "React.ReactNode",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "container",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "typescript",
+            "typeText": "Element"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "DocumentFragment"
+          }
+        ]
+      },
+      "typeText": "Element | DocumentFragment",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "forceMount",
+      "required": false,
+      "type": {
+        "kind": "literal",
+        "value": true
+      },
+      "typeText": "true",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "events": [],
+  "conditionalApi": [],
+  "unresolved": []
+}
