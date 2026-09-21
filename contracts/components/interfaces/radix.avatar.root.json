@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "radix.avatar.root",
+  "source": {
+    "kind": "package-declaration",
+    "package": "@radix-ui/react-avatar",
+    "version": "1.2.6",
+    "declarationPath": "node_modules/@radix-ui/react-avatar/dist/index.d.ts",
+    "declarationSha256": "76962a35826bb40bd284c16f09d97542df5f22eda64dd7fd2c9831e51c6b3ecc",
+    "symbol": "Root"
+  },
+  "evidence": {
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "node_modules/@radix-ui/react-avatar/dist/index.d.ts@76962a35826bb40bd284c16f09d97542df5f22eda64dd7fd2c9831e51c6b3ecc"
+    }
+  },
+  "props": [
+    {
+      "name": "asChild",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "events": [],
+  "conditionalApi": [],
+  "unresolved": []
+}
