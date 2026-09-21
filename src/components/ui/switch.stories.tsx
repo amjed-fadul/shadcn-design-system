@@ -1,3 +1,4 @@
+import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Label } from "@/components/ui/label"
@@ -90,6 +91,27 @@ export const Sizes: Story = {
       </div>
     </div>
   ),
+}
+
+function ControlledSwitchStory() {
+  const [checked, setChecked] = React.useState(false)
+
+  return (
+    <div className="flex items-center gap-3">
+      <Switch
+        id="switch-controlled"
+        checked={checked}
+        onCheckedChange={setChecked}
+      />
+      <Label htmlFor="switch-controlled">
+        {checked ? "Enabled" : "Disabled"}
+      </Label>
+    </div>
+  )
+}
+
+export const Controlled: Story = {
+  render: () => <ControlledSwitchStory />,
 }
 
 export const Rtl: Story = {
