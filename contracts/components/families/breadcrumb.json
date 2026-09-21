@@ -1,0 +1,755 @@
+{
+  "schemaVersion": 1,
+  "id": "breadcrumb",
+  "source": {
+    "canonicalPath": "src/components/ui/breadcrumb.tsx",
+    "canonicalBlobSha": "b07813ec1988e702cf9eeb81da78409b2feb2c6b",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/breadcrumb.tsx",
+    "upstreamBlobSha": "7bcdf3a21029aadfc411e63a34a748288355b1ee"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/breadcrumb.tsx@b07813ec1988e702cf9eeb81da78409b2feb2c6b"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Breadcrumb",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.nav"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "html.nav"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "breadcrumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "breadcrumb navigation landmark",
+            "owner": "component",
+            "mechanism": "semantic nav with default aria-label=\"breadcrumb\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "aria-label",
+            "value": "breadcrumb",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "BreadcrumbList",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.ol"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "html.ol"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "breadcrumb-list",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "BreadcrumbItem",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.li"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "html.li"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "breadcrumb-item",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "BreadcrumbLink",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.a"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "alternatives": [
+            {
+              "when": {
+                "propName": "asChild",
+                "equals": true
+              },
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "breadcrumb-link",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "a"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "breadcrumb-link",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": [
+          {
+            "feature": "link semantics",
+            "owner": "author",
+            "mechanism": "provide href or use asChild with a router link component",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "BreadcrumbPage",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.span"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "font-weight.normal",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "span"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "breadcrumb-page",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "current page semantics",
+            "owner": "component",
+            "mechanism": "role=\"link\", aria-disabled=\"true\", and aria-current=\"page\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "role",
+            "value": "link",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "propName": "aria-disabled",
+            "value": "true",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "propName": "aria-current",
+            "value": "page",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "BreadcrumbSeparator",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.li"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "alternatives": [
+            {
+              "when": {
+                "propName": "children",
+                "truthiness": "truthy"
+              },
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "inherited-interface",
+                      "interfaceId": "html.li"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "breadcrumb-separator",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "inherited-interface",
+                      "interfaceId": "html.li"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "breadcrumb-separator",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [
+                      {
+                        "nodeId": "icon",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "icon",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": [
+          {
+            "feature": "decorative separator",
+            "owner": "component",
+            "mechanism": "role=\"presentation\" and aria-hidden=\"true\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "role",
+            "value": "presentation",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "propName": "aria-hidden",
+            "value": "true",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "BreadcrumbEllipsis",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.span"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "span"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "breadcrumb-ellipsis",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "icon",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "decorative collapsed-state indicator",
+            "owner": "component",
+            "mechanism": "role=\"presentation\" and aria-hidden=\"true\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "role",
+            "value": "presentation",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "propName": "aria-hidden",
+            "value": "true",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "unresolved": []
+}
