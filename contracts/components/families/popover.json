@@ -3,7 +3,7 @@
   "id": "popover",
   "source": {
     "canonicalPath": "src/components/ui/popover.tsx",
-    "canonicalBlobSha": "4df0eadac09cc1a8a88a5277712df2c4e8ced82a",
+    "canonicalBlobSha": "f9742bc6d2168cf02ddf3318856fcb327436620a",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/popover.tsx",
     "upstreamBlobSha": "d8e539566cfafc43bb8b6441679b88e64e9387a2"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/popover.tsx@4df0eadac09cc1a8a88a5277712df2c4e8ced82a"
+      "source": "src/components/ui/popover.tsx@f9742bc6d2168cf02ddf3318856fcb327436620a"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -488,7 +488,7 @@
       "component": {
         "localProps": [],
         "inherits": [
-          "html.h2"
+          "html.div"
         ],
         "slots": [],
         "composition": {

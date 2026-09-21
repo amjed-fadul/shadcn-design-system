@@ -61,7 +61,7 @@ function PopoverHeader({
 function PopoverTitle({
   className,
   ...props
-}: React.ComponentProps<"h2">) {
+}: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="popover-title"

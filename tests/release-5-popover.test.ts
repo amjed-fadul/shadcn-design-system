@@ -4,7 +4,9 @@ import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
 import Ajv2020 from "ajv/dist/2020"
-import { describe, expect, test } from "vitest"
+import { describe, expect, expectTypeOf, test } from "vitest"
+import type * as React from "react"
+import { PopoverTitle } from "../src/components/ui/popover"
 
 import familySchema from "../contracts/components/component-family.schema.json"
 import interfaceSchema from "../contracts/components/inherited-interface.schema.json"
@@ -14,13 +16,15 @@ import popoverTrigger from "../contracts/components/interfaces/radix.popover.tri
 import popoverAnchor from "../contracts/components/interfaces/radix.popover.anchor.json"
 import popoverPortal from "../contracts/components/interfaces/radix.popover.portal.json"
 import popoverContent from "../contracts/components/interfaces/radix.popover.content.json"
-import htmlH2 from "../contracts/components/interfaces/html.h2.json"
 import htmlDiv from "../contracts/components/interfaces/html.div.json"
 import htmlP from "../contracts/components/interfaces/html.p.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
 import knowledge from "../contracts/knowledge/components/popover.json"
 import references from "../contracts/knowledge/references.json"
-import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
+import {
+  analyzeIntrinsicReactInterface,
+  analyzePackageComponentInterface,
+} from "./helpers/typescript-interface-analysis"
 import { validateComponentFamilyInvariants } from "../src/contracts/components/invariants"
 import {
   analyzeJsxRenderTree,
@@ -90,7 +94,7 @@ describe("release.5 Popover", () => {
         popoverAnchor,
         popoverPortal,
         popoverContent,
-        htmlH2,
+        htmlDiv,
       ]) {
         expect(schemaValid(interfaceSchema, contract)).toBe(true)
       }
@@ -102,13 +106,13 @@ describe("release.5 Popover", () => {
 
       expect(popover.source.canonicalBlobSha).toBe(blobSha)
       expect(popover.source.canonicalBlobSha).toBe(
-        "4df0eadac09cc1a8a88a5277712df2c4e8ced82a"
+        "f9742bc6d2168cf02ddf3318856fcb327436620a"
       )
       expect(popover.source.upstreamPath).toBe(
         "apps/v4/registry/bases/radix/ui/popover.tsx"
       )
       expect(popoverRoot.source.declarationSha256).toBe(radixHash)
-      expect(htmlH2.source.declarationSha256).toBe(reactHash)
+      expect(htmlDiv.source.declarationSha256).toBe(reactHash)
     },
     60_000
   )
@@ -134,12 +138,9 @@ describe("release.5 Popover", () => {
         expect(contract.unresolved).toEqual([])
       }
 
-      const h2 = analyzePackageComponentInterface({
-        declarationPath: reactDeclarationPath,
-        symbol: 'React.JSX.IntrinsicElements["h2"]',
-      })
-      expect(htmlH2.props).toEqual(h2.props)
-      expect(htmlH2.unresolved).toEqual([])
+      expect(htmlDiv.props.map(({ name, required, typeText }) => ({ name, required, typeText })))
+        .toEqual(analyzeIntrinsicReactInterface("div"))
+      expect(htmlDiv.unresolved).toEqual([])
     },
     60_000
   )
@@ -152,7 +153,6 @@ describe("release.5 Popover", () => {
       popoverAnchor,
       popoverPortal,
       popoverContent,
-      htmlH2,
       htmlDiv,
       htmlP,
     ] as any[]
@@ -202,8 +202,17 @@ describe("release.5 Popover", () => {
     const title = analyzeJsxRenderTree(sourcePath, "PopoverTitle")
     if (!title.root) throw new Error("PopoverTitle render root is unresolved.")
     expect(title.root.tag).toBe("div")
-    expect(popover.exports.find((entry) => entry.name === "PopoverTitle")?.component?.inherits)
-      .toEqual(["html.h2"])
+    expect(title.root.receivesPublicProps).toBe(true)
+
+    const titleComponent = popover.exports.find((entry) => entry.name === "PopoverTitle")?.component
+    expect(titleComponent?.inherits).toEqual(["html.div"])
+    expect(titleComponent?.rendering.publicPropsTargetNodeId).toBe("host")
+    expect(titleComponent?.rendering.nodes.find((node) => node.id === "host")).toMatchObject({
+      host: { kind: "intrinsic", tag: "div" },
+      receivesPublicProps: true,
+    })
+    expectTypeOf<React.ComponentProps<typeof PopoverTitle>>()
+      .toEqualTypeOf<React.ComponentProps<"div">>()
 
     expect(Object.fromEntries(extractFunctionPropDefaults(sourcePath, "PopoverContent"))).toEqual({
       align: "center",
@@ -244,7 +253,7 @@ describe("release.5 Popover", () => {
       popoverAnchor,
       popoverPortal,
       popoverContent,
-      htmlH2,
+      htmlDiv,
     ]) {
       const serialized = JSON.stringify(contract)
       expect(serialized).not.toContain("/home/runner/")
