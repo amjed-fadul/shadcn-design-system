@@ -138,8 +138,8 @@ describe("simple/native-oriented component contracts", () => {
   })
 
   test("reconciles every approved token utility in source modifiers", () => {
-    expect(analyzeTailwindTokenDependencies("border-input file:text-foreground placeholder:text-muted-foreground md:text-sm leading-relaxed hover:bg-muted/50 focus-visible:ring-ring/50").map(({ tokenId }) => tokenId).sort()).toEqual([
-      "color.input", "color.foreground", "color.muted-foreground", "font-size.sm", "line-height.relaxed", "color.muted", "color.ring",
+    expect(analyzeTailwindTokenDependencies("border-input file:text-foreground placeholder:text-muted-foreground md:text-sm leading-relaxed leading-snug leading-normal ms-4 hover:bg-muted/50 focus-visible:ring-ring/50").map(({ tokenId }) => tokenId).sort()).toEqual([
+      "color.input", "color.foreground", "color.muted-foreground", "font-size.sm", "line-height.relaxed", "line-height.snug", "line-height.normal", "spacing.unit", "color.muted", "color.ring",
     ].sort())
   })
 
