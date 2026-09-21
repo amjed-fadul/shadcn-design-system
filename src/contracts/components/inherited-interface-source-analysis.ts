@@ -81,12 +81,22 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
   const { checker, file } = program
   const intrinsic = intrinsicPropsType(checker, file, source.symbol)
   const moduleSymbol = checker.getSymbolAtLocation(file)
-  const exported = intrinsic ? undefined : moduleSymbol && checker.getExportsOfModule(moduleSymbol).find((symbol) => symbol.getName() === source.symbol)
-  const declaration = exported?.valueDeclaration ?? exported?.declarations?.[0] ?? file
+  const symbolPath = source.symbol.split(".")
+  let exported = intrinsic ? undefined : moduleSymbol && checker.getExportsOfModule(moduleSymbol).find((symbol) => symbol.getName() === symbolPath[0])
+  let declaration = exported?.valueDeclaration ?? exported?.declarations?.[0] ?? file
   if (!intrinsic && !exported) throw new Error(`Unable to resolve package export: ${source.symbol}.`)
-  const exportedType = exported && checker.getTypeOfSymbolAtLocation(exported, declaration)
+  let exportedType = exported && checker.getTypeOfSymbolAtLocation(exported, declaration)
+
+  for (const memberName of symbolPath.slice(1)) {
+    const member = exportedType && checker.getPropertyOfType(exportedType, memberName)
+    if (!member) throw new Error(`Unable to resolve package export member: ${source.symbol}.`)
+    exported = member
+    declaration = member.valueDeclaration ?? member.declarations?.[0] ?? declaration
+    exportedType = checker.getTypeOfSymbolAtLocation(member, declaration)
+  }
+
   const parameter = exportedType?.getCallSignatures()[0]?.parameters[0]
-  const propsType = intrinsic ?? (parameter ? checker.getTypeOfSymbolAtLocation(parameter, declaration) : exported ? checker.getDeclaredTypeOfSymbol(exported) : undefined)
+  const propsType = intrinsic ?? (parameter ? checker.getTypeOfSymbolAtLocation(parameter, declaration) : exportedType)
   if (!propsType) throw new Error(`Package export ${source.symbol} does not expose component props.`)
   const branches = propsType.isUnion() ? propsType.types : [propsType]
   const evidenceRefs = ["declaration"]
