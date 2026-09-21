@@ -74,6 +74,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.empty.docs",
+      "kind": "official-documentation",
+      "title": "Empty - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/empty",
+      "locatorHint": "Empty; Usage; Composition; Outline; Background; Avatar; Avatar Group; InputGroup; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.input.docs",
       "kind": "official-documentation",
       "title": "Input - shadcn/ui",
