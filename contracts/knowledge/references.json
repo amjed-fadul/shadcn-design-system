@@ -98,6 +98,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.input-group.docs",
+      "kind": "official-documentation",
+      "title": "Input Group - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/input-group",
+      "locatorHint": "Input Group; Usage; Composition; Align; Button; Spinner; Textarea; Custom Input; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.label.docs",
       "kind": "official-documentation",
       "title": "Label - shadcn/ui",
