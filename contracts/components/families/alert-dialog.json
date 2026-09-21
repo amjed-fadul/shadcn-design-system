@@ -273,7 +273,19 @@
         "stateChannels": [],
         "conditionalApi": [],
         "events": [],
-        "tokenDependencies": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
         "rendering": {
           "rootNodeId": "overlay",
           "publicPropsTargetNodeId": "overlay",
