@@ -78,18 +78,6 @@
       ]
     },
     {
-      "name": "onOpenChange",
-      "required": false,
-      "type": {
-        "kind": "typescript",
-        "typeText": "(open: boolean) => void"
-      },
-      "typeText": "(open: boolean) => void",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
       "name": "open",
       "required": false,
       "type": {
