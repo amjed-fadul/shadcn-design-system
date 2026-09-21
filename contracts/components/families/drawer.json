@@ -518,7 +518,16 @@
                 "exportName": "DrawerPortal"
               },
               "receivesPublicProps": false,
-              "dataAttributes": [],
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "drawer-portal",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
               "children": [
                 {
                   "nodeId": "overlay",
