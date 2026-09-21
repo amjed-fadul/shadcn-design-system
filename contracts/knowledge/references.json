@@ -242,6 +242,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.toggle.docs",
+      "kind": "official-documentation",
+      "title": "Toggle - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/toggle",
+      "locatorHint": "Toggle; Usage; Outline; With Text; Size; Disabled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.tooltip.docs",
       "kind": "official-documentation",
       "title": "Tooltip - shadcn/ui",
