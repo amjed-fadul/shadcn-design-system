@@ -130,6 +130,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.spinner.docs",
+      "kind": "official-documentation",
+      "title": "Spinner - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/spinner",
+      "locatorHint": "Spinner; Usage; Customization; Size; Button; Badge; Input Group; Empty; RTL",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.table.docs",
       "kind": "official-documentation",
       "title": "Table - shadcn/ui",
