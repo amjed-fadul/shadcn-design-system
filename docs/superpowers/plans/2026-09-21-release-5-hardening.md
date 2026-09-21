@@ -39,10 +39,10 @@
 - Consumes: release.5 tree at `644f2098fd2ff54e66de27b39f951a341421687a`; `main` at `9b3d2be608eb568ddfa02fe4a530f561588c95a4`
 - Produces: one tree with Storybook config/scripts/dependencies, 19 original stories, and 18 currently integrated release.5 stories
 
-- [ ] Record the red baseline: `npm run typecheck` must fail on missing `@storybook/react-vite` and `npm run storybook:build` must be unavailable.
+- [ ] Record the red baseline: `npm run typecheck` must fail on missing `@storybook/react-vite` and `npm run build-storybook` must be unavailable.
 - [ ] Merge `main` with a real merge commit; resolve dependency/config conflicts by retaining the union of release.5 runtime dependencies and `main` Storybook dev dependencies/scripts.
 - [ ] Assert with tests or a manifest check that the 37 present component files have 37 story files and Storybook includes `src/**/*.stories.tsx`.
-- [ ] Run `npm ci`, `npm run typecheck`, Storybook's test command, `npm run storybook:build`, and `npm run build`.
+- [ ] Run `npm ci`, `npm run typecheck`, `npm run test-storybook`, `npm run build-storybook`, and `npm run build`.
 - [ ] Commit the integration resolution.
 
 ### Task 2: Integrate Collapsible as the nineteenth release.5 family
@@ -57,7 +57,7 @@
 
 - [ ] Write an inventory test that fails because Collapsible is absent and expects its source, story, contract, knowledge, and interface artifacts.
 - [ ] Cherry-pick or transplant only the Collapsible branch commits after merge-base `0803642dd23a9a192d27a86357f457d9a3fcedcc`, resolving references without removing later families.
-- [ ] Run the new inventory test, Collapsible-focused tests, typecheck, Storybook tests/build, and application build.
+- [ ] Run the new inventory test, Collapsible-focused tests, typecheck, `npm run test-storybook`, `npm run build-storybook`, and application build.
 - [ ] Commit the Collapsible integration.
 
 ### Task 3: Correct PopoverTitle source and contract truth
@@ -142,7 +142,7 @@
 - [ ] Add/adjust workflow assertions so a fixture containing `continue-on-error: true` or the Storybook type-error allowlist fails.
 - [ ] Upgrade Vitest and compatible packages to a non-vulnerable version, keeping test behavior stable.
 - [ ] Replace component-specific diagnostic workflows with a release-wide blocking sequence: install, typecheck, full tests, application build, Storybook tests/build, production audit, full audit.
-- [ ] Run typecheck, full tests, application build, Storybook tests/build, `npm audit --omit=dev`, and `npm audit`; require all to exit zero.
+- [ ] Run typecheck, full tests, application build, `npm run test-storybook`, `npm run build-storybook`, `npm audit --omit=dev`, and `npm audit`; require all to exit zero.
 - [ ] Commit CI/security hardening.
 
 ### Task 8: Final whole-release verification
