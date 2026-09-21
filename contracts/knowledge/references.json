@@ -18,6 +18,14 @@
       "accessedOn": "2026-09-20"
     },
     {
+      "id": "shadcn.alert-dialog.docs",
+      "kind": "official-documentation",
+      "title": "Alert Dialog - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/alert-dialog",
+      "locatorHint": "Alert Dialog; Usage; Composition; Basic; Small; Media; Destructive; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.avatar.docs",
       "kind": "official-documentation",
       "title": "Avatar - shadcn/ui",
