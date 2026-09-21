@@ -1018,8 +1018,7 @@
             {
               "id": "button",
               "host": {
-                "kind": "component-export",
-                "exportName": "Button"
+                "kind": "unresolved"
               },
               "receivesPublicProps": false,
               "dataAttributes": [],
@@ -1155,8 +1154,7 @@
             {
               "id": "button",
               "host": {
-                "kind": "component-export",
-                "exportName": "Button"
+                "kind": "unresolved"
               },
               "receivesPublicProps": false,
               "dataAttributes": [],
