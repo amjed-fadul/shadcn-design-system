@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "spinner-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "spinner"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays an animated loading indicator with status semantics.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.spinner.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Spinner when an action or region is waiting for work to complete and progress cannot be expressed as a determinate percentage.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.spinner.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Place Spinner next to loading text or inside a disabled action when the action is in progress.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.spinner.docs"
+        ]
+      }
+    }
+  ]
+}
