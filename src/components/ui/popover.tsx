@@ -61,9 +61,9 @@ function PopoverHeader({
 function PopoverTitle({
   className,
   ...props
-}: React.ComponentProps<"h2">) {
+}: React.ComponentProps<typeof PopoverPrimitive.Title>) {
   return (
-    <div
+    <PopoverPrimitive.Title
       data-slot="popover-title"
       className={cn("font-heading font-medium", className)}
       {...props}
@@ -74,9 +74,9 @@ function PopoverTitle({
 function PopoverDescription({
   className,
   ...props
-}: React.ComponentProps<"p">) {
+}: React.ComponentProps<typeof PopoverPrimitive.Description>) {
   return (
-    <p
+    <PopoverPrimitive.Description
       data-slot="popover-description"
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
