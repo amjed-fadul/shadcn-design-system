@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "toggle-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "toggle"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A two-state button that can be either on or off.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.toggle.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Toggle when a button-like control needs a persistent pressed and unpressed state.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Use pressed with onPressedChange for controlled state, or defaultPressed for uncontrolled initial state.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Provide an accessible name such as aria-label when the Toggle contains only an icon.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use variant=\"outline\" for the outline style; default is the standard transparent style.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Toggle size supports sm, default, and lg.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle.docs"
+        ]
+      }
+    }
+  ]
+}
