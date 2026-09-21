@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "toggle-group-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "toggle-group"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A set of two-state buttons that can be toggled on or off.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.toggle-group.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Toggle Group when related toggle actions belong together and the user may select either one item or multiple items.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle-group.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Set type=\"single\" for one selected value or type=\"multiple\" for an array of selected values.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Give every ToggleGroupItem a unique non-empty value and provide an accessible name for icon-only items.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle-group.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use spacing={0} for connected items; the default spacing is 2.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use orientation=\"vertical\" for a vertical group; variant and size are inherited by items from the group.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.toggle-group.docs"
+        ]
+      }
+    }
+  ]
+}
