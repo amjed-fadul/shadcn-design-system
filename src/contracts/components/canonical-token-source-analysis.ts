@@ -14,7 +14,7 @@ for (const [utility, token] of [["rounded-sm", "radius.sm"], ["rounded-md", "rad
 const approvedTokenIds = new Set(tokenContract.tokens.map((token) => token.id))
 const contractedNamespaces = new Set(tokenContract.coverage.contracted)
 const tokenCategory = new Map(tokenContract.tokens.map((token) => [token.id, token.category]))
-const spacingUtility = /^(?:size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|space-x|space-y|inset|inset-x|inset-y|top|right|bottom|left)-([0-9]+(?:\.[0-9]+)?)$/
+const spacingUtility = /^(?:size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|ps|pe|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|ms|me|space-x|space-y|inset|inset-x|inset-y|inset-s|inset-e|top|right|bottom|left|start|end)-([0-9]+(?:\.[0-9]+)?)$/
 const analyzer = createTokenSourceAnalyzer({
   classMergeFunctionNames: ["cn"],
   recipeFunctionNames: ["cva"],
