@@ -122,6 +122,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.pagination.docs",
+      "kind": "official-documentation",
+      "title": "Pagination - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/pagination",
+      "locatorHint": "Pagination; Usage; Composition; Simple; Icons Only; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.progress.docs",
       "kind": "official-documentation",
       "title": "Progress - shadcn/ui",
