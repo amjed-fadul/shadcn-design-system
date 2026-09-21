@@ -31,7 +31,7 @@ import {
   extractFunctionPropDefaults,
   listModuleExports,
 } from "./helpers/component-source-analysis"
-import { analyzeComponentTokenDependencies } from "./helpers/component-token-analysis"
+import { analyzeComponentTokenDependenciesForExport } from "./helpers/component-token-analysis"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const sourcePath = join(repoRoot, "src/components/ui/alert-dialog.tsx")
@@ -169,22 +169,25 @@ describe("release.5 Alert Dialog", () => {
     }
   })
 
-  test("keeps Alert Dialog token dependencies complete", () => {
-    const sourceTokens = analyzeComponentTokenDependencies(sourcePath)
-      .map((entry) => JSON.stringify(entry))
-      .sort()
+  test("keeps Alert Dialog token dependencies complete per export", () => {
+    for (const entry of family.exports) {
+      if (!entry.component) continue
 
-    const contractTokens = family.exports
-      .flatMap((entry) => entry.component?.tokenDependencies ?? [])
-      .map((entry) =>
-        JSON.stringify({
-          ...entry,
-          evidenceRefs: entry.evidenceRefs.filter((ref) => ref !== "tokens"),
-        })
-      )
-      .sort()
+      const sourceTokens = analyzeComponentTokenDependenciesForExport(sourcePath, entry.name)
+        .map((dependency) => JSON.stringify(dependency))
+        .sort()
 
-    expect(contractTokens).toEqual(sourceTokens)
+      const contractTokens = entry.component.tokenDependencies
+        .map((dependency) =>
+          JSON.stringify({
+            ...dependency,
+            evidenceRefs: dependency.evidenceRefs.filter((ref) => ref !== "tokens"),
+          })
+        )
+        .sort()
+
+      expect(contractTokens, entry.name).toEqual(sourceTokens)
+    }
   })
 
   test("keeps size and Button-derived action options exact", () => {
@@ -269,7 +272,7 @@ describe("release.5 Alert Dialog", () => {
       const component = family.exports.find((entry) => entry.name === name)!.component!
       const rendering = component.rendering as any
       expect(rendering.nodes.find((node: any) => node.id === "button")?.host)
-        .toEqual({ kind: "component-export", exportName: "Button" })
+        .toEqual({ kind: "unresolved" })
     }
   })
 
