@@ -1041,17 +1041,7 @@
         },
         "stateChannels": [],
         "conditionalApi": [],
-        "events": [
-          {
-            "propName": "onSelect",
-            "payload": {
-              "kind": "string"
-            },
-            "evidenceRefs": [
-              "declaration"
-            ]
-          }
-        ],
+        "events": [],
         "tokenDependencies": [
           {
             "tokenId": "spacing.unit",
