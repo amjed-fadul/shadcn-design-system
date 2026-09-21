@@ -227,10 +227,13 @@ describe("release.5 Command", () => {
         evidenceRefs: ["declaration"],
       },
     ])
-    expect(item.events).toEqual([
+    expect(item.events).toEqual([])
+    expect(commandItem.events).toEqual([
       {
         propName: "onSelect",
+        required: false,
         payload: { kind: "string" },
+        payloadTypeText: "string",
         evidenceRefs: ["declaration"],
       },
     ])
