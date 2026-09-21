@@ -90,6 +90,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.command.docs",
+      "kind": "official-documentation",
+      "title": "Command - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/command",
+      "locatorHint": "Command; About; Usage; Composition; Basic; Shortcuts; Groups; Scrollable; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.drawer.docs",
       "kind": "official-documentation",
       "title": "Drawer - shadcn/ui",
