@@ -87,6 +87,38 @@ export const Right: Story = {
   render: () => <DirectionStory direction="right" />,
 }
 
+
+export const ScrollableContent: Story = {
+  render: () => (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button variant="outline">Open scrollable drawer</Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Release notes</DrawerTitle>
+          <DrawerDescription>
+            Content can scroll while the footer actions remain available.
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="max-h-[40vh] overflow-y-auto px-4">
+          {Array.from({ length: 12 }, (_, index) => (
+            <p className="mb-4 text-sm" key={index}>
+              Drawer content section {index + 1}. This content demonstrates a
+              scrollable region inside the drawer.
+            </p>
+          ))}
+        </div>
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant="outline">Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  ),
+}
+
 function ControlledDrawerStory() {
   const [open, setOpen] = React.useState(false)
 
