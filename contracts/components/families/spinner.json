@@ -97,22 +97,7 @@
             ]
           }
         ],
-        "inheritedPropDefaults": [
-          {
-            "propName": "role",
-            "value": "status",
-            "evidenceRefs": [
-              "source"
-            ]
-          },
-          {
-            "propName": "aria-label",
-            "value": "Loading",
-            "evidenceRefs": [
-              "source"
-            ]
-          }
-        ]
+        "inheritedPropDefaults": []
       }
     }
   ],
