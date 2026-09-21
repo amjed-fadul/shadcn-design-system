@@ -140,12 +140,14 @@ describe("release.5 Popover", () => {
     ])
 
     const content = analyzeJsxRenderTree(sourcePath, "PopoverContent")
+    if (!content.root) throw new Error("PopoverContent render root is unresolved.")
     expect(content.root.tag).toBe("PopoverPrimitive.Portal")
     expect(content.root.portal).toBe(true)
     expect(content.root.children[0]?.tag).toBe("PopoverPrimitive.Content")
     expect(content.root.children[0]?.receivesPublicProps).toBe(true)
 
     const title = analyzeJsxRenderTree(sourcePath, "PopoverTitle")
+    if (!title.root) throw new Error("PopoverTitle render root is unresolved.")
     expect(title.root.tag).toBe("div")
     expect(popover.exports.find((entry) => entry.name === "PopoverTitle")?.component?.inherits)
       .toEqual(["html.h2"])
