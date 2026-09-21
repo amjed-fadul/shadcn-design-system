@@ -5,8 +5,8 @@
     "canonicalPath": "src/components/ui/alert-dialog.tsx",
     "canonicalBlobSha": "8f52a23d78dcba8c5226d4e375c03335399520b2",
     "implementationKind": "semantic-token-normalized-derivative",
-    "upstreamPath": "apps/v4/registry/new-york-v4/ui/alert-dialog.tsx",
-    "upstreamBlobSha": "566c463a61b48c79ad544bfdd80434174107c9d5"
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/alert-dialog.tsx",
+    "upstreamBlobSha": "9726776cda43f26e624e88a3dc54ec22eaefdcb3"
   },
   "evidence": {
     "source": {
