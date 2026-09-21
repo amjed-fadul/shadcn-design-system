@@ -88,6 +88,24 @@ export const Empty: Story = {
   ),
 }
 
+
+export const Scrollable: Story = {
+  render: () => (
+    <Command className="w-[360px] rounded-lg border shadow-md">
+      <CommandInput placeholder="Search commands..." />
+      <CommandList>
+        <CommandGroup heading="Commands">
+          {Array.from({ length: 24 }, (_, index) => (
+            <CommandItem key={index} value={`command-${index + 1}`}>
+              Command {index + 1}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  ),
+}
+
 function ControlledDialogStory() {
   const [open, setOpen] = React.useState(false)
 
