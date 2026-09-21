@@ -1,3 +1,4 @@
+import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Bluetooth, Trash2 } from "lucide-react"
 
@@ -118,6 +119,35 @@ export const Destructive: Story = {
       </AlertDialogContent>
     </AlertDialog>
   ),
+}
+
+
+function ControlledAlertDialogStory() {
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">{open ? "Dialog open" : "Open controlled dialog"}</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Controlled alert dialog</AlertDialogTitle>
+          <AlertDialogDescription>
+            The open state is controlled by the story.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+export const Controlled: Story = {
+  render: () => <ControlledAlertDialogStory />,
 }
 
 export const Rtl: Story = {
