@@ -69,6 +69,14 @@ function schemaValid(schema: object, value: unknown) {
   return new Ajv2020({ allErrors: true, strict: true }).compile(schema)(value)
 }
 
+function normalizeMachineSpecificTypePaths<T>(value: T): T {
+  const normalized = JSON.stringify(value).replace(
+    /import\\\(\\\"[^\\\"]*\\/node_modules\\/(@radix-ui\\/rect\\/dist\\/index)\\\"\\\)/g,
+    'import("$1")'
+  )
+  return JSON.parse(normalized) as T
+}
+
 describe("release.5 Popover", () => {
   test(
     "keeps the family and inherited interfaces schema-valid and source-pinned",
@@ -116,7 +124,9 @@ describe("release.5 Popover", () => {
 
       for (const [contract, symbol, events] of cases) {
         const expected = expectedRadix(symbol, [...events])
-        expect(contract.props).toEqual(expected.props)
+        expect(normalizeMachineSpecificTypePaths(contract.props)).toEqual(
+          normalizeMachineSpecificTypePaths(expected.props)
+        )
         expect(contract.events).toEqual(expected.events)
         expect(contract.conditionalApi).toEqual(expected.conditionalApi)
         expect(contract.unresolved).toEqual([])
@@ -159,7 +169,7 @@ describe("release.5 Popover", () => {
       interfaceContracts: new Map(interfaces.map((entry) => [entry.id, entry])),
       tokenIds: new Set(tokenContract.tokens.map((token: any) => token.id)),
       derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule: any) => rule.id)),
-      capabilityIds: new Set<string>(),
+      capabilityIds: new Set(["popover.context"]),
       sourceIdentity: {
         canonicalPath: popover.source.canonicalPath,
         canonicalBlobSha: popover.source.canonicalBlobSha,
@@ -197,6 +207,47 @@ describe("release.5 Popover", () => {
       align: "center",
       sideOffset: 4,
     })
+  })
+
+  test("records inherited slot behavior and Popover context composition", () => {
+    const root = popover.exports.find((entry) => entry.name === "Popover")?.component
+    expect(root?.composition).toEqual({
+      requires: [],
+      provides: ["popover.context"],
+      hardConstraints: [],
+    })
+
+    for (const name of ["PopoverTrigger", "PopoverAnchor", "PopoverContent"]) {
+      const component = popover.exports.find((entry) => entry.name === name)?.component
+      expect(component?.composition).toEqual({
+        requires: ["popover.context"],
+        provides: [],
+        hardConstraints: [],
+      })
+      expect(component?.slots).toEqual([
+        expect.objectContaining({
+          propName: "asChild",
+          default: false,
+          replacesHost: true,
+          forwardsProps: true,
+        }),
+      ])
+    }
+  })
+
+  test("keeps generated Popover interface artifacts path-portable", () => {
+    for (const contract of [
+      popoverRoot,
+      popoverTrigger,
+      popoverAnchor,
+      popoverPortal,
+      popoverContent,
+      htmlH2,
+    ]) {
+      const serialized = JSON.stringify(contract)
+      expect(serialized).not.toContain("/home/runner/")
+      expect(serialized).not.toContain("/Users/")
+    }
   })
 
   test("keeps Popover token dependencies complete and guidance registered", () => {
