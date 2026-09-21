@@ -170,6 +170,14 @@
       "accessedOn": "2026-09-21"
     },
     {
+      "id": "shadcn.slider.docs",
+      "kind": "official-documentation",
+      "title": "Slider - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/slider",
+      "locatorHint": "Slider; Usage; Range; Multiple Thumbs; Vertical; Controlled; Disabled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.switch.docs",
       "kind": "official-documentation",
       "title": "Switch - shadcn/ui",
