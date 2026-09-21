@@ -90,6 +90,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.drawer.docs",
+      "kind": "official-documentation",
+      "title": "Drawer - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/drawer",
+      "locatorHint": "Drawer; About; Usage; Composition; Scrollable Content; Sides; Responsive Dialog; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.empty.docs",
       "kind": "official-documentation",
       "title": "Empty - shadcn/ui",
