@@ -250,6 +250,14 @@
       "accessedOn": "2026-09-21"
     },
     {
+      "id": "shadcn.toggle-group.docs",
+      "kind": "official-documentation",
+      "title": "Toggle Group - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/toggle-group",
+      "locatorHint": "Toggle Group; Usage; Composition; Outline; Size; Spacing; Vertical; Disabled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.tooltip.docs",
       "kind": "official-documentation",
       "title": "Tooltip - shadcn/ui",
