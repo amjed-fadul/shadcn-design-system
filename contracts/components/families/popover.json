@@ -38,7 +38,9 @@
         "slots": [],
         "composition": {
           "requires": [],
-          "provides": [],
+          "provides": [
+            "popover.context"
+          ],
           "hardConstraints": []
         },
         "stateChannels": [
@@ -100,9 +102,30 @@
         "inherits": [
           "radix.popover.trigger"
         ],
-        "slots": [],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
         "composition": {
-          "requires": [],
+          "requires": [
+            "popover.context"
+          ],
           "provides": [],
           "hardConstraints": []
         },
@@ -155,9 +178,30 @@
         "inherits": [
           "radix.popover.content"
         ],
-        "slots": [],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
         "composition": {
-          "requires": [],
+          "requires": [
+            "popover.context"
+          ],
           "provides": [],
           "hardConstraints": []
         },
@@ -303,9 +347,30 @@
         "inherits": [
           "radix.popover.anchor"
         ],
-        "slots": [],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
         "composition": {
-          "requires": [],
+          "requires": [
+            "popover.context"
+          ],
           "provides": [],
           "hardConstraints": []
         },
