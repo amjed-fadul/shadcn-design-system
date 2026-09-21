@@ -7,6 +7,7 @@ import { describe, expect, test } from "vitest"
 
 import familySchema from "../contracts/components/component-family.schema.json"
 import interfaceSchema from "../contracts/components/inherited-interface.schema.json"
+import knowledgeSchema from "../contracts/knowledge/component-knowledge.schema.json"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
 import {
   analyzeJsxRenderTree,
@@ -38,6 +39,22 @@ function readJson(path: string) {
 
 function schemaValid(schema: object, value: unknown) {
   return new Ajv2020({ allErrors: true, strict: true }).compile(schema)(value)
+}
+
+function expectedRadix(symbol: string, eventNames: string[] = []) {
+  const full = analyzePackageComponentInterface({ declarationPath, symbol })
+  const events = eventNames.length
+    ? analyzePackageComponentInterface(
+        { declarationPath, symbol },
+        { props: [], events: eventNames }
+      ).events
+    : []
+
+  return {
+    props: full.props.filter((prop) => !eventNames.includes(prop.name)),
+    events,
+    conditionalApi: full.conditionalApi,
+  }
 }
 
 describe("release.5 Collapsible", () => {
@@ -78,35 +95,16 @@ describe("release.5 Collapsible", () => {
     ]
 
     expect(schemaValid(familySchema, family)).toBe(true)
-    const componentSpecificPropNames = new Map([
-      ["Root", ["asChild", "defaultOpen", "disabled", "open"]],
-      ["Trigger", ["asChild", "disabled"]],
-      ["Content", ["asChild", "forceMount"]],
-    ])
-
     for (const contract of interfaces) {
       expect(schemaValid(interfaceSchema, contract)).toBe(true)
-      const full = analyzePackageComponentInterface({
-        declarationPath,
-        symbol: contract.source.symbol,
-      })
-      const propNames = componentSpecificPropNames.get(contract.source.symbol)!
-      const events =
-        contract.source.symbol === "Root"
-          ? analyzePackageComponentInterface(
-              { declarationPath, symbol: "Root" },
-              { props: [], events: ["onOpenChange"] }
-            ).events
-          : []
-      const props = full.props.filter((prop) => propNames.includes(prop.name))
-
-      expect(
-        contract.props.filter((prop: { name: string }) => propNames.includes(prop.name))
-      ).toEqual(
-        props
+      const expected = expectedRadix(
+        contract.source.symbol,
+        contract.source.symbol === "Root" ? ["onOpenChange"] : []
       )
-      expect(contract.events ?? []).toEqual(events)
-      expect(contract.conditionalApi ?? []).toEqual(full.conditionalApi ?? [])
+
+      expect(contract.props).toEqual(expected.props)
+      expect(contract.events ?? []).toEqual(expected.events)
+      expect(contract.conditionalApi ?? []).toEqual(expected.conditionalApi ?? [])
       expect(contract.unresolved).toEqual([])
       expect(contract.source.declarationSha256).toBe(
         createHash("sha256").update(readFileSync(declarationPath)).digest("hex")
@@ -114,20 +112,34 @@ describe("release.5 Collapsible", () => {
     }
   }, 60_000)
 
-  testWithArtifacts("keeps Collapsible authoring guidance and its official reference available", () => {
+  testWithArtifacts("keeps Collapsible authoring guidance schema-valid and grounded in its official reference", () => {
     const knowledge = readJson(join(repoRoot, "contracts/knowledge/components/collapsible.json"))
     const references = readJson(join(repoRoot, "contracts/knowledge/references.json"))
 
+    expect(schemaValid(knowledgeSchema, knowledge)).toBe(true)
+    expect(knowledge.subject).toEqual({ kind: "component", id: "collapsible" })
     expect(knowledge.guidanceStatus).toMatchObject({
       whatItIs: "available",
       whenToUse: "available",
       howToUse: "available",
       options: "available",
     })
-    expect(
-      references.references.some(
-        (reference: { id: string }) => reference.id === "shadcn.collapsible.docs"
-      )
-    ).toBe(true)
+    const referenceIds = new Set(
+      references.references.map((reference: { id: string }) => reference.id)
+    )
+    for (const claim of [
+      knowledge.whatItIs,
+      ...(knowledge.whenToUse ?? []),
+      ...(knowledge.howToUse ?? []),
+      ...(knowledge.options ?? []),
+    ]) {
+      expect(claim.basis).toEqual({
+        kind: "source-derived",
+        referenceIds: ["shadcn.collapsible.docs"],
+      })
+      for (const referenceId of claim.basis.referenceIds) {
+        expect(referenceIds.has(referenceId)).toBe(true)
+      }
+    }
   })
 })
