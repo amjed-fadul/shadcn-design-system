@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "switch-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "switch"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A control that allows the user to toggle between checked and not checked.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.switch.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Switch for an on/off setting whose state changes independently.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.switch.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Associate the Switch with visible label content and use checked/defaultChecked with onCheckedChange for controlled or uncontrolled state.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.switch.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use size=\"sm\" for the compact switch or the default size otherwise.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.switch.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use disabled to make the switch unavailable and aria-invalid to expose an invalid state.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.switch.docs"
+        ]
+      }
+    }
+  ]
+}
