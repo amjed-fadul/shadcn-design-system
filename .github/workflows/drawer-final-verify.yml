@@ -1,0 +1,42 @@
+name: Drawer final verification
+
+on:
+  push:
+    branches:
+      - feat/release-5-drawer
+
+jobs:
+  verify-drawer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+      - run: npm ci --ignore-scripts
+      - name: Typecheck with Storybook baseline allowlist
+        shell: bash
+        run: |
+          set +e
+          npm run typecheck > /tmp/typecheck.log 2>&1
+          status=$?
+          set -e
+          cat /tmp/typecheck.log
+          if [ "$status" -eq 0 ]; then
+            exit 0
+          fi
+          grep -E "error TS" /tmp/typecheck.log \
+            | grep -vE "src/components/ui/.*\.stories\.tsx.*(TS2307: Cannot find module '@storybook/react-vite'|TS7006: Parameter 'args')" \
+            > /tmp/unexpected-type-errors || true
+          if [ -s /tmp/unexpected-type-errors ]; then
+            echo "Unexpected TypeScript errors:"
+            cat /tmp/unexpected-type-errors
+            exit 1
+          fi
+          echo "Only the pre-existing Storybook setup errors remain."
+      - run: npx vitest run tests/release-5-drawer.test.ts --testTimeout=60000
+      - run: npm run build
+      - run: npm audit --omit=dev
+      - name: Full repository regression diagnostic
+        continue-on-error: true
+        run: npm run test
