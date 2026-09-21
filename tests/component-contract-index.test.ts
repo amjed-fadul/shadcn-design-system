@@ -7,6 +7,7 @@ import { describe, expect, test } from "vitest"
 import type { ComponentContractArtifactSource } from "../src/contracts/components/loader"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import type { ComponentContractSet, ComponentFamilyContract, InheritedInterfaceContract } from "../src/contracts/components/types"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const manifestPath = "contracts/components/component-contract-set.json"
@@ -37,17 +38,17 @@ function memorySource(mutator?: (artifacts: Map<string, unknown>) => void): Comp
 }
 
 describe("component contract loader and derived index", () => {
-  test("loads exactly the canonical 19 families and every manifest interface", () => {
+  test("loads exactly the canonical 38 families and every manifest interface", () => {
     const loaded = loadComponentContracts()
 
     expect(["candidate", "approved"]).toContain(loaded.contractSet.status)
-    expect(loaded.contractSet.familyCount).toBe(19)
-    expect(loaded.contractSet.familyFiles).toHaveLength(19)
-    expect(loaded.families).toHaveLength(19)
+    expect(loaded.contractSet.familyCount).toBe(canonicalFamilyIds.length)
+    expect(loaded.contractSet.familyFiles).toHaveLength(canonicalFamilyIds.length)
+    expect(loaded.families).toHaveLength(canonicalFamilyIds.length)
     expect(loaded.interfaces).toHaveLength(manifest.interfaceFiles.length)
-    expect(new Set(loaded.families.map((family) => family.id)).size).toBe(19)
+    expect(new Set(loaded.families.map((family) => family.id)).size).toBe(canonicalFamilyIds.length)
     expect(new Set(loaded.interfaces.map((contract) => contract.id)).size).toBe(loaded.interfaces.length)
-    expect(loaded.families.map((family) => family.id)).toEqual(manifest.familyFiles.map((path) => path.split("/").at(-1)!.replace(/\.json$/, "")))
+    expect(loaded.families.map((family) => family.id)).toEqual(canonicalFamilyIds)
   })
 
   test("accepts both component contract lifecycle states", () => {
