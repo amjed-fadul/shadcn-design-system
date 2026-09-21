@@ -5,31 +5,13 @@ import { join, resolve } from "node:path"
 import * as ts from "typescript"
 import { describe, expect, test } from "vitest"
 
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
+
 const root = resolve(process.cwd())
 const familyDirectory = join(root, "contracts/components/families")
 const interfaceDirectory = join(root, "contracts/components/interfaces")
 const approvedTokenIds = new Set<string>(readJson(join(root, "contracts/tokens/token-contract.json")).tokens.map((token: AnyRecord) => token.id))
-const expectedFamilies = [
-  "accordion",
-  "badge",
-  "button",
-  "card",
-  "checkbox",
-  "dialog",
-  "dropdown-menu",
-  "input",
-  "label",
-  "scroll-area",
-  "select",
-  "separator",
-  "sheet",
-  "sidebar",
-  "skeleton",
-  "table",
-  "tabs",
-  "textarea",
-  "tooltip",
-]
+const expectedFamilies = [...canonicalFamilyIds].sort()
 
 type AnyRecord = Record<string, any>
 type SourceFacts = {
@@ -693,8 +675,8 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
 function independentAudit(artifacts: { families: AnyRecord[]; interfaces: AnyRecord[] }): string[] {
   const errors: string[] = []
   const familyIds = artifacts.families.map((family) => family.id).sort()
-  if (JSON.stringify(familyIds) !== JSON.stringify(expectedFamilies)) errors.push("contract set does not contain exactly the 19 expected families")
-  if (artifacts.families.length !== 19) errors.push(`expected 19 family artifacts, found ${artifacts.families.length}`)
+  if (JSON.stringify(familyIds) !== JSON.stringify(expectedFamilies)) errors.push("physical family artifacts do not match the independently approved release scope")
+  if (artifacts.families.length !== expectedFamilies.length) errors.push(`expected ${expectedFamilies.length} family artifacts, found ${artifacts.families.length}`)
   if (!["candidate", "approved"].includes(readJson(join(root, "contracts/components/component-contract-set.json")).status)) errors.push("component contract set has an invalid lifecycle status")
   errors.push(...directDeclarationErrors(artifacts.interfaces))
   errors.push(...directSourceErrors(artifacts.families, artifacts.interfaces))
@@ -760,6 +742,16 @@ function findUnreferencedEvidence(): string[] {
 declarationProgramCache = createDeclarationProgram(loadArtifacts().interfaces)
 
 describe("Phase 3 Task 10 independent review", () => {
+  test("matches the independent 38-family oracle to the manifest and physical artifacts", () => {
+    const manifest = readJson(join(root, "contracts/components/component-contract-set.json"))
+    const manifestIds = manifest.familyFiles.map((path: string) => path.split("/").at(-1)!.replace(/\.json$/, "")).sort()
+    const physicalIds = loadArtifacts().families.map((family) => family.id).sort()
+
+    expect(manifest.familyCount).toBe(expectedFamilies.length)
+    expect(manifestIds).toEqual(expectedFamilies)
+    expect(physicalIds).toEqual(expectedFamilies)
+  })
+
   test("audits every inherited interface through independent declaration access", () => {
     expect(directDeclarationErrors(loadArtifacts().interfaces)).toEqual([])
   })
@@ -786,7 +778,7 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(findUnreferencedEvidence()).toEqual([])
   })
 
-  test("audits all 19 families through direct AST and declaration access", () => {
+  test("audits the independently approved 38-family scope through direct AST and declaration access", () => {
     expect(independentAudit(loadArtifacts())).toEqual([])
   })
 

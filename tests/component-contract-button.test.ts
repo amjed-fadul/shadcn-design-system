@@ -13,6 +13,7 @@ import type { ComponentFamilyContract, InheritedInterfaceContract } from "../src
 import { extractButtonRenderingEvidence, extractCvaVariantLiterals, extractDataSlotLiterals, extractFunctionPropDefaults, listModuleExports, readCanonicalSourceBlobSha } from "./helpers/component-source-analysis"
 import { analyzeTailwindTokenDependencies } from "./helpers/component-token-analysis"
 import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const sourcePath = join(root, "src/components/ui/button.tsx")
@@ -20,7 +21,7 @@ const sourcePath = join(root, "src/components/ui/button.tsx")
 describe("Button component contract", () => {
   test("reconciles source identity and public exports", () => {
     const seed = JSON.parse(readFileSync(join(root, "provenance/seed-components.json"), "utf8")).components.button
-    expect(contractSet.familyCount).toBe(19)
+    expect(contractSet.familyCount).toBe(canonicalFamilyIds.length)
     expect(["candidate", "approved"]).toContain(contractSet.status)
     expect(contractSet.familyFiles).toContain("contracts/components/families/button.json")
     expect(button.id).toBe("button")

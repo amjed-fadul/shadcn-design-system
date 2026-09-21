@@ -11,6 +11,7 @@ import { isRenderingTree, type ComponentFamilyContract, type InheritedInterfaceC
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependencies, analyzeComponentTokenSource, auditComponentTokenCoverage, compareComponentTokenDependencies } from "./helpers/component-token-analysis"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const task5Families = ["dialog", "dropdown-menu", "select", "sheet"]
@@ -113,8 +114,8 @@ function authority() {
 
 describe("compound and overlay Phase 3 Task 5 component contracts", () => {
   test("preserves the four Task 5 families within the completed family set", () => {
-    expect(contractSet.familyCount).toBe(19)
-    expect(contractSet.familyFiles).toHaveLength(19)
+    expect(contractSet.familyCount).toBe(canonicalFamilyIds.length)
+    expect(contractSet.familyFiles).toHaveLength(canonicalFamilyIds.length)
     expect(contractSet.familyFiles.filter((file) => task5Families.some((id) => file.endsWith(`/${id}.json`))).sort()).toEqual(task5Families.map((id) => `contracts/components/families/${id}.json`).sort())
     expect(contractSet.familyFiles.some((file) => file.endsWith("/sidebar.json"))).toBe(true)
   })

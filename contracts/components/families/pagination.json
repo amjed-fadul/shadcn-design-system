@@ -281,7 +281,8 @@
             {
               "id": "button",
               "host": {
-                "kind": "component-export",
+                "kind": "cross-family-export",
+                "familyId": "button",
                 "exportName": "Button"
               },
               "receivesPublicProps": false,

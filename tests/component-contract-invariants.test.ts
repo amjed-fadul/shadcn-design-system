@@ -53,7 +53,7 @@ const htmlExample: InheritedInterfaceContract = {
   events: [{ propName: "onClick", required: false, payload: { kind: "boolean" }, payloadTypeText: "boolean", evidenceRefs: ["declaration"] }],
   unresolved: [],
 }
-const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), capabilityIds: new Set<string>(), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
+const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), capabilityIds: new Set<string>(), componentExportIds: new Set(["button.Button"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
 
 describe("component contract semantic invariants", () => {
   test("rejects a contract set whose declared family count exceeds its manifest", () => {
@@ -108,6 +108,18 @@ describe("component contract semantic invariants", () => {
       f.exports[0].component.rendering.nodes[0].host = { kind: "component-export", exportName: "Hook" }
     })
     expect(validateComponentFamilyInvariants(family, authority)).toContain("Component Example render host references non-JSX-authorable export: Hook.")
+  })
+
+  test("accepts a cross-family render host only when the target component export is authoritative", () => {
+    const family = changed((f: any) => {
+      f.exports[0].component.rendering.nodes[0].host = { kind: "cross-family-export", familyId: "button", exportName: "Button" }
+    })
+    expect(validateComponentFamilyInvariants(family, authority)).toEqual([])
+
+    const rendering = family.exports[0].component!.rendering
+    if (!("nodes" in rendering)) throw new Error("Expected a rendering tree fixture")
+    rendering.nodes[0].host = { kind: "cross-family-export", familyId: "button", exportName: "Missing" }
+    expect(validateComponentFamilyInvariants(family, authority)).toContain("Component Example render host references unknown cross-family component export: button.Missing.")
   })
 
   test.each([

@@ -33,7 +33,7 @@ function normalized(dependencies: Array<Pick<TokenDependency, "tokenId" | "when"
 }
 
 describe("Phase 3 Task 7 cross-family token dependency closure", () => {
-  test("reconciles token dependencies per component export across all 19 families", () => {
+  test("reconciles token dependencies per component export across the canonical family scope", () => {
     const mismatches: string[] = []
     for (const family of families) for (const entry of family.exports) {
       if (!entry.component) continue

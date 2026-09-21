@@ -120,6 +120,11 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
     }
     if (node.host.kind === "component-export" && !exportEntries.has(node.host.exportName)) errors.push(`Component ${componentName} render host references unknown export: ${node.host.exportName}.`)
     if (node.host.kind === "component-export" && exportEntries.has(node.host.exportName) && (exportEntries.get(node.host.exportName)!.kind !== "component" || !exportEntries.get(node.host.exportName)!.authorableJsx)) errors.push(`Component ${componentName} render host references non-JSX-authorable export: ${node.host.exportName}.`)
+    if (node.host.kind === "cross-family-export") {
+      const qualifiedExport = `${node.host.familyId}.${node.host.exportName}`
+      if (!authority.componentExportIds?.has(qualifiedExport)) errors.push(`Component ${componentName} render host references unknown cross-family component export: ${qualifiedExport}.`)
+      if (node.host.familyId === family.id) errors.push(`Component ${componentName} cross-family render host must reference a different family: ${qualifiedExport}.`)
+    }
     if (node.host.kind === "inherited-interface" && !authority.interfaceIds.has(node.host.interfaceId)) errors.push(`Component ${componentName} render host references unknown interface: ${node.host.interfaceId}.`)
   }
   const root = rendering.nodes.find((node) => node.id === rendering.rootNodeId)

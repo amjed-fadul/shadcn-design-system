@@ -78,12 +78,12 @@ type JsxDataAttribute = { name: string; value?: string; prop?: string; condition
   | { source: "unresolved" }
 )
 export type JsxDerivedSpread = { source: "prop" | "state"; name: string }
-export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; resolvedHost?: { tag: string; kind: "intrinsic" | "component" | "member" | "unresolved" }; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition }
+export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; sourceModule?: string; resolvedHost?: { tag: string; kind: "intrinsic" | "component" | "member" | "unresolved"; sourceModule?: string }; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition }
 export type JsxRenderAlternative = ({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { root: JsxRenderNode }
 export type JsxSourceUnresolvedFinding = SourceExpressionIdentity & { reason: string }
 export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; unresolved: string[]; unresolvedFindings: JsxSourceUnresolvedFinding[] }
-type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment"> }
-type JsxScope = { aliases: Map<string, JsxRenderNode>; hostAliases: Map<string, JsxHost>; derivedSpreads: Map<string, JsxDerivedSpread> }
+type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment">; sourceModule?: string }
+type JsxScope = { aliases: Map<string, JsxRenderNode>; hostAliases: Map<string, JsxHost>; derivedSpreads: Map<string, JsxDerivedSpread>; importSources: Map<string, string> }
 type JsxUnresolved = { messages: string[]; findings: JsxSourceUnresolvedFinding[] }
 
 function recordUnresolved(unresolved: JsxUnresolved, node: ts.Node, file: ts.SourceFile, reason: string) {
@@ -243,7 +243,8 @@ function jsxNode(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.JsxFragment
   const name = jsxTagName(opening.tagName, file)
   if (name.kind === "unresolved") recordUnresolved(unresolved, opening.tagName, file, `Unsupported JSX tag: ${name.tag}`)
   const resolvedHost = ts.isIdentifier(opening.tagName) ? scope.hostAliases.get(opening.tagName.text) : undefined
-  return { ...name, ...(resolvedHost ? { resolvedHost } : {}), portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved, scope), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings, scope) : [] }
+  const sourceModule = ts.isIdentifier(opening.tagName) ? scope.importSources.get(opening.tagName.text) : undefined
+  return { ...name, ...(sourceModule ? { sourceModule } : {}), ...(resolvedHost ? { resolvedHost } : {}), portal: name.tag === "Portal" || name.tag.endsWith(".Portal") || name.tag.endsWith("Portal"), ...jsxAttributes(opening.attributes, file, publicBindings, unresolved, scope), children: ts.isJsxElement(node) ? jsxChildren(node.children, file, unresolved, publicBindings, scope) : [] }
 }
 
 type ReturnedJsx = { expression: ts.Expression; when?: JsxRenderCondition; otherwise?: true }
@@ -278,7 +279,17 @@ function returnedJsx(functionDeclaration: SourceFunction, file: ts.SourceFile, p
 }
 
 function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved) {
-  const scope: JsxScope = { aliases: new Map(), hostAliases: new Map(), derivedSpreads: new Map() }
+  const importSources = new Map<string, string>()
+  for (const statement of file.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue
+    const source = statement.moduleSpecifier.text
+    const clause = statement.importClause
+    if (clause?.name) importSources.set(clause.name.text, source)
+    const bindings = clause?.namedBindings
+    if (bindings && ts.isNamespaceImport(bindings)) importSources.set(bindings.name.text, source)
+    if (bindings && ts.isNamedImports(bindings)) for (const element of bindings.elements) importSources.set(element.name.text, source)
+  }
+  const scope: JsxScope = { aliases: new Map(), hostAliases: new Map(), derivedSpreads: new Map(), importSources }
   const visit = (node: ts.Node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
       if (ts.isJsxElement(node.initializer) || ts.isJsxSelfClosingElement(node.initializer) || ts.isJsxFragment(node.initializer)) {
@@ -318,7 +329,7 @@ export function analyzeJsxRenderTree(sourcePath: string, exportName: string): Js
   return { alternatives: roots.map(({ when, otherwise, root }) => when ? { when, root } : { otherwise: otherwise ?? true, root }), unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
 }
 
-type ContractRenderNode = { id: string; host: { kind: string; tag?: string; interfaceId?: string; exportName?: string }; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; source: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: unknown; whenFalse?: unknown }>; derivedSpreads?: Array<{ source: string; name: string }>; children: Array<{ nodeId: string; when?: JsxRenderCondition }> }
+type ContractRenderNode = { id: string; host: { kind: string; tag?: string; interfaceId?: string; familyId?: string; exportName?: string }; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; source: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: unknown; whenFalse?: unknown }>; derivedSpreads?: Array<{ source: string; name: string }>; children: Array<{ nodeId: string; when?: JsxRenderCondition }> }
 type ContractRenderingTree = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: ContractRenderNode[]; portalBoundaries: Array<{ nodeId: string }> }
 type ContractRendering = ContractRenderingTree | { alternatives: Array<({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { rendering: ContractRenderingTree }> }
 
@@ -336,6 +347,10 @@ function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNo
   if (host.kind === "intrinsic") return resolved.kind === "intrinsic" && resolved.tag === host.tag
   if (host.kind === "fragment") return resolved.kind === "fragment"
   if (host.kind === "component-export") return normalizeRenderName(resolved.tag) === normalizeRenderName(host.exportName ?? "")
+  if (host.kind === "cross-family-export") {
+    const sourceFamilyId = (resolved.sourceModule ?? source.sourceModule)?.split("/").at(-1)?.replace(/\.[cm]?[jt]sx?$/, "")
+    return normalizeRenderName(resolved.tag) === normalizeRenderName(host.exportName ?? "") && sourceFamilyId === host.familyId
+  }
   if (host.kind === "inherited-interface") {
     const interfaceId = host.interfaceId ?? ""
     return conventions.matchesInheritedInterface?.(resolved.tag, interfaceId, normalizeRenderName) ?? normalizeRenderName(resolved.tag).endsWith(normalizeRenderName(interfaceId))

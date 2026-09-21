@@ -86,6 +86,16 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, family)).toBe(true)
   })
 
+  test("accepts an evidence-backed cross-family component host", () => {
+    const family = validFamily()
+    family.exports[0].component.rendering.nodes[0].host = {
+      kind: "cross-family-export",
+      familyId: "button",
+      exportName: "Button",
+    }
+    expect(validate(familySchema, family)).toBe(true)
+  })
+
   test("accepts factual render alternatives, conditional values, and derived spreads", () => {
     const family = validFamily()
     const branch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], derivedSpreads: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] })

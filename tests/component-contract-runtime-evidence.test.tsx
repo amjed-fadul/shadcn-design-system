@@ -12,13 +12,11 @@ import { resolveConditionalApiShape, validateComponentFamilyInvariants, validate
 import type { ComponentContractSet, ComponentFamilyContract, ComponentInvariantAuthority, ComponentDefinition, InheritedInterfaceContract, RenderingFact, RenderingTree } from "../src/contracts/components/types"
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const contractSet = contractSetJson as ComponentContractSet
-const expectedFamilyIds = [
-  "accordion", "badge", "button", "card", "checkbox", "dialog", "dropdown-menu", "input", "label",
-  "scroll-area", "select", "separator", "sheet", "sidebar", "skeleton", "table", "tabs", "textarea", "tooltip",
-]
+const expectedFamilyIds = canonicalFamilyIds
 
 type SeedComponent = {
   canonicalPath: string
@@ -60,6 +58,9 @@ function authority(): ComponentInvariantAuthority {
     tokenIds: new Set(tokenContract.tokens.map((token) => token.id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)),
     capabilityIds: new Set(families.flatMap((family) => family.exports.flatMap((entry) => entry.component?.composition.provides ?? []))),
+    componentExportIds: new Set(families.flatMap((family) => family.exports
+      .filter((entry) => entry.kind === "component" && entry.authorableJsx)
+      .map((entry) => `${family.id}.${entry.name}`))),
   }
 }
 
@@ -134,7 +135,7 @@ function sourceEvidencePath(source: string) {
 }
 
 describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
-  test("registers exactly the 19 seed families and no extra family artifact", () => {
+  test("registers exactly the independently approved seed families and no extra family artifact", () => {
     const actualFamilyFiles = readdirSync(join(root, "contracts/components/families"))
       .filter((file) => file.endsWith(".json"))
       .map((file) => `contracts/components/families/${file}`)
@@ -142,13 +143,13 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
     const registeredFamilyIds = families.map((family) => family.id).sort()
     const seedFamilyIds = Object.keys(seed.components).sort()
 
-    expect(contractSet.familyCount).toBe(19)
-    expect(contractSet.familyFiles).toHaveLength(19)
-    expect(new Set(contractSet.familyFiles).size).toBe(19)
+    expect(contractSet.familyCount).toBe(expectedFamilyIds.length)
+    expect(contractSet.familyFiles).toHaveLength(expectedFamilyIds.length)
+    expect(new Set(contractSet.familyFiles).size).toBe(expectedFamilyIds.length)
     expect(actualFamilyFiles).toEqual(contractSet.familyFiles.slice().sort())
     expect(registeredFamilyIds).toEqual(expectedFamilyIds.slice().sort())
     expect(registeredFamilyIds).toEqual(seedFamilyIds)
-    expect(families).toHaveLength(19)
+    expect(families).toHaveLength(expectedFamilyIds.length)
   })
 
   test("reconciles every public export classification with canonical source", () => {
@@ -216,8 +217,9 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
           expect(tree.nodes.filter((node) => node.receivesPublicProps)).toHaveLength(1)
           for (const node of tree.nodes) {
             const renderHost = node.host
-            if (renderHost.kind !== "component-export") continue
-            const host = family.exports.find((candidate) => candidate.name === renderHost.exportName)
+            if (renderHost.kind !== "component-export" && renderHost.kind !== "cross-family-export") continue
+            const hostFamily = renderHost.kind === "cross-family-export" ? familyById.get(renderHost.familyId) : family
+            const host = hostFamily?.exports.find((candidate) => candidate.name === renderHost.exportName)
             expect(host, `${family.id}.${entry.name} host ${renderHost.exportName}`).toMatchObject({ kind: "component", authorableJsx: true })
           }
         }

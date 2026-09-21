@@ -11,6 +11,7 @@ import { isRenderingTree, type ComponentFamilyContract, type InheritedInterfaceC
 import { extractCvaVariantLiterals, extractDataSlotLiterals, extractFunctionPropDefaults, listModuleExports, readCanonicalSourceBlobSha } from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependencies, analyzeTailwindTokenDependencies, auditComponentTokenCoverage } from "./helpers/component-token-analysis"
 import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 function tree(rendering: RenderingFact): RenderingTree {
   if (!isRenderingTree(rendering)) throw new Error("Expected an unconditional rendering tree in a pre-Task 6A family.")
@@ -48,10 +49,10 @@ function authority(families: ComponentFamilyContract[], interfaces: InheritedInt
 describe("simple/native-oriented component contracts", () => {
   test("preserves the frozen Task 3 subset within the expanded family set", () => {
     expect(["candidate", "approved"]).toContain(contractSet.status)
-    expect(contractSet.familyCount).toBe(19)
+    expect(contractSet.familyCount).toBe(canonicalFamilyIds.length)
     const frozenFiles = ["button", ...familyIds].map((id) => `contracts/components/families/${id}.json`).sort()
     expect(contractSet.familyFiles.filter((file) => frozenFiles.includes(file)).sort()).toEqual(frozenFiles)
-    expect(contractSet.familyFiles).toHaveLength(19)
+    expect(contractSet.familyFiles).toHaveLength(canonicalFamilyIds.length)
   })
 
   test.each(familyIds)("reconciles %s identity and exact public exports", (id) => {

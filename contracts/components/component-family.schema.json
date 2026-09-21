@@ -103,6 +103,7 @@
         { "type": "object", "additionalProperties": false, "required": ["kind", "tag"], "properties": { "kind": { "const": "intrinsic" }, "tag": { "type": "string" } } },
         { "type": "object", "additionalProperties": false, "required": ["kind", "interfaceId"], "properties": { "kind": { "const": "inherited-interface" }, "interfaceId": { "type": "string" } } },
         { "type": "object", "additionalProperties": false, "required": ["kind", "exportName"], "properties": { "kind": { "const": "component-export" }, "exportName": { "type": "string" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "familyId", "exportName"], "properties": { "kind": { "const": "cross-family-export" }, "familyId": { "type": "string" }, "exportName": { "type": "string" } } },
         { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "fragment" } } },
         { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "unresolved" } } }
       ]
