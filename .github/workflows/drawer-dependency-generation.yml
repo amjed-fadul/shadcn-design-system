@@ -1,0 +1,22 @@
+name: Drawer dependency generation
+
+on:
+  push:
+    branches:
+      - feat/release-5-drawer
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+      - run: npm install vaul@1.1.2 --save-exact --package-lock-only --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: drawer-dependency-files
+          path: |
+            package.json
+            package-lock.json
