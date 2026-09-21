@@ -4,11 +4,12 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
 import { canonicalInterfaceMemberAuthority } from "./canonical-interface-member-authority"
+import { canonicalComponentPropSourceAnalyzer } from "./canonical-component-prop-source-analysis"
 import { canonicalRenderSourceAnalysisConventions } from "./canonical-render-source-conventions"
 import { analyzeCanonicalDelegatedHostFacts, canonicalDelegatedHostEvidencePaths, canonicalSourceOwnedSlotPropNames } from "./canonical-slot-source-analysis"
 import { analyzePackageComponentInterface, type InterfaceMemberSelection } from "./inherited-interface-source-analysis"
 import type { ComponentContractSourceReconciliationContext } from "./loader"
-import { compareJsxRenderTree, analyzeJsxRenderTree, extractCvaVariantLiterals, extractFunctionPropDefaults, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
+import { compareJsxRenderTree, analyzeJsxRenderTree, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
 import { reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
 import { analyzeComponentTokenSourceForExport, compareComponentTokenDependenciesForExport } from "./canonical-token-source-analysis"
 import type { ComponentFamilyContract, ConditionalApiCase, InheritedInterfaceContract } from "./types"
@@ -100,16 +101,6 @@ function artifactClassification(family: ComponentFamilyContract) {
   return family.exports.map((entry) => ({ name: entry.name, kind: entry.kind, authorableJsx: entry.authorableJsx, hasComponent: Boolean(entry.component) })).sort((left, right) => left.name.localeCompare(right.name))
 }
 
-function localDefaults(path: string, exportName: string, localPropNames: readonly string[]) {
-  const defaults = new Map(extractFunctionPropDefaults(path, exportName))
-  for (const evidence of listModuleExports(path)) {
-    if (evidence.declarationKind !== "VariableDeclaration") continue
-    const variants = extractCvaVariantLiterals(path, evidence.name)
-    for (const [name, value] of Object.entries(variants.defaults)) if (localPropNames.includes(name) && !defaults.has(name)) defaults.set(name, value)
-  }
-  return [...defaults].filter(([name]) => localPropNames.includes(name)).map(([name, value]) => ({ name, default: value })).sort((left, right) => left.name.localeCompare(right.name))
-}
-
 function localConditionalWhens(tree: JsxRenderTree) {
   const values = new Map<string, Set<string | number | boolean>>()
   const add = (condition: JsxRenderCondition | undefined) => {
@@ -177,6 +168,8 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
   const cached = canonicalReconciliationCache.get(cacheKey)
   if (cached) return [...cached]
   const errors: string[] = []
+  const propAnalyzer = canonicalComponentPropSourceAnalyzer(repositoryRoot)
+  const interfacesById = new Map(context.interfaces.map((contract) => [contract.id, contract]))
   const sourceConditionalWhens = new Map<string, Array<{ propName: string; equals: string | number | boolean }>>()
   for (const family of context.families) {
     const path = join(repositoryRoot, family.source.canonicalPath)
@@ -218,8 +211,18 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
         if (renderErrors.some((error) => error.startsWith("Data attributes mismatch"))) errors.push(`Family ${family.id} render data-slot facts do not match source evidence.`)
         errors.push(`Component ${entry.name} rendering does not match source evidence.`)
       }
-      const contractedDefaults = entry.component.localProps.filter((prop) => Object.hasOwn(prop, "default")).map((prop) => ({ name: prop.name, default: prop.default })).sort((left, right) => left.name.localeCompare(right.name))
-      if (!sameValue(contractedDefaults, localDefaults(path, entry.name, entry.component.localProps.map((prop) => prop.name)))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)
+      const inheritedPropNames = new Set(entry.component.inherits.flatMap((interfaceId) => {
+        const contract = interfacesById.get(interfaceId)
+        return contract ? analyzeCanonicalInterfaceFacts(contract, undefined).props.map((prop) => prop.name) : []
+      }))
+      const propErrors = propAnalyzer.compareComponentLocalProps(
+        entry.component.localProps,
+        inheritedPropNames,
+        propAnalyzer.analyzeComponentPropSource(path, entry.name),
+      )
+      if (propErrors.some((error) => error.includes(" default "))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)
+      if (propErrors.some((error) => !error.includes(" default "))) errors.push(`Component ${entry.name} local prop surface does not match source evidence.`)
+      errors.push(...propErrors.map((error) => `Component ${entry.name}: ${error}`))
     }
     errors.push(...reconcileSourceEvidenceCompleteness(family, unresolved))
   }

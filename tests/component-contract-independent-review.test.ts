@@ -30,6 +30,8 @@ type SourceFacts = {
   directUsesSlot: boolean
   returnCount: number
   conditionalSource: boolean
+  propSurfaceError?: string
+  sourceLocalPropNames: Set<string>
 }
 
 type DeclarationContext = {
@@ -46,6 +48,7 @@ type DeclarationProgram = {
 const sourceCache = new Map<string, { sourceFile: ts.SourceFile; sourceText: string }>()
 const declarationCache = new Map<string, DeclarationContext | undefined>()
 let declarationProgramCache: DeclarationProgram | undefined
+let componentProgramCache: DeclarationProgram | undefined
 
 function readJson(path: string): any {
   return JSON.parse(readFileSync(path, "utf8"))
@@ -93,7 +96,7 @@ function sourceFacts(path: string): { sourceFile: ts.SourceFile; sourceText: str
   if (cached) return cached
   const sourceText = readFileSync(path, "utf8")
   const facts = {
-    sourceFile: ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX),
+    sourceFile: componentProgramCache?.program.getSourceFile(resolve(path)) ?? ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX),
     sourceText,
   }
   sourceCache.set(path, facts)
@@ -222,15 +225,162 @@ function returnExpressions(functionLike: ts.FunctionLikeDeclaration): ts.Express
   return expressions
 }
 
+function directBindingDefaults(functionLike: ts.FunctionLikeDeclaration): Map<string, unknown> {
+  const defaults = new Map<string, unknown>()
+  const parameter = functionLike.parameters[0]
+  if (!parameter || !ts.isObjectBindingPattern(parameter.name)) return defaults
+  for (const element of parameter.name.elements) {
+    const name = element.propertyName && (ts.isIdentifier(element.propertyName) || ts.isStringLiteral(element.propertyName))
+      ? element.propertyName.text
+      : ts.isIdentifier(element.name) ? element.name.text : undefined
+    const value = literalValue(element.initializer)
+    if (name && value !== undefined) defaults.set(name, value)
+  }
+  return defaults
+}
+
+function forwardedBindingNames(functionLike: ts.FunctionLikeDeclaration): Set<string> {
+  const names = new Set<string>()
+  const parameter = functionLike.parameters[0]
+  if (!parameter) return names
+  if (ts.isIdentifier(parameter.name)) names.add(parameter.name.text)
+  if (ts.isObjectBindingPattern(parameter.name)) for (const element of parameter.name.elements) {
+    if (element.dotDotDotToken && ts.isIdentifier(element.name)) names.add(element.name.text)
+  }
+  return names
+}
+
+function unwrapReturnedExpression(expression: ts.Expression): ts.Expression {
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isSatisfiesExpression(expression)) return unwrapReturnedExpression(expression.expression)
+  return expression
+}
+
+function returnedRootOpening(expression: ts.Expression): ts.JsxOpeningLikeElement | undefined {
+  const root = unwrapReturnedExpression(expression)
+  if (ts.isJsxElement(root)) return root.openingElement
+  return ts.isJsxSelfClosingElement(root) ? root : undefined
+}
+
+function resolvedSymbol(checker: ts.TypeChecker, node: ts.Node): ts.Symbol | undefined {
+  const symbol = checker.getSymbolAtLocation(node)
+  return symbol && symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol
+}
+
+function functionForSymbol(symbol: ts.Symbol | undefined): ts.FunctionLikeDeclaration | undefined {
+  for (const declaration of symbol?.declarations ?? []) {
+    const found = ts.isVariableDeclaration(declaration) ? functionLikeFor(declaration) : functionLikeIn(declaration)
+    if (found) return found
+  }
+  return undefined
+}
+
+function inheritedWrapperDefaults(functionLike: ts.FunctionLikeDeclaration, checker: ts.TypeChecker, seen = new Set<ts.FunctionLikeDeclaration>()): Map<string, unknown> {
+  if (seen.has(functionLike)) return new Map()
+  seen.add(functionLike)
+  const forwarded = forwardedBindingNames(functionLike)
+  const branches: Array<Map<string, unknown>> = []
+  for (const expression of returnExpressions(functionLike)) {
+    const opening = returnedRootOpening(expression)
+    if (!opening || !opening.attributes.properties.some((property) => ts.isJsxSpreadAttribute(property) && ts.isIdentifier(property.expression) && forwarded.has(property.expression.text))) continue
+    const defaults = new Map<string, unknown>()
+    if (ts.isIdentifier(opening.tagName)) {
+      const child = functionForSymbol(resolvedSymbol(checker, opening.tagName))
+      if (child) {
+        for (const [name, value] of inheritedWrapperDefaults(child, checker, new Set(seen))) defaults.set(name, value)
+        for (const [name, value] of directBindingDefaults(child)) defaults.set(name, value)
+      }
+    }
+    for (const property of opening.attributes.properties) {
+      if (!ts.isJsxAttribute(property)) continue
+      const name = ts.isIdentifier(property.name) ? property.name.text : undefined
+      const initializer = property.initializer
+      const value = initializer && ts.isStringLiteral(initializer)
+        ? initializer.text
+        : initializer && ts.isJsxExpression(initializer) ? literalValue(initializer.expression) : undefined
+      if (name && value !== undefined) defaults.set(name, value)
+    }
+    branches.push(defaults)
+  }
+  seen.delete(functionLike)
+  if (!branches.length) return new Map()
+  const common = new Map(branches[0])
+  for (const [name, value] of common) if (!branches.every((branch) => branch.has(name) && branch.get(name) === value)) common.delete(name)
+  return common
+}
+
+function independentTypeName(name: ts.EntityName): string {
+  return ts.isIdentifier(name) ? name.text : name.right.text
+}
+
+function independentStringKeys(node: ts.TypeNode | undefined): string[] {
+  if (!node) return []
+  if (ts.isUnionTypeNode(node)) return node.types.flatMap(independentStringKeys)
+  return ts.isLiteralTypeNode(node) && ts.isStringLiteral(node.literal) ? [node.literal.text] : []
+}
+
+function independentLocalPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): Set<string> {
+  const names = new Set<string>()
+  if (!typeNode || visited.has(typeNode)) return names
+  visited.add(typeNode)
+  if (ts.isParenthesizedTypeNode(typeNode)) return independentLocalPropNames(typeNode.type, checker, visited)
+  if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
+    for (const member of typeNode.types) for (const name of independentLocalPropNames(member, checker, new Set(visited))) names.add(name)
+    return names
+  }
+  if (ts.isTypeLiteralNode(typeNode)) {
+    for (const member of typeNode.members) if (ts.isPropertySignature(member) && member.name && (ts.isIdentifier(member.name) || ts.isStringLiteral(member.name))) names.add(member.name.text)
+    return names
+  }
+  if (!ts.isTypeReferenceNode(typeNode)) return names
+  const utility = independentTypeName(typeNode.typeName)
+  if (utility === "Pick") return new Set(independentStringKeys(typeNode.typeArguments?.[1]))
+  if (utility === "Omit") {
+    const selected = independentLocalPropNames(typeNode.typeArguments?.[0], checker, new Set(visited))
+    for (const name of independentStringKeys(typeNode.typeArguments?.[1])) selected.delete(name)
+    return selected
+  }
+  if (utility === "VariantProps") return new Set(checker.getPropertiesOfType(checker.getTypeAtLocation(typeNode)).map((property) => property.name))
+  if (utility === "ComponentProps") {
+    const target = typeNode.typeArguments?.[0]
+    if (!target || !ts.isTypeQueryNode(target)) return names
+    const child = functionForSymbol(resolvedSymbol(checker, target.exprName))
+    return child ? independentLocalPropNames(child.parameters[0]?.type, checker, new Set(visited)) : names
+  }
+  const symbol = resolvedSymbol(checker, typeNode.typeName)
+  for (const declaration of symbol?.declarations ?? []) if (ts.isTypeAliasDeclaration(declaration)) {
+    for (const name of independentLocalPropNames(declaration.type, checker, new Set(visited))) names.add(name)
+  }
+  return names
+}
+
 function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): SourceFacts {
   const functionLike = functionLikeFor(declaration)
   const bindings = new Set<string>()
   const restBindings = new Set<string>()
   const bindingDefaults = new Map<string, unknown>()
   const typeFacts = new Map<string, { typeText: string; values: string[] }>()
+  let propSurfaceError: string | undefined
+  let sourceLocalPropNames = new Set<string>()
   if (functionLike?.parameters[0]) {
     const parameter = functionLike.parameters[0]
     collectTypeFacts(parameter.type, sourceFile, typeFacts)
+    const checker = componentProgramCache?.checker
+    if (checker) {
+      const propsType = checker.getTypeAtLocation(parameter)
+      if (propsType.flags & ts.TypeFlags.Any) propSurfaceError = "component props type is any"
+      else if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) propSurfaceError = "component props type cannot be resolved"
+      else {
+        for (const symbol of checker.getPropertiesOfType(propsType)) {
+          const type = checker.getTypeOfSymbolAtLocation(symbol, parameter)
+          typeFacts.set(symbol.name, {
+            typeText: checker.typeToString(type, parameter, ts.TypeFormatFlags.NoTruncation),
+            values: [...new Set(stringLiteralValues(type))].sort(),
+          })
+        }
+      }
+      sourceLocalPropNames = independentLocalPropNames(parameter.type, checker)
+      for (const [name, value] of inheritedWrapperDefaults(functionLike, checker)) bindingDefaults.set(name, value)
+    }
     if (ts.isObjectBindingPattern(parameter.name)) {
       for (const element of parameter.name.elements) {
         if (ts.isBindingElement(element) && ts.isIdentifier(element.name)) {
@@ -306,6 +456,8 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     directUsesSlot,
     returnCount: functionLike ? returnExpressions(functionLike).length : 0,
     conditionalSource: /\bif\s*\(|\?|&&/.test(bodyText),
+    ...(propSurfaceError ? { propSurfaceError } : {}),
+    sourceLocalPropNames,
   }
 }
 
@@ -458,7 +610,7 @@ function sourceDeclarationContext(artifact: AnyRecord): DeclarationContext | und
 }
 
 function normalizeTypeText(value: string): string {
-  return value.replace(/\s+/g, "")
+  return value.replace(/\s+/g, "").split("|").filter((member) => member !== "undefined" && member !== "null").join("|")
 }
 
 function propertySymbols(checker: ts.TypeChecker, type: ts.Type, name: string): ts.Symbol[] {
@@ -486,6 +638,23 @@ function createDeclarationProgram(interfaces: AnyRecord[]): DeclarationProgram {
     esModuleInterop: true,
     skipLibCheck: true,
     target: ts.ScriptTarget.ES2022,
+  })
+  return { program, checker: program.getTypeChecker() }
+}
+
+function createComponentProgram(families: AnyRecord[]): DeclarationProgram {
+  const sourcePaths = families.map((family) => resolve(root, family.source.canonicalPath))
+  const program = ts.createProgram(sourcePaths, {
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    jsx: ts.JsxEmit.ReactJSX,
+    strict: true,
+    skipLibCheck: true,
+    esModuleInterop: true,
+    allowSyntheticDefaultImports: true,
+    baseUrl: root,
+    paths: { "@/*": ["src/*"] },
   })
   return { program, checker: program.getTypeChecker() }
 }
@@ -560,8 +729,10 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       }
       if (!exported.component) continue
       const source = componentSourceFacts(sourceFile, declaration)
+      if (source.propSurfaceError) errors.push(`${family.id}.${exported.name}: ${source.propSurfaceError}`)
       const variants = cvaFacts(sourceFile, source.sourceText)
-      const sourceProps = new Set([...source.bindings, ...source.typeFacts.keys(), ...variants.variants.keys()])
+      const sourceProps = new Set([...source.bindings].filter((name) => !source.restBindings.has(name)).concat([...source.typeFacts.keys(), ...variants.variants.keys()]))
+      const contractedLocalNames = new Set((exported.component.localProps ?? []).map((prop: AnyRecord) => prop.name))
       for (const localProp of exported.component.localProps ?? []) {
         if (!sourceProps.has(localProp.name)) errors.push(`${family.id}.${exported.name}: local prop ${localProp.name} is not in the source signature`)
         const sourceType = source.typeFacts.get(localProp.name)
@@ -581,7 +752,15 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       const inheritedProps = new Set<string>()
       for (const interfaceId of exported.component.inherits ?? []) {
         const inherited = interfaceById.get(interfaceId)
-        for (const prop of inherited?.props ?? []) inheritedProps.add(prop.name)
+        const context = inherited && sourceDeclarationContext(inherited)
+        if (!context) {
+          errors.push(`${family.id}.${exported.name}: inherited prop surface ${interfaceId} cannot be resolved independently`)
+          continue
+        }
+        for (const prop of context.checker.getPropertiesOfType(context.propsType)) inheritedProps.add(prop.name)
+      }
+      for (const propName of source.sourceLocalPropNames) {
+        if (!inheritedProps.has(propName) && !contractedLocalNames.has(propName)) errors.push(`${family.id}.${exported.name}: source local prop ${propName} is omitted from the contract`)
       }
       const hasAsChild = inheritedProps.has("asChild") || sourceProps.has("asChild")
       const slots = exported.component.slots ?? []
@@ -740,6 +919,7 @@ function findUnreferencedEvidence(): string[] {
 }
 
 declarationProgramCache = createDeclarationProgram(loadArtifacts().interfaces)
+componentProgramCache = createComponentProgram(loadArtifacts().families)
 
 describe("Phase 3 Task 10 independent review", () => {
   test("matches the independent 38-family oracle to the manifest and physical artifacts", () => {
@@ -772,6 +952,64 @@ describe("Phase 3 Task 10 independent review", () => {
   test.each([["content", 274], ["overlay", 267], ["portal", 3]])("independently resolves Vaul %s props through its React default import", (member, count) => {
     const context = sourceDeclarationContext(interfaceById(loadArtifacts(), `vaul.drawer.${member}`))!
     expect(context.checker.getPropertiesOfType(context.propsType)).toHaveLength(count as number)
+  })
+
+  test("independently resolves composed local prop surfaces and delegated defaults", () => {
+    const facts = (id: string, exportName: string) => {
+      const { sourceFile } = sourceFacts(join(root, "src/components/ui", `${id}.tsx`))
+      return componentSourceFacts(sourceFile, declarationFor(sourceFile, exportName)!)
+    }
+
+    const action = facts("alert-dialog", "AlertDialogAction")
+    expect(action.typeFacts.get("variant")?.values).toEqual(["default", "destructive", "ghost", "link", "outline", "secondary"])
+    expect(action.typeFacts.get("size")?.values).toEqual(["default", "icon", "icon-lg", "icon-sm", "icon-xs", "lg", "sm", "xs"])
+
+    const inputGroupButton = facts("input-group", "InputGroupButton")
+    expect(inputGroupButton.typeFacts.get("asChild")?.typeText).toBe("boolean | undefined")
+    expect(inputGroupButton.typeFacts.get("size")?.values).toEqual(["icon-sm", "icon-xs", "sm", "xs"])
+    expect(inputGroupButton.bindingDefaults.get("asChild")).toBe(false)
+
+    const previous = facts("pagination", "PaginationPrevious")
+    expect(previous.typeFacts.get("isActive")?.typeText).toBe("boolean | undefined")
+    expect(previous.typeFacts.get("size")?.values).toEqual(["default", "icon", "icon-lg", "icon-sm", "icon-xs", "lg", "sm", "xs"])
+    expect(previous.bindingDefaults.get("size")).toBe("default")
+  })
+
+  test("independent local-prop comparison catches exact composed-surface mutations", () => {
+    const artifacts = clone(loadArtifacts())
+    const previous = exportByName(familyById(artifacts, "pagination"), "PaginationPrevious").component
+    previous.localProps = previous.localProps.filter((prop: AnyRecord) => prop.name !== "isActive")
+    previous.localProps.find((prop: AnyRecord) => prop.name === "size").default = "icon"
+    previous.localProps.find((prop: AnyRecord) => prop.name === "size").type.values = ["default"]
+
+    const findings = directSourceErrors(artifacts.families, artifacts.interfaces)
+    expect(findings).toContain("pagination.PaginationPrevious: source local prop isActive is omitted from the contract")
+    expect(findings).toContain("pagination.PaginationPrevious: enum values for size differ from source literals")
+    expect(findings).toContain("pagination.PaginationPrevious: default for size differs from source")
+  })
+
+  test("independent prop analysis fails closed for an any-typed surface", () => {
+    const fixturePath = join(root, "tests/fixtures/component-prop-source-analysis-fixture.tsx")
+    const fixtureProgram = ts.createProgram([fixturePath], {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      jsx: ts.JsxEmit.ReactJSX,
+      strict: true,
+      skipLibCheck: true,
+    })
+    const previousProgram = componentProgramCache
+    componentProgramCache = { program: fixtureProgram, checker: fixtureProgram.getTypeChecker() }
+    sourceCache.delete(fixturePath)
+    try {
+      const { sourceFile } = sourceFacts(fixturePath)
+      const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "AnyPropsFixture")!)
+      expect(facts.typeFacts.size).toBe(0)
+      expect(facts.propSurfaceError).toBe("component props type is any")
+    } finally {
+      componentProgramCache = previousProgram
+      sourceCache.delete(fixturePath)
+    }
   })
 
   test("has no unreferenced evidence records", () => {
