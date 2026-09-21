@@ -106,6 +106,14 @@
       "accessedOn": "2026-09-21"
     },
     {
+      "id": "shadcn.radio-group.docs",
+      "kind": "official-documentation",
+      "title": "Radio Group - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/radio-group",
+      "locatorHint": "Radio Group; Usage; Composition; Description; Choice Card; Fieldset; Disabled; Invalid; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.scroll-area.docs",
       "kind": "official-documentation",
       "title": "Scroll Area - shadcn/ui",
