@@ -53,8 +53,25 @@
       "name": "aria-atomic",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -65,10 +82,15 @@
       "name": "aria-autocomplete",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"list\" | \"none\" | \"inline\" | \"both\""
+        "kind": "enum",
+        "values": [
+          "none",
+          "inline",
+          "list",
+          "both"
+        ]
       },
-      "typeText": "\"list\" | \"none\" | \"inline\" | \"both\"",
+      "typeText": "\"none\" | \"inline\" | \"list\" | \"both\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -99,8 +121,25 @@
       "name": "aria-busy",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -111,8 +150,29 @@
       "name": "aria-checked",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "boolean | \"true\" | \"false\" | \"mixed\""
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "mixed"
+          }
+        ]
       },
       "typeText": "boolean | \"true\" | \"false\" | \"mixed\"",
       "evidenceRefs": [
@@ -178,8 +238,45 @@
       "name": "aria-current",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "boolean | \"true\" | \"false\" | \"page\" | \"step\" | \"location\" | \"date\" | \"time\""
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "page"
+          },
+          {
+            "kind": "literal",
+            "value": "step"
+          },
+          {
+            "kind": "literal",
+            "value": "location"
+          },
+          {
+            "kind": "literal",
+            "value": "date"
+          },
+          {
+            "kind": "literal",
+            "value": "time"
+          }
+        ]
       },
       "typeText": "boolean | \"true\" | \"false\" | \"page\" | \"step\" | \"location\" | \"date\" | \"time\"",
       "evidenceRefs": [
@@ -223,8 +320,25 @@
       "name": "aria-disabled",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -235,10 +349,17 @@
       "name": "aria-dropeffect",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"link\" | \"none\" | \"copy\" | \"execute\" | \"move\" | \"popup\""
+        "kind": "enum",
+        "values": [
+          "none",
+          "copy",
+          "execute",
+          "link",
+          "move",
+          "popup"
+        ]
       },
-      "typeText": "\"link\" | \"none\" | \"copy\" | \"execute\" | \"move\" | \"popup\"",
+      "typeText": "\"none\" | \"copy\" | \"execute\" | \"link\" | \"move\" | \"popup\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -258,8 +379,25 @@
       "name": "aria-expanded",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -281,8 +419,25 @@
       "name": "aria-grabbed",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -293,10 +448,47 @@
       "name": "aria-haspopup",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "boolean | \"true\" | \"false\" | \"dialog\" | \"grid\" | \"listbox\" | \"menu\" | \"tree\""
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "menu"
+          },
+          {
+            "kind": "literal",
+            "value": "listbox"
+          },
+          {
+            "kind": "literal",
+            "value": "tree"
+          },
+          {
+            "kind": "literal",
+            "value": "grid"
+          },
+          {
+            "kind": "literal",
+            "value": "dialog"
+          }
+        ]
       },
-      "typeText": "boolean | \"true\" | \"false\" | \"dialog\" | \"grid\" | \"listbox\" | \"menu\" | \"tree\"",
+      "typeText": "boolean | \"true\" | \"false\" | \"menu\" | \"listbox\" | \"tree\" | \"grid\" | \"dialog\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -305,8 +497,25 @@
       "name": "aria-hidden",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -317,8 +526,33 @@
       "name": "aria-invalid",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "boolean | \"true\" | \"false\" | \"grammar\" | \"spelling\""
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "grammar"
+          },
+          {
+            "kind": "literal",
+            "value": "spelling"
+          }
+        ]
       },
       "typeText": "boolean | \"true\" | \"false\" | \"grammar\" | \"spelling\"",
       "evidenceRefs": [
@@ -373,8 +607,12 @@
       "name": "aria-live",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"off\" | \"assertive\" | \"polite\""
+        "kind": "enum",
+        "values": [
+          "off",
+          "assertive",
+          "polite"
+        ]
       },
       "typeText": "\"off\" | \"assertive\" | \"polite\"",
       "evidenceRefs": [
@@ -385,8 +623,25 @@
       "name": "aria-modal",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -397,8 +652,25 @@
       "name": "aria-multiline",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -409,8 +681,25 @@
       "name": "aria-multiselectable",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -421,8 +710,11 @@
       "name": "aria-orientation",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"horizontal\" | \"vertical\""
+        "kind": "enum",
+        "values": [
+          "horizontal",
+          "vertical"
+        ]
       },
       "typeText": "\"horizontal\" | \"vertical\"",
       "evidenceRefs": [
@@ -466,8 +758,29 @@
       "name": "aria-pressed",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "boolean | \"true\" | \"false\" | \"mixed\""
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "mixed"
+          }
+        ]
       },
       "typeText": "boolean | \"true\" | \"false\" | \"mixed\"",
       "evidenceRefs": [
@@ -478,8 +791,25 @@
       "name": "aria-readonly",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -490,10 +820,21 @@
       "name": "aria-relevant",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"text\" | \"additions\" | \"additions removals\" | \"additions text\" | \"all\" | \"removals\" | \"removals additions\" | \"removals text\" | \"text additions\" | \"text removals\""
+        "kind": "enum",
+        "values": [
+          "additions",
+          "additions removals",
+          "additions text",
+          "all",
+          "removals",
+          "removals additions",
+          "removals text",
+          "text",
+          "text additions",
+          "text removals"
+        ]
       },
-      "typeText": "\"text\" | \"additions\" | \"additions removals\" | \"additions text\" | \"all\" | \"removals\" | \"removals additions\" | \"removals text\" | \"text additions\" | \"text removals\"",
+      "typeText": "\"additions\" | \"additions removals\" | \"additions text\" | \"all\" | \"removals\" | \"removals additions\" | \"removals text\" | \"text\" | \"text additions\" | \"text removals\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -502,8 +843,25 @@
       "name": "aria-required",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -569,8 +927,25 @@
       "name": "aria-selected",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -592,8 +967,13 @@
       "name": "aria-sort",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"none\" | \"ascending\" | \"descending\" | \"other\""
+        "kind": "enum",
+        "values": [
+          "none",
+          "ascending",
+          "descending",
+          "other"
+        ]
       },
       "typeText": "\"none\" | \"ascending\" | \"descending\" | \"other\"",
       "evidenceRefs": [
@@ -692,10 +1072,37 @@
       "name": "children",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "ReactNode"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Iterable<React.ReactNode>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactPortal"
+          }
+        ]
       },
-      "typeText": "ReactNode",
+      "typeText": "React.ReactNode",
       "evidenceRefs": [
         "declaration"
       ]
@@ -737,8 +1144,33 @@
       "name": "contentEditable",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish | \"inherit\" | \"plaintext-only\""
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "inherit"
+          },
+          {
+            "kind": "literal",
+            "value": "plaintext-only"
+          }
+        ]
       },
       "typeText": "Booleanish | \"inherit\" | \"plaintext-only\"",
       "evidenceRefs": [
@@ -794,8 +1226,21 @@
       "name": "defaultValue",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "string | number | readonly string[]"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "array",
+            "item": {
+              "kind": "string"
+            }
+          }
+        ]
       },
       "typeText": "string | number | readonly string[]",
       "evidenceRefs": [
@@ -817,8 +1262,25 @@
       "name": "draggable",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -863,10 +1325,19 @@
       "name": "inputMode",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"none\" | \"search\" | \"text\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\""
+        "kind": "enum",
+        "values": [
+          "none",
+          "text",
+          "tel",
+          "url",
+          "email",
+          "numeric",
+          "decimal",
+          "search"
+        ]
       },
-      "typeText": "\"none\" | \"search\" | \"text\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\"",
+      "typeText": "\"none\" | \"text\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\" | \"search\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -941,10 +1412,21 @@
       "name": "key",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Key"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "bigint"
+          }
+        ]
       },
-      "typeText": "Key",
+      "typeText": "React.Key",
       "evidenceRefs": [
         "declaration"
       ]
@@ -976,9 +1458,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -988,9 +1470,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1000,9 +1482,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "AnimationEventHandler<HTMLHeadingElement>"
+        "typeText": "React.AnimationEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "AnimationEventHandler<HTMLHeadingElement>",
+      "typeText": "React.AnimationEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1012,9 +1494,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "AnimationEventHandler<HTMLHeadingElement>"
+        "typeText": "React.AnimationEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "AnimationEventHandler<HTMLHeadingElement>",
+      "typeText": "React.AnimationEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1024,9 +1506,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "AnimationEventHandler<HTMLHeadingElement>"
+        "typeText": "React.AnimationEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "AnimationEventHandler<HTMLHeadingElement>",
+      "typeText": "React.AnimationEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1036,9 +1518,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "AnimationEventHandler<HTMLHeadingElement>"
+        "typeText": "React.AnimationEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "AnimationEventHandler<HTMLHeadingElement>",
+      "typeText": "React.AnimationEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1048,9 +1530,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "AnimationEventHandler<HTMLHeadingElement>"
+        "typeText": "React.AnimationEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "AnimationEventHandler<HTMLHeadingElement>",
+      "typeText": "React.AnimationEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1060,9 +1542,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "AnimationEventHandler<HTMLHeadingElement>"
+        "typeText": "React.AnimationEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "AnimationEventHandler<HTMLHeadingElement>",
+      "typeText": "React.AnimationEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1072,9 +1554,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1084,9 +1566,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1096,9 +1578,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1108,9 +1590,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1120,9 +1602,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FocusEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FocusEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FocusEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FocusEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1132,9 +1614,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FocusEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FocusEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FocusEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FocusEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1144,9 +1626,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1156,9 +1638,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1168,9 +1650,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1180,9 +1662,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1192,9 +1674,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1204,9 +1686,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1216,9 +1698,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1228,9 +1710,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1240,9 +1722,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "CompositionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.CompositionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "CompositionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.CompositionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1252,9 +1734,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "CompositionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.CompositionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "CompositionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.CompositionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1264,9 +1746,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "CompositionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.CompositionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "CompositionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.CompositionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1276,9 +1758,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "CompositionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.CompositionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "CompositionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.CompositionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1288,9 +1770,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "CompositionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.CompositionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "CompositionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.CompositionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1300,9 +1782,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "CompositionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.CompositionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "CompositionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.CompositionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1312,9 +1794,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1324,9 +1806,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1336,9 +1818,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ClipboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ClipboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1348,9 +1830,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ClipboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ClipboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1360,9 +1842,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ClipboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ClipboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1372,9 +1854,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ClipboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ClipboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1384,9 +1866,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1396,9 +1878,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1408,9 +1890,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1420,9 +1902,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1432,9 +1914,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1444,9 +1926,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1456,9 +1938,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1468,9 +1950,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1480,9 +1962,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1492,9 +1974,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1504,9 +1986,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1516,9 +1998,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1528,9 +2010,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1540,9 +2022,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1552,9 +2034,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1564,9 +2046,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1576,9 +2058,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1588,9 +2070,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "DragEventHandler<HTMLHeadingElement>"
+        "typeText": "React.DragEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "DragEventHandler<HTMLHeadingElement>",
+      "typeText": "React.DragEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1600,9 +2082,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1612,9 +2094,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1624,9 +2106,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1636,9 +2118,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1648,9 +2130,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1660,9 +2142,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1672,9 +2154,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1684,9 +2166,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1696,9 +2178,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1708,9 +2190,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1720,9 +2202,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FocusEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FocusEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FocusEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FocusEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1732,9 +2214,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FocusEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FocusEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FocusEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FocusEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1744,9 +2226,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1756,9 +2238,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1768,9 +2250,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1780,9 +2262,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1792,9 +2274,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1804,9 +2286,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1816,9 +2298,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "KeyboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "KeyboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1828,9 +2310,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "KeyboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "KeyboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1840,9 +2322,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "KeyboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "KeyboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1852,9 +2334,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "KeyboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "KeyboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1864,9 +2346,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "KeyboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "KeyboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1876,9 +2358,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "KeyboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "KeyboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.KeyboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1888,9 +2370,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1900,9 +2382,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1912,9 +2394,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1924,9 +2406,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1936,9 +2418,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1948,9 +2430,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1960,9 +2442,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1972,9 +2454,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1984,9 +2466,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1996,9 +2478,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2008,9 +2490,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2020,9 +2502,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2032,9 +2514,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2044,9 +2526,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2056,9 +2538,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2068,9 +2550,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2080,9 +2562,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2092,9 +2574,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2104,9 +2586,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2116,9 +2598,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2128,9 +2610,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2140,9 +2622,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "MouseEventHandler<HTMLHeadingElement>"
+        "typeText": "React.MouseEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "MouseEventHandler<HTMLHeadingElement>",
+      "typeText": "React.MouseEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2152,9 +2634,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ClipboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ClipboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2164,9 +2646,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ClipboardEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ClipboardEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ClipboardEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2176,9 +2658,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2188,9 +2670,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2200,9 +2682,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2212,9 +2694,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2224,9 +2706,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2236,9 +2718,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2248,9 +2730,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2260,9 +2742,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2272,9 +2754,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2284,9 +2766,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2296,9 +2778,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2308,9 +2790,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2320,9 +2802,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2332,9 +2814,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2344,9 +2826,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2356,9 +2838,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2368,9 +2850,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2380,9 +2862,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2392,9 +2874,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2404,9 +2886,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "PointerEventHandler<HTMLHeadingElement>"
+        "typeText": "React.PointerEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "PointerEventHandler<HTMLHeadingElement>",
+      "typeText": "React.PointerEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2416,9 +2898,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2428,9 +2910,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2440,9 +2922,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2452,9 +2934,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2464,9 +2946,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2476,9 +2958,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2488,9 +2970,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2500,9 +2982,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2512,9 +2994,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "UIEventHandler<HTMLHeadingElement>"
+        "typeText": "React.UIEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "UIEventHandler<HTMLHeadingElement>",
+      "typeText": "React.UIEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2524,9 +3006,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "UIEventHandler<HTMLHeadingElement>"
+        "typeText": "React.UIEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "UIEventHandler<HTMLHeadingElement>",
+      "typeText": "React.UIEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2536,9 +3018,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2548,9 +3030,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2560,9 +3042,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2572,9 +3054,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2584,9 +3066,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2596,9 +3078,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2608,9 +3090,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2620,9 +3102,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2632,9 +3114,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2644,9 +3126,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLHeadingElement>"
+        "typeText": "React.FormEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "FormEventHandler<HTMLHeadingElement>",
+      "typeText": "React.FormEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2656,9 +3138,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2668,9 +3150,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2680,9 +3162,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2692,9 +3174,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2704,9 +3186,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2716,9 +3198,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2728,9 +3210,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2740,9 +3222,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2752,9 +3234,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2764,9 +3246,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2776,9 +3258,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2788,9 +3270,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TouchEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TouchEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TouchEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TouchEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2800,9 +3282,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TransitionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TransitionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TransitionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TransitionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2812,9 +3294,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "TransitionEventHandler<HTMLHeadingElement>"
+        "typeText": "React.TransitionEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "TransitionEventHandler<HTMLHeadingElement>",
+      "typeText": "React.TransitionEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2824,9 +3306,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2836,9 +3318,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2848,9 +3330,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2860,9 +3342,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "ReactEventHandler<HTMLHeadingElement>"
+        "typeText": "React.ReactEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "ReactEventHandler<HTMLHeadingElement>",
+      "typeText": "React.ReactEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2872,9 +3354,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "WheelEventHandler<HTMLHeadingElement>"
+        "typeText": "React.WheelEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "WheelEventHandler<HTMLHeadingElement>",
+      "typeText": "React.WheelEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2884,9 +3366,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "WheelEventHandler<HTMLHeadingElement>"
+        "typeText": "React.WheelEventHandler<HTMLHeadingElement>"
       },
-      "typeText": "WheelEventHandler<HTMLHeadingElement>",
+      "typeText": "React.WheelEventHandler<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2928,10 +3410,22 @@
       "name": "ref",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "LegacyRef<HTMLHeadingElement>"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "(instance: HTMLHeadingElement) => void | React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.RefObject<HTMLHeadingElement>"
+          }
+        ]
       },
-      "typeText": "LegacyRef<HTMLHeadingElement>",
+      "typeText": "React.LegacyRef<HTMLHeadingElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2984,10 +3478,291 @@
       "name": "role",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "AriaRole"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": "none"
+          },
+          {
+            "kind": "literal",
+            "value": "list"
+          },
+          {
+            "kind": "literal",
+            "value": "link"
+          },
+          {
+            "kind": "literal",
+            "value": "menu"
+          },
+          {
+            "kind": "literal",
+            "value": "listbox"
+          },
+          {
+            "kind": "literal",
+            "value": "tree"
+          },
+          {
+            "kind": "literal",
+            "value": "grid"
+          },
+          {
+            "kind": "literal",
+            "value": "dialog"
+          },
+          {
+            "kind": "literal",
+            "value": "search"
+          },
+          {
+            "kind": "literal",
+            "value": "alert"
+          },
+          {
+            "kind": "literal",
+            "value": "alertdialog"
+          },
+          {
+            "kind": "literal",
+            "value": "application"
+          },
+          {
+            "kind": "literal",
+            "value": "article"
+          },
+          {
+            "kind": "literal",
+            "value": "banner"
+          },
+          {
+            "kind": "literal",
+            "value": "button"
+          },
+          {
+            "kind": "literal",
+            "value": "cell"
+          },
+          {
+            "kind": "literal",
+            "value": "checkbox"
+          },
+          {
+            "kind": "literal",
+            "value": "columnheader"
+          },
+          {
+            "kind": "literal",
+            "value": "combobox"
+          },
+          {
+            "kind": "literal",
+            "value": "complementary"
+          },
+          {
+            "kind": "literal",
+            "value": "contentinfo"
+          },
+          {
+            "kind": "literal",
+            "value": "definition"
+          },
+          {
+            "kind": "literal",
+            "value": "directory"
+          },
+          {
+            "kind": "literal",
+            "value": "document"
+          },
+          {
+            "kind": "literal",
+            "value": "feed"
+          },
+          {
+            "kind": "literal",
+            "value": "figure"
+          },
+          {
+            "kind": "literal",
+            "value": "form"
+          },
+          {
+            "kind": "literal",
+            "value": "gridcell"
+          },
+          {
+            "kind": "literal",
+            "value": "group"
+          },
+          {
+            "kind": "literal",
+            "value": "heading"
+          },
+          {
+            "kind": "literal",
+            "value": "img"
+          },
+          {
+            "kind": "literal",
+            "value": "listitem"
+          },
+          {
+            "kind": "literal",
+            "value": "log"
+          },
+          {
+            "kind": "literal",
+            "value": "main"
+          },
+          {
+            "kind": "literal",
+            "value": "marquee"
+          },
+          {
+            "kind": "literal",
+            "value": "math"
+          },
+          {
+            "kind": "literal",
+            "value": "menubar"
+          },
+          {
+            "kind": "literal",
+            "value": "menuitem"
+          },
+          {
+            "kind": "literal",
+            "value": "menuitemcheckbox"
+          },
+          {
+            "kind": "literal",
+            "value": "menuitemradio"
+          },
+          {
+            "kind": "literal",
+            "value": "navigation"
+          },
+          {
+            "kind": "literal",
+            "value": "note"
+          },
+          {
+            "kind": "literal",
+            "value": "option"
+          },
+          {
+            "kind": "literal",
+            "value": "presentation"
+          },
+          {
+            "kind": "literal",
+            "value": "progressbar"
+          },
+          {
+            "kind": "literal",
+            "value": "radio"
+          },
+          {
+            "kind": "literal",
+            "value": "radiogroup"
+          },
+          {
+            "kind": "literal",
+            "value": "region"
+          },
+          {
+            "kind": "literal",
+            "value": "row"
+          },
+          {
+            "kind": "literal",
+            "value": "rowgroup"
+          },
+          {
+            "kind": "literal",
+            "value": "rowheader"
+          },
+          {
+            "kind": "literal",
+            "value": "scrollbar"
+          },
+          {
+            "kind": "literal",
+            "value": "searchbox"
+          },
+          {
+            "kind": "literal",
+            "value": "separator"
+          },
+          {
+            "kind": "literal",
+            "value": "slider"
+          },
+          {
+            "kind": "literal",
+            "value": "spinbutton"
+          },
+          {
+            "kind": "literal",
+            "value": "status"
+          },
+          {
+            "kind": "literal",
+            "value": "switch"
+          },
+          {
+            "kind": "literal",
+            "value": "tab"
+          },
+          {
+            "kind": "literal",
+            "value": "table"
+          },
+          {
+            "kind": "literal",
+            "value": "tablist"
+          },
+          {
+            "kind": "literal",
+            "value": "tabpanel"
+          },
+          {
+            "kind": "literal",
+            "value": "term"
+          },
+          {
+            "kind": "literal",
+            "value": "textbox"
+          },
+          {
+            "kind": "literal",
+            "value": "timer"
+          },
+          {
+            "kind": "literal",
+            "value": "toolbar"
+          },
+          {
+            "kind": "literal",
+            "value": "tooltip"
+          },
+          {
+            "kind": "literal",
+            "value": "treegrid"
+          },
+          {
+            "kind": "literal",
+            "value": "treeitem"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "string & {}"
+          }
+        ]
       },
-      "typeText": "AriaRole",
+      "typeText": "React.AriaRole",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3018,8 +3793,25 @@
       "name": "spellCheck",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "Booleanish"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
       },
       "typeText": "Booleanish",
       "evidenceRefs": [
@@ -3031,9 +3823,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "CSSProperties"
+        "typeText": "React.CSSProperties"
       },
-      "typeText": "CSSProperties",
+      "typeText": "React.CSSProperties",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3086,8 +3878,11 @@
       "name": "translate",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"yes\" | \"no\""
+        "kind": "enum",
+        "values": [
+          "yes",
+          "no"
+        ]
       },
       "typeText": "\"yes\" | \"no\"",
       "evidenceRefs": [
@@ -3109,10 +3904,13 @@
       "name": "unselectable",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "\"on\" | \"off\""
+        "kind": "enum",
+        "values": [
+          "off",
+          "on"
+        ]
       },
-      "typeText": "\"on\" | \"off\"",
+      "typeText": "\"off\" | \"on\"",
       "evidenceRefs": [
         "declaration"
       ]
