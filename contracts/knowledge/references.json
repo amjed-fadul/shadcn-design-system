@@ -18,6 +18,14 @@
       "accessedOn": "2026-09-20"
     },
     {
+      "id": "shadcn.avatar.docs",
+      "kind": "official-documentation",
+      "title": "Avatar - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/avatar",
+      "locatorHint": "Avatar; Usage; Composition; Badge; Avatar Group; Sizes; Dropdown; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.badge.docs",
       "kind": "official-documentation",
       "title": "Badge - shadcn/ui",
