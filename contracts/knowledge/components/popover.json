@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "popover-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "popover"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays rich content in a portal, triggered by a button.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.popover.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Popover when a trigger should reveal rich, interactive content without navigating away from the current context.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.popover.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Popover with PopoverTrigger and PopoverContent; PopoverHeader, PopoverTitle, and PopoverDescription can structure content inside the surface.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.popover.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use PopoverTrigger with asChild when an existing control such as Button should act as the trigger.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.popover.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use the align prop on PopoverContent to control horizontal alignment.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.popover.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Popover supports RTL layouts through the Radix-backed component and directional positioning props.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.popover.docs"
+        ]
+      }
+    }
+  ]
+}
