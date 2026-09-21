@@ -145,6 +145,12 @@
                   "evidenceRefs": [
                     "source"
                   ]
+                },
+                {
+                  "nodeId": "thumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
                 }
               ],
               "evidenceRefs": [
@@ -192,6 +198,28 @@
                   "name": "data-slot",
                   "source": "literal",
                   "value": "slider-range",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "thumb",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.slider.thumb"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "slider-thumb",
                   "evidenceRefs": [
                     "source"
                   ]

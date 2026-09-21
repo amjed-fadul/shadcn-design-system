@@ -153,6 +153,7 @@
     "contracts/components/interfaces/radix.separator.root.json",
     "contracts/components/interfaces/radix.slider.range.json",
     "contracts/components/interfaces/radix.slider.root.json",
+    "contracts/components/interfaces/radix.slider.thumb.json",
     "contracts/components/interfaces/radix.slider.track.json",
     "contracts/components/interfaces/radix.switch.root.json",
     "contracts/components/interfaces/radix.switch.thumb.json",

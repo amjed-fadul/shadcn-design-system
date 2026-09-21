@@ -7,11 +7,11 @@ import { describe, expect, test } from "vitest"
 
 import contractSetJson from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
+import { canonicalInterfaceMemberAuthority } from "../src/contracts/components/canonical-interface-member-authority"
 import { resolveConditionalApiShape, validateComponentFamilyInvariants, validateInheritedInterfaceInvariants } from "../src/contracts/components/invariants"
 import type { ComponentContractSet, ComponentFamilyContract, ComponentInvariantAuthority, ComponentDefinition, InheritedInterfaceContract, RenderingFact, RenderingTree } from "../src/contracts/components/types"
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
-import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const contractSet = contractSetJson as ComponentContractSet
@@ -133,20 +133,6 @@ function sourceEvidencePath(source: string) {
   return source.replace(/@[0-9]+\.[0-9]+\.[0-9]+$/, "")
 }
 
-function normalizedTypeText(typeText: string) {
-  const members = typeText.split(" | ")
-  return members.length > 1 ? members.sort().join(" | ") : typeText
-}
-
-const intrinsicInterfaceCache = new Map<string, ReturnType<typeof analyzeIntrinsicReactInterface>>()
-function analyzeIntrinsic(tag: keyof React.JSX.IntrinsicElements) {
-  const cached = intrinsicInterfaceCache.get(tag)
-  if (cached) return cached
-  const analyzed = analyzeIntrinsicReactInterface(tag)
-  intrinsicInterfaceCache.set(tag, analyzed)
-  return analyzed
-}
-
 describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
   test("registers exactly the 19 seed families and no extra family artifact", () => {
     const actualFamilyFiles = readdirSync(join(root, "contracts/components/families"))
@@ -196,7 +182,7 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
       .filter((file) => file.endsWith(".json"))
       .map((file) => `contracts/components/interfaces/${file}`)
       .sort()
-    expect(contractSet.interfaceFiles).toHaveLength(77)
+    expect(contractSet.interfaceFiles).toHaveLength(referencedInterfaceIds.size)
     expect(new Set(contractSet.interfaceFiles).size).toBe(contractSet.interfaceFiles.length)
     expect(actualInterfaceFiles).toEqual(contractSet.interfaceFiles.slice().sort())
     expect(new Set(interfaces.map((item) => item.id)).size).toBe(interfaces.length)
@@ -209,27 +195,8 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
       expect(JSON.parse(readFileSync(join(root, "node_modules", contract.source.package, "package.json"), "utf8")).version).toBe(contract.source.version)
       expect(validateInheritedInterfaceInvariants(contract)).toEqual([])
 
-      if (contract.source.kind === "react-intrinsic") {
-        const tag = contract.source.symbol.match(/\["([^\"]+)"\]/)?.[1]
-        expect(tag).toBeTypeOf("string")
-        const analyzed = analyzeIntrinsic(tag as keyof React.JSX.IntrinsicElements)
-        expect(contract.props.map(({ name, required, typeText }) => ({ name, required, typeText }))).toEqual(analyzed)
-        expect(contract.events ?? []).toEqual([])
-        expect(contract.conditionalApi ?? []).toEqual([])
-      } else if (contract.source.symbol === "LabelProps" || contract.source.symbol === "SeparatorProps") {
-        const expected = analyzeIntrinsic(contract.source.symbol === "LabelProps" ? "label" : "div").filter(({ name }) => name !== "ref")
-        expected.push({ name: "asChild", required: false, typeText: "boolean" })
-        if (contract.source.symbol === "SeparatorProps") {
-          expected.push({ name: "decorative", required: false, typeText: "boolean" })
-          expected.push({ name: "orientation", required: false, typeText: "\"horizontal\" | \"vertical\"" })
-        }
-        expect(contract.props.map(({ name, required, typeText }) => ({ name, required, typeText: normalizedTypeText(typeText) }))).toEqual(expected.map(({ name, required, typeText }) => ({ name, required, typeText: normalizedTypeText(typeText) })).sort((left, right) => left.name.localeCompare(right.name)))
-        expect(contract.events ?? []).toEqual([])
-        expect(contract.conditionalApi ?? []).toEqual([])
-      } else {
-        const analyzed = analyzePackageComponentInterface(contract.source, { props: contract.props.map(({ name }) => name), events: (contract.events ?? []).map(({ propName }) => propName) })
-        expect({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }).toEqual(analyzed)
-      }
+      const analyzed = analyzePackageComponentInterface(contract.source, canonicalInterfaceMemberAuthority[contract.id])
+      expect({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }, contract.id).toEqual(analyzed)
     }
   }, 60000)
 

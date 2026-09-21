@@ -447,8 +447,13 @@ function sourceDeclarationContext(artifact: AnyRecord): DeclarationContext | und
   let propsType: ts.Type | undefined
   if (artifact.source.kind === "package-declaration") {
     const moduleSymbol = (sourceFile as ts.SourceFile & { symbol?: ts.Symbol }).symbol
-    const symbol = moduleSymbol && checker!.getExportsOfModule(moduleSymbol).find((item) => item.name === artifact.source.symbol)
-    const componentType = symbol && checker!.getTypeOfSymbolAtLocation(symbol, sourceFile)
+    const [exportName, ...members] = artifact.source.symbol.split(".") as string[]
+    let symbol = moduleSymbol && checker!.getExportsOfModule(moduleSymbol).find((item) => item.name === exportName)
+    let componentType = symbol && checker!.getTypeOfSymbolAtLocation(symbol, sourceFile)
+    for (const member of members) {
+      symbol = componentType && checker!.getPropertyOfType(componentType, member)
+      componentType = symbol && checker!.getTypeOfSymbolAtLocation(symbol, sourceFile)
+    }
     const signature = componentType && checker!.getSignaturesOfType(componentType, ts.SignatureKind.Call)[0]
     const propsParameter = signature?.parameters[0]
     if (propsParameter) propsType = checker!.getTypeOfSymbolAtLocation(propsParameter, sourceFile)
@@ -496,6 +501,7 @@ function createDeclarationProgram(interfaces: AnyRecord[]): DeclarationProgram {
   const program = ts.createProgram(declarationPaths, {
     module: ts.ModuleKind.CommonJS,
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    esModuleInterop: true,
     skipLibCheck: true,
     target: ts.ScriptTarget.ES2022,
   })
@@ -513,11 +519,6 @@ function directDeclarationErrors(interfaces: AnyRecord[]): string[] {
     if (!context) {
       errors.push(`${artifact.id}: declaration symbol cannot be resolved independently`)
       continue
-    }
-    if (artifact.source.kind === "package-declaration") {
-      const moduleSymbol = (context.sourceFile as ts.SourceFile & { symbol?: ts.Symbol }).symbol
-      const exported = moduleSymbol && context.checker.getExportsOfModule(moduleSymbol).some((item) => item.name === artifact.source.symbol)
-      if (!exported) errors.push(`${artifact.id}: exported declaration ${artifact.source.symbol} is missing`)
     }
     for (const prop of artifact.props ?? []) {
       const actual = uniqueSymbols(propertySymbols(context.checker, context.propsType, prop.name))
@@ -759,6 +760,28 @@ function findUnreferencedEvidence(): string[] {
 declarationProgramCache = createDeclarationProgram(loadArtifacts().interfaces)
 
 describe("Phase 3 Task 10 independent review", () => {
+  test("audits every inherited interface through independent declaration access", () => {
+    expect(directDeclarationErrors(loadArtifacts().interfaces)).toEqual([])
+  })
+
+  test.each(["empty", "group", "input", "item", "list", "separator"])("independently resolves the cmdk Command.%s declaration", (member) => {
+    const artifact = interfaceById(loadArtifacts(), `cmdk.command.${member}`)
+    const context = sourceDeclarationContext(artifact)
+    expect(context).toBeDefined()
+    expect(directDeclarationErrors([artifact])).toEqual([])
+  })
+
+  test("rejects missing cmdk static members instead of resolving them as Command", () => {
+    const artifact = clone(interfaceById(loadArtifacts(), "cmdk.command.input"))
+    artifact.source.symbol = "Command.Missing"
+    expect(sourceDeclarationContext(artifact)).toBeUndefined()
+  })
+
+  test.each([["content", 274], ["overlay", 267], ["portal", 3]])("independently resolves Vaul %s props through its React default import", (member, count) => {
+    const context = sourceDeclarationContext(interfaceById(loadArtifacts(), `vaul.drawer.${member}`))!
+    expect(context.checker.getPropertiesOfType(context.propsType)).toHaveLength(count as number)
+  })
+
   test("has no unreferenced evidence records", () => {
     expect(findUnreferencedEvidence()).toEqual([])
   })

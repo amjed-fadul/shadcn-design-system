@@ -6,7 +6,7 @@ import { join } from "node:path"
 import { canonicalInterfaceMemberAuthority } from "./canonical-interface-member-authority"
 import { canonicalRenderSourceAnalysisConventions } from "./canonical-render-source-conventions"
 import { analyzeCanonicalDelegatedHostFacts, canonicalDelegatedHostEvidencePaths, canonicalSourceOwnedSlotPropNames } from "./canonical-slot-source-analysis"
-import { analyzePackageComponentInterface } from "./inherited-interface-source-analysis"
+import { analyzePackageComponentInterface, type InterfaceMemberSelection } from "./inherited-interface-source-analysis"
 import type { ComponentContractSourceReconciliationContext } from "./loader"
 import { compareJsxRenderTree, analyzeJsxRenderTree, extractCvaVariantLiterals, extractFunctionPropDefaults, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
 import { reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
@@ -154,7 +154,7 @@ function canonicalInterfaceMembers(contract: InheritedInterfaceContract) {
   return canonicalInterfaceMemberAuthority[contract.id]
 }
 
-function analyzeCanonicalInterfaceFacts(contract: InheritedInterfaceContract, members: { props: readonly string[]; events: readonly string[] } | undefined) {
+function analyzeCanonicalInterfaceFacts(contract: InheritedInterfaceContract, members: InterfaceMemberSelection | undefined) {
   const key = JSON.stringify({ source: contract.source, members })
   const cached = analyzedInterfaceFacts.get(key)
   if (cached) return cached
@@ -164,21 +164,7 @@ function analyzeCanonicalInterfaceFacts(contract: InheritedInterfaceContract, me
 }
 
 function interfaceFactsMatch(contract: InheritedInterfaceContract, sourceFacts: ReturnType<typeof analyzePackageComponentInterface>) {
-  if (contract.source.kind !== "react-intrinsic" && !contract.source.symbol.endsWith("Props")) {
-    return sameValue({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }, sourceFacts)
-  }
-  return sameValue(
-    {
-      props: contract.props.map(({ name, required }) => ({ name, required })),
-      events: (contract.events ?? []).map(({ propName, required }) => ({ propName, required })),
-      conditionalApi: contract.conditionalApi ?? [],
-    },
-    {
-      props: sourceFacts.props.map(({ name, required }) => ({ name, required })),
-      events: sourceFacts.events.map(({ propName, required }) => ({ propName, required })),
-      conditionalApi: sourceFacts.conditionalApi,
-    },
-  )
+  return sameValue({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }, sourceFacts)
 }
 
 /**

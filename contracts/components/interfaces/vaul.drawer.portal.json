@@ -15,7 +15,80 @@
       "source": "node_modules/vaul/dist/index.d.ts@e7441be68f390975c6155c805cea8f54cc1b7f3656b6b9440ecbbbd7753499e6"
     }
   },
-  "props": [],
+  "props": [
+    {
+      "name": "children",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Iterable<React.ReactNode>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactPortal"
+          }
+        ]
+      },
+      "typeText": "React.ReactNode",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "container",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "typescript",
+            "typeText": "Element"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "DocumentFragment"
+          }
+        ]
+      },
+      "typeText": "Element | DocumentFragment",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "forceMount",
+      "required": false,
+      "type": {
+        "kind": "literal",
+        "value": true
+      },
+      "typeText": "true",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
   "events": [],
   "conditionalApi": [],
   "unresolved": []

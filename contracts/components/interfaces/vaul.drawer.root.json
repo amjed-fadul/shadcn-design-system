@@ -50,8 +50,35 @@
       "name": "children",
       "required": false,
       "type": {
-        "kind": "typescript",
-        "typeText": "React.ReactNode"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Iterable<React.ReactNode>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactPortal"
+          }
+        ]
       },
       "typeText": "React.ReactNode",
       "evidenceRefs": [
