@@ -13,15 +13,18 @@ import { analyzeJsxRenderTree, compareJsxRenderTree } from "./helpers/component-
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const sourcePath = join(root, "src/components/ui/pagination.tsx")
+const wrongExportSourcePath = join(root, "tests/fixtures/pagination-cross-family-wrong-export.tsx")
+const wrongModuleSourcePath = join(root, "tests/fixtures/pagination-cross-family-wrong-module.tsx")
 
 function loadJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T
 }
 
+const family = pagination as ComponentFamilyContract
+const link = family.exports.find((entry) => entry.name === "PaginationLink")!.component!
+
 describe("release.5 Pagination", () => {
   test("models PaginationLink's imported Button as an authoritative cross-family render host", () => {
-    const family = pagination as ComponentFamilyContract
-    const link = family.exports.find((entry) => entry.name === "PaginationLink")!.component!
     const source = analyzeJsxRenderTree(sourcePath, "PaginationLink")
     const rendering = link.rendering
     const rootNode = "nodes" in rendering
@@ -51,5 +54,14 @@ describe("release.5 Pagination", () => {
       capabilityIds: new Set<string>(),
       componentExportIds,
     })).toEqual([])
+  })
+
+  test.each([
+    ["an aliased wrong export", wrongExportSourcePath, { importedName: "Avatar", localName: "Button", moduleSpecifier: "@/components/ui/button" }],
+    ["a same-basename wrong module", wrongModuleSourcePath, { importedName: "Button", localName: "Button", moduleSpecifier: "@/other/button" }],
+  ])("rejects %s as evidence for button.Button", (_case, adversarialSourcePath, expectedBinding) => {
+    const source = analyzeJsxRenderTree(adversarialSourcePath, "PaginationLink")
+    expect(source.root?.importBinding).toEqual(expectedBinding)
+    expect(compareJsxRenderTree(link.rendering, source)).not.toEqual([])
   })
 })
