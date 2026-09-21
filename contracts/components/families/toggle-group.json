@@ -388,27 +388,6 @@
                   "evidenceRefs": [
                     "source"
                   ]
-                },
-                {
-                  "name": "data-variant",
-                  "source": "derived",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-size",
-                  "source": "derived",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-spacing",
-                  "source": "derived",
-                  "evidenceRefs": [
-                    "source"
-                  ]
                 }
               ],
               "children": [],
@@ -442,5 +421,18 @@
       }
     }
   ],
-  "unresolved": []
+  "unresolved": [
+    {
+      "topic": "context-derived Toggle Group item data attributes",
+      "scope": "ToggleGroupItem render facts",
+      "reason": "data-variant, data-size, and data-spacing are derived from ToggleGroupContext with local-prop fallbacks. The current rendering schema cannot represent context-derived data-attribute values without falsely attributing them to a direct prop or primitive state.",
+      "evidenceAttempted": [
+        "canonical Toggle Group source",
+        "current component rendering data-attribute schema"
+      ],
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ]
 }
