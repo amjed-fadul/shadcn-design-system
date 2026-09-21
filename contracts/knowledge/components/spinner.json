@@ -21,7 +21,7 @@
   },
   "whenToUse": [
     {
-      "statement": "Use Spinner when an action or region is waiting for work to complete and progress cannot be expressed as a determinate percentage.",
+      "statement": "Use Spinner to indicate a loading state.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [
@@ -32,7 +32,7 @@
   ],
   "howToUse": [
     {
-      "statement": "Place Spinner next to loading text or inside a disabled action when the action is in progress.",
+      "statement": "Inside a Button, place Spinner before the label with data-icon=\"inline-start\" or after the label with data-icon=\"inline-end\".",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [
