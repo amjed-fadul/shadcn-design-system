@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "field-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "field"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Combines labels, controls, help text, and validation to compose accessible form fields and grouped inputs.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.field.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Field to structure a form control with its label, helper text, and validation; use FieldSet and FieldLegend for related groups of controls.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Associate FieldLabel htmlFor with the control id, add aria-invalid to invalid controls, and render FieldError for validation messages.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use FieldContent when a horizontal field needs label and description content aligned beside the control.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Field orientation supports vertical, horizontal, and responsive; vertical is the default.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs"
+        ]
+      }
+    },
+    {
+      "statement": "FieldError accepts authored children or an errors array and deduplicates repeated messages.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs"
+        ]
+      }
+    }
+  ]
+}
