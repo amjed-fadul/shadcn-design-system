@@ -39,30 +39,6 @@
       ]
     },
     {
-      "name": "crossOrigin",
-      "required": false,
-      "type": {
-        "kind": "typescript",
-        "typeText": "CrossOrigin"
-      },
-      "typeText": "CrossOrigin",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
-      "name": "referrerPolicy",
-      "required": false,
-      "type": {
-        "kind": "typescript",
-        "typeText": "HTMLAttributeReferrerPolicy"
-      },
-      "typeText": "HTMLAttributeReferrerPolicy",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
       "name": "src",
       "required": false,
       "type": {
