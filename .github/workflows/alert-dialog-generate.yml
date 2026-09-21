@@ -23,7 +23,7 @@ jobs:
       - name: Commit generated interfaces
         shell: bash
         run: |
-          if git diff --quiet -- contracts/components/interfaces; then
+          if [ -z "$(git status --porcelain -- contracts/components/interfaces)" ]; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
