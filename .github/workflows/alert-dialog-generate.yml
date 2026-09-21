@@ -1,0 +1,33 @@
+name: Alert Dialog interface generation
+
+on:
+  push:
+    branches:
+      - feat/release-5-alert-dialog
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/release-5-alert-dialog
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+      - run: npm ci --ignore-scripts
+      - run: npx vitest run tests/alert-dialog-interface-generator.test.ts
+      - name: Commit generated interfaces
+        shell: bash
+        run: |
+          if git diff --quiet -- contracts/components/interfaces; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add contracts/components/interfaces
+          git commit -m "feat: add generated alert dialog interface contracts"
+          git push origin HEAD:feat/release-5-alert-dialog
