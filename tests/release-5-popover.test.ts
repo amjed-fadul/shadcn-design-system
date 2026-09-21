@@ -70,11 +70,13 @@ function schemaValid(schema: object, value: unknown) {
 }
 
 function normalizeMachineSpecificTypePaths<T>(value: T): T {
-  const normalized = JSON.stringify(value).replace(
-    /import\("[^"]*\/node_modules\/@radix-ui\/rect\/dist\/index"\)/g,
-    'import("@radix-ui/rect/dist/index")'
-  )
-  return JSON.parse(normalized) as T
+  return JSON.parse(JSON.stringify(value), (_key, current) => {
+    if (typeof current !== "string") return current
+    return current.replace(
+      /import\("[^"]*\/node_modules\/@radix-ui\/rect\/dist\/index"\)/g,
+      'import("@radix-ui/rect/dist/index")'
+    )
+  }) as T
 }
 
 describe("release.5 Popover", () => {
