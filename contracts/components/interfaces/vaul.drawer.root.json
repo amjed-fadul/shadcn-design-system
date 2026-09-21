@@ -380,5 +380,18 @@
     }
   ],
   "conditionalApi": [],
-  "unresolved": []
+  "unresolved": [
+    {
+      "topic": "snap-point fade conditional API",
+      "scope": "vaul.drawer.root",
+      "reason": "Vaul DialogProps is a union where fadeFromIndex is only meaningful with snapPoints. The current component conditional schema models literal discriminators but cannot represent presence-based array branches without flattening the union.",
+      "evidenceAttempted": [
+        "pinned vaul 1.1.2 declaration",
+        "canonical inherited-interface analyzer"
+      ],
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ]
 }
