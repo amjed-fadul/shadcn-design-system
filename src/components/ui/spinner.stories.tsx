@@ -22,7 +22,7 @@ export const Default: Story = {}
 export const InButton: Story = {
   render: () => (
     <Button disabled>
-      <Spinner />
+      <Spinner data-icon="inline-start" />
       Saving
     </Button>
   ),
@@ -39,7 +39,7 @@ export const Rtl: Story = {
   render: () => (
     <div dir="rtl">
       <Button disabled>
-        <Spinner aria-label="جارٍ الحفظ" />
+        <Spinner data-icon="inline-start" aria-label="جارٍ الحفظ" />
         جارٍ الحفظ
       </Button>
     </div>
