@@ -108,7 +108,15 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
     })
     return { propName, required: symbols.length === branches.length && symbols.every((symbol) => !(symbol.getFlags() & ts.SymbolFlags.Optional)), payload: mergeStructuredTypes(payloadTypes.map((type) => structuredType(checker, type, declaration))), payloadTypeText: mergedTypeText(checker, payloadTypes, declaration), evidenceRefs }
   })
-  const discriminator = branches.length > 1 ? propFacts.find((prop) => prop.type.kind === "enum") : undefined
+  const discriminator = branches.length > 1 ? propFacts.find((prop) => {
+    const branchTypes = branches.map((branch) => {
+      const symbol = checker.getPropertyOfType(branch, prop.name)
+      return symbol ? checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration ?? declaration) : undefined
+    })
+    return branchTypes.length === branches.length
+      && branchTypes.every((type): type is ts.StringLiteralType => Boolean(type?.isStringLiteral()))
+      && new Set(branchTypes.map((type) => type.value)).size > 1
+  }) : undefined
   const conditionalApi = discriminator ? branches.map((branch) => {
     const typeSymbol = checker.getPropertyOfType(branch, discriminator.name)
     const type = typeSymbol && checker.getTypeOfSymbolAtLocation(typeSymbol, typeSymbol.valueDeclaration ?? declaration)
