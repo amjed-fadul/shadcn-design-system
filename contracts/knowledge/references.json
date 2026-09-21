@@ -82,6 +82,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.progress.docs",
+      "kind": "official-documentation",
+      "title": "Progress - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/progress",
+      "locatorHint": "Progress; Usage; Label; Controlled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.scroll-area.docs",
       "kind": "official-documentation",
       "title": "Scroll Area - shadcn/ui",
