@@ -3931,9 +3931,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.RefObject<import(\"/home/runner/work/shadcn-design-system/shadcn-design-system/node_modules/@radix-ui/rect/dist/index\").Measurable>"
+        "typeText": "React.RefObject<import(\"@radix-ui/rect/dist/index\").Measurable>"
       },
-      "typeText": "React.RefObject<import(\"/home/runner/work/shadcn-design-system/shadcn-design-system/node_modules/@radix-ui/rect/dist/index\").Measurable>",
+      "typeText": "React.RefObject<import(\"@radix-ui/rect/dist/index\").Measurable>",
       "evidenceRefs": [
         "declaration"
       ]
