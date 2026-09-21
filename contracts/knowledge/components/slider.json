@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "slider-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "slider"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "An input where the user selects a value from within a given range.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.slider.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Slider when the user should choose a numeric value or range along a continuous scale.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.slider.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Use a one-number array such as defaultValue={[33]} for a single-value slider.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.slider.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use two or more values in the value/defaultValue array when a range or multiple thumbs are required.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.slider.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use orientation=\"vertical\" for a vertical slider.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.slider.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use disabled to make the slider unavailable and dir=\"rtl\" when direction needs to be explicit.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.slider.docs"
+        ]
+      }
+    }
+  ]
+}
