@@ -82,6 +82,14 @@
       "accessedOn": "2026-09-21"
     },
     {
+      "id": "shadcn.field.docs",
+      "kind": "official-documentation",
+      "title": "Field - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/field",
+      "locatorHint": "Field; Usage; Composition; Anatomy; Validation and Errors; Accessibility; RTL; Responsive Layout; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.input.docs",
       "kind": "official-documentation",
       "title": "Input - shadcn/ui",
