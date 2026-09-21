@@ -15,9 +15,13 @@ import popoverAnchor from "../contracts/components/interfaces/radix.popover.anch
 import popoverPortal from "../contracts/components/interfaces/radix.popover.portal.json"
 import popoverContent from "../contracts/components/interfaces/radix.popover.content.json"
 import htmlH2 from "../contracts/components/interfaces/html.h2.json"
+import htmlDiv from "../contracts/components/interfaces/html.div.json"
+import htmlP from "../contracts/components/interfaces/html.p.json"
+import tokenContract from "../contracts/tokens/token-contract.json"
 import knowledge from "../contracts/knowledge/components/popover.json"
 import references from "../contracts/knowledge/references.json"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
+import { validateComponentFamilyInvariants } from "../src/contracts/components/invariants"
 import {
   analyzeJsxRenderTree,
   extractFunctionPropDefaults,
@@ -127,6 +131,43 @@ describe("release.5 Popover", () => {
     },
     60_000
   )
+
+
+  test("passes semantic family invariants against the real interface and token authority", () => {
+    const interfaces = [
+      popoverRoot,
+      popoverTrigger,
+      popoverAnchor,
+      popoverPortal,
+      popoverContent,
+      htmlH2,
+      htmlDiv,
+      htmlP,
+    ] as any[]
+
+    const authority = {
+      interfaceIds: new Set(interfaces.map((entry) => entry.id)),
+      interfacePropNames: new Map(
+        interfaces.map((entry) => [
+          entry.id,
+          new Set([
+            ...entry.props.map((prop: any) => prop.name),
+            ...(entry.events ?? []).map((event: any) => event.propName),
+          ]),
+        ])
+      ),
+      interfaceContracts: new Map(interfaces.map((entry) => [entry.id, entry])),
+      tokenIds: new Set(tokenContract.tokens.map((token: any) => token.id)),
+      derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule: any) => rule.id)),
+      capabilityIds: new Set<string>(),
+      sourceIdentity: {
+        canonicalPath: popover.source.canonicalPath,
+        canonicalBlobSha: popover.source.canonicalBlobSha,
+      },
+    }
+
+    expect(validateComponentFamilyInvariants(popover as any, authority as any)).toEqual([])
+  })
 
   test("keeps the seven public exports and source rendering facts exact", () => {
     expect(listModuleExports(sourcePath).map((entry) => entry.name)).toEqual([
