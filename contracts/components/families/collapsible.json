@@ -3,7 +3,7 @@
   "id": "collapsible",
   "source": {
     "canonicalPath": "src/components/ui/collapsible.tsx",
-    "canonicalBlobSha": "152d3725f9218878b976dddc68bbeafe0f34ab78",
+    "canonicalBlobSha": "d7e32ed4872189829129ac7d9b38012253bd0f41",
     "implementationKind": "upstream-wrapper",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/collapsible.tsx",
     "upstreamBlobSha": "2f7a4e7fc64a8874373c1584646a63f28cd63c47"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/collapsible.tsx@152d3725f9218878b976dddc68bbeafe0f34ab78"
+      "source": "src/components/ui/collapsible.tsx@d7e32ed4872189829129ac7d9b38012253bd0f41"
     },
     "declaration": {
       "kind": "inherited-interface",
