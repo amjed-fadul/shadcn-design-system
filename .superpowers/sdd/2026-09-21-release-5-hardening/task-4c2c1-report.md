@@ -238,3 +238,55 @@ Final focused results:
 - `.superpowers/sdd/2026-09-21-release-5-hardening/task-4c2c1-report.md`
 
 No component-family JSON, token contract, component implementation, canonical recipe authority, release artifact, 4C2C2 conditional/token-expression parser, exception, allowlist, weakened equality, or manual fact cleanup changed.
+
+## Fix Round 3 — render-reachable nested class roots
+
+### Confirmed root cause and correction
+
+The independent imported-recipe audit delegated class-root discovery to the general `walkComponent` helper. That helper intentionally stops at every nested function-like node except its own mapped-render special case, so `className` attributes inside inline `.map(...)` callbacks and reachable local render functions never reached imported-recipe authority validation. Production traverses those nested bodies, leaving the independent oracle with a false-negative boundary.
+
+The independent audit now has a dedicated return-root traversal. It begins at the component's returned expressions and follows only expressions that can contribute rendered JSX: JSX/fragment descendants, conditional and fallback branches, array elements, inline or locally bound `.map(...)` callbacks, JSX aliases, and explicitly invoked local function/arrow render results. It preserves the original AST nodes, so nearest lexical bindings continue to govern imported recipe and selector identity. Recursion guards reject cycles.
+
+The traversal does not scan arbitrary nested declarations. It also respects expression semantics: for `left && right`, only `right` can become the rendered result, so a JSX-producing call used solely as the left-hand condition is not promoted into a class root. Unrelated or unreachable nested closures therefore remain outside token-recipe authority.
+
+### Strict RED / GREEN evidence
+
+All npm commands used Node `v22.18.0` through `PATH=/Users/amjedfadul/.nvm/versions/node/v22.18.0/bin:$PATH`.
+
+Initial targeted RED:
+
+- selected nested-root run: **2 failed / 1 passed / 46 skipped**;
+- the valid mapped fixture returned zero imported class facts;
+- the mapped wrong-authority fixture returned zero unresolved evidence;
+- the non-render nested-closure exclusion already passed, proving the boundary rather than merely broadening traversal.
+
+A second focused RED changed the exclusion fixture so an invalid JSX-producing closure is invoked only as the left condition of `&&`. The first implementation incorrectly followed that non-rendered result and emitted an authority error. Restricting `&&` traversal to its contributing right branch made the case GREEN without an exception or call-name filter.
+
+Final focused coverage includes:
+
+- exact imported default facts from inline `.map` callback JSX;
+- exact imported default facts from an invoked local render function;
+- wrong/re-exported, stale, default-import, and namespace-import producers inside nested render paths, each unresolved with zero leaked recipe facts;
+- an imported binding shadowed by a `.map` callback parameter;
+- a JSX-producing closure whose result is used only as a condition, excluded from class roots.
+
+Final results:
+
+- nested-root selection: **3/3 passed, 46 skipped**;
+- combined production and independent imported-recipe selection: **15 passed, 40 skipped**;
+- compatibility run (imported recipes, stateful families, unresolved reconciliation): **3 files passed, 70/70 tests passed**;
+- full independent review: **47 passed / 2 expected residual failures**, with the unchanged **55 source findings** plus `collapsible.json:tokens`;
+- `npm run typecheck`: **exit 0**;
+- `git diff --check`: **exit 0** before commit;
+- Release-001 base/current blobs: `75b59166086e9de0c67656fe64712a8cc70aa6e3` / `75b59166086e9de0c67656fe64712a8cc70aa6e3`;
+- family-contract and release-artifact diff from `143edc316924ba604f571e60f19c47f6207ba48d`: empty.
+
+Per the controller's bounded-gate instruction, `components:verify` and the full suite were not run. This round changes only the separate independent oracle and its fixtures; the production analyzer and token closure are unchanged.
+
+### Fix-round changed files
+
+- `tests/component-contract-independent-review.test.ts`
+- `tests/fixtures/imported-cva-consumer.tsx`
+- `.superpowers/sdd/2026-09-21-release-5-hardening/task-4c2c1-report.md`
+
+No production analyzer, component-family JSON, token contract, component source, canonical authority input, release artifact, 4C2C2 parser, family/path exception, finding filter, contract-derived truth, or manual fact cleanup changed.

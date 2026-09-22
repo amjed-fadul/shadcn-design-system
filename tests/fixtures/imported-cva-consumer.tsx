@@ -167,6 +167,37 @@ function LocalAndImportedFixture() {
   return <div className={cn("px-2 h-0", aliasedRecipe())} />
 }
 
+function MappedImportedRecipeFixture() {
+  return <>{["first", "second"].map((item) => <div key={item} className={aliasedRecipe()} />)}</>
+}
+
+function NestedImportedRecipeFixture() {
+  const renderItem = () => <div className={aliasedRecipe()} />
+  return <>{renderItem()}</>
+}
+
+function MappedWrongRecipeFixture() {
+  return <>{["first"].map((item) => <div key={item} className={reexportedRecipe()} />)}</>
+}
+
+function NestedDefaultRecipeFixture() {
+  const renderItem = () => <div className={defaultRecipe()} />
+  return <>{renderItem()}</>
+}
+
+function MappedNamespaceRecipeFixture() {
+  return <>{["first"].map((item) => <div key={item} className={recipeNamespace.importedRecipe()} />)}</>
+}
+
+function MappedShadowRecipeFixture() {
+  return <>{[() => "shadow-sm"].map((aliasedRecipe) => <div className={aliasedRecipe()} />)}</>
+}
+
+function UnusedNestedRecipeFixture() {
+  const unusedRender = () => <div className={defaultRecipe()} />
+  return <>{unusedRender() && <div className="shadow-sm" />}</>
+}
+
 function RecipeOutsideClassRootFixture() {
   const ignored = aliasedRecipe()
   return <div className="shadow-sm">{String(ignored)}</div>
@@ -197,7 +228,13 @@ export {
   ImportedStaticFixture,
   LocalShadowFixture,
   LocalAndImportedFixture,
+  MappedImportedRecipeFixture,
+  MappedNamespaceRecipeFixture,
+  MappedShadowRecipeFixture,
+  MappedWrongRecipeFixture,
   NamespaceImportFixture,
+  NestedDefaultRecipeFixture,
+  NestedImportedRecipeFixture,
   ParameterShadowFixture,
   PublicPropLocalShadowFixture,
   RecipeOutsideClassRootFixture,
@@ -207,5 +244,6 @@ export {
   UnknownValueFixture,
   UnrelatedBodyCallFixture,
   UnsupportedInvocationFixture,
+  UnusedNestedRecipeFixture,
   WrappedRecipeFixture,
 }

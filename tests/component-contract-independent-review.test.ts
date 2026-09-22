@@ -1057,6 +1057,104 @@ function independentSafeRecipeSelector(expression: ts.Expression, invocation: ts
   return independentSafeRecipeSelector(initializer, invocation, sourceFile, visited)
 }
 
+function independentClassRootExpressions(declaration: ts.Node | undefined): ts.Expression[] {
+  const component = declaration ? functionLikeIn(declaration) : undefined
+  if (!component) return []
+  const roots: ts.Expression[] = []
+  const resolving = new Set<ts.Node>()
+  const functionFromBinding = (binding: IndependentLexicalBinding | undefined): ts.FunctionLikeDeclaration | undefined => {
+    if (binding?.initializer && (ts.isArrowFunction(binding.initializer) || ts.isFunctionExpression(binding.initializer))) return binding.initializer
+    if (binding?.declaration && ts.isFunctionDeclaration(binding.declaration)) return binding.declaration
+    return undefined
+  }
+  const visitFunction = (functionLike: ts.FunctionLikeDeclaration): void => {
+    if (resolving.has(functionLike)) return
+    resolving.add(functionLike)
+    for (const returned of returnExpressions(functionLike)) visitExpression(returned)
+    resolving.delete(functionLike)
+  }
+  const visitCallback = (expression: ts.Expression | undefined, invocation: ts.CallExpression): void => {
+    if (!expression) return
+    if (ts.isArrowFunction(expression) || ts.isFunctionExpression(expression)) {
+      visitFunction(expression)
+      return
+    }
+    if (!ts.isIdentifier(expression)) return
+    const callback = functionFromBinding(independentNearestLexicalBinding(invocation, expression.text))
+    if (callback) visitFunction(callback)
+  }
+  const visitJsxAttributes = (attributes: ts.JsxAttributes): void => {
+    for (const attribute of attributes.properties) {
+      if (!ts.isJsxAttribute(attribute) || !ts.isIdentifier(attribute.name) || attribute.name.text !== "className" || !attribute.initializer) continue
+      if (ts.isStringLiteral(attribute.initializer)) roots.push(attribute.initializer)
+      else if (ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression) roots.push(attribute.initializer.expression)
+    }
+  }
+  const visitJsxChildren = (children: ts.NodeArray<ts.JsxChild>): void => {
+    for (const child of children) {
+      if (ts.isJsxElement(child) || ts.isJsxFragment(child)) visitExpression(child)
+      else if (ts.isJsxExpression(child)) visitExpression(child.expression)
+    }
+  }
+  const visitExpression = (expression: ts.Expression | undefined): void => {
+    if (!expression) return
+    if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) {
+      visitExpression(expression.expression)
+      return
+    }
+    if (ts.isJsxElement(expression)) {
+      visitJsxAttributes(expression.openingElement.attributes)
+      visitJsxChildren(expression.children)
+      return
+    }
+    if (ts.isJsxSelfClosingElement(expression)) {
+      visitJsxAttributes(expression.attributes)
+      return
+    }
+    if (ts.isJsxFragment(expression)) {
+      visitJsxChildren(expression.children)
+      return
+    }
+    if (ts.isConditionalExpression(expression)) {
+      visitExpression(expression.whenTrue)
+      visitExpression(expression.whenFalse)
+      return
+    }
+    if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+      visitExpression(expression.right)
+      return
+    }
+    if (ts.isBinaryExpression(expression) && [ts.SyntaxKind.BarBarToken, ts.SyntaxKind.QuestionQuestionToken].includes(expression.operatorToken.kind)) {
+      visitExpression(expression.left)
+      visitExpression(expression.right)
+      return
+    }
+    if (ts.isArrayLiteralExpression(expression)) {
+      for (const element of expression.elements) if (ts.isExpression(element)) visitExpression(element)
+      return
+    }
+    if (ts.isIdentifier(expression)) {
+      const binding = independentNearestLexicalBinding(expression, expression.text)
+      if (binding?.initializer && binding.declaration && !resolving.has(binding.declaration)) {
+        resolving.add(binding.declaration)
+        visitExpression(binding.initializer)
+        resolving.delete(binding.declaration)
+      }
+      return
+    }
+    if (!ts.isCallExpression(expression)) return
+    if (ts.isPropertyAccessExpression(expression.expression) && expression.expression.name.text === "map") {
+      visitCallback(expression.arguments[0], expression)
+      return
+    }
+    if (!ts.isIdentifier(expression.expression)) return
+    const functionLike = functionFromBinding(independentNearestLexicalBinding(expression, expression.expression.text))
+    if (functionLike) visitFunction(functionLike)
+  }
+  visitFunction(component)
+  return roots
+}
+
 function cvaFacts(sourceFile: ts.SourceFile, bodyText: string, declaration?: ts.Node, resolveRecipeSource = independentRecipeSource): { variants: Map<string, string[]>; defaults: Map<string, unknown>; texts: string[]; classSources: IndependentCvaClassSource[]; localClassSources: IndependentCvaClassSource[]; unresolved: string[] } {
   const variants = new Map<string, string[]>()
   const defaults = new Map<string, unknown>()
@@ -1264,12 +1362,7 @@ function cvaFacts(sourceFile: ts.SourceFile, bodyText: string, declaration?: ts.
     }
     unresolved.push(`${sourceFile.fileName}:${expression.getStart(sourceFile)}:unsupported dynamic class producer`)
   }
-  const component = declaration ? functionLikeIn(declaration) : undefined
-  walkComponent(component ?? declaration ?? sourceFile, (node) => {
-    if (!ts.isJsxAttribute(node) || !ts.isIdentifier(node.name) || node.name.text !== "className" || !node.initializer) return
-    if (ts.isStringLiteral(node.initializer)) traceClassExpression(node.initializer)
-    else if (ts.isJsxExpression(node.initializer)) traceClassExpression(node.initializer.expression)
-  })
+  for (const rootExpression of independentClassRootExpressions(declaration)) traceClassExpression(rootExpression)
   return { variants, defaults, texts, classSources, localClassSources, unresolved }
 }
 
@@ -2297,6 +2390,56 @@ describe("Phase 3 Task 10 independent review", () => {
     const outside = analyze("RecipeOutsideClassRootFixture")
     expect(outside.unresolved).toEqual([])
     expect(outside.classSources).toEqual([])
+  })
+
+  test("independent discovery traces mapped callbacks and invoked nested render functions", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const fixtureAuthority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)
+    const sourceFile = sourceFacts(consumerPath).sourceFile
+    const exactFacts = [
+      { tokenId: "radius.lg" },
+      { tokenId: "font-size.sm" },
+      { tokenId: "color.background" },
+      { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: 0 } },
+    ]
+    for (const exportName of ["MappedImportedRecipeFixture", "NestedImportedRecipeFixture"]) {
+      const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, exportName)!)
+      const facts = cvaFacts(sourceFile, source.sourceText, source.declaration, fixtureAuthority)
+      expect(facts.unresolved, exportName).toEqual([])
+      expect(independentImportedFactErrors(exportName, exactFacts, sourceFile, facts), exportName).toEqual([])
+      expect(facts.classSources.length, exportName).toBeGreaterThan(0)
+    }
+  })
+
+  test("independent nested render discovery fails closed without leaking recipe facts", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const sourceFile = sourceFacts(consumerPath).sourceFile
+    const analyze = (exportName: string, authority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)) => {
+      const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, exportName)!)
+      return cvaFacts(sourceFile, source.sourceText, source.declaration, authority)
+    }
+
+    for (const exportName of ["MappedWrongRecipeFixture", "NestedDefaultRecipeFixture", "MappedNamespaceRecipeFixture", "MappedShadowRecipeFixture"]) {
+      const facts = analyze(exportName)
+      expect(facts.unresolved.length, exportName).toBeGreaterThan(0)
+      expect(facts.classSources, exportName).toEqual([])
+    }
+    const stale = analyze("MappedImportedRecipeFixture", () => undefined)
+    expect(stale.unresolved.length).toBeGreaterThan(0)
+    expect(stale.classSources).toEqual([])
+  })
+
+  test("independent nested render discovery excludes closure results used only as conditions", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const fixtureAuthority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)
+    const sourceFile = sourceFacts(consumerPath).sourceFile
+    const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, "UnusedNestedRecipeFixture")!)
+    const facts = cvaFacts(sourceFile, source.sourceText, source.declaration, fixtureAuthority)
+    expect(facts.unresolved).toEqual([])
+    expect(facts.classSources).toEqual([])
   })
 
   test("independent imported-recipe comparison is exact, deduplicated, and key-order insensitive", () => {
