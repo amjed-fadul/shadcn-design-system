@@ -30,11 +30,14 @@ export type RenderHost =
   | { kind: "cross-family-export"; familyId: string; exportName: string }
   | { kind: "fragment" }
   | { kind: "unresolved" }
-export type RenderCondition =
+export type RenderAtomicCondition =
   | { propName: string; equals: string | number | boolean }
   | { propName: string; truthiness: "truthy" | "falsy" }
+  | { propName: string; nullishness: "nullish" | "non-nullish" }
   | { source: "state"; name: string; equals: string | number | boolean }
   | { source: "state"; name: string; truthiness: "truthy" | "falsy" }
+  | { source: "state"; name: string; nullishness: "nullish" | "non-nullish" }
+export type RenderCondition = RenderAtomicCondition | { all: AtLeastTwo<RenderCondition> }
 export type RenderValue = { source: "literal"; value: string | number | boolean } | { source: "prop" | "state"; name: string }
 export type RenderChildRef = EvidenceRef & { nodeId: string; when?: RenderCondition }
 export type RenderDataAttribute = EvidenceRef & { name: string; value?: string; prop?: string; condition?: RenderCondition } & (

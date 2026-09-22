@@ -127,10 +127,24 @@ function ConditionalJsxAliasFixture({ expanded, ...rest }: { expanded: boolean }
   return content
 }
 
-function NullishChildFixture({ children, ...rest }: { children?: string }) {
+function NullishChildFixture({ children, ...rest }: { children?: string | number | boolean }) {
   return (
     <Primitive.Root data-slot="nullish-root" {...rest}>
       {children ?? <Primitive.Fallback data-slot="nullish-fallback" />}
+    </Primitive.Root>
+  )
+}
+
+function NestedHostPortalFixture({ enabled, asChild, ...rest }: { enabled: boolean; asChild: boolean }) {
+  const Comp = asChild ? Primitive.Portal : "div"
+  if (!enabled) return <Primitive.Fallback {...rest} />
+  return <Comp data-slot="nested-portal" {...rest} />
+}
+
+function AndTernaryChildFixture({ enabled, compact, ...rest }: { enabled: boolean; compact: boolean }) {
+  return (
+    <Primitive.Root {...rest}>
+      {enabled && (compact ? <Primitive.Compact /> : <Primitive.Expanded />)}
     </Primitive.Root>
   )
 }
@@ -155,4 +169,4 @@ function NonMapCallbackFixture({ items, ...rest }: { items: string[] }) {
   )
 }
 
-export { ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+export { AndTernaryChildFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

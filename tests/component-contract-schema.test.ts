@@ -115,6 +115,19 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, malformed)).toBe(false)
   })
 
+  test("accepts exact nullish and compound render conditions", () => {
+    const family = validFamily()
+    const branch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] })
+    family.exports[0].component.rendering = {
+      alternatives: [
+        { when: { propName: "children", nullishness: "non-nullish" }, rendering: branch("present"), evidenceRefs: ["source"] },
+        { when: { all: [{ propName: "enabled", equals: true }, { propName: "children", nullishness: "nullish" }] }, rendering: branch("fallback"), evidenceRefs: ["source"] },
+      ],
+    }
+
+    expect(validate(familySchema, family)).toBe(true)
+  })
+
   test.each([
     ["unknown structured property", (value: any) => ({ ...value, unknown: true })],
     ["invalid export kind", (value: any) => ({ ...value, exports: [{ ...value.exports[0], kind: "widget" }] })],

@@ -104,7 +104,9 @@ function artifactClassification(family: ComponentFamilyContract) {
 function localConditionalWhens(tree: JsxRenderTree) {
   const values = new Map<string, Set<string | number | boolean>>()
   const add = (condition: JsxRenderCondition | undefined) => {
-    if (!condition || !("propName" in condition)) return
+    if (!condition) return
+    if ("all" in condition) { for (const member of condition.all) add(member); return }
+    if (!("propName" in condition) || "nullishness" in condition) return
     const candidates = "equals" in condition ? typeof condition.equals === "boolean" ? [condition.equals, !condition.equals] : [condition.equals] : [true, false]
     const set = values.get(condition.propName) ?? new Set<string | number | boolean>()
     for (const candidate of candidates) set.add(candidate)

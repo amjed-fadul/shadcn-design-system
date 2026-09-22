@@ -112,8 +112,11 @@
       "oneOf": [
         { "$ref": "#/$defs/apiCondition" },
         { "type": "object", "additionalProperties": false, "required": ["propName", "truthiness"], "properties": { "propName": { "type": "string" }, "truthiness": { "enum": ["truthy", "falsy"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["propName", "nullishness"], "properties": { "propName": { "type": "string" }, "nullishness": { "enum": ["nullish", "non-nullish"] } } },
         { "type": "object", "additionalProperties": false, "required": ["source", "name", "equals"], "properties": { "source": { "const": "state" }, "name": { "type": "string" }, "equals": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] } } },
-        { "type": "object", "additionalProperties": false, "required": ["source", "name", "truthiness"], "properties": { "source": { "const": "state" }, "name": { "type": "string" }, "truthiness": { "enum": ["truthy", "falsy"] } } }
+        { "type": "object", "additionalProperties": false, "required": ["source", "name", "truthiness"], "properties": { "source": { "const": "state" }, "name": { "type": "string" }, "truthiness": { "enum": ["truthy", "falsy"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["source", "name", "nullishness"], "properties": { "source": { "const": "state" }, "name": { "type": "string" }, "nullishness": { "enum": ["nullish", "non-nullish"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["all"], "properties": { "all": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/renderCondition" } } } }
       ]
     },
     "renderValue": {

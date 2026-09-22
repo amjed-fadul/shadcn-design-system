@@ -86,14 +86,22 @@ export function resolveConditionalApiShape(component: ComponentDefinition, selec
 
 function isPublicRenderCondition(condition: RenderCondition): condition is Extract<RenderCondition, { propName: string }> { return "propName" in condition }
 
+function atomicRenderConditions(condition: RenderCondition): Array<Exclude<RenderCondition, { all: RenderCondition[] }>> {
+  return "all" in condition ? condition.all.flatMap(atomicRenderConditions) : [condition]
+}
+
 function validateRenderCondition(errors: string[], componentName: string, scope: string, condition: RenderCondition, props: Map<string, PublicPropFact>) {
+  if ("all" in condition) {
+    for (const member of condition.all) validateRenderCondition(errors, componentName, scope, member, props)
+    return
+  }
   if (!isPublicRenderCondition(condition)) return
   const prop = props.get(condition.propName)
   if (!prop || prop.availability !== "available") {
     errors.push(`Component ${componentName} ${scope} condition references unknown prop: ${condition.propName}.`)
     return
   }
-  if ("truthiness" in condition) return
+  if ("truthiness" in condition || "nullishness" in condition) return
   if (!prop.type || !isStructuredPropTypeAssignable({ kind: "literal", value: condition.equals }, prop.type)) {
     errors.push(`Component ${componentName} ${scope} condition has incompatible literal for prop ${condition.propName}: ${String(condition.equals)}.`)
   }
@@ -140,12 +148,13 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
     hasEvidence(errors, child.evidenceRefs, family.evidence, `Render child ${componentName}.${node.id}->${child.nodeId}`)
     if (!ids.has(child.nodeId)) errors.push(`Component ${componentName} render node ${node.id} references unknown child: ${child.nodeId}.`)
     if (child.when) {
-      if (isPublicRenderCondition(child.when)) {
-        const condition = child.when
-        if (!props.has(condition.propName)) errors.push(`Component ${componentName} render child condition references unknown prop: ${condition.propName}.`)
-        const localProp = localProps.find((prop) => prop.name === condition.propName)
-        if ("equals" in condition && localProp?.type.kind === "boolean" && typeof condition.equals !== "boolean") errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has boolean prop ${condition.propName} but equals is not boolean.`)
-        if ("equals" in condition && localProp?.type.kind === "enum" && (typeof condition.equals !== "string" || !localProp.type.values.includes(condition.equals))) errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has enum prop ${condition.propName} without value: ${String(condition.equals)}.`)
+      for (const condition of atomicRenderConditions(child.when)) {
+        if (isPublicRenderCondition(condition)) {
+          if (!props.has(condition.propName)) errors.push(`Component ${componentName} render child condition references unknown prop: ${condition.propName}.`)
+          const localProp = localProps.find((prop) => prop.name === condition.propName)
+          if ("equals" in condition && localProp?.type.kind === "boolean" && typeof condition.equals !== "boolean") errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has boolean prop ${condition.propName} but equals is not boolean.`)
+          if ("equals" in condition && localProp?.type.kind === "enum" && (typeof condition.equals !== "string" || !localProp.type.values.includes(condition.equals))) errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has enum prop ${condition.propName} without value: ${String(condition.equals)}.`)
+        }
       }
     }
   }

@@ -271,11 +271,11 @@ function mappedRenderEvidence(functionLike: ts.FunctionLikeDeclaration): SourceF
   })
 }
 
-function independentRenderCondition(expression: ts.Expression, bindings: Set<string>, booleanBranch = false): AnyRecord | undefined {
+function independentRenderCondition(expression: ts.Expression, bindings: Set<string>, mode: "truthiness" | "boolean" | "non-nullish" = "truthiness"): AnyRecord | undefined {
   const reference = (name: string, value: AnyRecord) => bindings.has(name) ? { propName: name, ...value } : { source: "state", name, ...value }
-  if (ts.isIdentifier(expression)) return reference(expression.text, booleanBranch ? { equals: true } : { truthiness: "truthy" })
+  if (ts.isIdentifier(expression)) return reference(expression.text, mode === "boolean" ? { equals: true } : mode === "non-nullish" ? { nullishness: "non-nullish" } : { truthiness: "truthy" })
   if (ts.isPrefixUnaryExpression(expression) && expression.operator === ts.SyntaxKind.ExclamationToken && ts.isIdentifier(expression.operand)) {
-    return reference(expression.operand.text, booleanBranch ? { equals: false } : { truthiness: "falsy" })
+    return reference(expression.operand.text, mode === "boolean" ? { equals: false } : { truthiness: "falsy" })
   }
   if (ts.isBinaryExpression(expression) && [ts.SyntaxKind.EqualsEqualsEqualsToken, ts.SyntaxKind.EqualsEqualsToken].includes(expression.operatorToken.kind)) {
     const left = ts.isIdentifier(expression.left) ? expression.left.text : undefined
@@ -285,57 +285,94 @@ function independentRenderCondition(expression: ts.Expression, bindings: Set<str
   return undefined
 }
 
+function negateIndependentRenderCondition(condition: AnyRecord): AnyRecord | undefined {
+  if (condition.all) return undefined
+  if (condition.truthiness) return { ...condition, truthiness: condition.truthiness === "truthy" ? "falsy" : "truthy" }
+  if (condition.nullishness) return { ...condition, nullishness: condition.nullishness === "nullish" ? "non-nullish" : "nullish" }
+  if (typeof condition.equals === "boolean") return { ...condition, equals: !condition.equals }
+  return undefined
+}
+
+function combineIndependentRenderConditions(left: AnyRecord, right: AnyRecord): AnyRecord {
+  const members = [...(left.all ?? [left]), ...(right.all ?? [right])]
+  return { all: members.filter((condition, index) => members.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(condition)) === index) }
+}
+
 function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): AnyRecord[] {
   if (!functionLike.body || !ts.isBlock(functionLike.body)) return []
   const bindings = new Set<string>()
   const parameter = functionLike.parameters[0]
   if (parameter && ts.isObjectBindingPattern(parameter.name)) for (const element of parameter.name.elements) if (ts.isIdentifier(element.name)) bindings.add(element.name.text)
-  const topLevel: AnyRecord[] = []
+  const branches: Array<{ predicate?: AnyRecord; expression: ts.Expression }> = []
   for (const statement of functionLike.body.statements) {
     if (ts.isIfStatement(statement)) {
-      const returns = ts.isReturnStatement(statement.thenStatement)
-        || ts.isBlock(statement.thenStatement) && statement.thenStatement.statements.some(ts.isReturnStatement)
-      const condition = returns ? independentRenderCondition(statement.expression, bindings) : undefined
-      if (condition) topLevel.push(condition)
-    } else if (ts.isReturnStatement(statement) && statement.expression && topLevel.length) topLevel.push({ otherwise: true })
+      const returned = ts.isReturnStatement(statement.thenStatement)
+        ? statement.thenStatement.expression
+        : ts.isBlock(statement.thenStatement)
+          ? statement.thenStatement.statements.find(ts.isReturnStatement)?.expression
+          : undefined
+      const condition = returned ? independentRenderCondition(statement.expression, bindings) : undefined
+      if (condition && returned) branches.push({ predicate: condition, expression: returned })
+    } else if (ts.isReturnStatement(statement) && statement.expression) branches.push({ expression: statement.expression })
   }
-  if (topLevel.length > 1) {
-    if (topLevel.length === 2 && "truthiness" in topLevel[0] && topLevel[1].otherwise) {
-      const first = topLevel[0]
-      topLevel[1] = { ...first, truthiness: first.truthiness === "truthy" ? "falsy" : "truthy" }
-    }
-    return topLevel
+  if (branches.length === 2 && branches[0].predicate && !branches[1].predicate) {
+    branches[1].predicate = negateIndependentRenderCondition(branches[0].predicate)
   }
 
   const declarations = new Map<string, ts.Expression>()
   walkComponent(functionLike.body, (node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) declarations.set(node.name.text, node.initializer)
   })
-  for (const expression of returnExpressions(functionLike)) {
-    const root = unwrapReturnedExpression(expression)
-    if (ts.isIdentifier(root)) {
-      const initializer = declarations.get(root.text)
-      if (initializer && ts.isConditionalExpression(initializer)) {
-        const condition = independentRenderCondition(initializer.condition, bindings, true)
-        if (condition) return [condition, { otherwise: true }]
-      }
-    }
-    const opening = returnedRootOpening(root)
-    if (opening && ts.isIdentifier(opening.tagName)) {
-      const initializer = declarations.get(opening.tagName.text)
-      if (initializer && ts.isConditionalExpression(initializer)) {
-        const condition = independentRenderCondition(initializer.condition, bindings, true)
-        if (condition) return [condition, { otherwise: true }]
-      }
-    }
+  const nestedCondition = (expression: ts.Expression): AnyRecord | undefined => {
+    const visited = new Set<string>()
     let found: AnyRecord | undefined
-    walkComponent(root, (node) => {
-      if (found || !ts.isBinaryExpression(node) || node.operatorToken.kind !== ts.SyntaxKind.QuestionQuestionToken) return
-      found = independentRenderCondition(node.left, bindings)
-    })
-    if (found) return [found, { otherwise: true }]
+    const visit = (node: ts.Node): void => {
+      if (found) return
+      if (ts.isIdentifier(node) && declarations.has(node.text)) {
+        const initializer = declarations.get(node.text)!
+        const isRootAlias = node === expression
+        const isJsxTag = ts.isJsxOpeningElement(node.parent) || ts.isJsxSelfClosingElement(node.parent)
+        const isJsxAlias = ts.isJsxExpression(node.parent)
+        if ((isRootAlias || isJsxTag) && ts.isConditionalExpression(initializer)) {
+          found = independentRenderCondition(initializer.condition, bindings, "boolean")
+          return
+        }
+        if ((isRootAlias || isJsxAlias) && !visited.has(node.text)) {
+          visited.add(node.text)
+          visit(initializer)
+          if (found) return
+        }
+      }
+      node.forEachChild(visit)
+    }
+    visit(unwrapReturnedExpression(expression))
+    return found
   }
-  return []
+
+  const results: AnyRecord[] = []
+  const branchCandidates: Array<{ predicate?: AnyRecord; expression: ts.Expression }> = branches.length
+    ? branches
+    : returnExpressions(functionLike).map((expression) => ({ expression }))
+  for (const branch of branchCandidates) {
+    let nullish: AnyRecord | undefined
+    walkComponent(unwrapReturnedExpression(branch.expression), (node) => {
+      if (!nullish && ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) {
+        nullish = independentRenderCondition(node.left, bindings, "non-nullish")
+      }
+    })
+    const nested = nullish ?? nestedCondition(branch.expression)
+    if (!nested) {
+      results.push(branch.predicate ?? { otherwise: true })
+      continue
+    }
+    const inverse = negateIndependentRenderCondition(nested)
+    if (branch.predicate && inverse) {
+      results.push(combineIndependentRenderConditions(branch.predicate, nested), combineIndependentRenderConditions(branch.predicate, inverse))
+    } else if (!branch.predicate && inverse) {
+      results.push(nested, nullish ? inverse : { otherwise: true })
+    } else results.push(branch.predicate ?? nested)
+  }
+  return results.length === 1 && results[0].otherwise ? [] : results
 }
 
 function returnExpressions(functionLike: ts.FunctionLikeDeclaration): ts.Expression[] {
@@ -729,6 +766,7 @@ function collectChildIds(node: AnyRecord, ids: string[]): void {
 
 function normalizedPredicate(predicate: AnyRecord): AnyRecord {
   if (predicate.otherwise) return { otherwise: true }
+  if (predicate.all) return { all: predicate.all.map(normalizedPredicate) }
   if (predicate.truthiness === "truthy") return { ...predicate, equals: true, truthiness: undefined }
   if (predicate.truthiness === "falsy") return { ...predicate, equals: false, truthiness: undefined }
   return predicate
@@ -1038,8 +1076,10 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
 
       const variantsToCheck = renderings(exported.component)
       if (!variantsToCheck.length) errors.push(`${family.id}.${exported.name}: render tree is missing`)
-      if (variantsToCheck.length > 1) {
-        const contractPredicates = exported.component.rendering.alternatives.map((alternative: AnyRecord) => normalizedPredicate(alternative.when ?? { otherwise: true }))
+      if (source.renderAlternativePredicates.length || "alternatives" in exported.component.rendering) {
+        const contractPredicates = "alternatives" in exported.component.rendering
+          ? exported.component.rendering.alternatives.map((alternative: AnyRecord) => normalizedPredicate(alternative.when ?? { otherwise: true }))
+          : []
         const sourcePredicates = source.renderAlternativePredicates.map(normalizedPredicate)
         if (JSON.stringify(contractPredicates) !== JSON.stringify(sourcePredicates)) errors.push(`${family.id}.${exported.name}: render alternative predicates differ from the canonical AST`)
       }
@@ -1381,6 +1421,37 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(
       "breadcrumb.BreadcrumbLink: render alternative predicates differ from the canonical AST",
     )
+  })
+
+  test("independent conditional-render oracle rejects an omitted whole branch", () => {
+    const artifacts = clone(loadArtifacts())
+    const link = exportByName(familyById(artifacts, "breadcrumb"), "BreadcrumbLink").component
+    link.rendering = link.rendering.alternatives[1].rendering
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(
+      "breadcrumb.BreadcrumbLink: render alternative predicates differ from the canonical AST",
+    )
+  })
+
+  test("independently distinguishes nullishness from truthiness, including falsy non-nullish values", () => {
+    const { sourceFile } = sourceFacts(join(root, "tests/fixtures/component-analysis-completeness-fixture.tsx"))
+    const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "NullishChildFixture")!)
+
+    expect(facts.renderAlternativePredicates).toEqual([
+      { propName: "children", nullishness: "non-nullish" },
+      { propName: "children", nullishness: "nullish" },
+    ])
+  })
+
+  test("independently retains compound outer-return and conditional-host predicates", () => {
+    const { sourceFile } = sourceFacts(join(root, "tests/fixtures/component-analysis-completeness-fixture.tsx"))
+    const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "NestedHostPortalFixture")!)
+
+    expect(facts.renderAlternativePredicates).toEqual([
+      { propName: "enabled", truthiness: "falsy" },
+      { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: true }] },
+      { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: false }] },
+    ])
   })
 
   test("has no unreferenced evidence records", () => {
