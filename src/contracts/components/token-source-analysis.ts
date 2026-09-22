@@ -5,8 +5,9 @@ import type { SourceExpressionIdentity, TokenCondition, TokenConditionAtom, Toke
 
 export type ClassSource = { classNames: string; propName?: string; equals?: string; source: SourceExpressionIdentity }
 export type UnresolvedClassSource = SourceExpressionIdentity & { reason: string }
-export type ComponentTokenSourceAnalysis = { resolved: ClassSource[]; unresolved: UnresolvedClassSource[] }
 export type TokenUtilityResolution = Pick<TokenDependency, "tokenId" | "viaDerivedRule">
+export type TokenExpressionSource = TokenUtilityResolution & { when?: TokenCondition; source: SourceExpressionIdentity }
+export type ComponentTokenSourceAnalysis = { resolved: ClassSource[]; tokenExpressions: TokenExpressionSource[]; unresolved: UnresolvedClassSource[] }
 export type TokenCoverageFinding = { utility: string; classification: string; tokenId?: string; namespace?: string }
 export type ImportedRecipeRequest = Readonly<{ sourcePath: string; moduleSpecifier: string; importedName: string }>
 export type ImportedRecipeResolution = Readonly<{ sourcePath: string; exportName: string }>
@@ -20,6 +21,7 @@ export type TokenSourceAnalyzerConfig = Readonly<{
   recipeClassPropertyNames?: readonly string[]
   recipeUnresolvedReasons?: Partial<Record<RecipeUnresolvedReason, string>>
   resolveImportedRecipe?: (request: ImportedRecipeRequest) => ImportedRecipeResolution | undefined
+  resolveCssVariable?: (cssVariable: string, multiplier: number) => TokenUtilityResolution | undefined
   readSource?: (sourcePath: string) => string
 }>
 
@@ -55,6 +57,43 @@ function bindingNames(name: ts.BindingName): string[] {
 }
 function publicPropBindings(functionLike: Pick<ts.SignatureDeclarationBase, "parameters">) {
   return new Set(functionLike.parameters[0] ? bindingNames(functionLike.parameters[0].name) : [])
+}
+
+type StaticCssText = { text: string } | { reason: "dynamic" | "ambiguous" }
+
+function staticCssPrimitive(expression: ts.Expression, scope: Scope, visited = new Set<string>()): string | number | undefined {
+  if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression) || ts.isNumericLiteral(expression)) return expression.text
+  if (ts.isPrefixUnaryExpression(expression) && [ts.SyntaxKind.PlusToken, ts.SyntaxKind.MinusToken].includes(expression.operator)) {
+    const operand = staticCssPrimitive(expression.operand, scope, visited)
+    if (typeof operand !== "string" || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(operand)) return undefined
+    return `${expression.operator === ts.SyntaxKind.MinusToken ? "-" : "+"}${operand}`
+  }
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return staticCssPrimitive(expression.expression, scope, visited)
+  if (!ts.isIdentifier(expression) || scope.publicPropBindings.has(expression.text) || visited.has(expression.text)) return undefined
+  const initializer = scope.values.get(expression.text)
+  if (!initializer) return undefined
+  visited.add(expression.text)
+  return staticCssPrimitive(initializer, scope, visited)
+}
+
+function staticCssText(expression: ts.Expression, scope: Scope): StaticCssText {
+  if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression)) return { text: expression.text }
+  if (!ts.isTemplateExpression(expression)) return { reason: "dynamic" }
+  let text = expression.head.text
+  for (const span of expression.templateSpans) {
+    const value = staticCssPrimitive(span.expression, scope)
+    if (value === undefined) return { reason: "dynamic" }
+    const before = text.at(-1)
+    const after = span.literal.text[0]
+    if ((before && /[A-Za-z0-9_.-]/.test(before)) || (after && /[A-Za-z0-9_.-]/.test(after))) return { reason: "ambiguous" }
+    text += String(value) + span.literal.text
+  }
+  return { text }
+}
+
+function arbitraryUtilityExpression(utility: string): string | undefined {
+  const match = /^[A-Za-z][A-Za-z0-9-]*-\[(.*)\]$/.exec(utility)
+  return match?.[1]
 }
 
 const operationalVariant = /^(?:\*|\*\*|dark|rtl|ltr|portrait|landscape|print|motion-safe|motion-reduce|contrast-more|contrast-less|forced-colors|sm|md|lg|xl|2xl|first|last|only|odd|even|first-of-type|last-of-type|only-of-type|empty|hover|focus|focus-within|focus-visible|active|visited|target|disabled|enabled|checked|indeterminate|default|required|valid|invalid|in-range|out-of-range|placeholder|placeholder-shown|autofill|read-only|open|before|after|first-letter|first-line|marker|selection|file|backdrop|(?:group|peer)-(?:hover|focus|focus-within|focus-visible|active|visited|disabled|enabled|checked|open)(?:\/[A-Za-z0-9_-]+)?|@[a-z][A-Za-z0-9_-]*(?:\/[A-Za-z0-9_-]+)?)$/
@@ -233,6 +272,41 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
   const isNamedCall = (expression: ts.Expression, names: ReadonlySet<string>): expression is ts.CallExpression => ts.isCallExpression(expression) && ts.isIdentifier(expression.expression) && names.has(expression.expression.text)
   const sourceIdentity = (node: ts.Node, sourcePath: string, file: ts.SourceFile): SourceExpressionIdentity => ({ sourcePath, start: node.getStart(file), end: node.getEnd(), expressionKind: ts.SyntaxKind[node.kind], sourceText: node.getText(file) })
   const recordUnresolved = (node: ts.Node, sourcePath: string, file: ts.SourceFile, output: ComponentTokenSourceAnalysis, reason: string) => output.unresolved.push({ ...sourceIdentity(node, sourcePath, file), reason })
+  const recordIdentityUnresolved = (source: SourceExpressionIdentity, output: ComponentTokenSourceAnalysis, reason: string) => output.unresolved.push({ ...source, reason })
+
+  const resolveCssArithmeticText = (text: string): TokenUtilityResolution | string | undefined => {
+    if (!config.resolveCssVariable || !text.includes("calc(") || !text.includes("var(")) return undefined
+    const variables = [...text.matchAll(/var\(\s*(--[A-Za-z0-9_-]+)\s*\)/g)]
+    if (variables.length !== 1) return variables.length > 1
+      ? "CSS token arithmetic must reference exactly one variable."
+      : "CSS token arithmetic expression shape is not equivalent."
+    const variable = variables[0][1]
+    const exact = /^calc\(\s*var\(\s*(--[A-Za-z0-9_-]+)\s*\)\s*\*\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\)$/.exec(text)
+    if (exact) {
+      const multiplier = Number(exact[2])
+      const resolution = config.resolveCssVariable(exact[1], multiplier)
+      return resolution ?? "CSS token arithmetic references an unapproved variable."
+    }
+    if (new RegExp(`^calc\\(\\s*var\\(\\s*${variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\)\\s*\\/\\s*[+-]?(?:0+(?:\\.0*)?|\\.0+)\\s*\\)$`).test(text)) return "CSS token arithmetic divides by zero."
+    if (!config.resolveCssVariable(variable, 1)) return "CSS token arithmetic references an unapproved variable."
+    if (/^calc\(\s*var\(\s*--[A-Za-z0-9_-]+\s*\)\s*\*\s*[^)]+\)$/.test(text)) return "CSS token arithmetic operand is not numeric."
+    if (/^calc\(.*\)\s*(?:\+|-|\/)\s*.*\)$/.test(text)) return "Unsupported CSS token arithmetic operator."
+    return "CSS token arithmetic expression shape is not equivalent."
+  }
+
+  const resolveCssArithmeticExpression = (expression: ts.Expression, output: ComponentTokenSourceAnalysis, sourcePath: string, file: ts.SourceFile, scope: Scope, when?: TokenCondition): void => {
+    if (!config.resolveCssVariable || !expression.getText(file).includes("calc(") || !expression.getText(file).includes("var(")) return
+    const source = sourceIdentity(expression, sourcePath, file)
+    const staticText = staticCssText(expression, scope)
+    if ("reason" in staticText) {
+      recordIdentityUnresolved(source, output, staticText.reason === "ambiguous" ? "Ambiguous CSS token arithmetic interpolation." : "Dynamic CSS token arithmetic operand.")
+      return
+    }
+    const resolution = resolveCssArithmeticText(staticText.text)
+    if (!resolution) return
+    if (typeof resolution === "string") { recordIdentityUnresolved(source, output, resolution); return }
+    output.tokenExpressions.push({ ...resolution, ...(when ? { when } : {}), source })
+  }
 
   const exportedLocalRecipeName = (source: ts.SourceFile, exportName: string): string | undefined => {
     const candidates: string[] = []
@@ -324,11 +398,14 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
   const recipeClassSources = (definitionRecord: RecipeDefinition, output: ComponentTokenSourceAnalysis, scope: Scope, invocation?: ts.CallExpression, resolving = new Set<ts.CallExpression>()): void => {
     const { call, sourcePath, sourceFile: file } = definitionRecord
     if (resolving.has(call)) return
-    const buffered: ComponentTokenSourceAnalysis = { resolved: [], unresolved: [] }
+    const buffered: ComponentTokenSourceAnalysis = { resolved: [], tokenExpressions: [], unresolved: [] }
     const finish = () => {
       resolving.delete(call)
       output.unresolved.push(...buffered.unresolved)
-      if (buffered.unresolved.length === 0) output.resolved.push(...buffered.resolved)
+      if (buffered.unresolved.length === 0) {
+        output.resolved.push(...buffered.resolved)
+        output.tokenExpressions.push(...buffered.tokenExpressions)
+      }
     }
     resolving.add(call); classSourcesFromExpression(call.arguments[0], buffered, sourcePath, file, scope, {}, resolving)
     const definition = call.arguments[1]
@@ -461,8 +538,8 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
   }
   const analyze = (sourcePath: string, exportName?: string): ComponentTokenSourceAnalysis => {
     const source = sourceFile(sourcePath); const declaration = exportName ? findTopLevelFunction(source, exportName) : undefined
-    if (exportName && !declaration?.body) return { resolved: [], unresolved: [{ sourcePath, start: 0, end: 0, expressionKind: "SourceFile", sourceText: exportName, reason: "No component source found." }] }
-    const output: ComponentTokenSourceAnalysis = { resolved: [], unresolved: [] }
+    if (exportName && !declaration?.body) return { resolved: [], tokenExpressions: [], unresolved: [{ sourcePath, start: 0, end: 0, expressionKind: "SourceFile", sourceText: exportName, reason: "No component source found." }] }
+    const output: ComponentTokenSourceAnalysis = { resolved: [], tokenExpressions: [], unresolved: [] }
     const invalidateBindings = (scope: Scope, names: Iterable<string>) => {
       for (const name of names) {
         scope.importedBindings.delete(name)
@@ -502,13 +579,33 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
       }
       if (ts.isFunctionLike(node) && node !== declaration) { const nested = nestedScope(scope); invalidateBindings(nested, node.parameters.flatMap((parameter) => bindingNames(parameter.name))); for (const binding of publicPropBindings(node)) { nested.publicPropBindings.add(binding); if (binding === "className") nested.publicClassBindings.add(binding) } if ("body" in node && node.body) visit(node.body, nested); return }
       if (ts.isVariableStatement(node)) { for (const child of node.declarationList.declarations) if (ts.isIdentifier(child.name) && child.initializer) { scope.values.set(child.name.text, child.initializer); if (isNamedCall(child.initializer, recipeNames)) scope.recipes.set(child.name.text, { call: child.initializer, sourcePath, sourceFile: source }) } ts.forEachChild(node, (child) => visit(child, scope)); return }
+      if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && node.name.text === "style" && node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
+        let styleExpression = node.initializer.expression
+        while (ts.isParenthesizedExpression(styleExpression) || ts.isAsExpression(styleExpression) || ts.isTypeAssertionExpression(styleExpression) || ts.isNonNullExpression(styleExpression)) styleExpression = styleExpression.expression
+        if (ts.isObjectLiteralExpression(styleExpression)) for (const property of styleExpression.properties) {
+          if (ts.isPropertyAssignment(property)) resolveCssArithmeticExpression(property.initializer, output, sourcePath, source, scope)
+        }
+        return
+      }
       if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && node.name.text === "className" && node.initializer) { if (ts.isStringLiteral(node.initializer)) output.resolved.push({ classNames: node.initializer.text, source: sourceIdentity(node.initializer, sourcePath, source) }); else if (ts.isJsxExpression(node.initializer)) classSourcesFromExpression(node.initializer.expression, output, sourcePath, source, scope); return }
       if (isNamedCall(node as ts.Expression, classMergeNames)) { classSourcesFromExpression(node as ts.CallExpression, output, sourcePath, source, scope); return }
       ts.forEachChild(node, (child) => visit(child, scope))
     }
     const scope = topLevelScope(source, sourcePath)
     if (declaration) { invalidateBindings(scope, declaration.parameters.flatMap((parameter) => bindingNames(parameter.name))); for (const binding of publicPropBindings(declaration)) { scope.publicPropBindings.add(binding); if (binding === "className") scope.publicClassBindings.add(binding) } visit(declaration.body!, scope) } else visit(source, scope)
-    return { resolved: unique(output.resolved), unresolved: unique(output.unresolved) }
+    for (const classSource of output.resolved) for (const rawUtility of classSource.classNames.split(/\s+/).filter(Boolean)) {
+      const parsed = parseTailwindTokenUtility(rawUtility)
+      const expression = parsed && arbitraryUtilityExpression(parsed.utility)
+      if (!expression || !expression.includes("calc(") || !expression.includes("var(")) continue
+      const recipeCondition = classSource.propName && classSource.equals !== undefined ? { propName: classSource.propName, equals: classSource.equals } satisfies TokenConditionAtom : undefined
+      const when = combineConditions(recipeCondition, parsed.when)
+      if (when === false) continue
+      const resolution = resolveCssArithmeticText(expression)
+      if (!resolution) continue
+      if (typeof resolution === "string") recordIdentityUnresolved(classSource.source, output, resolution)
+      else output.tokenExpressions.push({ ...resolution, ...(when ? { when } : {}), source: classSource.source })
+    }
+    return { resolved: unique(output.resolved), tokenExpressions: unique(output.tokenExpressions), unresolved: unique(output.unresolved) }
   }
   const analyzeTailwindTokenDependencies = (classNames: string, evidenceRefs: string[] = ["source"]): TokenDependency[] => unique(classNames.split(/\s+/).filter(Boolean).flatMap((rawUtility) => {
     const parsed = parseTailwindTokenUtility(rawUtility)
@@ -516,11 +613,16 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     const resolution = config.resolveUtility(parsed.utility)
     return resolution ? [{ ...resolution, ...(parsed.when ? { when: parsed.when } : {}), evidenceRefs }] : []
   }))
-  const dependencies = (sourcePath: string, exportName?: string) => unique(analyze(sourcePath, exportName).resolved.flatMap((recipe) => analyzeTailwindTokenDependencies(recipe.classNames).flatMap((dependency) => {
-    const recipeCondition = recipe.propName && recipe.equals ? { propName: recipe.propName, equals: recipe.equals } satisfies TokenConditionAtom : undefined
-    const when = combineConditions(recipeCondition, dependency.when)
-    return when === false ? [] : [{ ...dependency, ...(when ? { when } : {}) }]
-  })))
+  const dependencies = (sourcePath: string, exportName?: string) => {
+    const analysis = analyze(sourcePath, exportName)
+    const classDependencies = analysis.resolved.flatMap((recipe) => analyzeTailwindTokenDependencies(recipe.classNames).flatMap((dependency) => {
+      const recipeCondition = recipe.propName && recipe.equals ? { propName: recipe.propName, equals: recipe.equals } satisfies TokenConditionAtom : undefined
+      const when = combineConditions(recipeCondition, dependency.when)
+      return when === false ? [] : [{ ...dependency, ...(when ? { when } : {}) }]
+    }))
+    const expressionDependencies = analysis.tokenExpressions.map(({ source: _source, ...dependency }) => ({ ...dependency, evidenceRefs: ["source"] }))
+    return unique([...classDependencies, ...expressionDependencies])
+  }
   const comparable = ({ tokenId, when, viaDerivedRule }: Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">) => ({ tokenId, ...(when ? { when } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) })
   const key = (dependency: Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">) => stableSerialize(comparable(dependency))
   const compare = (sourcePath: string, dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>, exportName?: string, includeUnresolved = true, analysis = analyze(sourcePath, exportName)) => {

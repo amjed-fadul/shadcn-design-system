@@ -67,6 +67,9 @@ const analyzer = createTokenSourceAnalyzer({
     if (gitBlobSha(source) !== component.canonicalBlobSha) return undefined
     return { sourcePath: importedPath, exportName: importedName }
   },
+  resolveCssVariable: (cssVariable, multiplier) => cssVariable === "--spacing" && approvedTokenIds.has("spacing.unit")
+    ? { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier } }
+    : undefined,
   resolveUtility: (utility) => {
     const tokenId = direct.get(utility)
     if (tokenId && approvedTokenIds.has(tokenId)) return { tokenId }
