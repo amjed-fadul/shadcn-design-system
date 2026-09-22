@@ -169,7 +169,24 @@
     "rendering": {
       "oneOf": [
         { "$ref": "#/$defs/renderingTree" },
-        { "type": "object", "additionalProperties": false, "required": ["alternatives"], "properties": { "alternatives": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/renderingAlternative" } } } }
+        {
+          "type": "object", "additionalProperties": false, "required": ["alternatives"],
+          "properties": {
+            "alternatives": {
+              "oneOf": [
+                { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/renderingAlternative" } },
+                {
+                  "type": "array", "minItems": 1, "maxItems": 1,
+                  "items": {
+                    "type": "object", "additionalProperties": false,
+                    "required": ["when", "rendering", "evidenceRefs"],
+                    "properties": { "when": { "$ref": "#/$defs/renderCondition" }, "rendering": { "$ref": "#/$defs/renderingTree" }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
+                  }
+                }
+              ]
+            }
+          }
+        }
       ]
     },
     "accessibility": {

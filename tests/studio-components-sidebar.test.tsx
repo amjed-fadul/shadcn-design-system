@@ -84,7 +84,7 @@ describe("Studio V1 Sidebar component foundation", () => {
     expect(container.querySelector('[data-slot="sidebar-menu-sub-button"]')).not.toBeNull()
   })
 
-  test("preserves Sidebar trigger callbacks and the Cmd/Ctrl+B shortcut", () => {
+  test("preserves Sidebar trigger callbacks without core shortcut or persistence side effects", () => {
     let triggerClicks = 0
     const container = render(
       <SidebarProvider>
@@ -102,8 +102,8 @@ describe("Studio V1 Sidebar component foundation", () => {
     expect(sidebar?.getAttribute("data-state")).toBe("collapsed")
 
     act(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", ctrlKey: true })))
-    expect(sidebar?.getAttribute("data-state")).toBe("expanded")
-    expect(document.cookie).toContain("sidebar_state=true")
+    expect(sidebar?.getAttribute("data-state")).toBe("collapsed")
+    expect(document.cookie).not.toContain("sidebar_state=false")
   })
 
   test("preserves controlled SidebarProvider open state and onOpenChange values", () => {
@@ -141,12 +141,9 @@ describe("Studio V1 Sidebar component foundation", () => {
     expect(sidebar?.getAttribute("data-state")).toBe("expanded")
   })
 
-  test("preserves Sidebar mobile Sheet behavior", () => {
-    const originalInnerWidth = window.innerWidth
-    Object.defineProperty(window, "innerWidth", { configurable: true, value: 500 })
-
+  test("preserves Sidebar mobile Sheet behavior from its explicit input", () => {
     const container = render(
-      <SidebarProvider>
+      <SidebarProvider isMobile>
         <Sidebar>
           <SidebarContent>Mobile navigation</SidebarContent>
         </Sidebar>
@@ -155,8 +152,7 @@ describe("Studio V1 Sidebar component foundation", () => {
     )
 
     act(() => (container.querySelector('[data-slot="sidebar-trigger"]') as HTMLButtonElement).click())
-    expect(document.body.querySelector('[data-mobile="true"]')?.textContent).toContain("Mobile navigation")
+    expect(document.body.querySelector('[data-slot="sidebar"][data-mobile="true"]')?.textContent).toContain("Mobile navigation")
 
-    Object.defineProperty(window, "innerWidth", { configurable: true, value: originalInnerWidth })
   })
 })

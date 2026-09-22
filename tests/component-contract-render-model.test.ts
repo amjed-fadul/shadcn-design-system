@@ -14,7 +14,7 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(tree.unresolved).toEqual([])
     expect(tree.alternatives).toEqual([
       { when: { propName: "collapsible", equals: "none" }, root: expect.objectContaining({ tag: "div", receivesPublicProps: true }) },
-      { when: { source: "state", name: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Primitive.Sheet", receivesPublicProps: true }) },
+      { when: { propName: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Primitive.Sheet", receivesPublicProps: true }) },
       { otherwise: true, root: expect.objectContaining({ tag: "div", receivesPublicProps: true }) },
     ])
   })
@@ -27,7 +27,7 @@ describe("generic render-model alternatives and factual aliases", () => {
       {
         name: "data-collapsible",
         source: "conditional-value",
-        condition: { source: "state", name: "state", equals: "collapsed" },
+        condition: { propName: "state", equals: "collapsed" },
         whenTrue: { source: "prop", name: "collapsible" },
         whenFalse: { source: "literal", value: "" },
       },
@@ -75,23 +75,9 @@ describe("generic render-model alternatives and factual aliases", () => {
 
     expect(sidebarTree.unresolved).toEqual([])
     expect(sidebarTree.alternatives).toEqual([
-      { when: { propName: "collapsible", equals: "none" }, root: expect.objectContaining({ tag: "div" }) },
-      { when: { source: "state", name: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Sheet" }) },
-      {
-        otherwise: true,
-        root: expect.objectContaining({
-          tag: "div",
-          dataAttributes: expect.arrayContaining([
-            expect.objectContaining({
-              name: "data-collapsible",
-              source: "conditional-value",
-              condition: { source: "state", name: "state", equals: "collapsed" },
-              whenTrue: { source: "prop", name: "collapsible" },
-              whenFalse: { source: "literal", value: "" },
-            }),
-          ]),
-        }),
-      },
+      { when: { propName: "collapsible", equals: "none" }, root: expect.objectContaining({ tag: "SidebarRenderContext.Provider" }) },
+      { when: { source: "state", name: "isMobile", truthiness: "truthy" }, root: expect.objectContaining({ tag: "SidebarRenderContext.Provider" }) },
+      { otherwise: true, root: expect.objectContaining({ tag: "SidebarRenderContext.Provider" }) },
     ])
     expect(menuButtonTree.unresolved).toEqual([])
     expect(menuButtonTree.alternatives).toEqual([
@@ -109,6 +95,79 @@ describe("generic render-model alternatives and factual aliases", () => {
     ])
   })
 
+  test("models Sidebar's explicit mobile attribute values and rail absence without evaluating state", () => {
+    const providerTree = sourceAnalysis.analyzeJsxRenderTree(sidebar, "SidebarProvider")
+    const sidebarTree = sourceAnalysis.analyzeJsxRenderTree(sidebar, "Sidebar")
+    const railTree = sourceAnalysis.analyzeJsxRenderTree(sidebar, "SidebarRail")
+
+    expect(providerTree.unresolved).toEqual([])
+    expect(providerTree.root?.children[0]?.children[0]?.dataAttributes).toEqual(expect.arrayContaining([
+      {
+        name: "data-mobile",
+        source: "derived-condition",
+        condition: { propName: "isMobile", truthiness: "truthy" },
+      },
+    ]))
+    expect(sidebarTree.unresolved).toEqual([])
+    expect(sidebarTree.alternatives?.[1]?.root.children[0]?.children[0]?.dataAttributes).toEqual(expect.arrayContaining([
+      {
+        name: "data-state",
+        source: "conditional-value",
+        condition: { source: "state", name: "openMobile", truthiness: "truthy" },
+        whenTrue: { source: "literal", value: "expanded" },
+        whenFalse: { source: "literal", value: "collapsed" },
+      },
+      {
+        name: "data-collapsible",
+        source: "conditional-value",
+        condition: { source: "state", name: "openMobile", truthiness: "truthy" },
+        whenTrue: { source: "literal", value: "" },
+        whenFalse: { source: "prop", name: "collapsible" },
+      },
+    ]))
+    expect(railTree).toMatchObject({
+      alternatives: [
+        { when: { source: "state", name: "isMobile", truthiness: "falsy" }, root: expect.objectContaining({ tag: "button" }) },
+      ],
+      unresolved: [],
+    })
+  })
+
+  test("keeps non-mobile conditional data attribute presence unresolved", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "UnsupportedConditionalPresenceFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-state: flag || undefined"])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-state", source: "unresolved", expression: "flag || undefined" }])
+  })
+
+  test("does not reclassify arbitrary initialized locals as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalConditionalValueFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-state: flag ? \"a\" : \"b\""])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-state", source: "unresolved", expression: "flag ? \"a\" : \"b\"" }])
+  })
+
+  test("does not reclassify arbitrary initialized locals in conditional value arms as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalConditionalArmFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-state: enabled ? value : \"\""])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-state", source: "unresolved", expression: "enabled ? value : \"\"" }])
+  })
+
+  test("does not reclassify arbitrary initialized locals in return branches as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalReturnFixture")
+
+    expect(tree.unresolved).toEqual(expect.arrayContaining(["Unsupported return condition: flag"]))
+    expect(tree.alternatives).toBeUndefined()
+  })
+
+  test("does not reclassify arbitrary initialized locals in equality conditions as runtime state", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ArbitraryLocalEqualityFixture")
+
+    expect(tree.unresolved).toEqual(["Dynamic data attribute data-collapsible: state === \"collapsed\" ? \"a\" : \"\""])
+    expect(tree.root?.dataAttributes).toEqual([{ name: "data-collapsible", source: "unresolved", expression: "state === \"collapsed\" ? \"a\" : \"\"" }])
+  })
+
   test("compares each alternative independently instead of collapsing source branches", () => {
     const source = sourceAnalysis.analyzeJsxRenderTree(fixture, "ConditionalRootFixture")
     const divBranch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], derivedSpreads: [], children: [] }], portalBoundaries: [] })
@@ -116,7 +175,7 @@ describe("generic render-model alternatives and factual aliases", () => {
     const rendering: Parameters<typeof sourceAnalysis.compareJsxRenderTree>[0] = {
       alternatives: [
         { when: { propName: "collapsible", equals: "none" }, rendering: divBranch("plain") },
-        { when: { source: "state", name: "isMobile", truthiness: "truthy" }, rendering: sheetBranch },
+        { when: { propName: "isMobile", truthiness: "truthy" }, rendering: sheetBranch },
         { otherwise: true as const, rendering: divBranch("desktop") },
       ],
     }

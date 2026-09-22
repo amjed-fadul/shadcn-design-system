@@ -9,6 +9,10 @@ const root = fileURLToPath(new URL("../", import.meta.url))
 process.chdir(root)
 const { module: identity } = await runnerImport(path.join(root, "scripts/release-inputs.ts"), { configFile: false })
 const { module: distribution } = await runnerImport(path.join(root, "scripts/distribution-identity.ts"), { configFile: false })
+const { module: releaseApi } = await runnerImport(path.join(root, "src/validator/release.ts"), { configFile: false })
+const { module: projectionApi } = await runnerImport(path.join(root, "src/validator/projection.ts"), { configFile: false })
+const { module: componentAuthority } = await runnerImport(path.join(root, "src/contracts/components/canonical-loader.ts"), { configFile: false })
+const { module: tokenAuthority } = await runnerImport(path.join(root, "src/contracts/tokens/contract.ts"), { configFile: false })
 const [command, ...args] = process.argv.slice(2)
 const option = name => {
   const index = args.indexOf(name)
@@ -29,7 +33,7 @@ function toolchain() {
   return { node, npm, platform: process.platform, arch: process.arch, tools }
 }
 function packBuild() {
-  const stage = mkdtempSync(path.join(tmpdir(), "release-001-build-"))
+  const stage = mkdtempSync(path.join(tmpdir(), "release-004-build-"))
   try {
     execFileSync(process.execPath, [path.join(root, "scripts/build-library.mjs"), "--out-dir", path.join(stage, "dist-library")], { cwd: root, stdio: "pipe", timeout: 180_000, maxBuffer: 16 * 1024 * 1024 })
     for (const file of readdirSync(root)) if (file === "package.json" || /^(README|LICEN[CS]E|COPYING)(\.|$)/i.test(file)) cpSync(path.join(root, file), path.join(stage, file))
@@ -40,16 +44,24 @@ function packBuild() {
     return { bytes, filename: result.filename, inventory }
   } finally { rmSync(stage, { recursive: true, force: true }) }
 }
+function candidateRelease(expectedSha256) {
+  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-004.json")
+  const raw = JSON.parse(readFileSync(releasePath, "utf8"))
+  const expectedProjection = projectionApi.projectExecutableContract({ componentContracts: componentAuthority.loadComponentContracts(), tokenContract: tokenAuthority.getTokenContract() })
+  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-004", requirePackageIdentity: true })
+  if (expectedSha256 !== undefined && release.sha256 !== expectedSha256) throw new Error("RELEASE_ANCHOR_MISMATCH")
+  if (JSON.stringify(release.packageIdentity) !== JSON.stringify(identity.packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
+  identity.verifyImplementationManifest(root, release.implementationInputs)
+  return release
+}
 // Keep npm's integrity report an independent cross-check of the packed bytes.
 import { createHash } from "node:crypto"
 function hash512(bytes) { return createHash("sha512").update(bytes).digest("base64") }
 
 if (!["generate", "verify", "release-verify"].includes(command)) throw new Error("Use generate --output DIR, verify --manifest FILE --tarball FILE --manifest-sha256 DIGEST, or release-verify --release-sha256 DIGEST")
 const buildToolchain = toolchain()
-const release = identity.verifyRepositoryRelease(root, command === "release-verify" ? option("--release-sha256") : undefined)
+const release = candidateRelease(command === "release-verify" ? option("--release-sha256") : undefined)
 if (command === "release-verify") {
-  await runnerImport(path.join(root, "scripts/library-data.ts"), { configFile: false })
-  identity.verifyRepositoryRelease(root)
   console.log(`Verified release ${release.releaseId}: ${release.sha256}`)
 } else if (command === "generate") {
   const output = path.resolve(option("--output"))
@@ -59,7 +71,7 @@ if (command === "release-verify") {
   const tarballPath = path.join(output, packed.filename)
   const manifestPath = path.join(output, "distribution-manifest.json")
   if (existsSync(tarballPath) || existsSync(manifestPath)) throw new Error("Candidate output already exists; choose a new directory")
-  identity.verifyRepositoryRelease(root)
+  candidateRelease()
   const manifest = distribution.generateDistributionManifest({ release, toolchain: buildToolchain, tarballFilename: packed.filename, tarballBytes: packed.bytes })
   const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`)
   writeFileSync(tarballPath, packed.bytes, { flag: "wx" })
@@ -73,7 +85,14 @@ if (command === "release-verify") {
   const tarballBytes = readFileSync(tarballPath)
   if (!/^[0-9a-f]{64}$/.test(expectedManifestSha256) || identity.sha256(manifestBytes) !== expectedManifestSha256) throw new Error("MANIFEST_HASH_MISMATCH: independently retained digest required")
   const rebuilt = packBuild()
+  const approvedTarballSha256 = identity.sha256(tarballBytes)
+  const rebuiltTarballSha256 = identity.sha256(rebuilt.bytes)
+  const approvedIntegrity = `sha512-${hash512(tarballBytes)}`
+  const rebuiltIntegrity = `sha512-${hash512(rebuilt.bytes)}`
+  if (approvedTarballSha256 !== rebuiltTarballSha256) throw new Error(`FRESH_TARBALL_SHA256_MISMATCH: approved ${approvedTarballSha256}, rebuilt ${rebuiltTarballSha256}`)
+  if (approvedIntegrity !== rebuiltIntegrity) throw new Error(`FRESH_TARBALL_INTEGRITY_MISMATCH: approved ${approvedIntegrity}, rebuilt ${rebuiltIntegrity}`)
+  if (!Buffer.from(tarballBytes).equals(rebuilt.bytes)) throw new Error("FRESH_TARBALL_BYTES_MISMATCH")
   distribution.verifyDistributionManifest({ manifestBytes, expectedManifestSha256, tarballBytes, tarballFilename: path.basename(tarballPath), release, toolchain: buildToolchain, expectedInventory: rebuilt.inventory })
-  identity.verifyRepositoryRelease(root)
+  candidateRelease()
   console.log(`Verified existing candidate, external manifest and fresh build: ${release.releaseId}, ${rebuilt.inventory.length} packed files. No expectations refreshed.`)
 }

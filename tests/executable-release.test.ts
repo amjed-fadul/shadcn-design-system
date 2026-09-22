@@ -3,8 +3,6 @@ import { describe, expect, test } from "vitest"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import { getTokenContract } from "../src/contracts/tokens/contract"
 import {
-  EXECUTABLE_RELEASE_ID,
-  EXECUTABLE_RELEASE_PATH,
   canonicalExecutableReleasePayload,
   createExecutableRelease,
   hashExecutableReleasePayload,

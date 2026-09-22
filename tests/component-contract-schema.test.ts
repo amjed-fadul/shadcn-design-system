@@ -105,6 +105,33 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, malformed)).toBe(false)
   })
 
+  test("permits a single rendering alternative only when it records conditional absence", () => {
+    const branch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], derivedSpreads: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] })
+    const conditional = validFamily()
+    conditional.exports[0].component.rendering = {
+      alternatives: [{ when: { source: "state", name: "isMobile", truthiness: "falsy" }, rendering: branch("rail"), evidenceRefs: ["source"] }],
+    }
+    expect(validate(familySchema, conditional)).toBe(true)
+
+    const multiAlternative = validFamily()
+    multiAlternative.exports[0].component.rendering = {
+      alternatives: [
+        { when: { propName: "mode", equals: "rail" }, rendering: branch("rail"), evidenceRefs: ["source"] },
+        { otherwise: true, rendering: branch("default"), evidenceRefs: ["source"] },
+      ],
+    }
+    expect(validate(familySchema, multiAlternative)).toBe(true)
+
+    for (const alternative of [
+      { rendering: branch("unconditional"), evidenceRefs: ["source"] },
+      { otherwise: true, rendering: branch("otherwise"), evidenceRefs: ["source"] },
+    ]) {
+      const malformed = validFamily()
+      malformed.exports[0].component.rendering = { alternatives: [alternative] }
+      expect(validate(familySchema, malformed)).toBe(false)
+    }
+  })
+
   test("accepts closed token source context and rejects empty or malformed context", () => {
     const contextual = validFamily()
     contextual.exports[0].component.tokenDependencies.push({

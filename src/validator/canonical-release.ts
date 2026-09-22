@@ -5,14 +5,18 @@ import { getTokenContract } from "../contracts/tokens/contract"
 import { projectExecutableContract } from "./projection"
 import { loadExecutableRelease } from "./release"
 import { validateAuthoredUi } from "./validate"
-import type { AuthoredUi, ExecutableRelease, ExecutableContractSource } from "./types"
+import type { AuthoredUi, ExecutableContractSource, ExecutableRelease } from "./types"
 
 const approvedSource: ExecutableContractSource = {
   componentContracts: loadComponentContracts(),
   tokenContract: getTokenContract(),
 }
 const approvedProjection = projectExecutableContract(approvedSource)
-const executableRelease = loadExecutableRelease(executableReleaseArtifact, { expectedProjection: approvedProjection, requirePackageIdentity: true })
+const executableRelease = loadExecutableRelease(executableReleaseArtifact, {
+  expectedProjection: approvedProjection,
+  expectedReleaseId: "shadcn-radix-release-004",
+  requirePackageIdentity: true,
+})
 
 /** Returns the one immutable release used by production validation. */
 export function getExecutableRelease(): ExecutableRelease {
