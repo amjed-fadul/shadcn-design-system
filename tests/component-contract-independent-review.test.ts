@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
 import { existsSync, readFileSync, readdirSync } from "node:fs"
-import { dirname, join, resolve } from "node:path"
+import { join, resolve } from "node:path"
 
 import * as ts from "typescript"
 import { describe, expect, test } from "vitest"
@@ -922,24 +922,6 @@ function independentRecipeSource(moduleSpecifier: string): string | undefined {
   return independentGitBlobSha(source) === entry.canonicalBlobSha ? path : undefined
 }
 
-function independentLocalModuleSource(importerPath: string, moduleSpecifier: string): string | undefined {
-  const base = moduleSpecifier.startsWith("./") || moduleSpecifier.startsWith("../")
-    ? resolve(dirname(importerPath), moduleSpecifier)
-    : moduleSpecifier.startsWith("@/")
-      ? join(root, "src", moduleSpecifier.slice(2))
-      : undefined
-  if (!base) return undefined
-  return [base, `${base}.ts`, `${base}.tsx`, join(base, "index.ts"), join(base, "index.tsx")].find(existsSync)
-}
-
-function independentReexportsName(sourceFile: ts.SourceFile, exportName: string): boolean {
-  return sourceFile.statements.some((statement) => ts.isExportDeclaration(statement)
-    && !!statement.moduleSpecifier
-    && !!statement.exportClause
-    && ts.isNamedExports(statement.exportClause)
-    && statement.exportClause.elements.some((element) => element.name.text === exportName))
-}
-
 function independentExportedRecipe(sourceFile: ts.SourceFile, exportName: string): ts.CallExpression | undefined {
   const localNames: string[] = []
   for (const statement of sourceFile.statements) {
@@ -961,16 +943,52 @@ function independentBindingNames(name: ts.BindingName): string[] {
   return name.elements.flatMap((element) => ts.isOmittedExpression(element) ? [] : independentBindingNames(element.name))
 }
 
-function independentLexicallyShadowed(node: ts.Node, name: string): boolean {
+type IndependentLexicalBinding = { kind: "parameter" | "variable" | "function" | "class" | "catch"; initializer?: ts.Expression; declaration?: ts.Node; owner: ts.Node }
+
+function independentStatementBinding(statement: ts.Statement, name: string): IndependentLexicalBinding | undefined {
+  if (ts.isVariableStatement(statement)) {
+    const declaration = statement.declarationList.declarations.find((candidate) => independentBindingNames(candidate.name).includes(name))
+    if (declaration) return { kind: "variable", ...(ts.isIdentifier(declaration.name) && declaration.initializer ? { initializer: declaration.initializer } : {}), declaration, owner: statement.parent }
+  }
+  if (ts.isFunctionDeclaration(statement) && statement.name?.text === name) return { kind: "function", declaration: statement, owner: statement.parent }
+  if (ts.isClassDeclaration(statement) && statement.name?.text === name) return { kind: "class", declaration: statement, owner: statement.parent }
+  return undefined
+}
+
+function independentNearestLexicalBinding(node: ts.Node, name: string): IndependentLexicalBinding | undefined {
   for (let current = node.parent; current && !ts.isSourceFile(current); current = current.parent) {
-    if (ts.isFunctionLike(current) && current.parameters.some((parameter) => independentBindingNames(parameter.name).includes(name))) return true
-    if (!ts.isBlock(current)) continue
-    for (const statement of current.statements) {
-      if (ts.isVariableStatement(statement) && statement.declarationList.declarations.some((declaration) => independentBindingNames(declaration.name).includes(name))) return true
-      if ((ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) && statement.name?.text === name) return true
+    if (ts.isBlock(current)) {
+      for (const statement of current.statements) {
+        const binding = independentStatementBinding(statement, name)
+        if (binding) return binding
+      }
+    }
+    if (ts.isCatchClause(current) && current.variableDeclaration && independentBindingNames(current.variableDeclaration.name).includes(name)) {
+      return { kind: "catch", declaration: current.variableDeclaration, owner: current }
+    }
+    if (ts.isForStatement(current) || ts.isForOfStatement(current) || ts.isForInStatement(current)) {
+      const initializer = current.initializer
+      if (initializer && ts.isVariableDeclarationList(initializer)) {
+        const declaration = initializer.declarations.find((candidate) => independentBindingNames(candidate.name).includes(name))
+        if (declaration) return { kind: "variable", ...(ts.isIdentifier(declaration.name) && declaration.initializer ? { initializer: declaration.initializer } : {}), declaration, owner: current }
+      }
+    }
+    if (ts.isCaseClause(current) || ts.isDefaultClause(current)) {
+      for (const clause of current.parent.clauses) for (const statement of clause.statements) {
+        const binding = independentStatementBinding(statement, name)
+        if (binding) return binding
+      }
+    }
+    if (ts.isFunctionLike(current)) {
+      const parameter = current.parameters.find((candidate) => independentBindingNames(candidate.name).includes(name))
+      if (parameter) return { kind: "parameter", declaration: parameter, owner: current }
     }
   }
-  return false
+  return undefined
+}
+
+function independentLexicallyShadowed(node: ts.Node, name: string): boolean {
+  return !!independentNearestLexicalBinding(node, name)
 }
 
 function independentSafeRecipeSelector(expression: ts.Expression, invocation: ts.CallExpression, sourceFile: ts.SourceFile, visited = new Set<string>()): boolean {
@@ -1011,11 +1029,19 @@ function independentSafeRecipeSelector(expression: ts.Expression, invocation: ts
   if (visited.has(expression.text)) return false
   type FunctionWithBody = ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction | ts.MethodDeclaration
   let owner: FunctionWithBody | undefined
+  let componentOwner: FunctionWithBody | undefined
   for (let current: ts.Node | undefined = invocation; current; current = current.parent) {
-    if (ts.isFunctionLike(current)) {
-      if (!owner && (ts.isFunctionDeclaration(current) || ts.isFunctionExpression(current) || ts.isArrowFunction(current) || ts.isMethodDeclaration(current))) owner = current
-      if (current.parameters.some((parameter) => independentBindingNames(parameter.name).includes(expression.text))) return true
+    if (ts.isFunctionDeclaration(current) || ts.isFunctionExpression(current) || ts.isArrowFunction(current) || ts.isMethodDeclaration(current)) {
+      if (!owner) owner = current
+      componentOwner = current
     }
+  }
+  const lexicalBinding = independentNearestLexicalBinding(invocation, expression.text)
+  if (lexicalBinding) {
+    if (lexicalBinding.kind === "parameter") return lexicalBinding.owner === componentOwner
+    if (!lexicalBinding.initializer) return false
+    visited.add(expression.text)
+    return independentSafeRecipeSelector(lexicalBinding.initializer, invocation, sourceFile, visited)
   }
   const initializers = new Map<string, ts.Expression>()
   const collect = (node: ts.Node): void => {
@@ -1031,11 +1057,12 @@ function independentSafeRecipeSelector(expression: ts.Expression, invocation: ts
   return independentSafeRecipeSelector(initializer, invocation, sourceFile, visited)
 }
 
-function cvaFacts(sourceFile: ts.SourceFile, bodyText: string, declaration?: ts.Node, resolveRecipeSource = independentRecipeSource): { variants: Map<string, string[]>; defaults: Map<string, unknown>; texts: string[]; classSources: IndependentCvaClassSource[]; unresolved: string[] } {
+function cvaFacts(sourceFile: ts.SourceFile, bodyText: string, declaration?: ts.Node, resolveRecipeSource = independentRecipeSource): { variants: Map<string, string[]>; defaults: Map<string, unknown>; texts: string[]; classSources: IndependentCvaClassSource[]; localClassSources: IndependentCvaClassSource[]; unresolved: string[] } {
   const variants = new Map<string, string[]>()
   const defaults = new Map<string, unknown>()
   const texts: string[] = []
   const classSources: IndependentCvaClassSource[] = []
+  const localClassSources: IndependentCvaClassSource[] = []
   const unresolved: string[] = []
   const parseRecipe = (call: ts.CallExpression, recipeFile: ts.SourceFile, sourcePath: string, invocation?: ts.CallExpression): void => {
     const textStart = texts.length
@@ -1116,47 +1143,134 @@ function cvaFacts(sourceFile: ts.SourceFile, bodyText: string, declaration?: ts.
     variants.clear(); for (const [name, values] of variantsBefore) variants.set(name, values)
     defaults.clear(); for (const [name, value] of defaultsBefore) defaults.set(name, value)
   }
+  void bodyText
+  type IndependentImport = { kind: "named" | "default" | "namespace"; importedName?: string; moduleSpecifier: string; node: ts.Node }
+  const imports = new Map<string, IndependentImport>()
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || !statement.importClause) continue
+    const moduleSpecifier = statement.moduleSpecifier.text
+    if (statement.importClause.name) imports.set(statement.importClause.name.text, { kind: "default", moduleSpecifier, node: statement.importClause.name })
+    const bindings = statement.importClause.namedBindings
+    if (bindings && ts.isNamespaceImport(bindings)) imports.set(bindings.name.text, { kind: "namespace", moduleSpecifier, node: bindings })
+    if (bindings && ts.isNamedImports(bindings)) for (const binding of bindings.elements) {
+      imports.set(binding.name.text, { kind: "named", importedName: binding.propertyName?.text ?? binding.name.text, moduleSpecifier, node: binding })
+    }
+  }
+  const localRecipes = new Map<string, ts.CallExpression>()
   for (const statement of sourceFile.statements) {
     if (!ts.isVariableStatement(statement)) continue
-    for (const declaration of statement.declarationList.declarations) {
-      if (!ts.isIdentifier(declaration.name) || !declaration.initializer || !ts.isCallExpression(declaration.initializer)) continue
-      if (declaration.initializer.expression.getText(sourceFile) !== "cva" || !bodyText.includes(declaration.name.text)) continue
-      parseRecipe(declaration.initializer, sourceFile, sourceFile.fileName)
+    for (const item of statement.declarationList.declarations) {
+      if (ts.isIdentifier(item.name) && item.initializer && ts.isCallExpression(item.initializer) && ts.isIdentifier(item.initializer.expression) && item.initializer.expression.text === "cva") localRecipes.set(item.name.text, item.initializer)
     }
   }
-  for (const statement of sourceFile.statements) {
-    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || !statement.importClause?.namedBindings || !ts.isNamedImports(statement.importClause.namedBindings)) continue
-    for (const binding of statement.importClause.namedBindings.elements) {
-      const localName = binding.name.text
-      if (["cn", "cva"].includes(binding.propertyName?.text ?? localName)) continue
-      if (!bodyText.includes(localName)) continue
-      const importedName = binding.propertyName?.text ?? localName
-      const invocations: ts.CallExpression[] = []
-      const visit = (node: ts.Node): void => {
-        if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === localName && bodyText.includes(node.getText(sourceFile))) invocations.push(node)
-        node.forEachChild(visit)
+  const resolveImportedInvocation = (candidate: IndependentImport, importedName: string | undefined, invocation: ts.CallExpression): void => {
+    if (candidate.kind !== "named" || !importedName) {
+      unresolved.push(`${sourceFile.fileName}:${invocation.getStart(sourceFile)}:unsupported imported class producer`)
+      return
+    }
+    const sourcePath = resolveRecipeSource(candidate.moduleSpecifier)
+    if (!sourcePath) {
+      unresolved.push(`${sourceFile.fileName}:${invocation.getStart(sourceFile)}:unapproved or stale recipe module`)
+      return
+    }
+    const importedFile = sourceFacts(sourcePath).sourceFile
+    const recipe = independentExportedRecipe(importedFile, importedName)
+    if (!recipe) {
+      unresolved.push(`${sourceFile.fileName}:${candidate.node.getStart(sourceFile)}:missing recipe export`)
+      return
+    }
+    parseRecipe(recipe, importedFile, sourcePath, invocation)
+  }
+  const resolving = new Set<ts.Node>()
+  const traceClassExpression = (expression: ts.Expression | undefined): void => {
+    if (!expression) return
+    if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression)) {
+      localClassSources.push({ classNames: expression.text, sourcePath: sourceFile.fileName })
+      return
+    }
+    if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) {
+      traceClassExpression(expression.expression)
+      return
+    }
+    if (ts.isConditionalExpression(expression)) {
+      traceClassExpression(expression.whenTrue)
+      traceClassExpression(expression.whenFalse)
+      return
+    }
+    if (ts.isBinaryExpression(expression) && [ts.SyntaxKind.AmpersandAmpersandToken, ts.SyntaxKind.QuestionQuestionToken].includes(expression.operatorToken.kind)) {
+      traceClassExpression(expression.right)
+      return
+    }
+    if (ts.isIdentifier(expression)) {
+      const binding = independentNearestLexicalBinding(expression, expression.text)
+      if (binding?.kind === "parameter") return
+      if (binding?.initializer) {
+        if (resolving.has(binding.declaration!)) return
+        resolving.add(binding.declaration!)
+        traceClassExpression(binding.initializer)
+        resolving.delete(binding.declaration!)
+        return
       }
-      ;(declaration ?? sourceFile).forEachChild(visit)
-      if (!invocations.length) continue
-      const sourcePath = resolveRecipeSource(statement.moduleSpecifier.text)
-      if (!sourcePath) {
-        const localPath = independentLocalModuleSource(sourceFile.fileName, statement.moduleSpecifier.text)
-        if (!localPath) continue
-        const candidateFile = sourceFacts(localPath).sourceFile
-        if (!independentExportedRecipe(candidateFile, importedName) && !independentReexportsName(candidateFile, importedName)) continue
-        for (const invocation of invocations) unresolved.push(`${sourceFile.fileName}:${invocation.getStart(sourceFile)}:unapproved or stale recipe module`)
-        continue
+      unresolved.push(`${sourceFile.fileName}:${expression.getStart(sourceFile)}:unsupported dynamic class expression`)
+      return
+    }
+    if (!ts.isCallExpression(expression)) {
+      unresolved.push(`${sourceFile.fileName}:${expression.getStart(sourceFile)}:unsupported dynamic class expression`)
+      return
+    }
+    if (ts.isIdentifier(expression.expression)) {
+      const localName = expression.expression.text
+      const imported = imports.get(localName)
+      const lexicalBinding = independentNearestLexicalBinding(expression, localName)
+      if (imported && lexicalBinding) {
+        unresolved.push(`${sourceFile.fileName}:${expression.getStart(sourceFile)}:shadowed imported class producer`)
+        return
       }
-      const importedFile = sourceFacts(sourcePath).sourceFile
-      const recipe = independentExportedRecipe(importedFile, importedName)
-      if (!recipe) { unresolved.push(`${sourceFile.fileName}:${binding.getStart(sourceFile)}:missing recipe export`); continue }
-      for (const invocation of invocations) {
-        if (independentLexicallyShadowed(invocation, localName)) { unresolved.push(`${sourceFile.fileName}:${invocation.getStart(sourceFile)}:shadowed imported recipe`); continue }
-        parseRecipe(recipe, importedFile, sourcePath, invocation)
+      if (imported?.kind === "named" && imported.importedName === "cn") {
+        for (const argument of expression.arguments) traceClassExpression(argument)
+        return
+      }
+      if (imported) {
+        resolveImportedInvocation(imported, imported.importedName, expression)
+        return
+      }
+      const localRecipe = localRecipes.get(localName)
+      if (localRecipe) {
+        parseRecipe(localRecipe, sourceFile, sourceFile.fileName, expression)
+        return
+      }
+      if (lexicalBinding) {
+        const initializer = lexicalBinding.initializer
+        const functionLike = initializer && (ts.isArrowFunction(initializer) || ts.isFunctionExpression(initializer))
+          ? initializer
+          : lexicalBinding.declaration && ts.isFunctionDeclaration(lexicalBinding.declaration) ? lexicalBinding.declaration : undefined
+        if (functionLike && !resolving.has(functionLike)) {
+          resolving.add(functionLike)
+          for (const returned of returnExpressions(functionLike)) traceClassExpression(returned)
+          resolving.delete(functionLike)
+          return
+        }
+      }
+      unresolved.push(`${sourceFile.fileName}:${expression.getStart(sourceFile)}:unsupported dynamic class producer`)
+      return
+    }
+    if (ts.isPropertyAccessExpression(expression.expression) && ts.isIdentifier(expression.expression.expression)) {
+      const namespaceName = expression.expression.expression.text
+      const imported = imports.get(namespaceName)
+      if (imported?.kind === "namespace" && !independentLexicallyShadowed(expression, namespaceName)) {
+        resolveImportedInvocation(imported, expression.expression.name.text, expression)
+        return
       }
     }
+    unresolved.push(`${sourceFile.fileName}:${expression.getStart(sourceFile)}:unsupported dynamic class producer`)
   }
-  return { variants, defaults, texts, classSources, unresolved }
+  const component = declaration ? functionLikeIn(declaration) : undefined
+  walkComponent(component ?? declaration ?? sourceFile, (node) => {
+    if (!ts.isJsxAttribute(node) || !ts.isIdentifier(node.name) || node.name.text !== "className" || !node.initializer) return
+    if (ts.isStringLiteral(node.initializer)) traceClassExpression(node.initializer)
+    else if (ts.isJsxExpression(node.initializer)) traceClassExpression(node.initializer.expression)
+  })
+  return { variants, defaults, texts, classSources, localClassSources, unresolved }
 }
 
 function renderings(component: AnyRecord): AnyRecord[] {
@@ -1319,6 +1433,19 @@ function independentStableKey(value: unknown): string {
     return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${independentStableKey(record[key])}`).join(",")}}`
   }
   return JSON.stringify(value)
+}
+
+function independentImportedFactErrors(label: string, contractTokenFacts: AnyRecord[], sourceFile: ts.SourceFile, variants: ReturnType<typeof cvaFacts>): string[] {
+  const importedTokenFacts = independentImportedTokenDependencies(variants.classSources.filter((fact) => fact.sourcePath !== sourceFile.fileName))
+  const importedTokenIds = new Set(importedTokenFacts.map((fact) => fact.tokenId))
+  const exactLocalFacts = independentImportedTokenDependencies([...variants.localClassSources, ...variants.classSources.filter((fact) => fact.sourcePath === sourceFile.fileName)])
+    .filter((fact) => importedTokenIds.has(fact.tokenId))
+  const sourceExactFacts = new Map<string, AnyRecord>([...importedTokenFacts, ...exactLocalFacts].map((fact) => [independentStableKey(fact), fact]))
+  const contractExactFacts = new Map<string, AnyRecord>(contractTokenFacts.filter((fact) => importedTokenIds.has(fact.tokenId)).map((fact) => [independentStableKey(fact), fact]))
+  return [
+    ...[...sourceExactFacts].filter(([key]) => !contractExactFacts.has(key)).map(([, fact]) => `${label}: imported recipe token fact differs (missing ${independentStableKey(fact)})`),
+    ...[...contractExactFacts].filter(([key]) => !sourceExactFacts.has(key)).map(([, fact]) => `${label}: imported recipe token fact differs (invented ${independentStableKey(fact)})`),
+  ]
 }
 
 function sourceDeclarationContext(artifact: AnyRecord): DeclarationContext | undefined {
@@ -1543,12 +1670,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         ...(dependency.when ? { when: dependency.when } : {}),
         ...(dependency.viaDerivedRule ? { viaDerivedRule: dependency.viaDerivedRule } : {}),
       }))
-      const importedTokenFacts = independentImportedTokenDependencies(variants.classSources.filter((fact) => fact.sourcePath !== sourceFile.fileName))
-      const importedTokenIds = new Set(importedTokenFacts.map((fact) => fact.tokenId))
-      const sourceImportedFacts = new Map<string, AnyRecord>(importedTokenFacts.map((fact) => [independentStableKey(fact), fact]))
-      const contractImportedFacts = new Map<string, AnyRecord>(comparableContractTokens.filter((fact: AnyRecord) => importedTokenIds.has(fact.tokenId)).map((fact: AnyRecord) => [independentStableKey(fact), fact]))
-      for (const [key, fact] of sourceImportedFacts) if (!contractImportedFacts.has(key)) errors.push(`${family.id}.${exported.name}: imported recipe token fact differs (missing ${independentStableKey(fact)})`)
-      for (const [key, fact] of contractImportedFacts) if (!sourceImportedFacts.has(key)) errors.push(`${family.id}.${exported.name}: imported recipe token fact differs (invented ${independentStableKey(fact)})`)
+      errors.push(...independentImportedFactErrors(`${family.id}.${exported.name}`, comparableContractTokens, sourceFile, variants))
       for (const tokenId of contractTokenIds) {
         if (!sourceTokenIds.has(tokenId)) errors.push(`${family.id}.${exported.name}: token ${tokenId} has no direct source expression`)
       }
@@ -2139,16 +2261,70 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(wrongFacts.classSources).toEqual([])
   })
 
+  test("independent recipe authority follows nearest catch, loop, switch, and selector bindings", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const fixtureAuthority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)
+    const { sourceFile } = sourceFacts(consumerPath)
+    for (const exportName of ["CatchShadowFixture", "ForShadowFixture", "ForOfShadowFixture", "ForInShadowFixture", "SwitchShadowFixture", "PublicPropLocalShadowFixture"]) {
+      const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, exportName)!)
+      const facts = cvaFacts(sourceFile, source.sourceText, source.declaration, fixtureAuthority)
+      expect(facts.unresolved.length, exportName).toBeGreaterThan(0)
+      expect(facts.classSources, exportName).toEqual([])
+    }
+  })
+
+  test("independent discovery traces class roots through wrappers, default and namespace calls, and excludes off-root recipes", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const fixtureAuthority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)
+    const { sourceFile } = sourceFacts(consumerPath)
+    const analyze = (exportName: string) => {
+      const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, exportName)!)
+      return cvaFacts(sourceFile, source.sourceText, source.declaration, fixtureAuthority)
+    }
+
+    const wrapped = analyze("WrappedRecipeFixture")
+    expect(wrapped.unresolved).toEqual([])
+    expect(wrapped.classSources).not.toEqual([])
+
+    for (const exportName of ["DefaultImportFixture", "NamespaceImportFixture"]) {
+      const facts = analyze(exportName)
+      expect(facts.unresolved.length, exportName).toBeGreaterThan(0)
+      expect(facts.classSources, exportName).toEqual([])
+    }
+
+    const outside = analyze("RecipeOutsideClassRootFixture")
+    expect(outside.unresolved).toEqual([])
+    expect(outside.classSources).toEqual([])
+  })
+
   test("independent imported-recipe comparison is exact, deduplicated, and key-order insensitive", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const fixtureAuthority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)
+    const fixtureFile = sourceFacts(consumerPath).sourceFile
+    const fixtureSource = componentSourceFacts(fixtureFile, declarationFor(fixtureFile, "LocalAndImportedFixture")!)
+    const fixtureFacts = cvaFacts(fixtureFile, fixtureSource.sourceText, fixtureSource.declaration, fixtureAuthority)
+    expect(independentImportedFactErrors("fixture", [
+      { tokenId: "radius.lg" },
+      { tokenId: "font-size.sm" },
+      { tokenId: "color.background" },
+      { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: 0 } },
+      { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 } },
+    ], fixtureFile, fixtureFacts)).toEqual([])
+
     const importedErrors = (artifacts: ReturnType<typeof loadArtifacts>) => directSourceErrors(artifacts.families, artifacts.interfaces)
       .filter((error) => error.includes("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
     const baselineArtifacts = loadArtifacts()
-    const baselineCount = importedErrors(baselineArtifacts).length
+    const baselineErrors = importedErrors(baselineArtifacts)
+    expect(baselineErrors).not.toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2}}'))
+    expect(baselineErrors).not.toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5}}'))
 
     const reordered = clone(baselineArtifacts)
     const reorderedComponent = exportByName(familyById(reordered, "toggle-group"), "ToggleGroupItem").component
     reorderedComponent.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.input").when = { equals: "outline", propName: "variant" }
-    expect(importedErrors(reordered)).toHaveLength(baselineCount)
+    expect(importedErrors(reordered)).toEqual(baselineErrors)
 
     const inserted = clone(baselineArtifacts)
     exportByName(familyById(inserted, "toggle-group"), "ToggleGroupItem").component.tokenDependencies.push({
@@ -2156,12 +2332,12 @@ describe("Phase 3 Task 10 independent review", () => {
       when: { propName: "variant", equals: "default" },
       evidenceRefs: ["source", "tokens"],
     })
-    expect(importedErrors(inserted)).toHaveLength(baselineCount + 1)
+    expect(importedErrors(inserted)).toContainEqual(expect.stringContaining('invented {"tokenId":"color.input","when":{"equals":"default","propName":"variant"}}'))
 
     const omitted = clone(baselineArtifacts)
     const omittedComponent = exportByName(familyById(omitted, "toggle-group"), "ToggleGroupItem").component
     omittedComponent.tokenDependencies = omittedComponent.tokenDependencies.filter((dependency: AnyRecord) => dependency.tokenId !== "color.input")
-    expect(importedErrors(omitted)).toHaveLength(baselineCount + 1)
+    expect(importedErrors(omitted)).toContainEqual(expect.stringContaining('missing {"tokenId":"color.input","when":{"equals":"outline","propName":"variant"}}'))
 
     const validSpacing = clone(baselineArtifacts)
     exportByName(familyById(validSpacing, "toggle-group"), "ToggleGroupItem").component.tokenDependencies.push({
@@ -2170,12 +2346,14 @@ describe("Phase 3 Task 10 independent review", () => {
       viaDerivedRule: { multiplier: 7, id: "spacing.multiplier" },
       evidenceRefs: ["source", "tokens"],
     })
-    expect(importedErrors(validSpacing)).toHaveLength(baselineCount - 1)
+    expect(importedErrors(validSpacing)).not.toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"when":{"equals":"sm","propName":"size"}}'))
 
     const derivationDrift = clone(validSpacing)
     const driftComponent = exportByName(familyById(derivationDrift, "toggle-group"), "ToggleGroupItem").component
     driftComponent.tokenDependencies.at(-1).viaDerivedRule.multiplier = 8
-    expect(importedErrors(derivationDrift)).toHaveLength(baselineCount + 1)
+    const driftErrors = importedErrors(derivationDrift)
+    expect(driftErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"when":{"equals":"sm","propName":"size"}}'))
+    expect(driftErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":8},"when":{"equals":"sm","propName":"size"}}'))
   })
 
   test("has no unreferenced evidence records", () => {

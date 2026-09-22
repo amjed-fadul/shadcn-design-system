@@ -106,6 +106,12 @@ describe("imported CVA token source analysis", () => {
       "NamespaceImportFixture",
       "DefaultImportFixture",
       "ReexportFixture",
+      "CatchShadowFixture",
+      "ForShadowFixture",
+      "ForOfShadowFixture",
+      "ForInShadowFixture",
+      "SwitchShadowFixture",
+      "PublicPropLocalShadowFixture",
     ] as const) {
       const analysis = analyzer.analyzeComponentTokenSourceForExport(consumerPath, exportName)
       expect(analysis.unresolved.length, exportName).toBeGreaterThan(0)

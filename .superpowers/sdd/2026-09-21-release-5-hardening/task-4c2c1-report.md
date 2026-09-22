@@ -189,3 +189,52 @@ Mutation coverage now includes unknown key, unknown literal value, spread, non-o
 - `.superpowers/sdd/2026-09-21-release-5-hardening/task-4c2c1-report.md`
 
 No component-family JSON, token contract, source component, release artifact, render/prop/interface authority, 4C2C2 parser, suppression, weakened comparison, or manual fact cleanup changed.
+
+## Fix Round 2 — exact local/imported identity, complete lexical scope, and class-root discovery
+
+### Confirmed root causes and corrections
+
+1. The independent exact comparator assigned every contract fact sharing an imported token ID to imported provenance. `ToggleGroupItem` therefore mislabeled its local `px-2` and `pe-1.5` facts as invented imported facts. The comparator now forms an exact, stable-keyed union of imported facts plus independently parsed local facts for the imported token IDs before comparing both directions. It no longer normalizes against a baseline count.
+2. Production scope invalidation covered ordinary blocks and function parameters but not catch variables, traditional `for` initializers, `for-of`/`for-in` bindings, or the shared lexical environment of switch clauses. The production visitor now creates nested scopes and invalidates those bindings before analyzing class expressions. The independent audit separately resolves the nearest declaration across block, catch, loop, switch, and function scopes; a closer local selector binding now wins over an outer public prop.
+3. Independent imported-recipe discovery scanned named calls throughout a component declaration. This missed default and namespace calls, treated unused recipe calls as token inputs, and reached wrapper recipes only accidentally. Per the controller ruling, discovery now begins at actual JSX `className` roots, recursively follows class composition and local function/arrow wrappers, and classifies imported calls only when they contribute to that class path. Default, namespace, wrong-authority, and unsupported imported producers on the path fail closed; an imported recipe call outside the path is excluded.
+
+The class-root boundary is semantic and generic. It does not filter by family, file path, finding text, provider implementation, or contract contents. Local literal facts are independently parsed only to establish exact provenance in the imported-token comparison; no local fact is promoted into contract truth.
+
+### Strict TDD evidence
+
+All commands used Node `v22.18.0` through `PATH=/Users/amjedfadul/.nvm/versions/node/v22.18.0/bin:$PATH`.
+
+The initial targeted RED run selected four tests and produced **4 failures**:
+
+- production lexical authority failed first on `CatchShadowFixture`;
+- independent nearest-binding authority failed first on the catch binding;
+- class-root discovery silently accepted `DefaultImportFixture`;
+- exact comparison reported the local spacing multipliers `2` and `1.5` as invented imported facts.
+
+The tests cover catch, traditional `for`, `for-of`, `for-in`, direct switch-clause declarations, and public-prop shadowing; local arrow wrappers; default and namespace imported producers; an imported recipe call outside `className`; exact insertion, omission, condition drift, derivation drift, semantic object-key reordering, and valid local-plus-imported spacing.
+
+Final focused results:
+
+- production imported-recipe suite: **6/6 passed**;
+- combined imported/authority/discovery/comparator selection: **12 passed / 40 skipped**;
+- production compatibility (imported recipes, stateful families, unresolved reconciliation): **3 files passed, 70/70 tests passed**.
+
+### Bounded gates and exact residuals
+
+- Full independent review: **44 passed / 2 expected residual failures**. The comparator-only false findings are gone; the source audit is restored to exactly **55 findings**, plus the unchanged unreferenced `collapsible.json:tokens` evidence record.
+- Token dependency suite: **1 passed / 3 expected failures**. Closure remains exactly `missing: 45`, `invented: 15`, `unresolved: 0`, `suspiciousContractedNamespace: 7`, with **60** per-export mismatches.
+- `npm run typecheck`: **exit 0**.
+- `git diff --check`: **exit 0** before commit.
+- Release-001 base/current blobs: `75b59166086e9de0c67656fe64712a8cc70aa6e3` / `75b59166086e9de0c67656fe64712a8cc70aa6e3`.
+- Family-contract and release-artifact diff from `e3f32fe0ae2388c52d7585103c30ee569376ca38`: empty.
+- `components:verify` and the full suite were not rerun: the controller requested bounded verification unless semantic counts changed, and the production token closure is unchanged while the independent count only removes the two confirmed comparator false positives.
+
+### Fix-round changed files
+
+- `src/contracts/components/token-source-analysis.ts`
+- `tests/component-contract-imported-token-source-analysis.test.ts`
+- `tests/component-contract-independent-review.test.ts`
+- `tests/fixtures/imported-cva-consumer.tsx`
+- `.superpowers/sdd/2026-09-21-release-5-hardening/task-4c2c1-report.md`
+
+No component-family JSON, token contract, component implementation, canonical recipe authority, release artifact, 4C2C2 conditional/token-expression parser, exception, allowlist, weakened equality, or manual fact cleanup changed.

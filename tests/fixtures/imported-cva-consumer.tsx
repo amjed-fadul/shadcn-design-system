@@ -1,5 +1,6 @@
 import * as React from "react"
 
+import { cn } from "@/lib/utils"
 import {
   computedRecipe,
   dynamicRecipe,
@@ -112,6 +113,65 @@ function UnrelatedBodyCallFixture() {
   return <div className={aliasedRecipe() as string}>{visible ? "visible" : "hidden"}</div>
 }
 
+function CatchShadowFixture() {
+  try {
+    throw (() => "shadow-sm")
+  } catch (aliasedRecipe) {
+    if (typeof aliasedRecipe !== "function") return null
+    return <div className={aliasedRecipe()} />
+  }
+}
+
+function ForShadowFixture() {
+  for (let aliasedRecipe = () => "shadow-sm"; ;) {
+    return <div className={aliasedRecipe()} />
+  }
+}
+
+function ForOfShadowFixture() {
+  for (const aliasedRecipe of [() => "shadow-sm"]) {
+    return <div className={aliasedRecipe()} />
+  }
+  return null
+}
+
+function ForInShadowFixture() {
+  for (const aliasedRecipe in { value: true }) {
+    // @ts-expect-error The loop key deliberately shadows the imported callable.
+    return <div className={aliasedRecipe()} />
+  }
+  return null
+}
+
+function SwitchShadowFixture() {
+  switch ("value") {
+    case "value":
+      const aliasedRecipe = () => "shadow-sm"
+      return <div className={aliasedRecipe()} />
+  }
+}
+
+function PublicPropLocalShadowFixture({ tone }: { tone?: "default" | "danger" }) {
+  {
+    const tone = computeTone()
+    return <div className={aliasedRecipe({ tone }) as string} />
+  }
+}
+
+function WrappedRecipeFixture() {
+  const recipeWrapper = () => aliasedRecipe()
+  return <div className={cn("shadow-sm", recipeWrapper())} />
+}
+
+function LocalAndImportedFixture() {
+  return <div className={cn("px-2 h-0", aliasedRecipe())} />
+}
+
+function RecipeOutsideClassRootFixture() {
+  const ignored = aliasedRecipe()
+  return <div className="shadow-sm">{String(ignored)}</div>
+}
+
 async function DynamicImportFixture() {
   const recipes = await import("./imported-cva-recipe")
   return <div className={recipes[recipeName]({}) as string} />
@@ -122,9 +182,13 @@ export {
   AmbiguousInvocationFixture,
   AmbiguousDataFlowFixture,
   ArbitraryCallPropertyFixture,
+  CatchShadowFixture,
   ComputedElementSelectorFixture,
   DefaultImportFixture,
   DynamicImportFixture,
+  ForInShadowFixture,
+  ForOfShadowFixture,
+  ForShadowFixture,
   FunctionShadowFixture,
   ImportedComputedConfigFixture,
   ImportedDefaultsFixture,
@@ -132,11 +196,16 @@ export {
   ImportedDynamicFixture,
   ImportedStaticFixture,
   LocalShadowFixture,
+  LocalAndImportedFixture,
   NamespaceImportFixture,
   ParameterShadowFixture,
+  PublicPropLocalShadowFixture,
+  RecipeOutsideClassRootFixture,
   ReexportFixture,
+  SwitchShadowFixture,
   UnknownKeyFixture,
   UnknownValueFixture,
   UnrelatedBodyCallFixture,
   UnsupportedInvocationFixture,
+  WrappedRecipeFixture,
 }

@@ -329,6 +329,26 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     })
     const visit = (node: ts.Node, scope: Scope): void => {
       if (ts.isSourceFile(node) || ts.isBlock(node)) { const nested = nestedScope(scope); if (ts.isBlock(node)) invalidateBindings(nested, statementBindings(node.statements)); for (const statement of node.statements) visit(statement, nested); return }
+      if (ts.isCatchClause(node)) {
+        const nested = nestedScope(scope)
+        if (node.variableDeclaration) invalidateBindings(nested, bindingNames(node.variableDeclaration.name))
+        visit(node.block, nested)
+        return
+      }
+      if (ts.isForStatement(node) || ts.isForOfStatement(node) || ts.isForInStatement(node)) {
+        const nested = nestedScope(scope)
+        const initializer = node.initializer
+        if (initializer && ts.isVariableDeclarationList(initializer)) invalidateBindings(nested, initializer.declarations.flatMap((item) => bindingNames(item.name)))
+        ts.forEachChild(node, (child) => visit(child, nested))
+        return
+      }
+      if (ts.isSwitchStatement(node)) {
+        const nested = nestedScope(scope)
+        invalidateBindings(nested, node.caseBlock.clauses.flatMap((clause) => statementBindings(clause.statements)))
+        visit(node.expression, nested)
+        for (const clause of node.caseBlock.clauses) for (const statement of clause.statements) visit(statement, nested)
+        return
+      }
       if (ts.isFunctionLike(node) && node !== declaration) { const nested = nestedScope(scope); invalidateBindings(nested, node.parameters.flatMap((parameter) => bindingNames(parameter.name))); for (const binding of publicPropBindings(node)) { nested.publicPropBindings.add(binding); if (binding === "className") nested.publicClassBindings.add(binding) } if ("body" in node && node.body) visit(node.body, nested); return }
       if (ts.isVariableStatement(node)) { for (const child of node.declarationList.declarations) if (ts.isIdentifier(child.name) && child.initializer) { scope.values.set(child.name.text, child.initializer); if (isNamedCall(child.initializer, recipeNames)) scope.recipes.set(child.name.text, { call: child.initializer, sourcePath, sourceFile: source }) } ts.forEachChild(node, (child) => visit(child, scope)); return }
       if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && node.name.text === "className" && node.initializer) { if (ts.isStringLiteral(node.initializer)) output.resolved.push({ classNames: node.initializer.text, source: sourceIdentity(node.initializer, sourcePath, source) }); else if (ts.isJsxExpression(node.initializer)) classSourcesFromExpression(node.initializer.expression, output, sourcePath, source, scope); return }
