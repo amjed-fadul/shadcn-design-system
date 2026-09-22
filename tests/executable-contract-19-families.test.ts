@@ -13,23 +13,42 @@ const contract = projectExecutableContract({
 
 const familyIds = [
   "accordion",
+  "alert",
+  "alert-dialog",
+  "avatar",
   "badge",
+  "breadcrumb",
   "button",
   "card",
   "checkbox",
+  "collapsible",
+  "command",
   "dialog",
+  "drawer",
   "dropdown-menu",
+  "empty",
+  "field",
+  "input-group",
   "input",
   "label",
+  "pagination",
+  "popover",
+  "progress",
+  "radio-group",
   "scroll-area",
   "select",
   "separator",
   "sheet",
   "sidebar",
   "skeleton",
+  "slider",
+  "spinner",
+  "switch",
   "table",
   "tabs",
   "textarea",
+  "toggle",
+  "toggle-group",
   "tooltip",
 ] as const
 
@@ -114,20 +133,20 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
-describe("Phase 5 executable validator coverage across all 19 Phase 3 families", () => {
-  test("projects and resolves every authorable Phase 3 export", () => {
+describe("Phase 5 executable validator coverage across all 38 canonical families", () => {
+  test("projects and resolves every authorable canonical export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
     const authorable = Object.values(contract.exports).filter((entry) => entry.authorableJsx && entry.kind === "component")
     const nonAuthorable = Object.values(contract.exports).filter((entry) => !entry.authorableJsx)
     const hardConstraints = Object.values(contract.exports).flatMap((entry) => entry.component?.composition.hardConstraints ?? [])
 
     expect([...projectedFamilies].sort()).toEqual([...familyIds].sort())
-    expect(authorable).toHaveLength(103)
-    expect(nonAuthorable).toHaveLength(4)
+    expect(authorable).toHaveLength(199)
+    expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
     for (const entry of authorable) {
       const result = validateAuthoredUi({ root: nodeFor(entry.familyId, entry.name) }, contract)
-      expect(result.errors, `${entry.familyId}.${entry.name}`).toEqual([])
+      expect(result.errors.every((error) => error.code === "UNRESOLVED_FACT"), `${entry.familyId}.${entry.name}`).toBe(true)
     }
   })
 

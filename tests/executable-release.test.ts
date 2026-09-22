@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto"
+import { readFileSync } from "node:fs"
+import { fileURLToPath } from "node:url"
+
 import { describe, expect, test } from "vitest"
 
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
@@ -62,11 +66,32 @@ describe("immutable executable release", () => {
   test("loads the versioned canonical release artifact through the production entrypoint", () => {
     const release = getExecutableRelease()
 
-    expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-001.json")
+    expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-002.json")
     expect(release.releaseId).toBe(EXECUTABLE_RELEASE_ID)
     expect(release.componentContractSetId).toBe("shadcn-radix-component-contracts-001")
     expect(release.tokenContractId).toBe("shadcn-radix-token-contract-001")
     expect(release.projectionSchemaVersion).toBe(1)
+  })
+
+  test("contains every canonical family and export exactly once", () => {
+    const release = getExecutableRelease()
+    const canonical = loadComponentContracts()
+    const familyIds = [...new Set(Object.values(release.projection.exports).map((entry) => entry.familyId))].sort()
+    const exportIds = Object.keys(release.projection.exports).sort()
+    const expectedFamilyIds = canonical.families.map((family) => family.id).sort()
+    const expectedExportIds = canonical.families.flatMap((family) => family.exports.map((entry) => `${family.id}\u0000${entry.name}`)).sort()
+
+    expect(familyIds).toEqual(expectedFamilyIds)
+    expect(familyIds).toHaveLength(38)
+    expect(exportIds).toEqual(expectedExportIds)
+  })
+
+  test("preserves release 001 byte-for-byte while activating release 002", () => {
+    const release001 = readFileSync(fileURLToPath(new URL("../provenance/releases/shadcn-radix-release-001.json", import.meta.url)))
+    const digest = createHash("sha256").update(release001).digest("hex")
+
+    expect(digest).toBe("1f9274c16ba625cf02096a6b8bb6da570762a16296da8624daa7475db3a89370")
+    expect(EXECUTABLE_RELEASE_ID).toBe("shadcn-radix-release-002")
   })
 
   test("derives the canonical release payload from the approved projection", () => {

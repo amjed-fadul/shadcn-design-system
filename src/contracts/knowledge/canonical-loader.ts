@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
 
+import { loadComponentContracts } from "../components/canonical-loader"
 import { createKnowledgeLoader, KnowledgeLoadError, type KnowledgeArtifactSource } from "./loader"
 import type { LoadedKnowledge } from "./types"
 
@@ -21,8 +22,18 @@ const canonicalSource: KnowledgeArtifactSource = {
   },
 }
 
-const canonicalLoader = createKnowledgeLoader({ source: canonicalSource })
+const canonicalLoader = createKnowledgeLoader({ source: canonicalSource, requireAllReferencesUsed: true })
 
 export function loadKnowledge(): LoadedKnowledge {
-  return canonicalLoader()
+  const loaded = canonicalLoader()
+  const expectedFamilyIds = loadComponentContracts().families.map((family) => family.id).sort()
+  const actualFamilyIds = loaded.components.map((component) => component.subject.id).sort()
+  if (actualFamilyIds.length !== expectedFamilyIds.length || actualFamilyIds.some((id, index) => id !== expectedFamilyIds[index])) {
+    throw new KnowledgeLoadError(
+      "KNOWLEDGE_ARTIFACT_INVALID",
+      "Canonical knowledge component IDs must match the canonical component family IDs.",
+      "contracts/knowledge/knowledge-set.json",
+    )
+  }
+  return loaded
 }

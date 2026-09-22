@@ -16,9 +16,10 @@ import {
   type KnowledgeSet,
 } from "../src/contracts/knowledge"
 import type { KnowledgeArtifact } from "../src/contracts/knowledge/types"
+import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const baseline = "ba7578c7bbc04bf7a9449462707d98657f708cbf"
+const baseline = "f77976e"
 
 const referenceSet: KnowledgeReferenceSet = {
   schemaVersion: 1,
@@ -190,6 +191,13 @@ describe("knowledge contract boundary", () => {
     })).toThrow("KNOWLEDGE_REFERENCE_NOT_FOUND")
   })
 
+  test("can reject registered evidence that is not used by any claim", () => {
+    expect(() => createKnowledgeLoader({
+      source: sourceFor({}),
+      requireAllReferencesUsed: true,
+    })()).toThrow("Registered knowledge references are unused")
+  })
+
   test.each(["props", "tokens", "composition", "hardConstraints", "requiredChildren"])("rejects API-shaped knowledge field: %s", (field) => {
     const component = { ...minimalComponentKnowledge, [field]: [] } as Record<string, unknown>
 
@@ -257,32 +265,78 @@ describe("knowledge contract boundary", () => {
       "contracts/components",
       "src/contracts/components",
       "provenance/component-contract-source.json",
-    ], { cwd: root, stdio: "pipe" })).not.toThrow()
+    ], { cwd: root, stdio: "pipe", maxBuffer: 64 * 1024 * 1024 })).not.toThrow()
   })
 })
 
 describe("canonical knowledge vertical slice", () => {
-  test("lists all 19 component knowledge subjects and the canonical patterns", () => {
+  test("matches the canonical component family inventory and uses every registered reference", () => {
+    const loaded = loadKnowledge()
+    const canonicalFamilyIds = loadComponentContracts().families.map((family) => family.id).sort()
+    const knowledgeFamilyIds = loaded.components.map((entry) => entry.subject.id).sort()
+    const registeredReferenceIds = loaded.references.references.map((reference) => reference.id).sort()
+    const referencedIds = new Set<string>()
+
+    const collectReferenceIds = (value: unknown) => {
+      if (Array.isArray(value)) {
+        for (const entry of value) collectReferenceIds(entry)
+        return
+      }
+      if (!value || typeof value !== "object") return
+      for (const [key, child] of Object.entries(value)) {
+        if (key === "referenceIds" && Array.isArray(child)) {
+          for (const referenceId of child) if (typeof referenceId === "string") referencedIds.add(referenceId)
+        }
+        collectReferenceIds(child)
+      }
+    }
+
+    collectReferenceIds([...loaded.components, ...loaded.patterns])
+
+    expect(knowledgeFamilyIds).toEqual(canonicalFamilyIds)
+    expect(registeredReferenceIds).toEqual([...referencedIds].sort())
+  })
+
+  test("lists all 38 component knowledge subjects and the canonical patterns", () => {
     const loaded = loadKnowledge()
     const componentIds = [
       "accordion",
+      "alert",
+      "alert-dialog",
+      "avatar",
       "badge",
+      "breadcrumb",
       "button",
       "card",
       "checkbox",
+      "collapsible",
+      "command",
       "dialog",
+      "drawer",
       "dropdown-menu",
+      "empty",
+      "field",
+      "input-group",
       "input",
       "label",
+      "pagination",
+      "popover",
+      "progress",
+      "radio-group",
       "scroll-area",
       "select",
       "separator",
       "sheet",
       "sidebar",
       "skeleton",
+      "slider",
+      "spinner",
+      "switch",
       "table",
       "tabs",
       "textarea",
+      "toggle",
+      "toggle-group",
       "tooltip",
     ]
     const patternIds = [
@@ -340,7 +394,7 @@ describe("canonical knowledge vertical slice", () => {
   })
 
   test("canonical query exposes all components and patterns through separate entrypoints", () => {
-    expect(listComponentKnowledge()).toHaveLength(19)
+    expect(listComponentKnowledge()).toHaveLength(38)
     expect(listPatternKnowledge().map((entry) => entry.subject.id)).toEqual([
       "accordion-card",
       "dialog-with-actions",

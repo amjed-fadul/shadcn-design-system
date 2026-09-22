@@ -26,6 +26,7 @@ export type KnowledgeArtifactSource = {
 export type KnowledgeLoaderOptions = Readonly<{
   source: KnowledgeArtifactSource
   setPath?: string
+  requireAllReferencesUsed?: boolean
 }>
 
 export type KnowledgeLoadErrorCode =
@@ -135,8 +136,9 @@ function validateReferenceRecords(references: KnowledgeReference[], path: string
   }
 }
 
-function validateClaimReferences(artifacts: KnowledgeArtifact[], references: KnowledgeReference[], path: string) {
+function validateClaimReferences(artifacts: KnowledgeArtifact[], references: KnowledgeReference[], path: string, requireAllReferencesUsed = false) {
   const knownReferenceIds = new Set(references.map((reference) => reference.id))
+  const usedReferenceIds = new Set<string>()
   for (const artifact of artifacts) {
     validateGuidanceStatuses(artifact, path)
     for (const claim of claimFromGuidance(artifact)) {
@@ -145,7 +147,14 @@ function validateClaimReferences(artifacts: KnowledgeArtifact[], references: Kno
         if (!knownReferenceIds.has(referenceId)) {
           throw new KnowledgeLoadError("KNOWLEDGE_REFERENCE_NOT_FOUND", "Claim on " + artifact.subject.kind + ":" + artifact.subject.id + " references unknown evidence record: " + referenceId + ".", path)
         }
+        usedReferenceIds.add(referenceId)
       }
+    }
+  }
+  if (requireAllReferencesUsed) {
+    const unused = references.map((reference) => reference.id).filter((referenceId) => !usedReferenceIds.has(referenceId))
+    if (unused.length > 0) {
+      throw new KnowledgeLoadError("KNOWLEDGE_ARTIFACT_INVALID", "Registered knowledge references are unused: " + unused.join(", ") + ".", path)
     }
   }
 }
@@ -160,7 +169,7 @@ function validateArtifactIdentity(artifacts: KnowledgeArtifact[], expectedKind: 
   requireUnique(artifacts.map((artifact) => artifact.subject.id), expectedKind + " knowledge subject IDs", path)
 }
 
-function loadContracts({ source, setPath = defaultSetPath }: KnowledgeLoaderOptions): LoadedKnowledge {
+function loadContracts({ source, setPath = defaultSetPath, requireAllReferencesUsed = false }: KnowledgeLoaderOptions): LoadedKnowledge {
   const ajv = new Ajv2020({ allErrors: true, strict: true })
   const validateSet = ajv.compile(setSchema)
   const validateReferenceDocument = ajv.compile(referenceSetSchema)
@@ -181,7 +190,7 @@ function loadContracts({ source, setPath = defaultSetPath }: KnowledgeLoaderOpti
   const patterns = set.patternFiles.map((path) => schemaDocument<PatternKnowledge>(source, path, validatePattern))
   validateArtifactIdentity(components, "component", setPath)
   validateArtifactIdentity(patterns, "pattern", setPath)
-  validateClaimReferences([...components, ...patterns], referenceDocument.references, setPath)
+  validateClaimReferences([...components, ...patterns], referenceDocument.references, setPath, requireAllReferencesUsed)
 
   return deepFreeze({
     set,
