@@ -283,7 +283,24 @@ function unsafeAuthorityNode(typeNode: ts.TypeNode | undefined, checker: ts.Type
 }
 
 function sourceLocalPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, seen = new Set<ts.Node>()): Set<string> {
-  return new Set(sourceLocalPropTypeNodes(typeNode, checker, seen).keys())
+  const inherited = new Set<string>()
+  const visitInherited = (node: ts.TypeNode | undefined, visited = new Set<ts.Node>()) => {
+    if (!node || visited.has(node)) return
+    visited.add(node)
+    if (ts.isParenthesizedTypeNode(node)) return visitInherited(node.type, visited)
+    if (ts.isIntersectionTypeNode(node) || ts.isUnionTypeNode(node)) {
+      for (const member of node.types) visitInherited(member, new Set(visited))
+      return
+    }
+    if (!ts.isTypeReferenceNode(node)) return
+    const utility = rightmostTypeName(node.typeName)
+    if (utility !== "ComponentProps" && utility !== "ComponentPropsWithoutRef") return
+    const target = node.typeArguments?.[0]
+    if (!target || !ts.isLiteralTypeNode(target) || !ts.isStringLiteral(target.literal)) return
+    for (const property of checker.getPropertiesOfType(checker.getTypeAtLocation(node))) inherited.add(property.name)
+  }
+  visitInherited(typeNode)
+  return new Set([...sourceLocalPropTypeNodes(typeNode, checker, seen).keys()].filter((name) => !inherited.has(name)))
 }
 
 function delegatedDefaults(functionLike: SourceFunction, checker: ts.TypeChecker, visited: Set<SourceFunction>): Map<string, Literal> {

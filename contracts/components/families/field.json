@@ -865,19 +865,7 @@
         "source"
       ],
       "component": {
-        "localProps": [
-          {
-            "name": "children",
-            "required": false,
-            "type": {
-              "kind": "typescript",
-              "typeText": "ReactNode"
-            },
-            "evidenceRefs": [
-              "source"
-            ]
-          }
-        ],
+        "localProps": [],
         "inherits": [
           "html.div"
         ],

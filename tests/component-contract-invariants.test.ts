@@ -49,11 +49,16 @@ const htmlExample: InheritedInterfaceContract = {
   schemaVersion: 1, id: "html.example",
   source: { kind: "react-intrinsic", package: "@types/react", version: "18.3.3", declarationPath: "node_modules/@types/react/index.d.ts", declarationSha256: "a".repeat(64), symbol: "React.JSX.IntrinsicElements[\"example\"]" },
   evidence: { declaration: { kind: "inherited-interface", source: "node_modules/@types/react/index.d.ts" } },
-  props: [{ name: "inheritedState", required: false, type: { kind: "boolean" }, typeText: "boolean", evidenceRefs: ["declaration"] }],
+  props: [
+    { name: "inheritedState", required: false, type: { kind: "boolean" }, typeText: "boolean", evidenceRefs: ["declaration"] },
+    { name: "children", required: false, type: { kind: "typescript", typeText: "ReactNode" }, typeText: "ReactNode", evidenceRefs: ["declaration"] },
+  ],
   events: [{ propName: "onClick", required: false, payload: { kind: "boolean" }, payloadTypeText: "boolean", evidenceRefs: ["declaration"] }],
   unresolved: [],
 }
 const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), capabilityIds: new Set<string>(), componentExportIds: new Set(["button.Button"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
+
+authority.interfacePropNames.get("html.example")!.add("children")
 
 describe("component contract semantic invariants", () => {
   test("rejects a contract set whose declared family count exceeds its manifest", () => {
@@ -68,6 +73,12 @@ describe("component contract semantic invariants", () => {
   test("accepts a valid generic family", () => {
     expect(validateComponentFamilyInvariants(validFamily(), authority)).toEqual([])
     expect(() => assertComponentFamilyInvariants(validFamily(), authority)).not.toThrow()
+  })
+
+  test("accepts inherited children without requiring a duplicate local prop", () => {
+    const family = validFamily()
+    family.exports[0].component!.inherits = ["html.example"]
+    expect(validateComponentFamilyInvariants(family, authority)).toEqual([])
   })
 
   test("validates token conjunction cardinality, scoped uniqueness, and contradictions", () => {

@@ -764,6 +764,24 @@ function independentLocalPropTypeNodes(typeNode: ts.TypeNode | undefined, checke
   return values
 }
 
+function independentIntrinsicPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): Set<string> {
+  const names = new Set<string>()
+  if (!typeNode || visited.has(typeNode)) return names
+  visited.add(typeNode)
+  if (ts.isParenthesizedTypeNode(typeNode)) return independentIntrinsicPropNames(typeNode.type, checker, visited)
+  if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
+    for (const member of typeNode.types) for (const name of independentIntrinsicPropNames(member, checker, new Set(visited))) names.add(name)
+    return names
+  }
+  if (!ts.isTypeReferenceNode(typeNode)) return names
+  const utility = independentTypeName(typeNode.typeName)
+  const target = typeNode.typeArguments?.[0]
+  if ((utility === "ComponentProps" || utility === "ComponentPropsWithoutRef") && target && ts.isLiteralTypeNode(target) && ts.isStringLiteral(target.literal)) {
+    for (const property of checker.getPropertiesOfType(checker.getTypeAtLocation(typeNode))) names.add(property.name)
+  }
+  return names
+}
+
 function independentUnsafeAuthority(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): boolean {
   if (!typeNode || visited.has(typeNode)) return false
   visited.add(typeNode)
@@ -814,7 +832,8 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     if (checker) {
       const propsType = checker.getTypeAtLocation(parameter)
       const typeNode = independentPropsTypeNode(functionLike)
-      const localTypes = independentLocalPropTypeNodes(typeNode, checker)
+      const intrinsicProps = independentIntrinsicPropNames(typeNode, checker)
+      const localTypes = new Map([...independentLocalPropTypeNodes(typeNode, checker)].filter(([name]) => !intrinsicProps.has(name)))
       if (propsType.flags & ts.TypeFlags.Any) propSurfaceError = "component props type is any"
       else if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) propSurfaceError = "component props type cannot be resolved"
       else if (independentUnsafeAuthority(typeNode, checker)) propSurfaceError = "component props type contains unsafe any or unknown authority"

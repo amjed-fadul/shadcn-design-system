@@ -420,22 +420,18 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).not.toEqual([])
   })
 
-  test("exposes BreadcrumbSeparator's truthiness contract as a nullishness residual", () => {
+  test("reconciles BreadcrumbSeparator nullishness and rejects predicate drift", () => {
     const component = breadcrumbContract.exports.find((entry: any) => entry.name === "BreadcrumbSeparator").component
     const source = sourceAnalysis.analyzeJsxRenderTree(breadcrumb, "BreadcrumbSeparator")
 
     expect(source.unresolved).toEqual([])
-    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([
-      "Render alternative condition mismatch at 0.",
-      "Render alternative condition mismatch at 1.",
-    ])
-    const corrected = structuredClone(component.rendering)
-    corrected.alternatives[0].when = { propName: "children", nullishness: "non-nullish" }
-    delete corrected.alternatives[1].otherwise
-    corrected.alternatives[1].when = { propName: "children", nullishness: "nullish" }
-    expect(sourceAnalysis.compareJsxRenderTree(corrected, source)).toEqual([])
-    corrected.alternatives[0].rendering.nodes[0].host.interfaceId = "html.ol"
-    expect(sourceAnalysis.compareJsxRenderTree(corrected, source)).toContain("Render host mismatch at li: li.")
+    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([])
+    const predicateMutation = structuredClone(component.rendering)
+    predicateMutation.alternatives[0].when = { propName: "children", truthiness: "truthy" }
+    expect(sourceAnalysis.compareJsxRenderTree(predicateMutation, source)).toContain("Render alternative condition mismatch at 0.")
+    const hostMutation = structuredClone(component.rendering)
+    hostMutation.alternatives[0].rendering.nodes[0].host.interfaceId = "html.ol"
+    expect(sourceAnalysis.compareJsxRenderTree(hostMutation, source)).toContain("Render host mismatch at li: li.")
   })
 
   test("reconciles the real Slider Thumb mapped callback as a repeated child template", () => {
