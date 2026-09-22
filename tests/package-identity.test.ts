@@ -301,7 +301,7 @@ describe("release package input identity", () => {
       expect(String((error as { stderr?: string }).stderr)).toMatch(/FRESH_TARBALL_(?:BYTES|SHA256|INTEGRITY)_MISMATCH/)
     }
   }, 240_000)
-  test("requires a separately identified R4 release, external candidate, and complete handoff", () => {
+  test("retains the R4 source release and its separately anchored external candidate", () => {
     const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-004.json")
     const handoffPath = path.join(root, "docs/CANVAS-RELEASE-004.md")
     expect(existsSync(releasePath)).toBe(true)
@@ -321,11 +321,13 @@ describe("release package input identity", () => {
     expect(inputPaths).not.toContain("provenance/releases/shadcn-radix-release-004.json")
     expect(release.implementationInputs.find((entry: { path: string }) => entry.path === "scripts/release-inputs.ts")?.gitBlob).toBe("704b72395f4285fe5cc661a06649d5dfffd24244")
     expect(release.implementationInputs.find((entry: { path: string }) => entry.path === "src/validator/canonical-release.ts")?.gitBlob).toBe("7ea7d5ce6c1c18dc685d73f2202e9ab8a8b62f16")
-    expect(manifest.release).toEqual({ id: release.releaseId, payloadSha256: release.sha256 })
+    expect(release.sha256).toBe("58475d88eff09c397d4e0e27c1f7367868b69861f9c4f9c35bb94827d3e12999")
+    expect(manifest.release).toEqual({ id: release.releaseId, payloadSha256: "e0332a1103f1faa7a92e81c1815ffcfc4e4cbcdadeea7822391221b73c2b52a2" })
+    expect(manifest.release.payloadSha256).not.toBe(release.sha256)
     expect(manifest.package).toEqual({ name: release.packageIdentity.name, version: release.packageIdentity.version })
     expect(handoff).toContain("shadcn-radix-release-004")
     expect(handoff).toContain("0.0.0-release.4")
-    expect(handoff).toContain(release.sha256)
+    expect(handoff).toContain(manifest.release.payloadSha256)
     expect(handoff).toContain(manifest.tarball.sha256)
     expect(handoff).toContain(manifest.tarball.integrity)
     expect(handoff).toContain(r4ArtifactDirectory)
