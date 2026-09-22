@@ -90,20 +90,47 @@ function atomicRenderConditions(condition: RenderCondition): Array<Exclude<Rende
   return "all" in condition ? condition.all.flatMap(atomicRenderConditions) : [condition]
 }
 
+type AtomicRenderCondition = ReturnType<typeof atomicRenderConditions>[number]
+
+function renderConditionSubject(condition: AtomicRenderCondition): string {
+  return "propName" in condition ? `prop:${condition.propName}` : `state:${condition.name}`
+}
+
+function renderConditionAtomsContradict(left: AtomicRenderCondition, right: AtomicRenderCondition): boolean {
+  if (renderConditionSubject(left) !== renderConditionSubject(right)) return false
+  if ("equals" in left && "equals" in right) return left.equals !== right.equals
+  if ("truthiness" in left && "truthiness" in right) return left.truthiness !== right.truthiness
+  if ("nullishness" in left && "nullishness" in right) return left.nullishness !== right.nullishness
+  if ("nullishness" in left || "nullishness" in right) {
+    const nullish = "nullishness" in left ? left : right as Extract<AtomicRenderCondition, { nullishness: string }>
+    const other = nullish === left ? right : left
+    if (nullish.nullishness === "non-nullish") return false
+    return "equals" in other || "truthiness" in other && other.truthiness === "truthy"
+  }
+  const truthiness = "truthiness" in left ? left : right as Extract<AtomicRenderCondition, { truthiness: string }>
+  const equals = truthiness === left ? right : left
+  return "equals" in equals && Boolean(equals.equals) !== (truthiness.truthiness === "truthy")
+}
+
 function validateRenderCondition(errors: string[], componentName: string, scope: string, condition: RenderCondition, props: Map<string, PublicPropFact>) {
-  if ("all" in condition) {
-    for (const member of condition.all) validateRenderCondition(errors, componentName, scope, member, props)
-    return
+  const atoms = atomicRenderConditions(condition)
+  if (atoms.some((atom, index) => atoms.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(atom)) !== index)) {
+    errors.push(`Component ${componentName} ${scope} condition contains duplicate predicates.`)
   }
-  if (!isPublicRenderCondition(condition)) return
-  const prop = props.get(condition.propName)
-  if (!prop || prop.availability !== "available") {
-    errors.push(`Component ${componentName} ${scope} condition references unknown prop: ${condition.propName}.`)
-    return
+  if (atoms.some((atom, index) => atoms.slice(index + 1).some((candidate) => renderConditionAtomsContradict(atom, candidate)))) {
+    errors.push(`Component ${componentName} ${scope} condition contains contradictory predicates.`)
   }
-  if ("truthiness" in condition || "nullishness" in condition) return
-  if (!prop.type || !isStructuredPropTypeAssignable({ kind: "literal", value: condition.equals }, prop.type)) {
-    errors.push(`Component ${componentName} ${scope} condition has incompatible literal for prop ${condition.propName}: ${String(condition.equals)}.`)
+  for (const atom of atoms) {
+    if (!isPublicRenderCondition(atom)) continue
+    const prop = props.get(atom.propName)
+    if (!prop || prop.availability !== "available") {
+      errors.push(`Component ${componentName} ${scope} condition references unknown prop: ${atom.propName}.`)
+      continue
+    }
+    if ("truthiness" in atom || "nullishness" in atom) continue
+    if (!prop.type || !isStructuredPropTypeAssignable({ kind: "literal", value: atom.equals }, prop.type)) {
+      errors.push(`Component ${componentName} ${scope} condition has incompatible literal for prop ${atom.propName}: ${String(atom.equals)}.`)
+    }
   }
 }
 

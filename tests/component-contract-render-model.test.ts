@@ -92,6 +92,50 @@ describe("generic render-model alternatives and factual aliases", () => {
         }),
       },
     ])
+
+    const rendering: Parameters<typeof sourceAnalysis.compareJsxRenderTree>[0] = {
+      alternatives: [
+        {
+          when: { propName: "enabled", truthiness: "falsy" },
+          rendering: { rootNodeId: "fallback", publicPropsTargetNodeId: "fallback", nodes: [{ id: "fallback", host: { kind: "unresolved" }, receivesPublicProps: true, dataAttributes: [], derivedSpreads: [], children: [] }], portalBoundaries: [] },
+        },
+        {
+          when: { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: true }] },
+          rendering: { rootNodeId: "host", publicPropsTargetNodeId: "host", nodes: [{ id: "host", host: { kind: "unresolved" }, receivesPublicProps: true, dataAttributes: [{ name: "data-slot", source: "literal", value: "nested-portal" }], derivedSpreads: [], children: [] }], portalBoundaries: [{ nodeId: "host" }] },
+        },
+        {
+          when: { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: false }] },
+          rendering: { rootNodeId: "host", publicPropsTargetNodeId: "host", nodes: [{ id: "host", host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [{ name: "data-slot", source: "literal", value: "nested-portal" }], derivedSpreads: [], children: [] }], portalBoundaries: [] },
+        },
+      ],
+    }
+    expect(sourceAnalysis.compareJsxRenderTree(rendering, tree)).toEqual([])
+    const misplacedPortal = structuredClone(rendering)
+    ;[misplacedPortal.alternatives[1].rendering, misplacedPortal.alternatives[2].rendering] = [misplacedPortal.alternatives[2].rendering, misplacedPortal.alternatives[1].rendering]
+    expect(sourceAnalysis.compareJsxRenderTree(misplacedPortal, tree)).toEqual(expect.arrayContaining([
+      "Portal boundary mismatch at Comp.",
+      "Render host mismatch at Comp: Comp.",
+    ]))
+  })
+
+  test("prunes impossible cross-products from same-predicate sibling ternaries", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "SamePredicateSiblingTernaryFixture")
+
+    expect(tree.unresolved).toEqual([])
+    expect(tree.alternatives).toEqual([
+      {
+        when: { propName: "enabled", equals: true },
+        root: expect.objectContaining({
+          children: [expect.objectContaining({ tag: "Primitive.FirstOn" }), expect.objectContaining({ tag: "Primitive.SecondOn" })],
+        }),
+      },
+      {
+        otherwise: true,
+        root: expect.objectContaining({
+          children: [expect.objectContaining({ tag: "Primitive.FirstOff" }), expect.objectContaining({ tag: "Primitive.SecondOff" })],
+        }),
+      },
+    ])
   })
 
   test("retains both && and nested ternary predicates and rejects either mutation", () => {

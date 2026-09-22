@@ -146,12 +146,39 @@ function negateCondition(condition: JsxRenderCondition): JsxRenderCondition | un
   return undefined
 }
 
-function conjunction(left: JsxRenderCondition, right: JsxRenderCondition): JsxRenderCondition {
+function conditionSubject(condition: JsxAtomicRenderCondition): string {
+  return "propName" in condition ? `prop:${condition.propName}` : `state:${condition.name}`
+}
+
+function atomicConditionsContradict(left: JsxAtomicRenderCondition, right: JsxAtomicRenderCondition): boolean {
+  if (conditionSubject(left) !== conditionSubject(right)) return false
+  if ("equals" in left && "equals" in right) return left.equals !== right.equals
+  if ("truthiness" in left && "truthiness" in right) return left.truthiness !== right.truthiness
+  if ("nullishness" in left && "nullishness" in right) return left.nullishness !== right.nullishness
+  if ("nullishness" in left || "nullishness" in right) {
+    const nullish = "nullishness" in left ? left : right as Extract<JsxAtomicRenderCondition, { nullishness: string }>
+    const other = nullish === left ? right : left
+    if (nullish.nullishness === "non-nullish") return false
+    return "equals" in other || "truthiness" in other && other.truthiness === "truthy"
+  }
+  const truthiness = "truthiness" in left ? left : right as Extract<JsxAtomicRenderCondition, { truthiness: string }>
+  const equals = truthiness === left ? right : left
+  return "equals" in equals && (Boolean(equals.equals) !== (truthiness.truthiness === "truthy"))
+}
+
+function conjunction(left: JsxRenderCondition, right: JsxRenderCondition): JsxRenderCondition | "impossible" {
   const members = [
     ...("all" in left ? left.all : [left]),
     ...("all" in right ? right.all : [right]),
-  ].filter((condition, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(condition)) === index)
-  return members.length === 1 ? members[0] : { all: members as [JsxRenderCondition, JsxRenderCondition, ...JsxRenderCondition[]] }
+  ]
+  for (let leftIndex = 0; leftIndex < members.length; leftIndex++) {
+    for (let rightIndex = leftIndex + 1; rightIndex < members.length; rightIndex++) {
+      if (atomicConditionsContradict(members[leftIndex] as JsxAtomicRenderCondition, members[rightIndex] as JsxAtomicRenderCondition)) return "impossible"
+    }
+  }
+  const unique = members
+    .filter((condition, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(condition)) === index)
+  return unique.length === 1 ? unique[0] : { all: unique as [JsxRenderCondition, JsxRenderCondition, ...JsxRenderCondition[]] }
 }
 
 function booleanBranchCondition(expression: ts.Expression, publicBindings: Set<string>): JsxRenderCondition | undefined {
@@ -244,7 +271,7 @@ function branch<T>(value: T, marker: JsxBranchMarker = {}): JsxBranch<T> {
   return { ...marker, value } as JsxBranch<T>
 }
 
-function mergeBranchMarkers(left: JsxBranchMarker, right: JsxBranchMarker): JsxBranchMarker | undefined {
+function mergeBranchMarkers(left: JsxBranchMarker, right: JsxBranchMarker): JsxBranchMarker | "impossible" | undefined {
   const leftKey = left.when ? `when:${JSON.stringify(left.when)}` : left.otherwise ? "otherwise" : ""
   const rightKey = right.when ? `when:${JSON.stringify(right.when)}` : right.otherwise ? "otherwise" : ""
   if (!leftKey) return right
@@ -252,7 +279,9 @@ function mergeBranchMarkers(left: JsxBranchMarker, right: JsxBranchMarker): JsxB
   if (leftKey === rightKey && JSON.stringify(left.otherwiseFor ?? null) === JSON.stringify(right.otherwiseFor ?? null)) return left
   const leftCondition = left.when ?? (left.otherwiseFor ? negateCondition(left.otherwiseFor) : undefined)
   const rightCondition = right.when ?? (right.otherwiseFor ? negateCondition(right.otherwiseFor) : undefined)
-  return leftCondition && rightCondition ? { when: conjunction(leftCondition, rightCondition) } : undefined
+  if (!leftCondition || !rightCondition) return undefined
+  const condition = conjunction(leftCondition, rightCondition)
+  return condition === "impossible" ? "impossible" : { when: condition }
 }
 
 function directAliasHost(expression: ts.Expression, file: ts.SourceFile, scope: JsxScope): JsxHost | undefined {
@@ -308,6 +337,7 @@ function mappedJsxChildren(expression: ts.CallExpression, file: ts.SourceFile, u
   for (const result of returned) {
     for (const candidate of jsxExpressionBranches(result.expression, file, unresolved, publicBindings, scope)) {
       const marker = mergeBranchMarkers({ ...(result.when ? { when: result.when } : {}), ...(result.otherwise ? { otherwise: true as const } : {}) }, branchMarker(candidate))
+      if (marker === "impossible") continue
       if (!marker) {
         recordUnresolved(unresolved, result.expression, file, `Mapped JSX callback has compound branch predicates: ${result.expression.getText(file)}`)
         continue
@@ -334,6 +364,7 @@ function jsxExpressionBranches(expression: ts.Expression | undefined, file: ts.S
     }
     const apply = (items: JsxBranch<JsxRenderNode[]>[], marker: JsxBranchMarker) => items.flatMap((item) => {
       const merged = mergeBranchMarkers(marker, branchMarker(item))
+      if (merged === "impossible") return []
       if (merged) return [branch(item.value, merged)]
       recordUnresolved(unresolved, expression, file, `Conditional JSX child has compound predicates: ${expression.getText(file)}`)
       return []
@@ -363,10 +394,10 @@ function jsxExpressionBranches(expression: ts.Expression | undefined, file: ts.S
       const condition = publicBindings.has(propName)
         ? { propName, equals: true } as const
         : { source: "state", name: propName, truthiness: "truthy" } as const
-      return jsxExpressionBranches(expression.right, file, unresolved, publicBindings, scope).map((item) => branch(item.value.map((node) => ({
-          ...node,
-          when: node.when ? conjunction(condition, node.when) : condition,
-        })), branchMarker(item)))
+      return jsxExpressionBranches(expression.right, file, unresolved, publicBindings, scope).map((item) => branch(item.value.flatMap((node) => {
+        const when = node.when ? conjunction(condition, node.when) : condition
+        return when === "impossible" ? [] : [{ ...node, when }]
+      }), branchMarker(item)))
     }
     recordUnresolved(unresolved, expression.left, file, `Conditional JSX child cannot establish automatic structure: ${expression.left.getText(file)}`)
     return [branch(jsxExpressionBranches(expression.right, file, unresolved, publicBindings, scope).flatMap((item) => item.value))]
@@ -389,6 +420,7 @@ function jsxChildrenBranches(children: readonly ts.JsxChild[], file: ts.SourceFi
     const next: JsxBranch<JsxRenderNode[]>[] = []
     for (const result of results) for (const candidate of candidates) {
       const marker = mergeBranchMarkers(branchMarker(result), branchMarker(candidate))
+      if (marker === "impossible") continue
       if (marker) next.push(branch([...result.value, ...candidate.value], marker))
       else recordUnresolved(unresolved, child, file, `JSX children have independent branch predicates: ${child.getText(file)}`)
     }
@@ -413,6 +445,7 @@ function jsxNodeBranches(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.Jsx
   const results: JsxBranch<JsxRenderNode>[] = []
   for (const host of hosts) for (const child of children) {
     const marker = mergeBranchMarkers(branchMarker(host), branchMarker(child))
+    if (marker === "impossible") continue
     if (!marker) {
       recordUnresolved(unresolved, node, file, `JSX host and children have independent branch predicates: ${node.getText(file)}`)
       continue
@@ -521,6 +554,7 @@ export function analyzeJsxRenderTree(sourcePath: string, exportName: string): Js
     const candidates = jsxExpressionBranches(expression.expression, file, unresolved, bindings, scope)
     for (const candidate of candidates) {
       const marker = mergeBranchMarkers(outer, branchMarker(candidate))
+      if (marker === "impossible") continue
       if (!marker) {
         recordUnresolved(unresolved, expression.expression, file, `Returned JSX has compound branch predicates: ${expression.expression.getText(file)}`)
         continue

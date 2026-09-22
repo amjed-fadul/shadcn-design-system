@@ -149,6 +149,15 @@ function AndTernaryChildFixture({ enabled, compact, ...rest }: { enabled: boolea
   )
 }
 
+function SamePredicateSiblingTernaryFixture({ enabled, ...rest }: { enabled: boolean }) {
+  return (
+    <Primitive.Root {...rest}>
+      {enabled ? <Primitive.FirstOn /> : <Primitive.FirstOff />}
+      {enabled ? <Primitive.SecondOn /> : <Primitive.SecondOff />}
+    </Primitive.Root>
+  )
+}
+
 function MappedChildrenFixture({ items, showLabels, ...rest }: { items: string[]; showLabels: boolean }) {
   return (
     <Primitive.Root data-slot="mapped-root" {...rest}>
@@ -169,4 +178,4 @@ function NonMapCallbackFixture({ items, ...rest }: { items: string[] }) {
   )
 }
 
-export { AndTernaryChildFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+export { AndTernaryChildFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, SamePredicateSiblingTernaryFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

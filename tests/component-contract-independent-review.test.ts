@@ -41,10 +41,22 @@ type SourceFacts = {
   returnCount: number
   conditionalSource: boolean
   renderAlternativePredicates: AnyRecord[]
+  renderBranches: IndependentRenderBranch[]
   mappedRenderEvidence: Array<{ tag: string; parentTag?: string; collection: string; slot?: string; parentSlot?: string }>
   propSurfaceError?: string
   localPropFacts: Map<string, IndependentLocalPropFact>
 }
+
+type IndependentRenderNode = {
+  tag: string
+  resolvedTag?: string
+  importBinding?: { importedName: string; moduleSpecifier: string }
+  portal: boolean
+  receivesPublicProps: boolean
+  dataAttributes: Array<{ name: string; source: string; value?: unknown; prop?: string }>
+  children: Array<{ node: IndependentRenderNode; when?: AnyRecord }>
+}
+type IndependentRenderBranch = { predicate: AnyRecord; tree?: IndependentRenderNode }
 
 type DeclarationContext = {
   checker: ts.TypeChecker
@@ -293,12 +305,35 @@ function negateIndependentRenderCondition(condition: AnyRecord): AnyRecord | und
   return undefined
 }
 
-function combineIndependentRenderConditions(left: AnyRecord, right: AnyRecord): AnyRecord {
-  const members = [...(left.all ?? [left]), ...(right.all ?? [right])]
-  return { all: members.filter((condition, index) => members.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(condition)) === index) }
+function independentConditionSubject(condition: AnyRecord): string {
+  return condition.propName ? `prop:${condition.propName}` : `state:${condition.name}`
 }
 
-function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): AnyRecord[] {
+function independentAtomsContradict(left: AnyRecord, right: AnyRecord): boolean {
+  if (independentConditionSubject(left) !== independentConditionSubject(right)) return false
+  if ("equals" in left && "equals" in right) return left.equals !== right.equals
+  if (left.truthiness && right.truthiness) return left.truthiness !== right.truthiness
+  if (left.nullishness && right.nullishness) return left.nullishness !== right.nullishness
+  if (left.nullishness || right.nullishness) {
+    const nullish = left.nullishness ? left : right
+    const other = nullish === left ? right : left
+    if (nullish.nullishness === "non-nullish") return false
+    return "equals" in other || other.truthiness === "truthy"
+  }
+  const truthiness = left.truthiness ? left : right
+  const equals = truthiness === left ? right : left
+  return "equals" in equals && Boolean(equals.equals) !== (truthiness.truthiness === "truthy")
+}
+
+function combineIndependentRenderConditions(left: AnyRecord, right: AnyRecord): AnyRecord | undefined {
+  const members = [...(left.all ?? [left]), ...(right.all ?? [right])]
+  if (members.some((condition, index) => members.slice(index + 1).some((candidate) => independentAtomsContradict(condition, candidate)))) return undefined
+  const unique = members
+    .filter((condition, index) => members.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(condition)) === index)
+  return unique.length === 1 ? unique[0] : { all: unique }
+}
+
+function independentRenderBranchExpressions(functionLike: ts.FunctionLikeDeclaration): Array<{ predicate: AnyRecord; expression: ts.Expression }> {
   if (!functionLike.body || !ts.isBlock(functionLike.body)) return []
   const bindings = new Set<string>()
   const parameter = functionLike.parameters[0]
@@ -349,7 +384,7 @@ function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): 
     return found
   }
 
-  const results: AnyRecord[] = []
+  const results: Array<{ predicate: AnyRecord; expression: ts.Expression }> = []
   const branchCandidates: Array<{ predicate?: AnyRecord; expression: ts.Expression }> = branches.length
     ? branches
     : returnExpressions(functionLike).map((expression) => ({ expression }))
@@ -362,17 +397,153 @@ function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): 
     })
     const nested = nullish ?? nestedCondition(branch.expression)
     if (!nested) {
-      results.push(branch.predicate ?? { otherwise: true })
+      results.push({ predicate: branch.predicate ?? { otherwise: true }, expression: branch.expression })
       continue
     }
     const inverse = negateIndependentRenderCondition(nested)
     if (branch.predicate && inverse) {
-      results.push(combineIndependentRenderConditions(branch.predicate, nested), combineIndependentRenderConditions(branch.predicate, inverse))
+      const positive = combineIndependentRenderConditions(branch.predicate, nested)
+      const negative = combineIndependentRenderConditions(branch.predicate, inverse)
+      if (positive) results.push({ predicate: positive, expression: branch.expression })
+      if (negative) results.push({ predicate: negative, expression: branch.expression })
     } else if (!branch.predicate && inverse) {
-      results.push(nested, nullish ? inverse : { otherwise: true })
-    } else results.push(branch.predicate ?? nested)
+      results.push(
+        { predicate: nested, expression: branch.expression },
+        { predicate: nullish ? inverse : { otherwise: true }, expression: branch.expression },
+      )
+    } else results.push({ predicate: branch.predicate ?? nested, expression: branch.expression })
   }
-  return results.length === 1 && results[0].otherwise ? [] : results
+  return results.length === 1 && results[0].predicate.otherwise ? [] : results
+}
+
+function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): AnyRecord[] {
+  return independentRenderBranchExpressions(functionLike).map((branch) => branch.predicate)
+}
+
+function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sourceFile: ts.SourceFile, restBindings: Set<string>): IndependentRenderBranch[] {
+  const declarations = new Map<string, ts.Expression>()
+  walkComponent(functionLike.body!, (node) => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) declarations.set(node.name.text, node.initializer)
+  })
+  const imports = new Map<string, { importedName: string; moduleSpecifier: string }>()
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue
+    const moduleSpecifier = statement.moduleSpecifier.text
+    const clause = statement.importClause
+    if (clause?.name) imports.set(clause.name.text, { importedName: "default", moduleSpecifier })
+    if (clause?.namedBindings && ts.isNamespaceImport(clause.namedBindings)) imports.set(clause.namedBindings.name.text, { importedName: "*", moduleSpecifier })
+    if (clause?.namedBindings && ts.isNamedImports(clause.namedBindings)) for (const element of clause.namedBindings.elements) {
+      imports.set(element.name.text, { importedName: element.propertyName?.text ?? element.name.text, moduleSpecifier })
+    }
+  }
+  const bindings = new Set<string>()
+  const parameter = functionLike.parameters[0]
+  if (parameter && ts.isObjectBindingPattern(parameter.name)) for (const element of parameter.name.elements) if (ts.isIdentifier(element.name)) bindings.add(element.name.text)
+  const branchSelects = (predicate: AnyRecord, condition: AnyRecord): boolean | undefined => {
+    const atoms = predicate.all ?? [predicate]
+    const expected = JSON.stringify(normalizedPredicate(condition))
+    if (atoms.some((atom: AnyRecord) => JSON.stringify(normalizedPredicate(atom)) === expected)) return true
+    const inverse = negateIndependentRenderCondition(condition)
+    if (inverse && atoms.some((atom: AnyRecord) => JSON.stringify(normalizedPredicate(atom)) === JSON.stringify(normalizedPredicate(inverse)))) return false
+    return predicate.otherwise ? false : undefined
+  }
+  const selectedExpression = (expression: ts.Expression, predicate: AnyRecord, visited = new Set<string>()): ts.Expression => {
+    const unwrapped = unwrapReturnedExpression(expression)
+    if (ts.isIdentifier(unwrapped) && declarations.has(unwrapped.text) && !visited.has(unwrapped.text)) {
+      visited.add(unwrapped.text)
+      return selectedExpression(declarations.get(unwrapped.text)!, predicate, visited)
+    }
+    if (ts.isConditionalExpression(unwrapped)) {
+      const condition = independentRenderCondition(unwrapped.condition, bindings, "boolean")
+      const selected = condition && branchSelects(predicate, condition)
+      if (selected !== undefined) return selectedExpression(selected ? unwrapped.whenTrue : unwrapped.whenFalse, predicate, visited)
+    }
+    return unwrapped
+  }
+  const importForTag = (tagName: ts.JsxTagNameExpression) => {
+    let root: ts.Node = tagName
+    while (ts.isPropertyAccessExpression(root)) root = root.expression
+    return ts.isIdentifier(root) ? imports.get(root.text) : undefined
+  }
+  const renderNode = (expression: ts.Expression, predicate: AnyRecord, edgeWhen?: AnyRecord): { node: IndependentRenderNode; when?: AnyRecord } | undefined => {
+    const selected = selectedExpression(expression, predicate)
+    if (!ts.isJsxElement(selected) && !ts.isJsxSelfClosingElement(selected) && !ts.isJsxFragment(selected)) return undefined
+    if (ts.isJsxFragment(selected)) {
+      const children = selected.children.flatMap((child) => renderChild(child, predicate))
+      return { node: { tag: "Fragment", portal: false, receivesPublicProps: false, dataAttributes: [], children }, ...(edgeWhen ? { when: edgeWhen } : {}) }
+    }
+    const opening = ts.isJsxElement(selected) ? selected.openingElement : selected
+    const tag = opening.tagName.getText(sourceFile)
+    let resolvedTag: string | undefined
+    let importBinding = importForTag(opening.tagName)
+    if (ts.isIdentifier(opening.tagName) && declarations.has(opening.tagName.text)) {
+      const host = selectedExpression(declarations.get(opening.tagName.text)!, predicate)
+      if (ts.isStringLiteral(host)) resolvedTag = host.text
+      else if (ts.isIdentifier(host) || ts.isPropertyAccessExpression(host)) {
+        resolvedTag = host.getText(sourceFile)
+        let root: ts.Node = host
+        while (ts.isPropertyAccessExpression(root)) root = root.expression
+        if (ts.isIdentifier(root)) importBinding = imports.get(root.text)
+      }
+    }
+    const dataAttributes: IndependentRenderNode["dataAttributes"] = []
+    let receivesPublicProps = false
+    for (const attribute of opening.attributes.properties) {
+      if (ts.isJsxSpreadAttribute(attribute)) {
+        if (ts.isIdentifier(attribute.expression) && restBindings.has(attribute.expression.text)) receivesPublicProps = true
+        continue
+      }
+      if (!ts.isJsxAttribute(attribute)) continue
+      const name = attribute.name.getText(sourceFile)
+      if (!name.startsWith("data-")) continue
+      if (attribute.initializer && ts.isStringLiteral(attribute.initializer)) dataAttributes.push({ name, source: "literal", value: attribute.initializer.text })
+      else if (attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression && ts.isIdentifier(attribute.initializer.expression)) {
+        dataAttributes.push({
+          name,
+          source: bindings.has(attribute.initializer.expression.text) ? "prop" : "primitive-state",
+          prop: attribute.initializer.expression.text,
+        })
+      }
+      else dataAttributes.push({ name, source: "other" })
+    }
+    const effectiveTag = resolvedTag ?? tag
+    const children = ts.isJsxElement(selected) ? selected.children.flatMap((child) => renderChild(child, predicate)) : []
+    return {
+      node: {
+        tag,
+        ...(resolvedTag ? { resolvedTag } : {}),
+        ...(importBinding ? { importBinding } : {}),
+        portal: effectiveTag === "Portal" || effectiveTag.endsWith(".Portal") || effectiveTag.endsWith("Portal"),
+        receivesPublicProps,
+        dataAttributes,
+        children,
+      },
+      ...(edgeWhen ? { when: edgeWhen } : {}),
+    }
+  }
+  const renderChild = (child: ts.JsxChild, predicate: AnyRecord): Array<{ node: IndependentRenderNode; when?: AnyRecord }> => {
+    if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child)) {
+      const rendered = renderNode(child, predicate)
+      return rendered ? [rendered] : []
+    }
+    if (!ts.isJsxExpression(child) || !child.expression || ts.isIdentifier(child.expression) && child.expression.text === "children") return []
+    let expression = child.expression
+    let when: AnyRecord | undefined
+    if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) {
+      const nonNullish = independentRenderCondition(expression.left, bindings, "non-nullish")
+      if (nonNullish && branchSelects(predicate, nonNullish)) return []
+      expression = expression.right
+    } else if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+      when = independentRenderCondition(expression.left, bindings, "boolean")
+      expression = expression.right
+    }
+    const rendered = renderNode(expression, predicate, when)
+    return rendered ? [rendered] : []
+  }
+  return independentRenderBranchExpressions(functionLike).map(({ predicate, expression }) => {
+    const rendered = renderNode(expression, predicate)
+    return { predicate, ...(rendered ? { tree: rendered.node } : {}) }
+  })
 }
 
 function returnExpressions(functionLike: ts.FunctionLikeDeclaration): ts.Expression[] {
@@ -688,6 +859,7 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     returnCount: functionLike ? returnExpressions(functionLike).length : 0,
     conditionalSource: /\bif\s*\(|\?|&&/.test(bodyText),
     renderAlternativePredicates: functionLike ? renderAlternativePredicates(functionLike) : [],
+    renderBranches: functionLike ? independentRenderBranches(functionLike, sourceFile, restBindings) : [],
     mappedRenderEvidence: functionLike ? mappedRenderEvidence(functionLike) : [],
     ...(propSurfaceError ? { propSurfaceError } : {}),
     localPropFacts,
@@ -784,6 +956,55 @@ function independentHostMatches(tag: string, host: AnyRecord): boolean {
       ? host.exportName
       : host?.tag
   return typeof expected === "string" && normalizedHostName(tag) === normalizedHostName(expected)
+}
+
+function independentImportMatches(binding: IndependentRenderNode["importBinding"], host: AnyRecord): boolean {
+  if (!binding || !["component-export", "cross-family-export"].includes(host?.kind)) return true
+  if (binding.importedName !== host.exportName) return false
+  if (host.kind !== "cross-family-export") return true
+  const normalizedModule = binding.moduleSpecifier.replace(/\\/g, "/").replace(/\.(?:[cm]?[jt]sx?)$/, "")
+  return normalizedModule === host.familyId || normalizedModule.endsWith(`/${host.familyId}`)
+}
+
+function comparableIndependentAttribute(attribute: AnyRecord): AnyRecord {
+  return {
+    name: attribute.name,
+    source: attribute.source,
+    ...(Object.hasOwn(attribute, "value") ? { value: attribute.value } : {}),
+    ...(Object.hasOwn(attribute, "prop") ? { prop: attribute.prop } : {}),
+  }
+}
+
+function independentRenderTreeMatches(source: IndependentRenderNode, rendering: AnyRecord): boolean {
+  const nodes = new Map<string, AnyRecord>((rendering.nodes ?? []).map((node: AnyRecord) => [node.id, node]))
+  const portalIds = new Set<string>((rendering.portalBoundaries ?? []).map((boundary: AnyRecord) => boundary.nodeId))
+  const visited = new Set<string>()
+  const compareNode = (sourceNode: IndependentRenderNode, nodeId: string): boolean => {
+    const contractNode = nodes.get(nodeId)
+    if (!contractNode || visited.has(nodeId)) return false
+    visited.add(nodeId)
+    const sourceHost = sourceNode.resolvedTag ?? sourceNode.tag
+    if (!independentHostMatches(sourceHost, contractNode.host) || !independentImportMatches(sourceNode.importBinding, contractNode.host)) return false
+    if (sourceNode.portal !== portalIds.has(nodeId) || sourceNode.receivesPublicProps !== Boolean(contractNode.receivesPublicProps)) return false
+    const contractAttributes = contractNode.dataAttributes ?? []
+    if (sourceNode.dataAttributes.length !== contractAttributes.length) return false
+    if (!sourceNode.dataAttributes.every((attribute, index) => {
+      const candidate = comparableIndependentAttribute(contractAttributes[index])
+      if (attribute.name !== candidate.name) return false
+      if (attribute.source === "other") return true
+      return JSON.stringify(comparableIndependentAttribute(attribute)) === JSON.stringify(candidate)
+    })) return false
+    const contractChildren = contractNode.children ?? []
+    if (sourceNode.children.length !== contractChildren.length) return false
+    return sourceNode.children.every((child, index) => {
+      const contractChild = contractChildren[index]
+      if (JSON.stringify(normalizedPredicate(child.when ?? { otherwise: true })) !== JSON.stringify(normalizedPredicate(contractChild.when ?? { otherwise: true }))) return false
+      return typeof contractChild.nodeId === "string" && compareNode(child.node, contractChild.nodeId)
+    })
+  }
+  return typeof rendering.rootNodeId === "string"
+    && compareNode(source, rendering.rootNodeId)
+    && visited.size === nodes.size
 }
 
 function directTokenEvidence(text: string, tokenIds: Set<string>): Set<string> {
@@ -1081,7 +1302,16 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
           ? exported.component.rendering.alternatives.map((alternative: AnyRecord) => normalizedPredicate(alternative.when ?? { otherwise: true }))
           : []
         const sourcePredicates = source.renderAlternativePredicates.map(normalizedPredicate)
-        if (JSON.stringify(contractPredicates) !== JSON.stringify(sourcePredicates)) errors.push(`${family.id}.${exported.name}: render alternative predicates differ from the canonical AST`)
+        const predicatesMatch = JSON.stringify(contractPredicates) === JSON.stringify(sourcePredicates)
+        if (!predicatesMatch) errors.push(`${family.id}.${exported.name}: render alternative predicates differ from the canonical AST`)
+        if (predicatesMatch && "alternatives" in exported.component.rendering) {
+          exported.component.rendering.alternatives.forEach((alternative: AnyRecord, index: number) => {
+            const sourceTree = source.renderBranches[index]?.tree
+            if (!sourceTree || !independentRenderTreeMatches(sourceTree, alternative.rendering)) {
+              errors.push(`${family.id}.${exported.name}: render alternative tree ${index} differs from the canonical AST`)
+            }
+          })
+        }
       }
       const expectedPortalCount = source.portalCount
       const actualPortalCount = variantsToCheck.reduce((count, rendering) => count + (rendering.portalBoundaries ?? []).length, 0)
@@ -1431,6 +1661,47 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(
       "breadcrumb.BreadcrumbLink: render alternative predicates differ from the canonical AST",
     )
+  })
+
+  test("independent conditional-render oracle binds each predicate to its own tree", () => {
+    const artifacts = clone(loadArtifacts())
+    const link = exportByName(familyById(artifacts, "breadcrumb"), "BreadcrumbLink").component
+    ;[link.rendering.alternatives[0].rendering, link.rendering.alternatives[1].rendering] = [link.rendering.alternatives[1].rendering, link.rendering.alternatives[0].rendering]
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(
+      "breadcrumb.BreadcrumbLink: render alternative tree 0 differs from the canonical AST",
+    )
+  })
+
+  test("independent branch-tree oracle rejects a portal and conditional host moved to the wrong predicate", () => {
+    const { sourceFile } = sourceFacts(join(root, "tests/fixtures/component-analysis-completeness-fixture.tsx"))
+    const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "NestedHostPortalFixture")!)
+    const rendering = (host: AnyRecord, portal: boolean): AnyRecord => ({
+      rootNodeId: "host",
+      publicPropsTargetNodeId: "host",
+      nodes: [{
+        id: "host",
+        host,
+        receivesPublicProps: true,
+        dataAttributes: [{ name: "data-slot", source: "literal", value: "nested-portal" }],
+        children: [],
+      }],
+      portalBoundaries: portal ? [{ nodeId: "host" }] : [],
+    })
+    const portalRendering = rendering({ kind: "unresolved" }, true)
+    const divRendering = rendering({ kind: "intrinsic", tag: "div" }, false)
+
+    expect(independentRenderTreeMatches(facts.renderBranches[1].tree!, portalRendering)).toBe(true)
+    expect(independentRenderTreeMatches(facts.renderBranches[2].tree!, divRendering)).toBe(true)
+    expect(independentRenderTreeMatches(facts.renderBranches[1].tree!, divRendering)).toBe(false)
+    expect(independentRenderTreeMatches(facts.renderBranches[2].tree!, portalRendering)).toBe(false)
+  })
+
+  test("independent conjunction canonicalization rejects complements and deduplicates identical atoms", () => {
+    const enabled = { propName: "enabled", equals: true }
+
+    expect(combineIndependentRenderConditions(enabled, enabled)).toEqual(enabled)
+    expect(combineIndependentRenderConditions(enabled, { propName: "enabled", equals: false })).toBeUndefined()
   })
 
   test("independently distinguishes nullishness from truthiness, including falsy non-nullish values", () => {
