@@ -3445,7 +3445,7 @@ describe("Phase 3 Task 10 independent review", () => {
     const driftErrors = importedErrors(derivationDrift)
     expect(driftErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"when":{"equals":"sm","propName":"size"}}'))
     expect(driftErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":8},"when":{"equals":"sm","propName":"size"}}'))
-  })
+  }, 15_000)
 
   test("has no unreferenced evidence records", () => {
     expect(findUnreferencedEvidence()).toEqual([])

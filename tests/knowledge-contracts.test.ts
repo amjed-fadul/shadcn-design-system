@@ -267,13 +267,20 @@ describe("knowledge contract boundary", () => {
       "provenance/component-contract-source.json",
     ], { cwd: root, stdio: "pipe", maxBuffer: 64 * 1024 * 1024 }).toString().trim().split("\n").filter(Boolean).sort()
     expect(changedPaths).toEqual([
+      "contracts/components/component-family.schema.json",
       "contracts/components/families/field.json",
+      "contracts/components/inherited-interface.schema.json",
       "contracts/components/interfaces/html.fieldset.json",
       "contracts/components/interfaces/html.legend.json",
       "contracts/components/interfaces/html.nav.json",
       "contracts/components/interfaces/html.ol.json",
       "contracts/components/interfaces/html.p.json",
+      "contracts/components/interfaces/vaul.drawer.root.json",
+      "src/contracts/components/canonical-source-reconciliation.ts",
+      "src/contracts/components/inherited-interface-source-analysis.ts",
+      "src/contracts/components/invariants.ts",
       "src/contracts/components/render-source-analysis.ts",
+      "src/contracts/components/types.ts",
     ])
   })
 })
