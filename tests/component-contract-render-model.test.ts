@@ -12,9 +12,75 @@ const breadcrumbContract = JSON.parse(readFileSync(fileURLToPath(new URL("../con
 const slider = fileURLToPath(new URL("../src/components/ui/slider.tsx", import.meta.url))
 const sliderContract = JSON.parse(readFileSync(fileURLToPath(new URL("../contracts/components/families/slider.json", import.meta.url)), "utf8"))
 const field = fileURLToPath(new URL("../src/components/ui/field.tsx", import.meta.url))
+const fieldContract = JSON.parse(readFileSync(fileURLToPath(new URL("../contracts/components/families/field.json", import.meta.url)), "utf8"))
 const toggleGroup = fileURLToPath(new URL("../src/components/ui/toggle-group.tsx", import.meta.url))
+const toggleGroupContract = JSON.parse(readFileSync(fileURLToPath(new URL("../contracts/components/families/toggle-group.json", import.meta.url)), "utf8"))
 
 describe("generic render-model alternatives and factual aliases", () => {
+  test("treats a directly rendered scalar public prop as content rather than unresolved structure", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ScalarPropChildFixture")
+
+    expect(tree.unresolved).toEqual([])
+    expect(tree.root?.children).toEqual([])
+  })
+
+  test("does not analyze an unused conditional local as a JSX host alias", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "NonHostConditionalFixture")
+
+    expect(tree.unresolved).toEqual([])
+  })
+
+  test("preserves coerced prop truthiness in data attributes and conditional child edges", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "CoercedTruthinessFixture")
+
+    expect(tree.unresolved).toEqual([])
+    expect(tree.root?.dataAttributes).toEqual([
+      { name: "data-content", source: "derived-condition", condition: { propName: "children", truthiness: "truthy" } },
+    ])
+    expect(tree.root?.children[0]).toMatchObject({ tag: "StaticChild", when: { propName: "children", truthiness: "truthy" } })
+  })
+
+  test("reconciles FieldLabel through its immediate cross-family Label host", () => {
+    const component = fieldContract.exports.find((entry: any) => entry.name === "FieldLabel").component
+    const source = sourceAnalysis.analyzeJsxRenderTree(field, "FieldLabel")
+
+    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([])
+    const mutated = structuredClone(component.rendering)
+    mutated.nodes[0].host.familyId = "separator"
+    expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Render host mismatch at Label: Label.")
+  })
+
+  test("reconciles FieldSeparator coerced data and child truthiness facts", () => {
+    const component = fieldContract.exports.find((entry: any) => entry.name === "FieldSeparator").component
+    const source = sourceAnalysis.analyzeJsxRenderTree(field, "FieldSeparator")
+
+    expect(source.unresolved).toEqual([])
+    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([])
+    const mutated = structuredClone(component.rendering)
+    mutated.nodes[0].children[1].when = { propName: "children", truthiness: "falsy" }
+    expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Conditional render edge mismatch at div>span.")
+  })
+
+  test("reconciles ToggleGroup's provider child and rejects its omission", () => {
+    const component = toggleGroupContract.exports.find((entry: any) => entry.name === "ToggleGroup").component
+    const source = sourceAnalysis.analyzeJsxRenderTree(toggleGroup, "ToggleGroup")
+
+    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([])
+    const mutated = structuredClone(component.rendering)
+    mutated.nodes[0].children = []
+    expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Automatic child count mismatch at ToggleGroupPrimitive.Root.")
+  })
+
+  test("reconciles ToggleGroupItem derived-state attribute targets and rejects drift", () => {
+    const component = toggleGroupContract.exports.find((entry: any) => entry.name === "ToggleGroupItem").component
+    const source = sourceAnalysis.analyzeJsxRenderTree(toggleGroup, "ToggleGroupItem")
+
+    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([])
+    const mutated = structuredClone(component.rendering)
+    mutated.nodes[0].dataAttributes.find((attribute: any) => attribute.name === "data-variant").prop = "variant"
+    expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Data attributes mismatch at ToggleGroupPrimitive.Item.")
+  })
+
   test("normalizes a single surviving branch after a source null return", () => {
     const tree = sourceAnalysis.analyzeJsxRenderTree(field, "FieldError")
 

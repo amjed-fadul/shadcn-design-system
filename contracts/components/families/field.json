@@ -632,8 +632,9 @@
             {
               "id": "host",
               "host": {
-                "kind": "inherited-interface",
-                "interfaceId": "radix.label.root"
+                "kind": "cross-family-export",
+                "familyId": "label",
+                "exportName": "Label"
               },
               "receivesPublicProps": true,
               "dataAttributes": [

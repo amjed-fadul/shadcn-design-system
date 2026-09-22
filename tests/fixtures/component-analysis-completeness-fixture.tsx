@@ -189,4 +189,22 @@ function NonMapCallbackFixture({ items, ...rest }: { items: string[] }) {
   )
 }
 
-export { AndTernaryChildFixture, ConditionalDataBranchFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, SamePredicateSiblingTernaryFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+function ScalarPropChildFixture({ label, ...rest }: { label?: string }) {
+  return <Primitive.Root {...rest}>{label}</Primitive.Root>
+}
+
+function NonHostConditionalFixture({ value, ...rest }: { value?: number }) {
+  const fallback = 100
+  const resolvedValue = typeof value === "number" ? value : fallback
+  return <Primitive.Root data-value={resolvedValue} {...rest} />
+}
+
+function CoercedTruthinessFixture({ children, ...rest }: { children?: string }) {
+  return (
+    <Primitive.Root data-content={!!children} {...rest}>
+      {children && <StaticChild />}
+    </Primitive.Root>
+  )
+}
+
+export { AndTernaryChildFixture, CoercedTruthinessFixture, ConditionalDataBranchFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonHostConditionalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, SamePredicateSiblingTernaryFixture, ScalarPropChildFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

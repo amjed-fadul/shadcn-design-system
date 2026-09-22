@@ -34,6 +34,10 @@ const canonicalComponentConditionalAuthority: Readonly<Record<string, readonly C
     { when: { propName: "showCloseButton", equals: true }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] },
     { when: { propName: "showCloseButton", equals: false }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] },
   ],
+  "toggle-group\u0000ToggleGroup": [
+    { when: { propName: "type", equals: "single" }, propRefinements: [], eventRefinements: [], stateChannels: [{ name: "value", controlledProp: "value", defaultProp: "defaultValue", changeEventProp: "onValueChange", evidenceRefs: ["declaration"] }], evidenceRefs: ["declaration"] },
+    { when: { propName: "type", equals: "multiple" }, propRefinements: [], eventRefinements: [], stateChannels: [{ name: "value", controlledProp: "value", defaultProp: "defaultValue", changeEventProp: "onValueChange", evidenceRefs: ["declaration"] }], evidenceRefs: ["declaration"] },
+  ],
 }
 
 const noCapabilities = { requires: [], provides: [], hardConstraints: [] }
@@ -45,6 +49,32 @@ const noCapabilities = { requires: [], provides: [], hardConstraints: [] }
  * to an unrelated export.
  */
 const canonicalComponentCompositionAuthority: Readonly<Record<string, { requires: string[]; provides: string[]; hardConstraints: string[] }>> = {
+  "alert-dialog\u0000AlertDialog": { requires: [], provides: ["alert-dialog.context"], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogAction": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogCancel": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogContent": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogDescription": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogOverlay": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogPortal": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogTitle": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogTrigger": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000Avatar": { requires: [], provides: ["avatar.context"], hardConstraints: [] },
+  "avatar\u0000AvatarBadge": { requires: ["avatar.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000AvatarFallback": { requires: ["avatar.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000AvatarGroup": { requires: [], provides: ["avatar-group.context"], hardConstraints: [] },
+  "avatar\u0000AvatarGroupCount": { requires: ["avatar-group.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000AvatarImage": { requires: ["avatar.context"], provides: [], hardConstraints: [] },
+  "collapsible\u0000Collapsible": { requires: [], provides: ["collapsible.context"], hardConstraints: [] },
+  "collapsible\u0000CollapsibleContent": { requires: ["collapsible.context"], provides: [], hardConstraints: [] },
+  "collapsible\u0000CollapsibleTrigger": { requires: ["collapsible.context"], provides: [], hardConstraints: [] },
+  "command\u0000Command": { requires: [], provides: ["command.context"], hardConstraints: [] },
+  "command\u0000CommandDialog": { requires: [], provides: ["command.context"], hardConstraints: [] },
+  "command\u0000CommandEmpty": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandGroup": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandInput": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandItem": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandList": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandSeparator": { requires: ["command.context"], provides: [], hardConstraints: [] },
   "dialog\u0000Dialog": { requires: [], provides: ["dialog.context"], hardConstraints: [] },
   "dialog\u0000DialogClose": { requires: ["dialog.context"], provides: [], hardConstraints: [] },
   "dialog\u0000DialogContent": { requires: ["dialog.context"], provides: [], hardConstraints: [] },
@@ -67,6 +97,20 @@ const canonicalComponentCompositionAuthority: Readonly<Record<string, { requires
   "dropdown-menu\u0000DropdownMenuSubContent": { requires: ["dropdown-menu.subcontext"], provides: [], hardConstraints: [] },
   "dropdown-menu\u0000DropdownMenuSubTrigger": { requires: ["dropdown-menu.subcontext"], provides: [], hardConstraints: [] },
   "dropdown-menu\u0000DropdownMenuTrigger": { requires: ["dropdown-menu.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000Drawer": { requires: [], provides: ["drawer.context"], hardConstraints: [] },
+  "drawer\u0000DrawerClose": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerContent": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerDescription": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerOverlay": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerPortal": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerTitle": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerTrigger": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "popover\u0000Popover": { requires: [], provides: ["popover.context"], hardConstraints: [] },
+  "popover\u0000PopoverAnchor": { requires: ["popover.context"], provides: [], hardConstraints: [] },
+  "popover\u0000PopoverContent": { requires: ["popover.context"], provides: [], hardConstraints: [] },
+  "popover\u0000PopoverTrigger": { requires: ["popover.context"], provides: [], hardConstraints: [] },
+  "radio-group\u0000RadioGroup": { requires: [], provides: ["radio-group.context"], hardConstraints: [] },
+  "radio-group\u0000RadioGroupItem": { requires: ["radio-group.context"], provides: [], hardConstraints: [] },
   "select\u0000Select": { requires: [], provides: ["select.context"], hardConstraints: [] },
   "select\u0000SelectContent": { requires: ["select.context"], provides: [], hardConstraints: [] },
   "select\u0000SelectGroup": { requires: ["select.context"], provides: [], hardConstraints: [] },
@@ -88,6 +132,8 @@ const canonicalComponentCompositionAuthority: Readonly<Record<string, { requires
   "sidebar\u0000SidebarTrigger": { requires: ["sidebar.context"], provides: [], hardConstraints: [] },
   "sidebar\u0000SidebarRail": { requires: ["sidebar.context"], provides: [], hardConstraints: [] },
   "sidebar\u0000SidebarMenuButton": { requires: ["sidebar.context"], provides: [], hardConstraints: [] },
+  "toggle-group\u0000ToggleGroup": { requires: [], provides: ["toggle-group.context"], hardConstraints: [] },
+  "toggle-group\u0000ToggleGroupItem": { requires: ["toggle-group.context"], provides: [], hardConstraints: [] },
 }
 
 function sourceClassification(path: string) {

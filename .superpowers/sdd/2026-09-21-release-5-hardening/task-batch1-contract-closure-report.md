@@ -49,3 +49,32 @@ Per the task boundary, the full suite and `components:verify` were not run.
 ## Scope review
 
 The closure introduces no family/path exception, contract-derived source truth, finding filter, or weakened equality. Production and independent implementations remain separate, invalid arithmetic publishes no partial fact, and the only dynamic approved-variable result is the source-supported bare spacing token.
+
+## Canonical-loader closure follow-up
+
+The canonical loader exposed residual facts that the prior focused gates did not instantiate. Root-cause classification and repair were:
+
+- Generic render analysis now treats direct public scalar children as authored content rather than automatic structure, limits conditional JSX-host analysis to bindings actually used as JSX tags, and normalizes `!!children` plus `children &&` to the same truthiness fact. This removed false unresolved evidence for CommandDialog, PaginationPrevious, PaginationNext, and Progress, and reconciled FieldSeparator without adding unresolved placeholders.
+- Source-backed contract corrections record FieldLabel's immediate cross-family `label.Label` host, ToggleGroup's automatic context-provider child, and ToggleGroupItem's exact `resolvedVariant`/`resolvedSize` derived-state targets.
+- Canonical source authority now covers the promoted AlertDialog, Avatar, Collapsible, Command, Drawer, Popover, RadioGroup, and ToggleGroup composition facts and ToggleGroup's declaration-backed single/multiple conditional API. Focused acceptance and mutation tests prevent artifacts from self-authorizing those facts.
+- Existing mutation cases were updated to mutate Button's branch-based render trees and to exercise source reclassification on an unconsumed component, preserving the intended production boundary after the render model became conditional.
+
+Node 22.18.0 targeted evidence:
+
+- Canonical index: 11/11 passed.
+- Canonical query: 8/8 passed.
+- Mutation: 69/69 assertions passed.
+- Independent review: 81/81 passed.
+- Canonical source authority acceptance/mutation: 2/2 passed.
+- Render model: 29/29 passed.
+- Combined targeted assertion count: 200/200 passed.
+- Loader scope: 6/6 passed; unresolved source reconciliation: 8/8 passed; component invariants: 77/77 passed.
+- `npm run typecheck`: passed.
+- Changed family JSON parse check: passed.
+- `git diff --check`: passed.
+
+After the combined targeted assertions completed, Vitest emitted the known infrastructure-level unhandled error `[vitest-worker]: Timeout calling "onTaskUpdate"`. The assertion summaries above were all green; this worker-reporting timeout made that Vitest process exit nonzero and is recorded explicitly rather than represented as a clean command exit.
+
+Release 001 remains byte-identical with SHA-256:
+
+`1f9274c16ba625cf02096a6b8bb6da570762a16296da8624daa7475db3a89370`

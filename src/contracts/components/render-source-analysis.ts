@@ -130,7 +130,11 @@ function derivedCondition(expression: ts.Expression, publicBindings: Set<string>
 
 function truthinessCondition(expression: ts.Expression, publicBindings: Set<string>): JsxRenderCondition | undefined {
   if (ts.isIdentifier(expression)) return referenceCondition(expression.text, publicBindings, { truthiness: "truthy" })
-  if (ts.isPrefixUnaryExpression(expression) && expression.operator === ts.SyntaxKind.ExclamationToken && ts.isIdentifier(expression.operand)) return referenceCondition(expression.operand.text, publicBindings, { truthiness: "falsy" })
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return truthinessCondition(expression.expression, publicBindings)
+  if (ts.isPrefixUnaryExpression(expression) && expression.operator === ts.SyntaxKind.ExclamationToken) {
+    const operand = truthinessCondition(expression.operand, publicBindings)
+    if (operand && !("all" in operand) && "truthiness" in operand) return { ...operand, truthiness: operand.truthiness === "truthy" ? "falsy" : "truthy" }
+  }
   return undefined
 }
 
@@ -262,7 +266,7 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
         dataAttributes.push({ name: property.name.text, source: "conditional-value", ...values })
         continue
       }
-      const condition = expression && derivedCondition(expression, publicBindings)
+      const condition = expression && (derivedCondition(expression, publicBindings) ?? truthinessCondition(expression, publicBindings))
       if (condition) {
         dataAttributes.push({ name: property.name.text, source: "derived-condition", condition })
         continue
@@ -369,6 +373,7 @@ function jsxExpressionBranches(expression: ts.Expression | undefined, file: ts.S
   if (!expression || expression.kind === ts.SyntaxKind.NullKeyword) return [branch([])]
   if (ts.isIdentifier(expression) && expression.text === "children") return [branch([])]
   if (ts.isIdentifier(expression) && scope.aliases.has(expression.text)) return structuredClone(scope.aliases.get(expression.text)!)
+  if (ts.isIdentifier(expression) && publicBindings.has(expression.text)) return [branch([])]
   if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return jsxExpressionBranches(expression.expression, file, unresolved, publicBindings, scope)
   if (ts.isConditionalExpression(expression)) {
     const condition = booleanBranchCondition(expression.condition, publicBindings)
@@ -409,7 +414,9 @@ function jsxExpressionBranches(expression: ts.Expression | undefined, file: ts.S
     if (ts.isIdentifier(expression.left)) {
       const propName = expression.left.text
       const condition = publicBindings.has(propName)
-        ? { propName, equals: true } as const
+        ? propName === "children"
+          ? { propName, truthiness: "truthy" } as const
+          : { propName, equals: true } as const
         : { source: "state", name: propName, truthiness: "truthy" } as const
       return jsxExpressionBranches(expression.right, file, unresolved, publicBindings, scope).map((item) => branch(item.value.flatMap((node) => {
         const when = node.when ? conjunction(condition, node.when) : condition
@@ -524,6 +531,12 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
     if (bindings && ts.isNamedImports(bindings)) for (const element of bindings.elements) importBindings.set(element.name.text, { importedName: element.propertyName?.text ?? element.name.text, localName: element.name.text, moduleSpecifier })
   }
   const scope: JsxScope = { aliases: new Map(), hostAliases: new Map(), derivedSpreads: new Map(), importBindings }
+  const jsxHostAliases = new Set<string>()
+  const collectHostAliases = (node: ts.Node) => {
+    if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && ts.isIdentifier(node.tagName)) jsxHostAliases.add(node.tagName.text)
+    if (!ts.isFunctionLike(node) || node === functionDeclaration) ts.forEachChild(node, collectHostAliases)
+  }
+  if (functionDeclaration.body) ts.forEachChild(functionDeclaration.body, collectHostAliases)
   const containsJsx = (expression: ts.Expression): boolean => {
     if (ts.isJsxElement(expression) || ts.isJsxSelfClosingElement(expression) || ts.isJsxFragment(expression)) return true
     if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return containsJsx(expression.expression)
@@ -537,7 +550,7 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
   const visit = (node: ts.Node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
       if (containsJsx(node.initializer)) scope.aliases.set(node.name.text, jsxExpressionBranches(node.initializer, file, unresolved, publicBindings, scope))
-      else if (canBeHost(node.initializer)) {
+      else if (jsxHostAliases.has(node.name.text) && canBeHost(node.initializer)) {
         const hosts = aliasHostBranches(node.initializer, file, unresolved, publicBindings, scope)
         if (hosts) scope.hostAliases.set(node.name.text, hosts)
       }

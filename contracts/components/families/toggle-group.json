@@ -220,6 +220,25 @@
                   ]
                 }
               ],
+              "children": [
+                {
+                  "nodeId": "context",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "context",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
               "children": [],
               "evidenceRefs": [
                 "source"
@@ -898,6 +917,7 @@
                 {
                   "name": "data-variant",
                   "source": "primitive-state",
+                  "prop": "resolvedVariant",
                   "evidenceRefs": [
                     "source"
                   ]
@@ -905,6 +925,7 @@
                 {
                   "name": "data-size",
                   "source": "primitive-state",
+                  "prop": "resolvedSize",
                   "evidenceRefs": [
                     "source"
                   ]
