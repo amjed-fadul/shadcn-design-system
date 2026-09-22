@@ -73,8 +73,21 @@
     },
     "tokenCondition": {
       "oneOf": [
+        { "$ref": "#/$defs/tokenConditionAtom" },
+        { "type": "object", "additionalProperties": false, "required": ["all"], "properties": { "all": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/tokenConditionAtom" } } } }
+      ]
+    },
+    "tokenConditionAtom": {
+      "oneOf": [
         { "$ref": "#/$defs/apiCondition" },
-        { "type": "object", "additionalProperties": false, "required": ["all"], "properties": { "all": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/apiCondition" } } } }
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["subject", "scope", "relation", "propName", "equals"],
+          "properties": {
+            "subject": { "enum": ["data", "aria"] }, "scope": { "enum": ["self", "group", "peer", "in"] }, "relation": { "enum": ["attribute", "has"] }, "name": { "type": "string" },
+            "propName": { "type": "string" }, "equals": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] }
+          }
+        }
       ]
     },
     "conditional": {

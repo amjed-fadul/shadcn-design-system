@@ -67,3 +67,36 @@ Result: **4 files passed; 15 tests passed / 64 skipped**. Imported-CVA compatibi
 - Parsing is generic and syntax/semantics based; there is no family/path exception, finding filter, contract-derived truth, manual fact list, or weakened equality.
 - Exact comparison includes condition property, scalar value, conjunction membership/order, token ID, and derivation provenance. Unsupported or ambiguous prefix semantics fail closed rather than being flattened.
 - The change deliberately exposes stale unconditional family facts but does not edit them. CSS spacing expressions, templates, variables, and 4C3 cleanup remain untouched.
+
+## Fix Round 1 — scoped condition semantics and trustworthy independent audit
+
+### Confirmed causes and corrections
+
+1. Utility conditions retained only `propName` and `equals`, so self, group, peer, ancestor (`in`), and descendant (`has`) predicates collapsed into the same subject. A utility condition atom now explicitly retains `subject: data|aria`, `scope: self|group|peer|in`, `relation: attribute|has`, and an optional group/peer `name`. Recipe conditions remain component-prop atoms. Merge identity includes all subject metadata plus `propName`, allowing a group and self condition on the same property to coexist while still rejecting a contradiction on the same scoped subject.
+2. The grammar now supports Tailwind 4.3.3-positive group/peer/in/has data and aria forms, including nested `group-has-*`, and decodes escaped static values such as `some\\_value` to `some_value`. Named `in-*`, negative `not-*`, malformed trailing escapes, interpolation, arbitrary selectors, unsupported prefixes, unescaped arbitrary-value whitespace semantics, and contradictory same-subject predicates fail closed.
+3. `placeholder` was absent from the operational-prefix authority. It is now supported without inventing a condition. A canonical `Input` corpus assertion proves `placeholder:text-muted-foreground` retains the underlying `color.muted-foreground` dependency.
+4. `TokenCondition.all` now uses `AtLeastTwo<TokenConditionAtom>`. The schema requires at least two complete atoms and recognizes either legacy recipe atoms or fully scoped utility atoms. Runtime invariants independently reject undersized, duplicate, and contradictory conjunctions using full scoped identity. Duplicate dependency and production source comparison keys recursively sort object keys while deliberately retaining conjunction array order.
+5. The independent implementation separately gained scoped grammar, trailing-escape tracking, escaped-value decoding, full-subject merge identity, `placeholder`, and exact whole-utility token resolution. It no longer discovers tokens by substring inside utilities such as `content-['bg-primary']`.
+
+### Strict RED / GREEN evidence
+
+The initial focused run produced **12 expected failures / 3 passes / 139 skipped**. The failures covered production scoped conditions, same-property/different-subject conjunctions, positive group/peer/in/has forms, escaped values, negative/named-in/trailing-escape rejection, placeholder, stable comparison, schema support, invariant cardinality/uniqueness/contradiction, independent scoped grammar, and exact independent utility identity.
+
+Tailwind-backed cases use the installed `tailwindcss` **4.3.3** design-system parser/compiler. They prove the supported candidates compile, named `in-data-[...]/name` does not compile, negative `not-data-*` is valid Tailwind syntax but deliberately fails closed because negation is not representable, and `placeholder:` compiles as an operational variant.
+
+Final focused compatibility command covered the production parser, schema, invariants, imported-CVA analysis, and unresolved reconciliation: **5 files passed; 114/114 tests passed**. The narrower finding selection is **15/15 passed**. `npm run typecheck` exits **0**.
+
+### Corrected residuals and bounded gates
+
+- Full independent review: **52 passed / 2 expected residual failures**. The sound direct-audit count is **263 findings**, plus the unchanged `collapsible.json:tokens` evidence orphan. The prior 257 figure is superseded: scoped identities, malformed-escape rejection, exact whole-utility matching, and the newly recognized operational prefix are now part of the oracle.
+- Token dependency diagnostic: **1 passed / 3 expected failures**. Exact closure is `missing: 145`, `invented: 126`, `unresolved: 0`, `suspiciousContractedNamespace: 7`, for **271** missing/invented facts.
+- Component verification: **25 suites passed / 19 failed; 456 tests passed / 17 failed** out of 473. Failures remain the exposed family-contract reconciliation/runtime residuals; no family cleanup was performed.
+- `git diff --check`: **exit 0**.
+- Release-001 base/current blobs remain `75b59166086e9de0c67656fe64712a8cc70aa6e3` / `75b59166086e9de0c67656fe64712a8cc70aa6e3`.
+- The scoped diff for `contracts/components/families`, `contracts/tokens`, and `provenance/releases` is empty.
+
+### Fix-round self-review
+
+- Production and independent scanners, value decoders, merge logic, and token resolution remain separate.
+- Conjunction order is semantic and remains order-sensitive; object property insertion order is not semantic and is normalized only for equality keys.
+- No family/path exception, finding suppression, allowlist keyed to a component, contract-derived truth, manual token fact, weakened equality, 4C2C2B expression support, family cleanup, or 4C3 work was introduced.

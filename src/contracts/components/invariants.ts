@@ -1,7 +1,32 @@
 import { isRenderingTree } from "./types"
-import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType } from "./types"
+import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType, TokenConditionAtom } from "./types"
 
 type PublicPropFact = { name: string; availability: "available" | "unavailable"; required?: boolean; type?: StructuredPropType }
+
+function stableSerialize(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableSerialize).join(",")}]`
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>
+    return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${stableSerialize(record[key])}`).join(",")}}`
+  }
+  return JSON.stringify(value)
+}
+
+function tokenConditionSubject({ equals: _equals, ...identity }: TokenConditionAtom): string {
+  return stableSerialize(identity)
+}
+
+function validateTokenCondition(errors: string[], componentName: string, tokenId: string, when: ComponentDefinition["tokenDependencies"][number]["when"]): void {
+  if (!when || !("all" in when)) return
+  const atoms = when.all as TokenConditionAtom[]
+  if (atoms.length < 2) errors.push(`Component ${componentName} token ${tokenId} conjunction must contain at least two conditions.`)
+  if (atoms.some((atom, index) => atoms.findIndex((candidate) => stableSerialize(candidate) === stableSerialize(atom)) !== index)) {
+    errors.push(`Component ${componentName} token ${tokenId} condition contains duplicate predicates.`)
+  }
+  if (atoms.some((atom, index) => atoms.slice(index + 1).some((candidate) => tokenConditionSubject(candidate) === tokenConditionSubject(atom) && candidate.equals !== atom.equals))) {
+    errors.push(`Component ${componentName} token ${tokenId} condition contains contradictory predicates.`)
+  }
+}
 
 export function isStructuredPropTypeAssignable(source: StructuredPropType, target: StructuredPropType): boolean {
   if (source.kind === "union") return source.members.every((member) => isStructuredPropTypeAssignable(member, target))
@@ -374,7 +399,8 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
     const tokenDependencyKeys = new Set<string>()
     for (const token of component.tokenDependencies) {
       hasEvidence(errors, token.evidenceRefs, family.evidence, `Token dependency ${entry.name}.${token.tokenId}`)
-      const key = JSON.stringify({ tokenId: token.tokenId, ...(token.when ? { when: token.when } : {}), ...(token.viaDerivedRule ? { viaDerivedRule: token.viaDerivedRule } : {}) })
+      validateTokenCondition(errors, entry.name, token.tokenId, token.when)
+      const key = stableSerialize({ tokenId: token.tokenId, ...(token.when ? { when: token.when } : {}), ...(token.viaDerivedRule ? { viaDerivedRule: token.viaDerivedRule } : {}) })
       if (tokenDependencyKeys.has(key)) errors.push(`Component ${entry.name} has duplicate token dependency: ${token.tokenId}.`)
       tokenDependencyKeys.add(key)
       if (!authority.tokenIds.has(token.tokenId)) errors.push(`Component ${entry.name} references unknown token: ${token.tokenId}.`)

@@ -90,7 +90,10 @@ describe("component contract JSON Schemas", () => {
     const family = validFamily()
     family.exports[0].component.tokenDependencies.push({
       tokenId: "spacing.unit",
-      when: { all: [{ propName: "orientation", equals: "vertical" }, { propName: "spacing", equals: 0 }] },
+      when: { all: [
+        { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "orientation", equals: "vertical" },
+        { subject: "data", scope: "self", relation: "attribute", propName: "spacing", equals: 0 },
+      ] },
       viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
       evidenceRefs: ["source"],
     })
@@ -99,6 +102,10 @@ describe("component contract JSON Schemas", () => {
     const malformed = structuredClone(family)
     malformed.exports[0].component.tokenDependencies[0].when.all = [{ propName: "spacing", equals: 0 }]
     expect(validate(familySchema, malformed)).toBe(false)
+
+    const incompleteScopedAtom = structuredClone(family)
+    delete incompleteScopedAtom.exports[0].component.tokenDependencies[0].when.all[0].scope
+    expect(validate(familySchema, incompleteScopedAtom)).toBe(false)
   })
 
   test("accepts an evidence-backed cross-family component host", () => {

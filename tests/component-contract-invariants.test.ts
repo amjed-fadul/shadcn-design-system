@@ -70,6 +70,19 @@ describe("component contract semantic invariants", () => {
     expect(() => assertComponentFamilyInvariants(validFamily(), authority)).not.toThrow()
   })
 
+  test("validates token conjunction cardinality, scoped uniqueness, and contradictions", () => {
+    const token = (all: any[]) => changed((family: any) => {
+      family.exports[0].component.tokenDependencies[0].when = { all }
+    })
+    const self = { subject: "data", scope: "self", relation: "attribute", propName: "state", equals: "open" }
+    const group = { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "state", equals: "closed" }
+
+    expect(validateComponentFamilyInvariants(token([self]), authority)).toContain("Component Example token color.primary conjunction must contain at least two conditions.")
+    expect(validateComponentFamilyInvariants(token([self, { ...self }]), authority)).toContain("Component Example token color.primary condition contains duplicate predicates.")
+    expect(validateComponentFamilyInvariants(token([self, { ...self, equals: "closed" }]), authority)).toContain("Component Example token color.primary condition contains contradictory predicates.")
+    expect(validateComponentFamilyInvariants(token([self, group]), authority)).toEqual([])
+  })
+
   test("accepts a portal boundary targeting a reachable render node", () => {
     expect(validateComponentFamilyInvariants(withPortalBoundary(), authority)).toEqual([])
   })

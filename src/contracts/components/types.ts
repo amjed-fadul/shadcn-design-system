@@ -22,8 +22,11 @@ export type ConditionalPropRefinement = EvidenceRef & ({ propName: string; avail
 export type ConditionalEventRefinement = EvidenceRef & { eventPropName: string; payload: StructuredPropType }
 export type ConditionalApiCase = EvidenceRef & { when: { propName: string; equals: string | number | boolean }; propRefinements: ConditionalPropRefinement[]; eventRefinements: ConditionalEventRefinement[]; stateChannels: StateChannel[] }
 export type EventContract = EvidenceRef & { propName: string; payload?: StructuredPropType }
-export type TokenConditionAtom = { propName: string; equals: string | number | boolean; all?: never }
-export type TokenCondition = TokenConditionAtom | { all: TokenConditionAtom[]; propName?: never; equals?: never }
+export type TokenConditionAtom = (
+  | { subject?: never; scope?: never; relation?: never; name?: never }
+  | { subject: "data" | "aria"; scope: "self" | "group" | "peer" | "in"; relation: "attribute" | "has"; name?: string }
+) & { propName: string; equals: string | number | boolean; all?: never }
+export type TokenCondition = TokenConditionAtom | { all: AtLeastTwo<TokenConditionAtom>; propName?: never; equals?: never }
 export type TokenDependency = EvidenceRef & { tokenId: string; when?: TokenCondition; viaDerivedRule?: { id: string; multiplier: number } }
 export type RenderHost =
   | { kind: "intrinsic"; tag: string }

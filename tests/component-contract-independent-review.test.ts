@@ -1506,7 +1506,7 @@ const independentOperationalPrefixes = new Set([
   "*", "**", "dark", "rtl", "ltr", "portrait", "landscape", "print", "motion-safe", "motion-reduce", "contrast-more", "contrast-less", "forced-colors",
   "sm", "md", "lg", "xl", "2xl", "first", "last", "only", "odd", "even", "first-of-type", "last-of-type", "only-of-type", "empty",
   "hover", "focus", "focus-within", "focus-visible", "active", "visited", "target", "disabled", "enabled", "checked", "indeterminate", "default",
-  "required", "valid", "invalid", "in-range", "out-of-range", "placeholder-shown", "autofill", "read-only", "open", "before", "after", "first-letter",
+  "required", "valid", "invalid", "in-range", "out-of-range", "placeholder", "placeholder-shown", "autofill", "read-only", "open", "before", "after", "first-letter",
   "first-line", "marker", "selection", "file", "backdrop",
 ])
 
@@ -1515,9 +1515,11 @@ function independentUtilitySegments(raw: string): string[] | undefined {
   let square = 0
   let round = 0
   let boundary = 0
+  let escaped = false
   for (let index = 0; index < raw.length; index += 1) {
     const character = raw[index]
-    if (character === "\\") { index += 1; continue }
+    if (escaped) { escaped = false; continue }
+    if (character === "\\") { escaped = true; continue }
     if (character === "[") square += 1
     if (character === "]") square -= 1
     if (character === "(") round += 1
@@ -1528,17 +1530,26 @@ function independentUtilitySegments(raw: string): string[] | undefined {
       boundary = index + 1
     }
   }
-  if (square !== 0 || round !== 0) return undefined
+  if (escaped || square !== 0 || round !== 0) return undefined
   result.push(raw.slice(boundary))
   return result.every((segment) => segment.length > 0) ? result : undefined
 }
 
 function independentScalar(value: string | undefined): string | number | boolean | undefined {
   if (value === undefined) return true
-  if (value.length === 0 || [...value].some((character) => " []{}$`'\"\\:".includes(character))) return undefined
-  if (value === "true" || value === "false") return value === "true"
-  if (/^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(value)) return Number(value)
-  return value
+  if (value.length === 0) return undefined
+  let decoded = ""
+  let escaped = false
+  for (const character of value) {
+    if (escaped) { decoded += character; escaped = false; continue }
+    if (character === "\\") { escaped = true; continue }
+    if (character === "_" || character === ":") return undefined
+    decoded += character
+  }
+  if (escaped || [...decoded].some((character) => " []{}$`'\"".includes(character))) return undefined
+  if (decoded === "true" || decoded === "false") return decoded === "true"
+  if (/^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(decoded)) return Number(decoded)
+  return decoded
 }
 
 function independentUtilityCondition(raw: string): { utility: string; atoms: AnyRecord[] } | undefined {
@@ -1546,30 +1557,24 @@ function independentUtilityCondition(raw: string): { utility: string; atoms: Any
   if (!segments) return undefined
   const atoms: AnyRecord[] = []
   for (const prefix of segments.slice(0, -1)) {
-    const data = /^(?:((?:group|peer|in)-))?(?:has-)?data-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))(?:\/([A-Za-z0-9_-]+))?$/.exec(prefix)
-    const aria = /^aria-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))$/.exec(prefix)
-    if (data) {
-      if (data[5] && !data[1]) return undefined
-      const equals = independentScalar(data[3])
+    const attribute = /^(?:(group|peer|in)-)?(has-)?(data|aria)-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))(?:\/([A-Za-z0-9_-]+))?$/.exec(prefix)
+    if (attribute) {
+      const scope = attribute[1] ?? "self"
+      const relation = attribute[2] ? "has" : "attribute"
+      const name = attribute[7]
+      if (name && scope !== "group" && scope !== "peer") return undefined
+      const equals = independentScalar(attribute[5])
       if (equals === undefined) return undefined
-      const propName = data[2] ?? data[4]
-      const prior = atoms.find((atom) => atom.propName === propName)
+      const atom = { subject: attribute[3], scope, relation, ...(name ? { name } : {}), propName: attribute[4] ?? attribute[6], equals }
+      const identity = independentStableKey({ ...atom, equals: undefined })
+      const prior = atoms.find((candidate) => independentStableKey({ ...candidate, equals: undefined }) === identity)
       if (prior && prior.equals !== equals) return undefined
-      if (!prior) atoms.push({ propName, equals })
-      continue
-    }
-    if (aria) {
-      const equals = independentScalar(aria[2])
-      if (equals === undefined) return undefined
-      const propName = `aria-${aria[1] ?? aria[3]}`
-      const prior = atoms.find((atom) => atom.propName === propName)
-      if (prior && prior.equals !== equals) return undefined
-      if (!prior) atoms.push({ propName, equals })
+      if (!prior) atoms.push(atom)
       continue
     }
     const namedState = /^(?:group|peer)-(?:hover|focus|focus-within|focus-visible|active|visited|disabled|enabled|checked|open)(?:\/[A-Za-z0-9_-]+)?$/.test(prefix)
     const container = /^@[a-z][A-Za-z0-9_-]*(?:\/[A-Za-z0-9_-]+)?$/.test(prefix)
-    if (prefix.includes("data-") || prefix.startsWith("aria-") || prefix.includes("${") || prefix.startsWith("[") || (!independentOperationalPrefixes.has(prefix) && !namedState && !container)) return undefined
+    if (prefix.includes("data-") || prefix.includes("aria-") || prefix.includes("${") || prefix.startsWith("[") || (!independentOperationalPrefixes.has(prefix) && !namedState && !container)) return undefined
   }
   return { utility: segments.at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, ""), atoms }
 }
@@ -1578,12 +1583,31 @@ function independentMergedCondition(source: IndependentCvaClassSource, utilityAt
   const atoms = [...(source.propName && source.equals ? [{ propName: source.propName, equals: source.equals }] : []), ...utilityAtoms]
   const unique: AnyRecord[] = []
   for (const atom of atoms) {
-    const prior = unique.find((candidate) => candidate.propName === atom.propName)
+    const { equals: _equals, ...identity } = atom
+    const prior = unique.find((candidate) => {
+      const { equals: _candidateEquals, ...candidateIdentity } = candidate
+      return independentStableKey(candidateIdentity) === independentStableKey(identity)
+    })
     if (prior && prior.equals !== atom.equals) return undefined
     if (!prior) unique.push(atom)
   }
   if (unique.length === 0) return {}
   return { when: unique.length === 1 ? unique[0] : { all: unique } }
+}
+
+function independentTokenIdsForUtility(utility: string): Set<string> {
+  const result = new Set<string>()
+  for (const tokenId of approvedTokenIds) {
+    const [category, name] = tokenId.split(".")
+    if (category === "color" && ["bg", "text", "border", "ring", "fill", "stroke", "outline"].some((prefix) => utility === `${prefix}-${name}`)) result.add(tokenId)
+    else if (tokenId === "font.heading" && utility === "font-heading") result.add(tokenId)
+    else if (category === "font-size" && utility === `text-${name}`) result.add(tokenId)
+    else if (category === "font-weight" && utility === `font-${name}`) result.add(tokenId)
+    else if (category === "letter-spacing" && utility === `tracking-${name}`) result.add(tokenId)
+    else if (category === "radius" && utility === `rounded-${name}`) result.add(tokenId)
+    else if (category === "shadow" && utility === `shadow-${name}`) result.add(tokenId)
+  }
+  return result
 }
 
 function independentImportedTokenDependencies(classSources: IndependentCvaClassSource[]): AnyRecord[] {
@@ -1594,7 +1618,7 @@ function independentImportedTokenDependencies(classSources: IndependentCvaClassS
     if (!parsed) continue
     const condition = independentMergedCondition(source, parsed.atoms)
     if (!condition) continue
-    for (const tokenId of directTokenEvidence(parsed.utility, approvedTokenIds)) {
+    for (const tokenId of independentTokenIdsForUtility(parsed.utility)) {
       if (tokenId !== "spacing.unit") dependencies.push({ tokenId, ...condition })
     }
     const match = parsed.utility.match(spacing)
@@ -2415,18 +2439,52 @@ describe("Phase 3 Task 10 independent review", () => {
     ])
 
     expect(facts).toEqual(expect.arrayContaining([
-      { tokenId: "radius.md", when: { propName: "size", equals: "sm" } },
+      { tokenId: "radius.md", when: { subject: "data", scope: "self", relation: "attribute", propName: "size", equals: "sm" } },
       {
         tokenId: "spacing.unit",
-        when: { all: [{ propName: "orientation", equals: "vertical" }, { propName: "spacing", equals: 0 }] },
+        when: { all: [
+          { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "orientation", equals: "vertical" },
+          { subject: "data", scope: "self", relation: "attribute", propName: "spacing", equals: 0 },
+        ] },
         viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
       },
       {
         tokenId: "color.background",
-        when: { all: [{ propName: "tone", equals: "default" }, { propName: "state", equals: "open" }] },
+        when: { all: [{ propName: "tone", equals: "default" }, { subject: "data", scope: "self", relation: "attribute", propName: "state", equals: "open" }] },
       },
-      { tokenId: "color.destructive", when: { propName: "aria-invalid", equals: true } },
+      { tokenId: "color.destructive", when: { subject: "aria", scope: "self", relation: "attribute", propName: "invalid", equals: true } },
     ]))
+  })
+
+  test("independent utility grammar preserves scoped relations and rejects lexical ambiguity", () => {
+    expect(independentImportedTokenDependencies([{
+      classNames: "group-data-[size=sm]/root:data-[size=lg]:rounded-md group-aria-[expanded=true]/root:rounded-lg peer-aria-checked/item:rounded-lg in-aria-[busy=true]:rounded-lg has-aria-[label=x]:rounded-lg group-has-data-[slot=media]/root:rounded-lg data-[label=some\\_value]:rounded-lg placeholder:text-sm",
+      sourcePath: "fixture.tsx",
+    }])).toEqual(expect.arrayContaining([
+      { tokenId: "radius.md", when: { all: [
+        { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "size", equals: "sm" },
+        { subject: "data", scope: "self", relation: "attribute", propName: "size", equals: "lg" },
+      ] } },
+      { tokenId: "radius.lg", when: { subject: "aria", scope: "group", relation: "attribute", name: "root", propName: "expanded", equals: true } },
+      { tokenId: "radius.lg", when: { subject: "aria", scope: "peer", relation: "attribute", name: "item", propName: "checked", equals: true } },
+      { tokenId: "radius.lg", when: { subject: "aria", scope: "in", relation: "attribute", propName: "busy", equals: true } },
+      { tokenId: "radius.lg", when: { subject: "aria", scope: "self", relation: "has", propName: "label", equals: "x" } },
+      { tokenId: "radius.lg", when: { subject: "data", scope: "group", relation: "has", name: "root", propName: "slot", equals: "media" } },
+      { tokenId: "radius.lg", when: { subject: "data", scope: "self", relation: "attribute", propName: "label", equals: "some_value" } },
+      { tokenId: "font-size.sm" },
+    ]))
+
+    expect(independentImportedTokenDependencies([{
+      classNames: "in-data-[state=open]/root:rounded-md not-data-[state=open]:rounded-md rounded-md\\",
+      sourcePath: "fixture.tsx",
+    }])).toEqual([])
+  })
+
+  test("independent token resolution matches complete utility identities", () => {
+    expect(independentImportedTokenDependencies([{
+      classNames: "content-['bg-primary'] content-['rounded-md']",
+      sourcePath: "fixture.tsx",
+    }])).toEqual([])
   })
 
   test("independent utility parser fails closed for malformed, dynamic, unsupported, ambiguous, and contradictory prefixes", () => {
@@ -2443,7 +2501,7 @@ describe("Phase 3 Task 10 independent review", () => {
 
     const errors = directSourceErrors(artifacts.families, artifacts.interfaces)
       .filter((error) => error.includes("checkbox.Checkbox: conditional utility token fact differs"))
-    expect(errors).toContainEqual(expect.stringContaining('missing {"tokenId":"color.primary","when":{"equals":"checked","propName":"state"}}'))
+    expect(errors).toContainEqual(expect.stringContaining('missing {"tokenId":"color.primary","when":{"equals":"checked","propName":"state","relation":"attribute","scope":"self","subject":"data"}}'))
     expect(errors).toContainEqual(expect.stringContaining('invented {"tokenId":"color.primary","when":{"equals":"unchecked","propName":"state"}}'))
   })
 
@@ -2617,7 +2675,7 @@ describe("Phase 3 Task 10 independent review", () => {
       .filter((error) => error.includes("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
     const baselineArtifacts = loadArtifacts()
     const baselineErrors = importedErrors(baselineArtifacts)
-    expect(baselineErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"when":{"equals":0,"propName":"spacing"}}'))
+    expect(baselineErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"when":{"equals":0,"name":"toggle-group","propName":"spacing","relation":"attribute","scope":"group","subject":"data"}}'))
     expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2}}'))
     expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5}}'))
 
