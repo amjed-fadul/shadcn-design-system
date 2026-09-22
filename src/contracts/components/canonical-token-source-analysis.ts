@@ -1,4 +1,9 @@
+import { createHash } from "node:crypto"
+import { readFileSync } from "node:fs"
+import { dirname, join, normalize } from "node:path"
+
 import tokenContract from "../../../contracts/tokens/token-contract.json"
+import seedComponents from "../../../provenance/seed-components.json"
 import { createTokenSourceAnalyzer, type TokenCoverageFinding } from "./token-source-analysis"
 
 const direct = new Map<string, string>()
@@ -15,6 +20,20 @@ const approvedTokenIds = new Set(tokenContract.tokens.map((token) => token.id))
 const contractedNamespaces = new Set(tokenContract.coverage.contracted)
 const tokenCategory = new Map(tokenContract.tokens.map((token) => [token.id, token.category]))
 const spacingUtility = /^(?:size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|ps|pe|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|ms|me|space-x|space-y|inset|inset-x|inset-y|inset-s|inset-e|top|right|bottom|left|start|end)-([0-9]+(?:\.[0-9]+)?)$/
+const canonicalRecipeModules = new Map(Object.entries(seedComponents.components).map(([, component]) => {
+  const canonicalPath = component.canonicalPath.replace(/\\/g, "/").replace(/\.[cm]?[jt]sx?$/, "")
+  return [`@/${canonicalPath.replace(/^src\//, "")}`, component]
+}))
+function gitBlobSha(source: string): string {
+  return createHash("sha1").update(`blob ${Buffer.byteLength(source)}\0${source}`).digest("hex")
+}
+function repositoryRootFor(sourcePath: string): string | undefined {
+  let current = normalize(dirname(sourcePath))
+  while (dirname(current) !== current) {
+    if (current.endsWith(join("src", "components", "ui"))) return dirname(dirname(dirname(current)))
+    current = dirname(current)
+  }
+}
 const analyzer = createTokenSourceAnalyzer({
   classMergeFunctionNames: ["cn"],
   recipeFunctionNames: ["cva"],
@@ -28,6 +47,24 @@ const analyzer = createTokenSourceAnalyzer({
     dynamicCompoundVariants: "Unsupported dynamic CVA compound variants.",
     compoundVariant: "Unsupported dynamic CVA compound variant.",
     compoundVariantProperty: "Unsupported CVA compound variant property.",
+    dynamicDefaultVariants: "Unsupported dynamic CVA defaults.",
+    defaultVariantProperty: "Unsupported CVA default property.",
+    defaultVariantValue: "Unsupported dynamic CVA default value.",
+    dynamicInvocation: "Unsupported dynamic CVA invocation.",
+    invocationProperty: "Unsupported CVA invocation property.",
+    unknownVariant: "CVA invocation references an unknown variant.",
+    importAuthority: "Imported CVA source is not approved.",
+    importedExport: "Imported CVA export is not a static recipe.",
+  },
+  resolveImportedRecipe: ({ sourcePath, moduleSpecifier, importedName }) => {
+    const component = canonicalRecipeModules.get(moduleSpecifier)
+    const repositoryRoot = component && repositoryRootFor(sourcePath)
+    if (!component || !repositoryRoot) return undefined
+    const importedPath = join(repositoryRoot, component.canonicalPath)
+    let source: string
+    try { source = readFileSync(importedPath, "utf8") } catch { return undefined }
+    if (gitBlobSha(source) !== component.canonicalBlobSha) return undefined
+    return { sourcePath: importedPath, exportName: importedName }
   },
   resolveUtility: (utility) => {
     const tokenId = direct.get(utility)

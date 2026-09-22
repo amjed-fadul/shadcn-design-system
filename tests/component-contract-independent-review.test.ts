@@ -12,6 +12,7 @@ const familyDirectory = join(root, "contracts/components/families")
 const interfaceDirectory = join(root, "contracts/components/interfaces")
 const approvedTokenIds = new Set<string>(readJson(join(root, "contracts/tokens/token-contract.json")).tokens.map((token: AnyRecord) => token.id))
 const expectedFamilies = [...canonicalFamilyIds].sort()
+const independentSeedComponents = Object.values(readJson(join(root, "provenance/seed-components.json")).components) as AnyRecord[]
 
 type AnyRecord = Record<string, any>
 type IndependentStructuredType =
@@ -906,46 +907,126 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
   }
 }
 
-function cvaFacts(sourceFile: ts.SourceFile, bodyText: string): { variants: Map<string, string[]>; defaults: Map<string, unknown>; texts: string[] } {
+type IndependentCvaClassSource = { classNames: string; propName?: string; equals?: string; sourcePath: string }
+
+function independentGitBlobSha(source: string): string {
+  return createHash("sha1").update(`blob ${Buffer.byteLength(source)}\0${source}`).digest("hex")
+}
+
+function independentRecipeSource(moduleSpecifier: string): string | undefined {
+  const entry = independentSeedComponents.find((component) => `@/${String(component.canonicalPath).replace(/^src\//, "").replace(/\.[cm]?[jt]sx?$/, "")}` === moduleSpecifier)
+  if (!entry) return undefined
+  const path = join(root, entry.canonicalPath)
+  if (!existsSync(path)) return undefined
+  const source = readFileSync(path, "utf8")
+  return independentGitBlobSha(source) === entry.canonicalBlobSha ? path : undefined
+}
+
+function independentExportedRecipe(sourceFile: ts.SourceFile, exportName: string): ts.CallExpression | undefined {
+  const localNames: string[] = []
+  for (const statement of sourceFile.statements) {
+    if (ts.isVariableStatement(statement) && statement.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) {
+      for (const declaration of statement.declarationList.declarations) if (ts.isIdentifier(declaration.name) && declaration.name.text === exportName) localNames.push(exportName)
+    }
+    if (!ts.isExportDeclaration(statement) || statement.moduleSpecifier || !statement.exportClause || !ts.isNamedExports(statement.exportClause)) continue
+    for (const element of statement.exportClause.elements) if (element.name.text === exportName) localNames.push(element.propertyName?.text ?? element.name.text)
+  }
+  if (localNames.length !== 1) return undefined
+  const calls = sourceFile.statements.flatMap((statement) => ts.isVariableStatement(statement)
+    ? statement.declarationList.declarations.flatMap((declaration) => ts.isIdentifier(declaration.name) && declaration.name.text === localNames[0] && declaration.initializer && ts.isCallExpression(declaration.initializer) && declaration.initializer.expression.getText(sourceFile) === "cva" ? [declaration.initializer] : [])
+    : [])
+  return calls.length === 1 ? calls[0] : undefined
+}
+
+function cvaFacts(sourceFile: ts.SourceFile, bodyText: string): { variants: Map<string, string[]>; defaults: Map<string, unknown>; texts: string[]; classSources: IndependentCvaClassSource[]; unresolved: string[] } {
   const variants = new Map<string, string[]>()
   const defaults = new Map<string, unknown>()
   const texts: string[] = []
+  const classSources: IndependentCvaClassSource[] = []
+  const unresolved: string[] = []
+  const parseRecipe = (call: ts.CallExpression, recipeFile: ts.SourceFile, sourcePath: string, invocation?: ts.CallExpression): void => {
+    texts.push(call.getText(recipeFile))
+    const base = call.arguments[0]
+    if (base && (ts.isStringLiteral(base) || ts.isNoSubstitutionTemplateLiteral(base))) classSources.push({ classNames: base.text, sourcePath })
+    else if (base) unresolved.push(`${sourcePath}:${base.getStart(recipeFile)}:dynamic recipe base`)
+    const options = call.arguments[1]
+    if (!options) return
+    if (!ts.isObjectLiteralExpression(options)) { unresolved.push(`${sourcePath}:${options.getStart(recipeFile)}:dynamic recipe configuration`); return }
+    const assignment = (name: string) => options.properties.find((property): property is ts.PropertyAssignment => ts.isPropertyAssignment(property) && propertyName(property.name) === name)?.initializer
+    const defaultOptions = assignment("defaultVariants")
+    if (defaultOptions && !ts.isObjectLiteralExpression(defaultOptions)) unresolved.push(`${sourcePath}:${defaultOptions.getStart(recipeFile)}:dynamic recipe defaults`)
+    if (defaultOptions && ts.isObjectLiteralExpression(defaultOptions)) for (const property of defaultOptions.properties) {
+      if (!ts.isPropertyAssignment(property) || ts.isComputedPropertyName(property.name)) { unresolved.push(`${sourcePath}:${property.getStart(recipeFile)}:computed recipe default`); continue }
+      const name = propertyName(property.name)
+      const value = literalValue(property.initializer)
+      if (!name || value === undefined || value === null) unresolved.push(`${sourcePath}:${property.getStart(recipeFile)}:dynamic recipe default`)
+      else defaults.set(name, value)
+    }
+    const selections = new Map<string, unknown>()
+    let dynamicSelection = new Set<string>()
+    if (invocation?.arguments[0]) {
+      const argument = invocation.arguments[0]
+      if (!ts.isObjectLiteralExpression(argument)) unresolved.push(`${invocation.getSourceFile().fileName}:${argument.getStart()}:dynamic recipe invocation`)
+      else for (const property of argument.properties) {
+        if ((!ts.isPropertyAssignment(property) && !ts.isShorthandPropertyAssignment(property)) || ts.isComputedPropertyName(property.name)) { unresolved.push(`${invocation.getSourceFile().fileName}:${property.getStart()}:computed recipe invocation`); continue }
+        const name = propertyName(property.name)
+        if (!name || ["class", "className"].includes(name)) continue
+        const initializer = ts.isPropertyAssignment(property) ? property.initializer : property.name
+        const value = literalValue(initializer)
+        if (value === undefined || value === null) dynamicSelection.add(name)
+        else selections.set(name, value)
+      }
+    }
+    const variantOptions = assignment("variants")
+    if (variantOptions && !ts.isObjectLiteralExpression(variantOptions)) { unresolved.push(`${sourcePath}:${variantOptions.getStart(recipeFile)}:dynamic recipe variants`); return }
+    if (!variantOptions || !ts.isObjectLiteralExpression(variantOptions)) return
+    for (const variant of variantOptions.properties) {
+      if (!ts.isPropertyAssignment(variant) || ts.isComputedPropertyName(variant.name) || !ts.isObjectLiteralExpression(variant.initializer)) { unresolved.push(`${sourcePath}:${variant.getStart(recipeFile)}:computed or dynamic recipe variant`); continue }
+      const variantName = propertyName(variant.name)
+      if (!variantName) continue
+      const values: string[] = []
+      for (const item of variant.initializer.properties) {
+        if (!ts.isPropertyAssignment(item) || ts.isComputedPropertyName(item.name)) { unresolved.push(`${sourcePath}:${item.getStart(recipeFile)}:computed recipe value`); continue }
+        const valueName = propertyName(item.name)
+        if (!valueName || (!ts.isStringLiteral(item.initializer) && !ts.isNoSubstitutionTemplateLiteral(item.initializer))) { unresolved.push(`${sourcePath}:${item.getStart(recipeFile)}:dynamic recipe value`); continue }
+        values.push(valueName)
+        if (!invocation || dynamicSelection.has(variantName)) classSources.push({ classNames: item.initializer.text, propName: variantName, equals: valueName, sourcePath })
+        else if (String(selections.get(variantName) ?? defaults.get(variantName)) === valueName) classSources.push({ classNames: item.initializer.text, sourcePath })
+      }
+      variants.set(variantName, values)
+    }
+  }
   for (const statement of sourceFile.statements) {
     if (!ts.isVariableStatement(statement)) continue
     for (const declaration of statement.declarationList.declarations) {
       if (!ts.isIdentifier(declaration.name) || !declaration.initializer || !ts.isCallExpression(declaration.initializer)) continue
       if (declaration.initializer.expression.getText(sourceFile) !== "cva" || !bodyText.includes(declaration.name.text)) continue
-      texts.push(declaration.initializer.getText(sourceFile))
-      const options = declaration.initializer.arguments[1]
-      if (!options || !ts.isObjectLiteralExpression(options)) continue
-      for (const property of options.properties) {
-        if (!ts.isPropertyAssignment(property)) continue
-        const name = propertyName(property.name)
-        if (!name || !ts.isObjectLiteralExpression(property.initializer)) continue
-        if (name === "variants") {
-          for (const variant of property.initializer.properties) {
-            if (!ts.isPropertyAssignment(variant) || !ts.isObjectLiteralExpression(variant.initializer)) continue
-            const variantName = propertyName(variant.name)
-            if (!variantName) continue
-            variants.set(variantName, variant.initializer.properties
-              .filter((item): item is ts.PropertyAssignment => ts.isPropertyAssignment(item))
-              .map((item) => propertyName(item.name))
-              .filter((item): item is string => !!item))
-          }
-        }
-        if (name === "defaultVariants") {
-          for (const defaultVariant of property.initializer.properties) {
-            if (!ts.isPropertyAssignment(defaultVariant)) continue
-            const defaultName = propertyName(defaultVariant.name)
-            if (!defaultName) continue
-            const value = literalValue(defaultVariant.initializer)
-            if (value !== undefined) defaults.set(defaultName, value)
-          }
-        }
-      }
+      parseRecipe(declaration.initializer, sourceFile, sourceFile.fileName)
     }
   }
-  return { variants, defaults, texts }
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || !statement.importClause?.namedBindings || !ts.isNamedImports(statement.importClause.namedBindings)) continue
+    for (const binding of statement.importClause.namedBindings.elements) {
+      const localName = binding.name.text
+      if (["cn", "cva"].includes(binding.propertyName?.text ?? localName)) continue
+      if (!bodyText.includes(localName)) continue
+      const importedName = binding.propertyName?.text ?? localName
+      const invocations: ts.CallExpression[] = []
+      const visit = (node: ts.Node): void => {
+        if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === localName && bodyText.includes(node.getText(sourceFile))) invocations.push(node)
+        node.forEachChild(visit)
+      }
+      sourceFile.forEachChild(visit)
+      if (!invocations.length) continue
+      const sourcePath = independentRecipeSource(statement.moduleSpecifier.text)
+      if (!sourcePath) continue
+      const importedFile = sourceFacts(sourcePath).sourceFile
+      const recipe = independentExportedRecipe(importedFile, importedName)
+      if (!recipe) { unresolved.push(`${sourceFile.fileName}:${binding.getStart(sourceFile)}:missing recipe export`); continue }
+      for (const invocation of invocations) parseRecipe(recipe, importedFile, sourcePath, invocation)
+    }
+  }
+  return { variants, defaults, texts, classSources, unresolved }
 }
 
 function renderings(component: AnyRecord): AnyRecord[] {
@@ -1082,6 +1163,23 @@ function directTokenEvidence(text: string, tokenIds: Set<string>): Set<string> {
     if (found) result.add(tokenId)
   }
   return result
+}
+
+function independentImportedTokenDependencies(classSources: IndependentCvaClassSource[]): AnyRecord[] {
+  const dependencies: AnyRecord[] = []
+  const spacing = /^(?:size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|ps|pe|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|ms|me|space-x|space-y|inset|inset-x|inset-y|inset-s|inset-e|top|right|bottom|left|start|end)-([0-9]+(?:\.[0-9]+)?)$/
+  for (const source of classSources) {
+    const condition = source.propName && source.equals ? { when: { propName: source.propName, equals: source.equals } } : {}
+    for (const tokenId of directTokenEvidence(source.classNames, approvedTokenIds)) {
+      if (tokenId !== "spacing.unit") dependencies.push({ tokenId, ...condition })
+    }
+    for (const rawUtility of source.classNames.split(/\s+/).filter(Boolean)) {
+      const utility = rawUtility.split(":").at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
+      const match = utility.match(spacing)
+      if (match) dependencies.push({ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: Number(match[1]) }, ...condition })
+    }
+  }
+  return dependencies.filter((dependency, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(dependency)) === index)
 }
 
 function sourceDeclarationContext(artifact: AnyRecord): DeclarationContext | undefined {
@@ -1300,6 +1398,18 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       const contractTokenIds = new Set<string>((exported.component.tokenDependencies ?? []).map((dependency: AnyRecord) => dependency.tokenId))
       const tokenText = `${source.sourceText}\n${variants.texts.join("\n")}`
       const sourceTokenIds = directTokenEvidence(tokenText, approvedTokenIds)
+      for (const unresolved of variants.unresolved) errors.push(`${family.id}.${exported.name}: unresolved imported recipe evidence (${unresolved})`)
+      const comparableContractTokens = (exported.component.tokenDependencies ?? []).map((dependency: AnyRecord) => ({
+        tokenId: dependency.tokenId,
+        ...(dependency.when ? { when: dependency.when } : {}),
+        ...(dependency.viaDerivedRule ? { viaDerivedRule: dependency.viaDerivedRule } : {}),
+      }))
+      const importedTokenFacts = independentImportedTokenDependencies(variants.classSources.filter((fact) => fact.sourcePath !== sourceFile.fileName))
+      for (const fact of importedTokenFacts) {
+        if (!comparableContractTokens.some((dependency: AnyRecord) => JSON.stringify(dependency) === JSON.stringify(fact))) {
+          errors.push(`${family.id}.${exported.name}: imported recipe token fact differs (${JSON.stringify(fact)})`)
+        }
+      }
       for (const tokenId of contractTokenIds) {
         if (!sourceTokenIds.has(tokenId)) errors.push(`${family.id}.${exported.name}: token ${tokenId} has no direct source expression`)
       }
@@ -1799,6 +1909,32 @@ describe("Phase 3 Task 10 independent review", () => {
       { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: true }] },
       { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: false }] },
     ])
+  })
+
+  test("independently resolves the pinned aliased Toggle CVA recipe with conditions and provenance", () => {
+    const toggleGroupPath = join(root, "src/components/ui/toggle-group.tsx")
+    const togglePath = join(root, "src/components/ui/toggle.tsx")
+    const { sourceFile } = sourceFacts(toggleGroupPath)
+    const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, "ToggleGroupItem")!)
+    const facts = cvaFacts(sourceFile, source.sourceText) as ReturnType<typeof cvaFacts> & {
+      classSources?: Array<{ classNames: string; propName?: string; equals?: string; sourcePath: string }>
+      unresolved?: string[]
+    }
+
+    expect(facts.unresolved).toEqual([])
+    expect(facts.classSources).toEqual(expect.arrayContaining([
+      expect.objectContaining({ classNames: expect.stringContaining("group/toggle"), sourcePath: togglePath }),
+      expect.objectContaining({ classNames: "border border-input bg-transparent hover:bg-muted", propName: "variant", equals: "outline", sourcePath: togglePath }),
+      expect.objectContaining({ classNames: expect.stringContaining("rounded-md"), propName: "size", equals: "sm", sourcePath: togglePath }),
+    ]))
+  })
+
+  test("independent imported-recipe audit rejects a condition mutation", () => {
+    const artifacts = clone(loadArtifacts())
+    const component = exportByName(familyById(artifacts, "toggle-group"), "ToggleGroupItem").component
+    component.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.input").when.equals = "default"
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
   })
 
   test("has no unreferenced evidence records", () => {
