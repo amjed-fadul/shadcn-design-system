@@ -116,3 +116,24 @@ The token dependency suite produced **1 passed / 3 expected residual failures**.
 - Fix-round changes are limited to the production analyzer, arithmetic fixtures/tests, the independent audit/tests, and this report.
 - Production and independent implementations remain separate. Neither consumes contract facts as source truth, weakens equality, filters findings, or introduces component/family exceptions, allowlists, or manual token facts.
 - Every rejected operand/operator/scope case emits unresolved evidence with exact source provenance and zero partial arithmetic facts. Conditions and derived rules remain part of exact bidirectional equality.
+
+## Fix Round 2 — complete write targets and temporal lexical scope
+
+### Confirmed findings and fixes
+
+1. The production write prepass marked only bare identifier assignment/update targets. It now recursively follows assignment-target structure through parentheses and assertion/non-null/satisfies wrappers, object shorthand/property/spread targets, array elements/spreads, and default-value assignment targets. It marks only identifier leaves and therefore does not mistake property keys, computed keys, right-hand values, or property-access receivers for binding writes. Expression-form `for-of` and `for-in` initializers are explicitly treated as writes in the loop's nearest scope.
+2. The independent arithmetic oracle previously prebound every block declaration to its initializer before visiting any statement. It now reserves later lexical names as unavailable, visits declaration initializers in execution order, and activates each declaration only afterward. Dedicated classic-for, for-of, for-in, and switch/case scopes prevent an outer constant from leaking through a nearer loop or case binding. Switch declarations are reserved across the case block while each case is audited in statement order; ambiguous cross-case execution remains unavailable and fails closed.
+
+### Strict TDD and verification evidence
+
+The focused RED selection produced **9 failed / 95 skipped**: four production cases incorrectly emitted the original constant through object destructuring, array destructuring, for-of expression assignment, and for-in expression assignment; five independent cases resolved a later block declaration, leaked an outer constant through three loop forms, or leaked it through switch scope. These fixtures deliberately use `const` bindings, with type-checked expected-error annotations where the invalid write is analyzer input, so they exercise the write scanner rather than mutable-binding rejection.
+
+The Node 22 targeted GREEN selection passed **9/9** with **95 skipped**. The complete production arithmetic suite passed **25/25**. The bounded arithmetic/utility/imported/schema/invariant/unresolved-reconciliation command passed **142/142** across six files. The full independent review produced **77 passed / 2 expected residual failures**; the five added tests account for the increase, and the known direct-audit/evidence residual categories remain. `npm run typecheck` exited **0** under Node 22. Per the fix-round instruction, `components:verify` and the full suite were not run.
+
+### Preservation and self-review
+
+- Release-001 remained byte-identical at blob `75b59166086e9de0c67656fe64712a8cc70aa6e3`.
+- The diff under `contracts/components`, `contracts/tokens`, and `provenance/releases` is empty.
+- Fix-round changes are limited to the production analyzer, focused arithmetic fixtures/tests, independent audit/tests, and this report.
+- Production assignment traversal is structural and generic: no component/family exceptions, target-name allowlists, source filters, contract-derived truth, or manual facts were added.
+- The independent scope implementation remains separate from production and fails closed whenever initialization order or control-flow reachability cannot establish a static operand.

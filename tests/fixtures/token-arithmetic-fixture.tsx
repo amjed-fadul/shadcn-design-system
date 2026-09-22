@@ -106,6 +106,34 @@ export function NegativeZeroFixture() {
   return <div style={{ gap: "calc(var(--spacing) * -0)" }} />
 }
 
+export function ObjectDestructuredAssignmentFixture() {
+  const multiplier = 2
+  // @ts-expect-error This invalid write is intentional analyzer input.
+  ;({ value: multiplier } = { value: 3 })
+  return <div style={{ gap: `calc(var(--spacing) * ${multiplier})` }} />
+}
+
+export function ArrayDestructuredAssignmentFixture() {
+  const multiplier = 2
+  // @ts-expect-error This invalid write is intentional analyzer input.
+  ;[multiplier] = [3]
+  return <div style={{ gap: `calc(var(--spacing) * ${multiplier})` }} />
+}
+
+export function ForOfExpressionTargetFixture() {
+  const multiplier = 2
+  // @ts-expect-error This invalid write is intentional analyzer input.
+  for (multiplier of [3]) void multiplier
+  return <div style={{ gap: `calc(var(--spacing) * ${multiplier})` }} />
+}
+
+export function ForInExpressionTargetFixture() {
+  const multiplier = 2
+  // @ts-expect-error This invalid write is intentional analyzer input.
+  for (multiplier in { 3: true }) void multiplier
+  return <div style={{ gap: `calc(var(--spacing) * ${multiplier})` }} />
+}
+
 function OutOfScopeOwner() {
   const OUT_OF_SCOPE_MULTIPLIER = 7
   return OUT_OF_SCOPE_MULTIPLIER

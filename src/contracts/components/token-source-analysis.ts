@@ -578,11 +578,31 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
         for (const item of statement.declarationList.declarations) if (ts.isIdentifier(item.name)) scope.values.set(item.name.text, valueBinding(item))
       }
     }
-    const markWritten = (expression: ts.Expression, scope: Scope) => {
-      if (ts.isIdentifier(expression)) {
-        const binding = scope.values.get(expression.text)
-        if (binding) binding.written = true
+    const markWritten = (target: ts.Expression, scope: Scope): void => {
+      if (ts.isParenthesizedExpression(target) || ts.isAsExpression(target) || ts.isTypeAssertionExpression(target) || ts.isNonNullExpression(target) || ts.isSatisfiesExpression(target)) {
+        markWritten(target.expression, scope)
+        return
       }
+      if (ts.isIdentifier(target)) {
+        const binding = scope.values.get(target.text)
+        if (binding) binding.written = true
+        return
+      }
+      if (ts.isArrayLiteralExpression(target)) {
+        for (const element of target.elements) if (!ts.isOmittedExpression(element)) {
+          markWritten(ts.isSpreadElement(element) ? element.expression : element, scope)
+        }
+        return
+      }
+      if (ts.isObjectLiteralExpression(target)) {
+        for (const property of target.properties) {
+          if (ts.isShorthandPropertyAssignment(property)) markWritten(property.name, scope)
+          else if (ts.isPropertyAssignment(property)) markWritten(property.initializer, scope)
+          else if (ts.isSpreadAssignment(property)) markWritten(property.expression, scope)
+        }
+        return
+      }
+      if (ts.isBinaryExpression(target) && target.operatorToken.kind === ts.SyntaxKind.EqualsToken) markWritten(target.left, scope)
     }
     const scanWrites = (node: ts.Node, scope: Scope): void => {
       if (ts.isSourceFile(node) || ts.isBlock(node)) {
@@ -604,6 +624,8 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
         if (initializer && ts.isVariableDeclarationList(initializer)) {
           invalidateBindings(nested, initializer.declarations.flatMap((item) => bindingNames(item.name)))
           for (const item of initializer.declarations) if (ts.isIdentifier(item.name)) nested.values.set(item.name.text, valueBinding(item))
+        } else if (initializer && (ts.isForOfStatement(node) || ts.isForInStatement(node))) {
+          markWritten(initializer, nested)
         }
         ts.forEachChild(node, (child) => scanWrites(child, nested))
         return

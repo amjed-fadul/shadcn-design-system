@@ -134,6 +134,19 @@ describe("CSS-variable token arithmetic source analysis", () => {
     ])
   })
 
+  test.each([
+    "ObjectDestructuredAssignmentFixture",
+    "ArrayDestructuredAssignmentFixture",
+    "ForOfExpressionTargetFixture",
+    "ForInExpressionTargetFixture",
+  ])("rejects immutable interpolation binding written through complex target in %s", (exportName) => {
+    const { tokenExpressions, unresolved } = arithmeticSources(exportName)
+    expect(tokenExpressions).toEqual([])
+    expect(unresolved).toEqual([
+      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
+    ])
+  })
+
   test("resolves the nearest immutable shadow without using a stale outer binding", () => {
     const { tokenExpressions, unresolved } = arithmeticSources("ShadowedBindingFixture")
     expect(unresolved).toEqual([])

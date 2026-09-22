@@ -1775,17 +1775,33 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
     if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) { inspectClassExpression(expression.right); return }
     if (ts.isCallExpression(expression)) for (const argument of expression.arguments) inspectClassExpression(argument)
   }
-  const scopeWithStatements = (parent: IndependentStaticScope, statements: ts.NodeArray<ts.Statement>): IndependentStaticScope => {
+  const reserveStatements = (parent: IndependentStaticScope, statements: readonly ts.Statement[]): IndependentStaticScope => {
     const scope = new Map(parent)
-    for (const statement of statements) if (ts.isVariableStatement(statement)) {
-      for (const item of statement.declarationList.declarations) if (ts.isIdentifier(item.name)) scope.set(item.name.text, item)
+    for (const statement of statements) {
+      if (ts.isVariableStatement(statement)) for (const item of statement.declarationList.declarations) {
+        for (const name of independentBindingNames(item.name)) scope.set(name, undefined)
+      }
+      if ((ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) && statement.name) scope.set(statement.name.text, undefined)
     }
     return scope
   }
+  const activateDeclaration = (scope: IndependentStaticScope, declaration: ts.VariableDeclaration): void => {
+    for (const name of independentBindingNames(declaration.name)) scope.set(name, ts.isIdentifier(declaration.name) ? declaration : undefined)
+  }
+  const activateStatement = (scope: IndependentStaticScope, statement: ts.Statement): void => {
+    if (ts.isVariableStatement(statement)) for (const declaration of statement.declarationList.declarations) activateDeclaration(scope, declaration)
+  }
   const visit = (node: ts.Node, scope: IndependentStaticScope): void => {
     if (ts.isSourceFile(node) || ts.isBlock(node)) {
-      const nested = scopeWithStatements(scope, node.statements)
+      const nested = reserveStatements(scope, node.statements)
       for (const statement of node.statements) visit(statement, nested)
+      return
+    }
+    if (ts.isVariableStatement(node)) {
+      for (const declaration of node.declarationList.declarations) {
+        if (declaration.initializer) visit(declaration.initializer, scope)
+        activateDeclaration(scope, declaration)
+      }
       return
     }
     if (ts.isFunctionLike(node)) {
@@ -1798,6 +1814,44 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
       const nested = new Map(scope)
       if (node.variableDeclaration) for (const name of independentBindingNames(node.variableDeclaration.name)) nested.set(name, undefined)
       visit(node.block, nested)
+      return
+    }
+    if (ts.isForStatement(node)) {
+      const nested = new Map(scope)
+      if (node.initializer && ts.isVariableDeclarationList(node.initializer)) {
+        for (const declaration of node.initializer.declarations) for (const name of independentBindingNames(declaration.name)) nested.set(name, undefined)
+        for (const declaration of node.initializer.declarations) {
+          if (declaration.initializer) visit(declaration.initializer, nested)
+          activateDeclaration(nested, declaration)
+        }
+      } else if (node.initializer) visit(node.initializer, nested)
+      if (node.condition) visit(node.condition, nested)
+      if (node.incrementor) visit(node.incrementor, nested)
+      visit(node.statement, nested)
+      return
+    }
+    if (ts.isForOfStatement(node) || ts.isForInStatement(node)) {
+      const nested = new Map(scope)
+      if (ts.isVariableDeclarationList(node.initializer)) {
+        for (const declaration of node.initializer.declarations) for (const name of independentBindingNames(declaration.name)) nested.set(name, undefined)
+        visit(node.expression, nested)
+        for (const declaration of node.initializer.declarations) activateDeclaration(nested, declaration)
+      } else {
+        visit(node.expression, nested)
+        visit(node.initializer, nested)
+      }
+      visit(node.statement, nested)
+      return
+    }
+    if (ts.isSwitchStatement(node)) {
+      visit(node.expression, scope)
+      const clauseStatements = node.caseBlock.clauses.flatMap((clause) => [...clause.statements])
+      const reserved = reserveStatements(scope, clauseStatements)
+      for (const clause of node.caseBlock.clauses) {
+        const nested = new Map(reserved)
+        if (ts.isCaseClause(clause)) visit(clause.expression, nested)
+        for (const statement of clause.statements) visit(statement, nested)
+      }
       return
     }
     if (ts.isJsxAttribute(node) && node.name.getText(sourceFile) === "style" && node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
@@ -1813,7 +1867,21 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
     }
     ts.forEachChild(node, (child) => visit(child, scope))
   }
-  const topLevelScope = scopeWithStatements(new Map(), sourceFile.statements)
+  const topLevelScope = reserveStatements(new Map(), sourceFile.statements)
+  let owner: ts.Node = declaration
+  while (owner.parent && owner.parent !== sourceFile) owner = owner.parent
+  for (const statement of sourceFile.statements) {
+    if (statement === owner) {
+      if (ts.isVariableStatement(statement) && ts.isVariableDeclaration(declaration)) {
+        for (const item of statement.declarationList.declarations) {
+          if (item === declaration) break
+          activateDeclaration(topLevelScope, item)
+        }
+      }
+      break
+    }
+    activateStatement(topLevelScope, statement)
+  }
   visit(declaration, topLevelScope)
   return {
     facts: [...new Map(facts.map((fact) => [independentStableKey(fact), fact])).values()],
@@ -2858,6 +2926,63 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(inspect("SameNameOwnerTwo").facts).toEqual([
       expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier: 9 } }),
     ])
+  })
+
+  test("independent arithmetic keeps a later block declaration unavailable before execution", () => {
+    const sourceFile = ts.createSourceFile(
+      "/virtual/arithmetic-use-before-declaration.tsx",
+      'const MULTIPLIER = 2\nfunction UseBeforeDeclarationFixture() { const view = <div style={{ gap: `calc(var(--spacing) * ${MULTIPLIER})` }} />; const MULTIPLIER = 3; return view }',
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX,
+    )
+    const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "UseBeforeDeclarationFixture")!)
+    expect(facts.facts).toEqual([])
+    expect(facts.unresolved).toEqual([
+      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
+    ])
+  })
+
+  test.each([
+    ["ForFixture", 'for (const MULTIPLIER = 3; false;) { return <div style={{ gap: `calc(var(--spacing) * ${MULTIPLIER})` }} /> }', 3],
+    ["ForOfFixture", 'for (const MULTIPLIER of [3]) { return <div style={{ gap: `calc(var(--spacing) * ${MULTIPLIER})` }} /> }', undefined],
+    ["ForInFixture", 'for (const MULTIPLIER in { 3: true }) { return <div style={{ gap: `calc(var(--spacing) * ${MULTIPLIER})` }} /> }', undefined],
+  ] as const)("independent arithmetic applies the nearest loop binding in %s", (exportName, loop, multiplier) => {
+    const sourceFile = ts.createSourceFile(
+      `/virtual/arithmetic-${exportName}.tsx`,
+      `const MULTIPLIER = 2\nfunction ${exportName}() { ${loop}; return null }`,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX,
+    )
+    const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, exportName)!)
+    if (multiplier === undefined) {
+      expect(facts.facts).toEqual([])
+      expect(facts.unresolved).toEqual([expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." })])
+    } else {
+      expect(facts.unresolved).toEqual([])
+      expect(facts.facts).toEqual([expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier } })])
+    }
+  })
+
+  test("independent arithmetic applies switch case scope and its temporal dead zone", () => {
+    const inspect = (body: string) => {
+      const sourceFile = ts.createSourceFile(
+        "/virtual/arithmetic-switch.tsx",
+        `const MULTIPLIER = 2\nfunction SwitchFixture(value: number) { switch (value) { case 1: ${body} } return null }`,
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TSX,
+      )
+      return independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "SwitchFixture")!)
+    }
+    const afterDeclaration = inspect('const MULTIPLIER = 4; return <div style={{ gap: `calc(var(--spacing) * ${MULTIPLIER})` }} />')
+    expect(afterDeclaration.unresolved).toEqual([])
+    expect(afterDeclaration.facts).toEqual([expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier: 4 } })])
+
+    const beforeDeclaration = inspect('const view = <div style={{ gap: `calc(var(--spacing) * ${MULTIPLIER})` }} />; const MULTIPLIER = 4; return view')
+    expect(beforeDeclaration.facts).toEqual([])
+    expect(beforeDeclaration.unresolved).toEqual([expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." })])
   })
 
   test("independent arithmetic audit rejects invented exact spacing facts bidirectionally", () => {
