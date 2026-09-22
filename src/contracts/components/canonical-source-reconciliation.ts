@@ -4,14 +4,15 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
 import { canonicalInterfaceMemberAuthority } from "./canonical-interface-member-authority"
+import { canonicalComponentPropSourceAnalyzer } from "./canonical-component-prop-source-analysis"
 import { canonicalRenderSourceAnalysisConventions } from "./canonical-render-source-conventions"
 import { analyzeCanonicalDelegatedHostFacts, canonicalDelegatedHostEvidencePaths, canonicalSourceOwnedSlotPropNames } from "./canonical-slot-source-analysis"
-import { analyzePackageComponentInterface } from "./inherited-interface-source-analysis"
+import { analyzePackageComponentInterface, type InterfaceMemberSelection } from "./inherited-interface-source-analysis"
 import type { ComponentContractSourceReconciliationContext } from "./loader"
-import { compareJsxRenderTree, analyzeJsxRenderTree, extractCvaVariantLiterals, extractFunctionPropDefaults, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
+import { compareJsxRenderTree, analyzeJsxRenderTree, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
 import { reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
 import { analyzeComponentTokenSourceForExport, compareComponentTokenDependenciesForExport } from "./canonical-token-source-analysis"
-import type { ComponentFamilyContract, ConditionalApiCase, InheritedInterfaceContract } from "./types"
+import type { ComponentFamilyContract, ConditionalApiCase, ConditionalApiCondition, InheritedInterfaceContract } from "./types"
 
 const analyzedInterfaceFacts = new Map<string, ReturnType<typeof analyzePackageComponentInterface>>()
 const canonicalReconciliationCache = new Map<string, readonly string[]>()
@@ -33,6 +34,10 @@ const canonicalComponentConditionalAuthority: Readonly<Record<string, readonly C
     { when: { propName: "showCloseButton", equals: true }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] },
     { when: { propName: "showCloseButton", equals: false }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] },
   ],
+  "toggle-group\u0000ToggleGroup": [
+    { when: { propName: "type", equals: "single" }, propRefinements: [], eventRefinements: [], stateChannels: [{ name: "value", controlledProp: "value", defaultProp: "defaultValue", changeEventProp: "onValueChange", evidenceRefs: ["declaration"] }], evidenceRefs: ["declaration"] },
+    { when: { propName: "type", equals: "multiple" }, propRefinements: [], eventRefinements: [], stateChannels: [{ name: "value", controlledProp: "value", defaultProp: "defaultValue", changeEventProp: "onValueChange", evidenceRefs: ["declaration"] }], evidenceRefs: ["declaration"] },
+  ],
 }
 
 const noCapabilities = { requires: [], provides: [], hardConstraints: [] }
@@ -44,6 +49,32 @@ const noCapabilities = { requires: [], provides: [], hardConstraints: [] }
  * to an unrelated export.
  */
 const canonicalComponentCompositionAuthority: Readonly<Record<string, { requires: string[]; provides: string[]; hardConstraints: string[] }>> = {
+  "alert-dialog\u0000AlertDialog": { requires: [], provides: ["alert-dialog.context"], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogAction": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogCancel": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogContent": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogDescription": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogOverlay": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogPortal": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogTitle": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "alert-dialog\u0000AlertDialogTrigger": { requires: ["alert-dialog.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000Avatar": { requires: [], provides: ["avatar.context"], hardConstraints: [] },
+  "avatar\u0000AvatarBadge": { requires: ["avatar.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000AvatarFallback": { requires: ["avatar.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000AvatarGroup": { requires: [], provides: ["avatar-group.context"], hardConstraints: [] },
+  "avatar\u0000AvatarGroupCount": { requires: ["avatar-group.context"], provides: [], hardConstraints: [] },
+  "avatar\u0000AvatarImage": { requires: ["avatar.context"], provides: [], hardConstraints: [] },
+  "collapsible\u0000Collapsible": { requires: [], provides: ["collapsible.context"], hardConstraints: [] },
+  "collapsible\u0000CollapsibleContent": { requires: ["collapsible.context"], provides: [], hardConstraints: [] },
+  "collapsible\u0000CollapsibleTrigger": { requires: ["collapsible.context"], provides: [], hardConstraints: [] },
+  "command\u0000Command": { requires: [], provides: ["command.context"], hardConstraints: [] },
+  "command\u0000CommandDialog": { requires: [], provides: ["command.context"], hardConstraints: [] },
+  "command\u0000CommandEmpty": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandGroup": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandInput": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandItem": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandList": { requires: ["command.context"], provides: [], hardConstraints: [] },
+  "command\u0000CommandSeparator": { requires: ["command.context"], provides: [], hardConstraints: [] },
   "dialog\u0000Dialog": { requires: [], provides: ["dialog.context"], hardConstraints: [] },
   "dialog\u0000DialogClose": { requires: ["dialog.context"], provides: [], hardConstraints: [] },
   "dialog\u0000DialogContent": { requires: ["dialog.context"], provides: [], hardConstraints: [] },
@@ -66,6 +97,20 @@ const canonicalComponentCompositionAuthority: Readonly<Record<string, { requires
   "dropdown-menu\u0000DropdownMenuSubContent": { requires: ["dropdown-menu.subcontext"], provides: [], hardConstraints: [] },
   "dropdown-menu\u0000DropdownMenuSubTrigger": { requires: ["dropdown-menu.subcontext"], provides: [], hardConstraints: [] },
   "dropdown-menu\u0000DropdownMenuTrigger": { requires: ["dropdown-menu.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000Drawer": { requires: [], provides: ["drawer.context"], hardConstraints: [] },
+  "drawer\u0000DrawerClose": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerContent": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerDescription": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerOverlay": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerPortal": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerTitle": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "drawer\u0000DrawerTrigger": { requires: ["drawer.context"], provides: [], hardConstraints: [] },
+  "popover\u0000Popover": { requires: [], provides: ["popover.context"], hardConstraints: [] },
+  "popover\u0000PopoverAnchor": { requires: ["popover.context"], provides: [], hardConstraints: [] },
+  "popover\u0000PopoverContent": { requires: ["popover.context"], provides: [], hardConstraints: [] },
+  "popover\u0000PopoverTrigger": { requires: ["popover.context"], provides: [], hardConstraints: [] },
+  "radio-group\u0000RadioGroup": { requires: [], provides: ["radio-group.context"], hardConstraints: [] },
+  "radio-group\u0000RadioGroupItem": { requires: ["radio-group.context"], provides: [], hardConstraints: [] },
   "select\u0000Select": { requires: [], provides: ["select.context"], hardConstraints: [] },
   "select\u0000SelectContent": { requires: ["select.context"], provides: [], hardConstraints: [] },
   "select\u0000SelectGroup": { requires: ["select.context"], provides: [], hardConstraints: [] },
@@ -87,6 +132,8 @@ const canonicalComponentCompositionAuthority: Readonly<Record<string, { requires
   "sidebar\u0000SidebarTrigger": { requires: ["sidebar.context"], provides: [], hardConstraints: [] },
   "sidebar\u0000SidebarRail": { requires: ["sidebar.context"], provides: [], hardConstraints: [] },
   "sidebar\u0000SidebarMenuButton": { requires: ["sidebar.context"], provides: [], hardConstraints: [] },
+  "toggle-group\u0000ToggleGroup": { requires: [], provides: ["toggle-group.context"], hardConstraints: [] },
+  "toggle-group\u0000ToggleGroupItem": { requires: ["toggle-group.context"], provides: [], hardConstraints: [] },
 }
 
 function sourceClassification(path: string) {
@@ -100,20 +147,12 @@ function artifactClassification(family: ComponentFamilyContract) {
   return family.exports.map((entry) => ({ name: entry.name, kind: entry.kind, authorableJsx: entry.authorableJsx, hasComponent: Boolean(entry.component) })).sort((left, right) => left.name.localeCompare(right.name))
 }
 
-function localDefaults(path: string, exportName: string, localPropNames: readonly string[]) {
-  const defaults = new Map(extractFunctionPropDefaults(path, exportName))
-  for (const evidence of listModuleExports(path)) {
-    if (evidence.declarationKind !== "VariableDeclaration") continue
-    const variants = extractCvaVariantLiterals(path, evidence.name)
-    for (const [name, value] of Object.entries(variants.defaults)) if (localPropNames.includes(name) && !defaults.has(name)) defaults.set(name, value)
-  }
-  return [...defaults].filter(([name]) => localPropNames.includes(name)).map(([name, value]) => ({ name, default: value })).sort((left, right) => left.name.localeCompare(right.name))
-}
-
 function localConditionalWhens(tree: JsxRenderTree) {
   const values = new Map<string, Set<string | number | boolean>>()
   const add = (condition: JsxRenderCondition | undefined) => {
-    if (!condition || !("propName" in condition)) return
+    if (!condition) return
+    if ("all" in condition) { for (const member of condition.all) add(member); return }
+    if (!("propName" in condition) || "nullishness" in condition) return
     const candidates = "equals" in condition ? typeof condition.equals === "boolean" ? [condition.equals, !condition.equals] : [condition.equals] : [true, false]
     const set = values.get(condition.propName) ?? new Set<string | number | boolean>()
     for (const candidate of candidates) set.add(candidate)
@@ -154,7 +193,7 @@ function canonicalInterfaceMembers(contract: InheritedInterfaceContract) {
   return canonicalInterfaceMemberAuthority[contract.id]
 }
 
-function analyzeCanonicalInterfaceFacts(contract: InheritedInterfaceContract, members: { props: readonly string[]; events: readonly string[] } | undefined) {
+function analyzeCanonicalInterfaceFacts(contract: InheritedInterfaceContract, members: InterfaceMemberSelection | undefined) {
   const key = JSON.stringify({ source: contract.source, members })
   const cached = analyzedInterfaceFacts.get(key)
   if (cached) return cached
@@ -164,21 +203,7 @@ function analyzeCanonicalInterfaceFacts(contract: InheritedInterfaceContract, me
 }
 
 function interfaceFactsMatch(contract: InheritedInterfaceContract, sourceFacts: ReturnType<typeof analyzePackageComponentInterface>) {
-  if (contract.source.kind !== "react-intrinsic" && !contract.source.symbol.endsWith("Props")) {
-    return sameValue({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }, sourceFacts)
-  }
-  return sameValue(
-    {
-      props: contract.props.map(({ name, required }) => ({ name, required })),
-      events: (contract.events ?? []).map(({ propName, required }) => ({ propName, required })),
-      conditionalApi: contract.conditionalApi ?? [],
-    },
-    {
-      props: sourceFacts.props.map(({ name, required }) => ({ name, required })),
-      events: sourceFacts.events.map(({ propName, required }) => ({ propName, required })),
-      conditionalApi: sourceFacts.conditionalApi,
-    },
-  )
+  return sameValue({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }, sourceFacts)
 }
 
 /**
@@ -191,7 +216,8 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
   const cached = canonicalReconciliationCache.get(cacheKey)
   if (cached) return [...cached]
   const errors: string[] = []
-  const sourceConditionalWhens = new Map<string, Array<{ propName: string; equals: string | number | boolean }>>()
+  const propAnalyzer = canonicalComponentPropSourceAnalyzer(repositoryRoot)
+  const sourceConditionalWhens = new Map<string, ConditionalApiCondition[]>()
   for (const family of context.families) {
     const path = join(repositoryRoot, family.source.canonicalPath)
     let source: string
@@ -210,6 +236,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       if (tokenErrors.length > 0) {
         errors.push(`Family ${family.id} token dependencies do not match source evidence.`)
         errors.push(`Component ${entry.name} token dependencies do not match source evidence.`)
+        errors.push(...tokenErrors.map((error) => `Component ${entry.name}: ${error}`))
       }
 
       const sourceRendering = analyzeJsxRenderTree(path, entry.name, canonicalRenderSourceAnalysisConventions)
@@ -231,9 +258,16 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       if (renderErrors.length > 0) {
         if (renderErrors.some((error) => error.startsWith("Data attributes mismatch"))) errors.push(`Family ${family.id} render data-slot facts do not match source evidence.`)
         errors.push(`Component ${entry.name} rendering does not match source evidence.`)
+        errors.push(...renderErrors.map((error) => `Component ${entry.name}: ${error}`))
       }
-      const contractedDefaults = entry.component.localProps.filter((prop) => Object.hasOwn(prop, "default")).map((prop) => ({ name: prop.name, default: prop.default })).sort((left, right) => left.name.localeCompare(right.name))
-      if (!sameValue(contractedDefaults, localDefaults(path, entry.name, entry.component.localProps.map((prop) => prop.name)))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)
+      const propErrors = propAnalyzer.compareComponentLocalProps(
+        entry.component.localProps,
+        propAnalyzer.analyzeComponentPropSource(path, entry.name),
+        new Set((entry.component.inheritedPropDefaults ?? []).map((defaultFact) => defaultFact.propName)),
+      )
+      if (propErrors.some((error) => error.includes(" default "))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)
+      if (propErrors.some((error) => !error.includes(" default "))) errors.push(`Component ${entry.name} local prop surface does not match source evidence.`)
+      errors.push(...propErrors.map((error) => `Component ${entry.name}: ${error}`))
     }
     errors.push(...reconcileSourceEvidenceCompleteness(family, unresolved))
   }
@@ -266,7 +300,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       ...component.inherits.flatMap((interfaceId) => sourceConditionalWhens.get(interfaceId) ?? []),
     ]
     for (const conditional of expectedConditionalApi) {
-      if (!supported.some((candidate) => candidate.propName === conditional.when.propName && candidate.equals === conditional.when.equals)) {
+      if (!supported.some((candidate) => candidate.propName === conditional.when.propName && ("equals" in candidate && "equals" in conditional.when ? candidate.equals === conditional.when.equals : "presence" in candidate && "presence" in conditional.when && candidate.presence === conditional.when.presence))) {
         errors.push(`Component ${entry.name} conditional API lacks source evidence for ${conditional.when.propName}.`)
       }
     }

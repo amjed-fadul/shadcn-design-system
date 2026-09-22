@@ -105,8 +105,8 @@ describe("token dependency source selector context", () => {
           },
         },
       })
-      export function Example() {
-        return <div className={styles()} />
+      export function Example({ variant }: { variant: "default" | "line" }) {
+        return <div className={styles({ variant })} />
       }
     `
     const dependencies = analyzer(() => source).analyzeComponentTokenDependenciesForExport("fixture.tsx", "Example")

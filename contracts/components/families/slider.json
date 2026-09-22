@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "id": "slider",
+  "source": {
+    "canonicalPath": "src/components/ui/slider.tsx",
+    "canonicalBlobSha": "6de9b281313adac1271ac2c4bf53a9aa1c3e4b1b",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/slider.tsx",
+    "upstreamBlobSha": "d94d3d8fca2e309caca599fca181720e8b6f2524"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/slider.tsx@6de9b281313adac1271ac2c4bf53a9aa1c3e4b1b"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.slider.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Slider",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "radix.slider.root"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [
+          {
+            "name": "value",
+            "controlledProp": "value",
+            "defaultProp": "defaultValue",
+            "changeEventProp": "onValueChange",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 40
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "orientation",
+              "equals": "vertical"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "orientation",
+              "equals": "vertical"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.slider.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "slider",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "track",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "thumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "track",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.slider.track"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "slider-track",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "range",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "range",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.slider.range"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "slider-range",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "thumb",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.slider.thumb"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "slider-thumb",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "slider semantics and keyboard interaction",
+            "owner": "component",
+            "mechanism": "Radix Slider Thumb supplies role=slider, value ARIA, keyboard navigation, orientation, direction, disabled state, and form behavior",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "feature": "accessible name",
+            "owner": "author",
+            "mechanism": "provide aria-label or equivalent labeling for the slider/thumb values",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "min",
+            "value": 0,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "propName": "max",
+            "value": 100,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "unresolved": []
+}

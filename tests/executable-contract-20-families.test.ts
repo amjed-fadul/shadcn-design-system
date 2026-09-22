@@ -15,24 +15,42 @@ const contract = projectExecutableContract({
 
 const familyIds = [
   "accordion",
+  "alert",
+  "alert-dialog",
+  "avatar",
   "badge",
+  "breadcrumb",
   "button",
   "card",
   "checkbox",
+  "collapsible",
+  "command",
   "dialog",
+  "drawer",
   "dropdown-menu",
+  "empty",
+  "field",
+  "input-group",
   "input",
   "label",
+  "pagination",
+  "popover",
+  "progress",
+  "radio-group",
   "scroll-area",
   "select",
   "separator",
   "sheet",
   "sidebar",
   "skeleton",
+  "slider",
+  "spinner",
   "switch",
   "table",
   "tabs",
   "textarea",
+  "toggle",
+  "toggle-group",
   "tooltip",
 ] as const
 
@@ -74,7 +92,7 @@ function bareNode(entry: ExecutableExport, childrenOverride?: AuthoredNode[], pr
   }
   const selected = new Map<string, string | number | boolean>()
   for (const conditional of componentContract.conditionalApi) {
-    if (!selected.has(conditional.when.propName)) selected.set(conditional.when.propName, conditional.when.equals)
+    if ("equals" in conditional.when && !selected.has(conditional.when.propName)) selected.set(conditional.when.propName, conditional.when.equals)
   }
   for (const [propName, value] of selected) props[propName] ??= literal(value)
   Object.assign(props, propsOverride)
@@ -117,21 +135,39 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
-describe("Phase 5 executable validator coverage across all 20 Phase 3 families", () => {
-  test("projects and resolves every authorable Phase 3 export", () => {
+describe("Phase 5 executable validator coverage across all 38 canonical families", () => {
+  test("projects and resolves every authorable canonical export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
     const authorable = Object.values(contract.exports).filter((entry) => entry.authorableJsx && entry.kind === "component")
     const nonAuthorable = Object.values(contract.exports).filter((entry) => !entry.authorableJsx)
     const hardConstraints = Object.values(contract.exports).flatMap((entry) => entry.component?.composition.hardConstraints ?? [])
 
     expect([...projectedFamilies].sort()).toEqual([...familyIds].sort())
-    expect(authorable).toHaveLength(104)
-    expect(nonAuthorable).toHaveLength(4)
+    expect(authorable).toHaveLength(199)
+    expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
     for (const entry of authorable) {
+      const exportId = `${entry.familyId}.${entry.name}`
       const result = validateAuthoredUi({ root: nodeFor(entry.familyId, entry.name) }, contract)
-      expect(result.errors, `${entry.familyId}.${entry.name}`).toEqual([])
+      expect(result.errors, exportId).toEqual([])
     }
+  })
+
+  test("selects Drawer fadeFromIndex presence branches and enforces required snapPoints", () => {
+    const absent = validateAuthoredUi({ root: component("drawer", "Drawer"), tokenUses: [] }, contract)
+    const incomplete = validateAuthoredUi({ root: component("drawer", "Drawer", { fadeFromIndex: literal(0) }), tokenUses: [] }, contract)
+    const complete = validateAuthoredUi({ root: component("drawer", "Drawer", { fadeFromIndex: literal(0), snapPoints: literal([0.25, "320px"]) }), tokenUses: [] }, contract)
+
+    expect(absent).toEqual({ ok: true, errors: [] })
+    expect(incomplete.errors).toContainEqual(expect.objectContaining({ code: "INVALID_PROP", message: "Required prop Drawer.snapPoints is missing." }))
+    expect(complete).toEqual({ ok: true, errors: [] })
+  })
+
+  test("models FieldError useMemo children as a source-backed dynamic expression", async () => {
+    const { analyzeJsxRenderTree } = await import("../src/contracts/components/render-source-analysis")
+    const result = analyzeJsxRenderTree("src/components/ui/field.tsx", "FieldError")
+    expect(result.unresolved).toEqual([])
+    expect(result.root?.kind).toBe("intrinsic")
   })
 
   test.each([

@@ -33,7 +33,7 @@ function toolchain() {
   return { node, npm, platform: process.platform, arch: process.arch, tools }
 }
 function packBuild() {
-  const stage = mkdtempSync(path.join(tmpdir(), "release-004-build-"))
+  const stage = mkdtempSync(path.join(tmpdir(), "release-005-build-"))
   try {
     execFileSync(process.execPath, [path.join(root, "scripts/build-library.mjs"), "--out-dir", path.join(stage, "dist-library")], { cwd: root, stdio: "pipe", timeout: 180_000, maxBuffer: 16 * 1024 * 1024 })
     for (const file of readdirSync(root)) if (file === "package.json" || /^(README|LICEN[CS]E|COPYING)(\.|$)/i.test(file)) cpSync(path.join(root, file), path.join(stage, file))
@@ -45,10 +45,10 @@ function packBuild() {
   } finally { rmSync(stage, { recursive: true, force: true }) }
 }
 function candidateRelease(expectedSha256) {
-  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-004.json")
+  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-005.json")
   const raw = JSON.parse(readFileSync(releasePath, "utf8"))
   const expectedProjection = projectionApi.projectExecutableContract({ componentContracts: componentAuthority.loadComponentContracts(), tokenContract: tokenAuthority.getTokenContract() })
-  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-004", requirePackageIdentity: true })
+  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-005", requirePackageIdentity: true })
   if (expectedSha256 !== undefined && release.sha256 !== expectedSha256) throw new Error("RELEASE_ANCHOR_MISMATCH")
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(identity.packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
   identity.verifyImplementationManifest(root, release.implementationInputs)

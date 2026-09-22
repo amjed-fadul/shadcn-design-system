@@ -176,6 +176,17 @@
       "component": {
         "localProps": [
           {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof SheetPrimitive.Portal>[\"container\"]"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
             "name": "side",
             "required": false,
             "type": {
@@ -201,28 +212,6 @@
             "default": true,
             "evidenceRefs": [
               "source"
-            ]
-          },
-          {
-            "name": "portalContainer",
-            "required": false,
-            "type": {
-              "kind": "union",
-              "members": [
-                {
-                  "kind": "typescript",
-                  "typeText": "Element"
-                },
-                {
-                  "kind": "typescript",
-                  "typeText": "DocumentFragment"
-                }
-              ]
-            },
-            "typeText": "Element | DocumentFragment",
-            "evidenceRefs": [
-              "source",
-              "declaration"
             ]
           }
         ],
@@ -290,17 +279,6 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 0
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
               "multiplier": 4
             },
             "evidenceRefs": [
@@ -328,6 +306,17 @@
           },
           {
             "tokenId": "shadow.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -863,7 +852,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "supported",
+            "refForwarding": "unresolved",
             "evidenceRefs": [
               "source",
               "declaration"

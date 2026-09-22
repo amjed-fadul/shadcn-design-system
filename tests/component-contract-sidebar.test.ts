@@ -12,6 +12,7 @@ import type { ComponentFamilyContract, InheritedInterfaceContract } from "../src
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependenciesForExport, analyzeComponentTokenSource, auditComponentTokenCoverage, compareComponentTokenDependenciesForExport } from "./helpers/component-token-analysis"
 import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const source = join(repoRoot, "src/components/ui/sidebar.tsx")
@@ -42,9 +43,9 @@ function authority() {
 }
 
 describe("Sidebar component family contract", () => {
-  test("registers Sidebar within the approved family set", () => {
-    expect(contractSet.familyCount).toBe(20)
-    expect(contractSet.familyFiles).toHaveLength(20)
+  test("preserves Sidebar within the independently approved family scope", () => {
+    expect(contractSet.familyCount).toBe(canonicalFamilyIds.length)
+    expect(contractSet.familyFiles).toHaveLength(canonicalFamilyIds.length)
     expect(contractSet.familyFiles).toContain("contracts/components/families/sidebar.json")
   })
 
@@ -94,8 +95,7 @@ describe("Sidebar component family contract", () => {
     expect(sidebar.localProps).toContainEqual({
       name: "portalContainer",
       required: false,
-      type: { kind: "union", members: [{ kind: "typescript", typeText: "Element" }, { kind: "typescript", typeText: "DocumentFragment" }] },
-      typeText: "Element | DocumentFragment",
+      type: { kind: "typescript", typeText: 'ComponentProps<typeof SheetContent>["portalContainer"]' },
       evidenceRefs: ["source", "declaration"],
     })
     expect(sidebar.rendering).toMatchObject({ alternatives: [

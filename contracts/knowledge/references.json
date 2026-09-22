@@ -10,12 +10,44 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.alert.docs",
+      "kind": "official-documentation",
+      "title": "Alert - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/alert",
+      "locatorHint": "Alert; Usage; Variants; API Reference",
+      "accessedOn": "2026-09-20"
+    },
+    {
+      "id": "shadcn.alert-dialog.docs",
+      "kind": "official-documentation",
+      "title": "Alert Dialog - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/alert-dialog",
+      "locatorHint": "Alert Dialog; Usage; Composition; Basic; Small; Media; Destructive; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.avatar.docs",
+      "kind": "official-documentation",
+      "title": "Avatar - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/avatar",
+      "locatorHint": "Avatar; Usage; Composition; Badge; Avatar Group; Sizes; Dropdown; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.badge.docs",
       "kind": "official-documentation",
       "title": "Badge - shadcn/ui",
       "locator": "https://ui.shadcn.com/docs/components/radix/badge",
       "locatorHint": "Badge; Usage; Variants",
       "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.breadcrumb.docs",
+      "kind": "official-documentation",
+      "title": "Breadcrumb - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/breadcrumb",
+      "locatorHint": "Breadcrumb; Usage; Composition; Custom separator; Collapsed; Link component; RTL; API Reference",
+      "accessedOn": "2026-09-21"
     },
     {
       "id": "shadcn.button.docs",
@@ -42,6 +74,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.collapsible.docs",
+      "kind": "official-documentation",
+      "title": "Collapsible - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/collapsible",
+      "locatorHint": "Collapsible; Usage; Composition; Controlled State; Basic; Settings Panel; File Tree; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.dialog.docs",
       "kind": "official-documentation",
       "title": "Dialog - shadcn/ui",
@@ -58,6 +98,38 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.command.docs",
+      "kind": "official-documentation",
+      "title": "Command - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/command",
+      "locatorHint": "Command; About; Usage; Composition; Basic; Shortcuts; Groups; Scrollable; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.drawer.docs",
+      "kind": "official-documentation",
+      "title": "Drawer - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/drawer",
+      "locatorHint": "Drawer; About; Usage; Composition; Scrollable Content; Sides; Responsive Dialog; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.empty.docs",
+      "kind": "official-documentation",
+      "title": "Empty - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/empty",
+      "locatorHint": "Empty; Usage; Composition; Outline; Background; Avatar; Avatar Group; InputGroup; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.field.docs",
+      "kind": "official-documentation",
+      "title": "Field - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/field",
+      "locatorHint": "Field; Usage; Composition; Anatomy; Validation and Errors; Accessibility; RTL; Responsive Layout; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.input.docs",
       "kind": "official-documentation",
       "title": "Input - shadcn/ui",
@@ -66,12 +138,52 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.input-group.docs",
+      "kind": "official-documentation",
+      "title": "Input Group - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/input-group",
+      "locatorHint": "Input Group; Usage; Composition; Align; Button; Spinner; Textarea; Custom Input; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.label.docs",
       "kind": "official-documentation",
       "title": "Label - shadcn/ui",
       "locator": "https://ui.shadcn.com/docs/components/radix/label",
       "locatorHint": "Label; Usage; Label in Field",
       "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.pagination.docs",
+      "kind": "official-documentation",
+      "title": "Pagination - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/pagination",
+      "locatorHint": "Pagination; Usage; Composition; Simple; Icons Only; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.popover.docs",
+      "kind": "official-documentation",
+      "title": "Popover - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/popover",
+      "locatorHint": "Popover; Usage; Composition; Align; With Form; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.progress.docs",
+      "kind": "official-documentation",
+      "title": "Progress - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/progress",
+      "locatorHint": "Progress; Usage; Label; Controlled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.radio-group.docs",
+      "kind": "official-documentation",
+      "title": "Radio Group - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/radio-group",
+      "locatorHint": "Radio Group; Usage; Composition; Description; Choice Card; Fieldset; Disabled; Invalid; RTL; API Reference",
+      "accessedOn": "2026-09-21"
     },
     {
       "id": "shadcn.scroll-area.docs",
@@ -122,12 +234,28 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "shadcn.spinner.docs",
+      "kind": "official-documentation",
+      "title": "Spinner - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/spinner",
+      "locatorHint": "Spinner; Usage; Customization; Size; Button; Badge; Input Group; Empty; RTL",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.slider.docs",
+      "kind": "official-documentation",
+      "title": "Slider - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/slider",
+      "locatorHint": "Slider; Usage; Range; Multiple Thumbs; Vertical; Controlled; Disabled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
       "id": "shadcn.switch.docs",
       "kind": "official-documentation",
       "title": "Switch - shadcn/ui",
       "locator": "https://ui.shadcn.com/docs/components/radix/switch",
-      "locatorHint": "Switch; Usage",
-      "accessedOn": "2026-09-08"
+      "locatorHint": "Switch; Usage; Description; Choice Card; Disabled; Invalid; Size; RTL; API Reference",
+      "accessedOn": "2026-09-21"
     },
     {
       "id": "shadcn.table.docs",
@@ -152,6 +280,22 @@
       "locator": "https://ui.shadcn.com/docs/components/radix/textarea",
       "locatorHint": "Textarea; Usage; Disabled",
       "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "shadcn.toggle.docs",
+      "kind": "official-documentation",
+      "title": "Toggle - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/toggle",
+      "locatorHint": "Toggle; Usage; Outline; With Text; Size; Disabled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
+    },
+    {
+      "id": "shadcn.toggle-group.docs",
+      "kind": "official-documentation",
+      "title": "Toggle Group - shadcn/ui",
+      "locator": "https://ui.shadcn.com/docs/components/radix/toggle-group",
+      "locatorHint": "Toggle Group; Usage; Composition; Outline; Size; Spacing; Vertical; Disabled; RTL; API Reference",
+      "accessedOn": "2026-09-21"
     },
     {
       "id": "shadcn.tooltip.docs",
@@ -192,14 +336,6 @@
       "locator": "https://www.radix-ui.com/primitives/docs/components/select",
       "locatorHint": "Features; Anatomy; Accessibility; Keyboard Interactions; Labelling",
       "accessedOn": "2026-09-02"
-    },
-    {
-      "id": "radix.switch.docs",
-      "kind": "official-documentation",
-      "title": "Switch - Radix Primitives",
-      "locator": "https://www.radix-ui.com/primitives/docs/components/switch",
-      "locatorHint": "Features; Accessibility; Keyboard Interactions",
-      "accessedOn": "2026-09-08"
     },
     {
       "id": "w3c.button.apg",

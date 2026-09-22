@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "avatar-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "avatar"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "An image element with a fallback for representing the user.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.avatar.docs"
+      ]
+    }
+  },
+  "howToUse": [
+    {
+      "statement": "Compose Avatar with AvatarImage and AvatarFallback; AvatarBadge may be added inside the Avatar.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.avatar.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Compose AvatarGroup from Avatar children and use AvatarGroupCount for the number of additional avatars.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.avatar.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use the size prop with sm, default, or lg to change the avatar size.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.avatar.docs"
+        ]
+      }
+    }
+  ]
+}

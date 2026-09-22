@@ -29,11 +29,11 @@ const contractedExportNames = () => {
 }
 
 describe("published library entrypoint", () => {
-  test("exposes all 108 contracted public exports including Switch", async () => {
+  test("exposes all 205 contracted public exports including Switch", async () => {
     const library = await import("../src/package/index")
     const names = contractedExportNames()
     expect(Object.keys(library).sort()).toEqual(names.sort())
-    expect(names).toHaveLength(108)
+    expect(names).toHaveLength(205)
     expect(Object.hasOwn(library, "Switch")).toBe(true)
     expect(Object.hasOwn(library, "SidebarNormalAppProvider")).toBe(false)
     const sidebar = readJson("contracts/components/families/sidebar.json")
@@ -84,7 +84,7 @@ describe("immutable Release 003 package artifact verification", () => {
 
   test("exposes every approved component export without exposing internal utilities", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "index.js"))
-    const names = contractedExportNames()
+    const names = Object.keys(readJson("provenance/releases/shadcn-radix-release-003.json").projection.exports).map((key) => key.split("\0")[1])
     expect(Object.keys(library).sort()).toEqual(names.sort())
     expect(names).toHaveLength(108)
     expect(Object.hasOwn(library, "Switch")).toBe(true)
@@ -95,7 +95,7 @@ describe("immutable Release 003 package artifact verification", () => {
   test("ships the R3 executable release and frozen contract data", async () => {
     const library = await import(/* @vite-ignore */ path.join(output, "release.js"))
     expect(Object.keys(library).sort()).toEqual(["getComponentContracts", "getExecutableRelease", "getTokenContract"])
-    expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-004.json"))
+    expect(library.getExecutableRelease()).toEqual(readJson("provenance/releases/shadcn-radix-release-003.json"))
     const components = library.getComponentContracts()
     expect(components.contractSet.id).toBe("shadcn-radix-component-contracts-001")
     expect(components.families).toHaveLength(20)
@@ -142,8 +142,8 @@ describe("immutable Release 003 package artifact verification", () => {
   })
 
   test("public declarations resolve and reject invalid usage without repository aliases", () => {
-    const manifest = readJson("package.json")
-    expect(manifest.version).toBe("0.0.0-release.4")
+    const manifest = JSON.parse(readFileSync(path.join(r3Extraction, "package", "package.json"), "utf8"))
+    expect(manifest.version).toBe("0.0.0-release.3")
     expect(Object.keys(manifest.exports).sort()).toEqual([".", "./release", "./styles.css"])
     const probe = path.join(r3Extraction, "package", "r3-library-type-probe.tsx")
     const validSource = `

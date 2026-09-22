@@ -176,6 +176,17 @@
       "component": {
         "localProps": [
           {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof DialogPrimitive.Portal>[\"container\"]"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
             "name": "showCloseButton",
             "required": false,
             "type": {
@@ -184,28 +195,6 @@
             "default": true,
             "evidenceRefs": [
               "source"
-            ]
-          },
-          {
-            "name": "portalContainer",
-            "required": false,
-            "type": {
-              "kind": "union",
-              "members": [
-                {
-                  "kind": "typescript",
-                  "typeText": "Element"
-                },
-                {
-                  "kind": "typescript",
-                  "typeText": "DocumentFragment"
-                }
-              ]
-            },
-            "typeText": "Element | DocumentFragment",
-            "evidenceRefs": [
-              "source",
-              "declaration"
             ]
           }
         ],
@@ -1075,7 +1064,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "supported",
+            "refForwarding": "unresolved",
             "evidenceRefs": [
               "source",
               "declaration"

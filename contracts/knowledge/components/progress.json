@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "progress-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "progress"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays an indicator showing the completion progress of a task, typically as a progress bar.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.progress.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Progress when a task has measurable completion that can be represented by a value.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.progress.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Set the value prop to the current progress value; the standard usage example is <Progress value={33} />.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.progress.docs"
+        ]
+      }
+    }
+  ]
+}

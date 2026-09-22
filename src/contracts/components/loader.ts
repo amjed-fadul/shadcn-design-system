@@ -154,7 +154,7 @@ function expectedIndex(contractSet: ComponentContractSet, families: ComponentFam
   }
 }
 
-function authorityFor(interfaces: InheritedInterfaceContract[], capabilityIds: Set<string>, tokenIds: ReadonlySet<string>, derivedTokenRuleIds: ReadonlySet<string>, sourceIdentity?: ComponentInvariantAuthority["sourceIdentity"]): ComponentInvariantAuthority {
+function authorityFor(interfaces: InheritedInterfaceContract[], capabilityIds: Set<string>, componentExportIds: Set<string>, tokenIds: ReadonlySet<string>, derivedTokenRuleIds: ReadonlySet<string>, sourceIdentity?: ComponentInvariantAuthority["sourceIdentity"]): ComponentInvariantAuthority {
   return {
     interfaceIds: new Set(interfaces.map((contract) => contract.id)),
     interfacePropNames: new Map(interfaces.map((contract) => [contract.id, new Set(contract.props.map((prop) => prop.name))])),
@@ -162,6 +162,7 @@ function authorityFor(interfaces: InheritedInterfaceContract[], capabilityIds: S
     tokenIds: new Set(tokenIds),
     derivedTokenRuleIds: new Set(derivedTokenRuleIds),
     capabilityIds,
+    componentExportIds,
     sourceIdentity,
   }
 }
@@ -202,6 +203,9 @@ function loadContracts({
   const families = contractSet.familyFiles.map((path) => schemaDocument<ComponentFamilyContract>(source, path, validateFamily))
   requireUnique(families.map((family) => family.id), "Family IDs", configuredContractSetPath)
   const capabilityIds = new Set(configuredCapabilityIds ?? [])
+  const componentExportIds = new Set(families.flatMap((family) => family.exports
+    .filter((entry) => entry.kind === "component" && entry.authorableJsx)
+    .map((entry) => `${family.id}.${entry.name}`)))
   for (const [index, family] of families.entries()) {
     const expectedId = contractSet.familyFiles[index].split("/").at(-1)!.replace(/\.json$/, "")
     if (family.id !== expectedId) throw new ComponentContractLoadError("COMPONENT_CONTRACT_ARTIFACT_INVALID", `Family ID ${family.id} does not match its manifest path ${contractSet.familyFiles[index]}.`, contractSet.familyFiles[index])
@@ -209,7 +213,7 @@ function loadContracts({
   for (const [index, family] of families.entries()) {
     const sourceIdentity = sourceIdentityForFamily?.(family.id)
     if (requireSourceIdentity && !sourceIdentity) throw new ComponentContractLoadError("COMPONENT_CONTRACT_ARTIFACT_INVALID", `Family has no configured source provenance: ${family.id}.`, contractSet.familyFiles[index])
-    rejectInvariantErrors(contractSet.familyFiles[index], invariantDocumentErrors(family, authorityFor(interfaces, capabilityIds, tokenIds, derivedTokenRuleIds, sourceIdentity)))
+    rejectInvariantErrors(contractSet.familyFiles[index], invariantDocumentErrors(family, authorityFor(interfaces, capabilityIds, componentExportIds, tokenIds, derivedTokenRuleIds, sourceIdentity)))
   }
 
   const sourceErrors = sourceReconciler?.({ contractSet, families, interfaces }) ?? []

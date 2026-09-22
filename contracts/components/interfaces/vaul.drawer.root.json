@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "id": "vaul.drawer.root",
+  "source": {
+    "kind": "package-declaration",
+    "package": "vaul",
+    "version": "1.1.2",
+    "declarationPath": "node_modules/vaul/dist/index.d.ts",
+    "declarationSha256": "e7441be68f390975c6155c805cea8f54cc1b7f3656b6b9440ecbbbd7753499e6",
+    "symbol": "Root"
+  },
+  "evidence": {
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "node_modules/vaul/dist/index.d.ts@e7441be68f390975c6155c805cea8f54cc1b7f3656b6b9440ecbbbd7753499e6"
+    }
+  },
+  "props": [
+    {
+      "name": "activeSnapPoint",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          }
+        ]
+      },
+      "typeText": "string | number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "autoFocus",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "children",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Iterable<React.ReactNode>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactPortal"
+          }
+        ]
+      },
+      "typeText": "React.ReactNode",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "closeThreshold",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "container",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "HTMLElement"
+      },
+      "typeText": "HTMLElement",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "defaultOpen",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "direction",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ]
+      },
+      "typeText": "\"top\" | \"bottom\" | \"left\" | \"right\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "disablePreventScroll",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "dismissible",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "fadeFromIndex",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "never"
+          }
+        ]
+      },
+      "typeText": "number | never",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "fixed",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "handleOnly",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "modal",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "nested",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "noBodyStyles",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAnimationEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "(open: boolean) => void"
+      },
+      "typeText": "(open: boolean) => void",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onClose",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "() => void"
+      },
+      "typeText": "() => void",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDrag",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "(event: React.PointerEvent<HTMLDivElement>, percentageDragged: number) => void"
+      },
+      "typeText": "(event: React.PointerEvent<HTMLDivElement>, percentageDragged: number) => void",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onRelease",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "(event: React.PointerEvent<HTMLDivElement>, open: boolean) => void"
+      },
+      "typeText": "(event: React.PointerEvent<HTMLDivElement>, open: boolean) => void",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "open",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "preventScrollRestoration",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "repositionInputs",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "scrollLockTimeout",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "setActiveSnapPoint",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "(snapPoint: number | string | null) => void"
+      },
+      "typeText": "(snapPoint: number | string | null) => void",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "setBackgroundColorOnScale",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "shouldScaleBackground",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "snapPoints",
+      "required": false,
+      "type": {
+        "kind": "array",
+        "item": {
+          "kind": "union",
+          "members": [
+            {
+              "kind": "string"
+            },
+            {
+              "kind": "number"
+            }
+          ]
+        }
+      },
+      "typeText": "(string | number)[]",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "snapToSequentialPoint",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "propName": "onOpenChange",
+      "required": false,
+      "payload": {
+        "kind": "boolean"
+      },
+      "payloadTypeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "conditionalApi": [
+    {
+      "when": {
+        "propName": "fadeFromIndex",
+        "presence": "present"
+      },
+      "propRefinements": [
+        {
+          "propName": "fadeFromIndex",
+          "availability": "available",
+          "required": true,
+          "type": {
+            "kind": "number"
+          },
+          "evidenceRefs": [
+            "declaration"
+          ]
+        },
+        {
+          "propName": "snapPoints",
+          "availability": "available",
+          "required": true,
+          "type": {
+            "kind": "array",
+            "item": {
+              "kind": "union",
+              "members": [
+                {
+                  "kind": "string"
+                },
+                {
+                  "kind": "number"
+                }
+              ]
+            }
+          },
+          "evidenceRefs": [
+            "declaration"
+          ]
+        }
+      ],
+      "eventRefinements": [],
+      "stateChannels": [],
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "when": {
+        "propName": "fadeFromIndex",
+        "presence": "absent"
+      },
+      "propRefinements": [
+        {
+          "propName": "fadeFromIndex",
+          "availability": "unavailable",
+          "evidenceRefs": [
+            "declaration"
+          ]
+        }
+      ],
+      "eventRefinements": [],
+      "stateChannels": [],
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "unresolved": []
+}

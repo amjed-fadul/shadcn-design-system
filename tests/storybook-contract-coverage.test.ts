@@ -1,9 +1,7 @@
-import { readdirSync, existsSync, readFileSync } from "node:fs"
+import { readFileSync, readdirSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { describe, expect, test } from "vitest"
-
-import contractSet from "../contracts/components/component-contract-set.json"
 
 const testsDirectory = path.dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = path.resolve(testsDirectory, "..")
@@ -13,25 +11,69 @@ const previewSource = readFileSync(
   "utf8"
 )
 
-const familyIds = contractSet.familyFiles.map((familyFile) =>
-  path.basename(familyFile, ".json")
-)
-const expectedStoryFiles = familyIds.map((familyId) => `${familyId}.stories.tsx`)
+const expectedFamilyIds = [
+  "accordion",
+  "alert-dialog",
+  "alert",
+  "avatar",
+  "badge",
+  "breadcrumb",
+  "button",
+  "card",
+  "checkbox",
+  "collapsible",
+  "command",
+  "dialog",
+  "drawer",
+  "dropdown-menu",
+  "empty",
+  "field",
+  "input-group",
+  "input",
+  "label",
+  "pagination",
+  "popover",
+  "progress",
+  "radio-group",
+  "scroll-area",
+  "select",
+  "separator",
+  "sheet",
+  "sidebar",
+  "skeleton",
+  "slider",
+  "spinner",
+  "switch",
+  "table",
+  "tabs",
+  "textarea",
+  "toggle-group",
+  "toggle",
+  "tooltip",
+] as const
 
 describe("Storybook contract coverage", () => {
-  test("has exactly one conventional story file for every approved family", () => {
-    expect(new Set(familyIds).size).toBe(familyIds.length)
-    expect(contractSet.familyCount).toBe(familyIds.length)
-
-    const missingStoryFiles = expectedStoryFiles.filter(
-      (storyFile) => !existsSync(path.join(storyDirectory, storyFile))
-    )
-    const actualStoryFiles = readdirSync(storyDirectory)
+  test("preserves the exact 38-family source and story manifests", () => {
+    const directoryEntries = readdirSync(storyDirectory)
+    const actualComponentFiles = directoryEntries
+      .filter(
+        (fileName) =>
+          fileName.endsWith(".tsx") && !fileName.endsWith(".stories.tsx")
+      )
+      .sort()
+    const actualStoryFiles = directoryEntries
       .filter((fileName) => fileName.endsWith(".stories.tsx"))
       .sort()
+    const expectedComponentFiles = expectedFamilyIds
+      .map((familyId) => `${familyId}.tsx`)
+      .sort()
+    const expectedStoryFiles = expectedFamilyIds
+      .map((familyId) => `${familyId}.stories.tsx`)
+      .sort()
 
-    expect(missingStoryFiles).toEqual([])
-    expect(actualStoryFiles).toEqual([...expectedStoryFiles].sort())
+    expect(expectedFamilyIds).toHaveLength(38)
+    expect(actualComponentFiles).toEqual(expectedComponentFiles)
+    expect(actualStoryFiles).toEqual(expectedStoryFiles)
   })
 
   test("keeps every axe rule enabled in the enforced Storybook gate", () => {

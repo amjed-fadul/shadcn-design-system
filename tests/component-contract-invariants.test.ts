@@ -49,11 +49,16 @@ const htmlExample: InheritedInterfaceContract = {
   schemaVersion: 1, id: "html.example",
   source: { kind: "react-intrinsic", package: "@types/react", version: "18.3.3", declarationPath: "node_modules/@types/react/index.d.ts", declarationSha256: "a".repeat(64), symbol: "React.JSX.IntrinsicElements[\"example\"]" },
   evidence: { declaration: { kind: "inherited-interface", source: "node_modules/@types/react/index.d.ts" } },
-  props: [{ name: "inheritedState", required: false, type: { kind: "boolean" }, typeText: "boolean", evidenceRefs: ["declaration"] }],
+  props: [
+    { name: "inheritedState", required: false, type: { kind: "boolean" }, typeText: "boolean", evidenceRefs: ["declaration"] },
+    { name: "children", required: false, type: { kind: "typescript", typeText: "ReactNode" }, typeText: "ReactNode", evidenceRefs: ["declaration"] },
+  ],
   events: [{ propName: "onClick", required: false, payload: { kind: "boolean" }, payloadTypeText: "boolean", evidenceRefs: ["declaration"] }],
   unresolved: [],
 }
-const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), capabilityIds: new Set<string>(), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
+const authority = { interfaceIds: new Set(["html.example"]), interfacePropNames: new Map([["html.example", new Set(["onClick", "inheritedState"])]]), interfaceContracts: new Map([[htmlExample.id, htmlExample]]), tokenIds: new Set(["color.primary"]), derivedTokenRuleIds: new Set(["spacing.multiplier"]), capabilityIds: new Set<string>(), componentExportIds: new Set(["button.Button"]), sourceIdentity: { canonicalPath: "src/example.tsx", canonicalBlobSha: "a".repeat(40) } }
+
+authority.interfacePropNames.get("html.example")!.add("children")
 
 describe("component contract semantic invariants", () => {
   test("rejects a contract set whose declared family count exceeds its manifest", () => {
@@ -70,35 +75,36 @@ describe("component contract semantic invariants", () => {
     expect(() => assertComponentFamilyInvariants(validFamily(), authority)).not.toThrow()
   })
 
-  test("uses source context in token dependency identity and rejects an empty context", () => {
-    const distinct = changed((family: any) => {
-      const dependency = family.exports[0].component.tokenDependencies[0]
-      dependency.sourceContext = { applicability: ["group-data-[state=open]/item"] }
-      family.exports[0].component.tokenDependencies.push({
-        ...structuredClone(dependency),
-        sourceContext: { applicability: [], target: { kind: "pseudo-element", name: "after" } },
-      })
-    })
-    expect(validateComponentFamilyInvariants(distinct, authority)).toEqual([])
+  test("accepts inherited children without requiring a duplicate local prop", () => {
+    const family = validFamily()
+    family.exports[0].component!.inherits = ["html.example"]
+    expect(validateComponentFamilyInvariants(family, authority)).toEqual([])
+  })
 
-    const duplicate = structuredClone(distinct)
-    duplicate.exports[0].component!.tokenDependencies.push(structuredClone(duplicate.exports[0].component!.tokenDependencies[0]))
-    expect(validateComponentFamilyInvariants(duplicate, authority)).toContain("Component Example has duplicate token dependency: color.primary.")
-
-    const reorderedDuplicate = changed((family: any) => {
-      const dependency = family.exports[0].component.tokenDependencies[0]
-      dependency.sourceContext = { applicability: [], target: { kind: "pseudo-element", name: "after" } }
-      family.exports[0].component.tokenDependencies.push({
-        ...structuredClone(dependency),
-        sourceContext: { target: { name: "after", kind: "pseudo-element" }, applicability: [] },
-      })
+  test("validates token conjunction cardinality, scoped uniqueness, and contradictions", () => {
+    const token = (all: any[]) => changed((family: any) => {
+      family.exports[0].component.tokenDependencies[0].when = { all }
     })
-    expect(validateComponentFamilyInvariants(reorderedDuplicate, authority)).toContain("Component Example has duplicate token dependency: color.primary.")
+    const self = { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "open" }
+    const group = { subject: "data", path: [{ kind: "group", name: "root" }], propName: "state", equals: "closed" }
 
-    const empty = changed((family: any) => {
-      family.exports[0].component.tokenDependencies[0].sourceContext = { applicability: [] }
+    expect(validateComponentFamilyInvariants(token([self]), authority)).toContain("Component Example token color.primary conjunction must contain at least two conditions.")
+    expect(validateComponentFamilyInvariants(token([self, { ...self }]), authority)).toContain("Component Example token color.primary condition contains duplicate predicates.")
+    expect(validateComponentFamilyInvariants(token([self, { ...self, equals: "closed" }]), authority)).toContain("Component Example token color.primary condition contains contradictory predicates.")
+    expect(validateComponentFamilyInvariants(token([self, group]), authority)).toEqual([])
+  })
+
+  test("validates utility condition path naming semantics after schema bypass", () => {
+    const token = (path: any[]) => changed((family: any) => {
+      family.exports[0].component.tokenDependencies[0].when = { subject: "data", path, propName: "state", equals: "open" }
     })
-    expect(validateComponentFamilyInvariants(empty, authority)).toContain("Component Example token dependency color.primary has empty source context.")
+
+    expect(validateComponentFamilyInvariants(token([{ kind: "has" }, { kind: "group", name: "root" }]), authority)).toEqual([])
+    expect(validateComponentFamilyInvariants(token([{ kind: "self", name: "root" }]), authority)).toContain("Component Example token color.primary condition has an invalid named self relation path segment.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "in", name: "root" }]), authority)).toContain("Component Example token color.primary condition has an invalid named in relation path segment.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "group", name: "not/name" }]), authority)).toContain("Component Example token color.primary condition has an invalid relation path name: not/name.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "peer", name: "inner" }, { kind: "group", name: "outer" }]), authority)).toContain("Component Example token color.primary condition has multiple named relation path segments.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "group" }, { kind: "peer", name: "inner" }]), authority)).toContain("Component Example token color.primary condition relation path name must target its first group or peer segment.")
   })
 
   test("accepts a portal boundary targeting a reachable render node", () => {
@@ -107,6 +113,34 @@ describe("component contract semantic invariants", () => {
 
   test("accepts a conditional render child reference", () => {
     expect(validateComponentFamilyInvariants(withConditionalChild(), authority)).toEqual([])
+  })
+
+  test.each([
+    ["contradictory", [{ propName: "enabled", equals: true }, { propName: "enabled", equals: false }], "Component Example render alternative 0 condition contains contradictory predicates."],
+    ["duplicate", [{ propName: "enabled", equals: true }, { propName: "enabled", equals: true }], "Component Example render alternative 0 condition contains duplicate predicates."],
+  ])("rejects %s authored conjunctions", (_name, all, expected) => {
+    const family = validFamily() as any
+    family.exports[0].component.localProps.push({ name: "enabled", required: false, type: { kind: "boolean" }, evidenceRefs: ["source"] })
+    const rendering = structuredClone(family.exports[0].component.rendering)
+    family.exports[0].component.rendering = {
+      alternatives: [
+        { when: { all }, rendering, evidenceRefs: ["source"] },
+        { otherwise: true, rendering: structuredClone(rendering), evidenceRefs: ["source"] },
+      ],
+    }
+
+    expect(validateComponentFamilyInvariants(family, authority)).toContain(expected)
+  })
+
+  test.each([
+    ["duplicate", { all: [{ propName: "tone", equals: "quiet" }, { propName: "tone", equals: "quiet" }] }, "Component Example render child root->child condition contains duplicate predicates."],
+    ["contradictory", { all: [{ propName: "tone", equals: "quiet" }, { propName: "tone", equals: "loud" }] }, "Component Example render child root->child condition contains contradictory predicates."],
+    ["recursively nested duplicate", { all: [{ all: [{ propName: "tone", equals: "quiet" }, { propName: "tone", equals: "quiet" }] }, { source: "state", name: "ready", equals: true }] }, "Component Example render child root->child condition contains duplicate predicates."],
+  ])("rejects a %s child conjunction", (_name, when, expected) => {
+    const family = withConditionalChild() as any
+    family.exports[0].component.rendering.nodes[0].children[0].when = when
+
+    expect(validateComponentFamilyInvariants(family, authority)).toContain(expected)
   })
 
   test.each([
@@ -139,6 +173,18 @@ describe("component contract semantic invariants", () => {
       f.exports[0].component.rendering.nodes[0].host = { kind: "component-export", exportName: "Hook" }
     })
     expect(validateComponentFamilyInvariants(family, authority)).toContain("Component Example render host references non-JSX-authorable export: Hook.")
+  })
+
+  test("accepts a cross-family render host only when the target component export is authoritative", () => {
+    const family = changed((f: any) => {
+      f.exports[0].component.rendering.nodes[0].host = { kind: "cross-family-export", familyId: "button", exportName: "Button" }
+    })
+    expect(validateComponentFamilyInvariants(family, authority)).toEqual([])
+
+    const rendering = family.exports[0].component!.rendering
+    if (!("nodes" in rendering)) throw new Error("Expected a rendering tree fixture")
+    rendering.nodes[0].host = { kind: "cross-family-export", familyId: "button", exportName: "Missing" }
+    expect(validateComponentFamilyInvariants(family, authority)).toContain("Component Example render host references unknown cross-family component export: button.Missing.")
   })
 
   test.each([

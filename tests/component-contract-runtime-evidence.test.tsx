@@ -7,18 +7,16 @@ import { describe, expect, test } from "vitest"
 
 import contractSetJson from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
+import { canonicalInterfaceMemberAuthority } from "../src/contracts/components/canonical-interface-member-authority"
 import { resolveConditionalApiShape, validateComponentFamilyInvariants, validateInheritedInterfaceInvariants } from "../src/contracts/components/invariants"
 import type { ComponentContractSet, ComponentFamilyContract, ComponentInvariantAuthority, ComponentDefinition, InheritedInterfaceContract, RenderingFact, RenderingTree } from "../src/contracts/components/types"
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
-import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const contractSet = contractSetJson as ComponentContractSet
-const expectedFamilyIds = [
-  "accordion", "badge", "button", "card", "checkbox", "dialog", "dropdown-menu", "input", "label",
-  "scroll-area", "select", "separator", "sheet", "sidebar", "skeleton", "switch", "table", "tabs", "textarea", "tooltip",
-]
+const expectedFamilyIds = canonicalFamilyIds
 
 type SeedComponent = {
   canonicalPath: string
@@ -60,6 +58,9 @@ function authority(): ComponentInvariantAuthority {
     tokenIds: new Set(tokenContract.tokens.map((token) => token.id)),
     derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)),
     capabilityIds: new Set(families.flatMap((family) => family.exports.flatMap((entry) => entry.component?.composition.provides ?? []))),
+    componentExportIds: new Set(families.flatMap((family) => family.exports
+      .filter((entry) => entry.kind === "component" && entry.authorableJsx)
+      .map((entry) => `${family.id}.${entry.name}`))),
   }
 }
 
@@ -133,22 +134,8 @@ function sourceEvidencePath(source: string) {
   return source.replace(/@[0-9]+\.[0-9]+\.[0-9]+$/, "")
 }
 
-function normalizedTypeText(typeText: string) {
-  const members = typeText.split(" | ")
-  return members.length > 1 ? members.sort().join(" | ") : typeText
-}
-
-const intrinsicInterfaceCache = new Map<string, ReturnType<typeof analyzeIntrinsicReactInterface>>()
-function analyzeIntrinsic(tag: keyof React.JSX.IntrinsicElements) {
-  const cached = intrinsicInterfaceCache.get(tag)
-  if (cached) return cached
-  const analyzed = analyzeIntrinsicReactInterface(tag)
-  intrinsicInterfaceCache.set(tag, analyzed)
-  return analyzed
-}
-
 describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
-  test("registers exactly the 20 seed families and no extra family artifact", () => {
+  test("registers exactly the independently approved seed families and no extra family artifact", () => {
     const actualFamilyFiles = readdirSync(join(root, "contracts/components/families"))
       .filter((file) => file.endsWith(".json"))
       .map((file) => `contracts/components/families/${file}`)
@@ -156,13 +143,13 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
     const registeredFamilyIds = families.map((family) => family.id).sort()
     const seedFamilyIds = Object.keys(seed.components).sort()
 
-    expect(contractSet.familyCount).toBe(20)
-    expect(contractSet.familyFiles).toHaveLength(20)
-    expect(new Set(contractSet.familyFiles).size).toBe(20)
+    expect(contractSet.familyCount).toBe(expectedFamilyIds.length)
+    expect(contractSet.familyFiles).toHaveLength(expectedFamilyIds.length)
+    expect(new Set(contractSet.familyFiles).size).toBe(expectedFamilyIds.length)
     expect(actualFamilyFiles).toEqual(contractSet.familyFiles.slice().sort())
     expect(registeredFamilyIds).toEqual(expectedFamilyIds.slice().sort())
     expect(registeredFamilyIds).toEqual(seedFamilyIds)
-    expect(families).toHaveLength(20)
+    expect(families).toHaveLength(expectedFamilyIds.length)
   })
 
   test("reconciles every public export classification with canonical source", () => {
@@ -196,7 +183,7 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
       .filter((file) => file.endsWith(".json"))
       .map((file) => `contracts/components/interfaces/${file}`)
       .sort()
-    expect(contractSet.interfaceFiles).toHaveLength(78)
+    expect(contractSet.interfaceFiles).toHaveLength(referencedInterfaceIds.size)
     expect(new Set(contractSet.interfaceFiles).size).toBe(contractSet.interfaceFiles.length)
     expect(actualInterfaceFiles).toEqual(contractSet.interfaceFiles.slice().sort())
     expect(new Set(interfaces.map((item) => item.id)).size).toBe(interfaces.length)
@@ -209,27 +196,8 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
       expect(JSON.parse(readFileSync(join(root, "node_modules", contract.source.package, "package.json"), "utf8")).version).toBe(contract.source.version)
       expect(validateInheritedInterfaceInvariants(contract)).toEqual([])
 
-      if (contract.source.kind === "react-intrinsic") {
-        const tag = contract.source.symbol.match(/\["([^\"]+)"\]/)?.[1]
-        expect(tag).toBeTypeOf("string")
-        const analyzed = analyzeIntrinsic(tag as keyof React.JSX.IntrinsicElements)
-        expect(contract.props.map(({ name, required, typeText }) => ({ name, required, typeText }))).toEqual(analyzed)
-        expect(contract.events ?? []).toEqual([])
-        expect(contract.conditionalApi ?? []).toEqual([])
-      } else if (contract.source.symbol === "LabelProps" || contract.source.symbol === "SeparatorProps") {
-        const expected = analyzeIntrinsic(contract.source.symbol === "LabelProps" ? "label" : "div").filter(({ name }) => name !== "ref")
-        expected.push({ name: "asChild", required: false, typeText: "boolean" })
-        if (contract.source.symbol === "SeparatorProps") {
-          expected.push({ name: "decorative", required: false, typeText: "boolean" })
-          expected.push({ name: "orientation", required: false, typeText: "\"horizontal\" | \"vertical\"" })
-        }
-        expect(contract.props.map(({ name, required, typeText }) => ({ name, required, typeText: normalizedTypeText(typeText) }))).toEqual(expected.map(({ name, required, typeText }) => ({ name, required, typeText: normalizedTypeText(typeText) })).sort((left, right) => left.name.localeCompare(right.name)))
-        expect(contract.events ?? []).toEqual([])
-        expect(contract.conditionalApi ?? []).toEqual([])
-      } else {
-        const analyzed = analyzePackageComponentInterface(contract.source, { props: contract.props.map(({ name }) => name), events: (contract.events ?? []).map(({ propName }) => propName) })
-        expect({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }).toEqual(analyzed)
-      }
+      const analyzed = analyzePackageComponentInterface(contract.source, canonicalInterfaceMemberAuthority[contract.id])
+      expect({ props: contract.props, events: contract.events ?? [], conditionalApi: contract.conditionalApi ?? [] }, contract.id).toEqual(analyzed)
     }
   }, 60000)
 
@@ -249,8 +217,9 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
           expect(tree.nodes.filter((node) => node.receivesPublicProps)).toHaveLength(1)
           for (const node of tree.nodes) {
             const renderHost = node.host
-            if (renderHost.kind !== "component-export") continue
-            const host = family.exports.find((candidate) => candidate.name === renderHost.exportName)
+            if (renderHost.kind !== "component-export" && renderHost.kind !== "cross-family-export") continue
+            const hostFamily = renderHost.kind === "cross-family-export" ? familyById.get(renderHost.familyId) : family
+            const host = hostFamily?.exports.find((candidate) => candidate.name === renderHost.exportName)
             expect(host, `${family.id}.${entry.name} host ${renderHost.exportName}`).toMatchObject({ kind: "component", authorableJsx: true })
           }
         }

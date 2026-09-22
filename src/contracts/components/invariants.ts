@@ -1,7 +1,59 @@
 import { isRenderingTree } from "./types"
-import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType } from "./types"
+import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, ConditionalApiCondition, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType, TokenConditionAtom } from "./types"
 
 type PublicPropFact = { name: string; availability: "available" | "unavailable"; required?: boolean; type?: StructuredPropType }
+
+function stableSerialize(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableSerialize).join(",")}]`
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>
+    return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${stableSerialize(record[key])}`).join(",")}}`
+  }
+  return JSON.stringify(value)
+}
+
+function tokenConditionSubject({ equals: _equals, ...identity }: TokenConditionAtom): string {
+  return stableSerialize(identity)
+}
+
+function validateTokenConditionAtomPath(errors: string[], componentName: string, tokenId: string, atom: TokenConditionAtom): void {
+  if (!("subject" in atom)) return
+  const path = atom.path as Array<{ kind?: unknown; name?: unknown }> | undefined
+  if (!Array.isArray(path) || path.length === 0) {
+    errors.push(`Component ${componentName} token ${tokenId} condition has an empty relation path.`)
+    return
+  }
+  const names: number[] = []
+  for (const [index, segment] of path.entries()) {
+    if (typeof segment !== "object" || segment === null || !["self", "has", "in", "group", "peer"].includes(String(segment.kind))) {
+      errors.push(`Component ${componentName} token ${tokenId} condition has an invalid relation path segment.`)
+      continue
+    }
+    if ("name" in segment) {
+      names.push(index)
+      if (segment.kind !== "group" && segment.kind !== "peer") errors.push(`Component ${componentName} token ${tokenId} condition has an invalid named ${String(segment.kind)} relation path segment.`)
+      if (typeof segment.name !== "string" || !/^[A-Za-z0-9_-]+$/.test(segment.name)) errors.push(`Component ${componentName} token ${tokenId} condition has an invalid relation path name: ${String(segment.name)}.`)
+    }
+  }
+  if (path.some((segment) => segment.kind === "self") && (path.length !== 1 || path[0]?.kind !== "self")) errors.push(`Component ${componentName} token ${tokenId} condition has self in a compound relation path.`)
+  if (names.length > 1) errors.push(`Component ${componentName} token ${tokenId} condition has multiple named relation path segments.`)
+  const firstNameable = path.findIndex((segment) => segment.kind === "group" || segment.kind === "peer")
+  if (names.length === 1 && names[0] !== firstNameable) errors.push(`Component ${componentName} token ${tokenId} condition relation path name must target its first group or peer segment.`)
+}
+
+function validateTokenCondition(errors: string[], componentName: string, tokenId: string, when: ComponentDefinition["tokenDependencies"][number]["when"]): void {
+  if (!when) return
+  const atoms = "all" in when ? when.all as TokenConditionAtom[] : [when as TokenConditionAtom]
+  for (const atom of atoms) validateTokenConditionAtomPath(errors, componentName, tokenId, atom)
+  if (!("all" in when)) return
+  if (atoms.length < 2) errors.push(`Component ${componentName} token ${tokenId} conjunction must contain at least two conditions.`)
+  if (atoms.some((atom, index) => atoms.findIndex((candidate) => stableSerialize(candidate) === stableSerialize(atom)) !== index)) {
+    errors.push(`Component ${componentName} token ${tokenId} condition contains duplicate predicates.`)
+  }
+  if (atoms.some((atom, index) => atoms.slice(index + 1).some((candidate) => tokenConditionSubject(candidate) === tokenConditionSubject(atom) && candidate.equals !== atom.equals))) {
+    errors.push(`Component ${componentName} token ${tokenId} condition contains contradictory predicates.`)
+  }
+}
 
 export function isStructuredPropTypeAssignable(source: StructuredPropType, target: StructuredPropType): boolean {
   if (source.kind === "union") return source.members.every((member) => isStructuredPropTypeAssignable(member, target))
@@ -51,15 +103,27 @@ function basePublicProps(component: ComponentDefinition, authority: ComponentInv
   return props
 }
 
-function resolveConditionalApiShapeAtStage(component: ComponentDefinition, selection: { propName: string; equals: string | number | boolean }, authority: ComponentInvariantAuthority, includeWrapperRefinements: boolean): EffectiveComponentApiShape {
+function sameConditionalApiCondition(left: ConditionalApiCondition, right: ConditionalApiCondition): boolean {
+  return left.propName === right.propName && ("equals" in left && "equals" in right ? left.equals === right.equals : "presence" in left && "presence" in right && left.presence === right.presence)
+}
+
+function conditionalApiConditionKey(condition: ConditionalApiCondition): string {
+  return `${condition.propName}:${"equals" in condition ? `equals=${JSON.stringify(condition.equals)}` : `presence=${condition.presence}`}`
+}
+
+function conditionalApiConditionLabel(condition: ConditionalApiCondition): string {
+  return "equals" in condition ? `${condition.propName}=${String(condition.equals)}` : `${condition.propName} ${condition.presence}`
+}
+
+function resolveConditionalApiShapeAtStage(component: ComponentDefinition, selection: ConditionalApiCondition, authority: ComponentInvariantAuthority, includeWrapperRefinements: boolean): EffectiveComponentApiShape {
   const interfaceCases = inheritedContracts(component, authority).flatMap((contract) => {
-    const cases = (contract.conditionalApi ?? []).filter((candidate) => candidate.when.propName === selection.propName && candidate.when.equals === selection.equals)
-    if (cases.length > 1) throw new Error(`Expected at most one inherited conditional API case for ${selection.propName}=${String(selection.equals)}.`)
+    const cases = (contract.conditionalApi ?? []).filter((candidate) => sameConditionalApiCondition(candidate.when, selection))
+    if (cases.length > 1) throw new Error(`Expected at most one inherited conditional API case for ${conditionalApiConditionLabel(selection)}.`)
     return cases
   })
-  const componentCases = component.conditionalApi.filter((candidate) => candidate.when.propName === selection.propName && candidate.when.equals === selection.equals)
-  if (componentCases.length > 1) throw new Error(`Expected at most one component conditional API case for ${selection.propName}=${String(selection.equals)}.`)
-  if (interfaceCases.length + componentCases.length === 0) throw new Error(`Expected a conditional API case for ${selection.propName}=${String(selection.equals)}.`)
+  const componentCases = component.conditionalApi.filter((candidate) => sameConditionalApiCondition(candidate.when, selection))
+  if (componentCases.length > 1) throw new Error(`Expected at most one component conditional API case for ${conditionalApiConditionLabel(selection)}.`)
+  if (interfaceCases.length + componentCases.length === 0) throw new Error(`Expected a conditional API case for ${conditionalApiConditionLabel(selection)}.`)
   const baseCases = interfaceCases.length > 0 ? interfaceCases : componentCases
   const wrapperCases = includeWrapperRefinements && interfaceCases.length > 0 ? componentCases : []
   const props = new Map<string, EffectivePublicProp>()
@@ -80,22 +144,57 @@ function resolveConditionalApiShapeAtStage(component: ComponentDefinition, selec
 }
 
 /** Resolves only factual branch shape; it does not validate authored runtime props. */
-export function resolveConditionalApiShape(component: ComponentDefinition, selection: { propName: string; equals: string | number | boolean }, authority: ComponentInvariantAuthority): EffectiveComponentApiShape {
+export function resolveConditionalApiShape(component: ComponentDefinition, selection: ConditionalApiCondition, authority: ComponentInvariantAuthority): EffectiveComponentApiShape {
   return resolveConditionalApiShapeAtStage(component, selection, authority, true)
 }
 
 function isPublicRenderCondition(condition: RenderCondition): condition is Extract<RenderCondition, { propName: string }> { return "propName" in condition }
 
-function validateRenderCondition(errors: string[], componentName: string, scope: string, condition: RenderCondition, props: Map<string, PublicPropFact>) {
-  if (!isPublicRenderCondition(condition)) return
-  const prop = props.get(condition.propName)
-  if (!prop || prop.availability !== "available") {
-    errors.push(`Component ${componentName} ${scope} condition references unknown prop: ${condition.propName}.`)
-    return
+function atomicRenderConditions(condition: RenderCondition): Array<Exclude<RenderCondition, { all: RenderCondition[] }>> {
+  return "all" in condition ? condition.all.flatMap(atomicRenderConditions) : [condition]
+}
+
+type AtomicRenderCondition = ReturnType<typeof atomicRenderConditions>[number]
+
+function renderConditionSubject(condition: AtomicRenderCondition): string {
+  return "propName" in condition ? `prop:${condition.propName}` : `state:${condition.name}`
+}
+
+function renderConditionAtomsContradict(left: AtomicRenderCondition, right: AtomicRenderCondition): boolean {
+  if (renderConditionSubject(left) !== renderConditionSubject(right)) return false
+  if ("equals" in left && "equals" in right) return left.equals !== right.equals
+  if ("truthiness" in left && "truthiness" in right) return left.truthiness !== right.truthiness
+  if ("nullishness" in left && "nullishness" in right) return left.nullishness !== right.nullishness
+  if ("nullishness" in left || "nullishness" in right) {
+    const nullish = "nullishness" in left ? left : right as Extract<AtomicRenderCondition, { nullishness: string }>
+    const other = nullish === left ? right : left
+    if (nullish.nullishness === "non-nullish") return false
+    return "equals" in other || "truthiness" in other && other.truthiness === "truthy"
   }
-  if ("truthiness" in condition) return
-  if (!prop.type || !isStructuredPropTypeAssignable({ kind: "literal", value: condition.equals }, prop.type)) {
-    errors.push(`Component ${componentName} ${scope} condition has incompatible literal for prop ${condition.propName}: ${String(condition.equals)}.`)
+  const truthiness = "truthiness" in left ? left : right as Extract<AtomicRenderCondition, { truthiness: string }>
+  const equals = truthiness === left ? right : left
+  return "equals" in equals && Boolean(equals.equals) !== (truthiness.truthiness === "truthy")
+}
+
+function validateRenderCondition(errors: string[], componentName: string, scope: string, condition: RenderCondition, props: Map<string, PublicPropFact>) {
+  const atoms = atomicRenderConditions(condition)
+  if (atoms.some((atom, index) => atoms.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(atom)) !== index)) {
+    errors.push(`Component ${componentName} ${scope} condition contains duplicate predicates.`)
+  }
+  if (atoms.some((atom, index) => atoms.slice(index + 1).some((candidate) => renderConditionAtomsContradict(atom, candidate)))) {
+    errors.push(`Component ${componentName} ${scope} condition contains contradictory predicates.`)
+  }
+  for (const atom of atoms) {
+    if (!isPublicRenderCondition(atom)) continue
+    const prop = props.get(atom.propName)
+    if (!prop || prop.availability !== "available") {
+      errors.push(`Component ${componentName} ${scope} condition references unknown prop: ${atom.propName}.`)
+      continue
+    }
+    if ("truthiness" in atom || "nullishness" in atom) continue
+    if (!prop.type || !isStructuredPropTypeAssignable({ kind: "literal", value: atom.equals }, prop.type)) {
+      errors.push(`Component ${componentName} ${scope} condition has incompatible literal for prop ${atom.propName}: ${String(atom.equals)}.`)
+    }
   }
 }
 
@@ -120,6 +219,11 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
     }
     if (node.host.kind === "component-export" && !exportEntries.has(node.host.exportName)) errors.push(`Component ${componentName} render host references unknown export: ${node.host.exportName}.`)
     if (node.host.kind === "component-export" && exportEntries.has(node.host.exportName) && (exportEntries.get(node.host.exportName)!.kind !== "component" || !exportEntries.get(node.host.exportName)!.authorableJsx)) errors.push(`Component ${componentName} render host references non-JSX-authorable export: ${node.host.exportName}.`)
+    if (node.host.kind === "cross-family-export") {
+      const qualifiedExport = `${node.host.familyId}.${node.host.exportName}`
+      if (!authority.componentExportIds?.has(qualifiedExport)) errors.push(`Component ${componentName} render host references unknown cross-family component export: ${qualifiedExport}.`)
+      if (node.host.familyId === family.id) errors.push(`Component ${componentName} cross-family render host must reference a different family: ${qualifiedExport}.`)
+    }
     if (node.host.kind === "inherited-interface" && !authority.interfaceIds.has(node.host.interfaceId)) errors.push(`Component ${componentName} render host references unknown interface: ${node.host.interfaceId}.`)
   }
   const root = rendering.nodes.find((node) => node.id === rendering.rootNodeId)
@@ -135,12 +239,14 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
     hasEvidence(errors, child.evidenceRefs, family.evidence, `Render child ${componentName}.${node.id}->${child.nodeId}`)
     if (!ids.has(child.nodeId)) errors.push(`Component ${componentName} render node ${node.id} references unknown child: ${child.nodeId}.`)
     if (child.when) {
-      if (isPublicRenderCondition(child.when)) {
-        const condition = child.when
-        if (!props.has(condition.propName)) errors.push(`Component ${componentName} render child condition references unknown prop: ${condition.propName}.`)
-        const localProp = localProps.find((prop) => prop.name === condition.propName)
-        if ("equals" in condition && localProp?.type.kind === "boolean" && typeof condition.equals !== "boolean") errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has boolean prop ${condition.propName} but equals is not boolean.`)
-        if ("equals" in condition && localProp?.type.kind === "enum" && (typeof condition.equals !== "string" || !localProp.type.values.includes(condition.equals))) errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has enum prop ${condition.propName} without value: ${String(condition.equals)}.`)
+      validateRenderCondition(errors, componentName, `render child ${node.id}->${child.nodeId}`, child.when, props)
+      for (const condition of atomicRenderConditions(child.when)) {
+        if (isPublicRenderCondition(condition)) {
+          if (!props.has(condition.propName)) errors.push(`Component ${componentName} render child condition references unknown prop: ${condition.propName}.`)
+          const localProp = localProps.find((prop) => prop.name === condition.propName)
+          if ("equals" in condition && localProp?.type.kind === "boolean" && typeof condition.equals !== "boolean") errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has boolean prop ${condition.propName} but equals is not boolean.`)
+          if ("equals" in condition && localProp?.type.kind === "enum" && (typeof condition.equals !== "string" || !localProp.type.values.includes(condition.equals))) errors.push(`Component ${componentName} render child condition for ${node.id}->${child.nodeId} has enum prop ${condition.propName} without value: ${String(condition.equals)}.`)
+        }
       }
     }
   }
@@ -210,12 +316,13 @@ function validateConditionalApi(errors: string[], family: ComponentFamilyContrac
     hasEvidence(errors, conditional.evidenceRefs, family.evidence, `Conditional API ${componentName}.${conditional.when.propName}`)
     const discriminator = baseProps.get(conditional.when.propName)
     if (!discriminator) errors.push(`Conditional API ${componentName} references unknown discriminant prop: ${conditional.when.propName}.`)
-    else if (!discriminator.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type)) errors.push(`Conditional API ${componentName}.${conditional.when.propName} has enum prop without value: ${String(conditional.when.equals)}.`)
-    const caseKey = `${conditional.when.propName}:${JSON.stringify(conditional.when.equals)}`
-    if (cases.has(caseKey)) errors.push(`Component ${componentName} has conflicting conditional API case for ${conditional.when.propName}=${String(conditional.when.equals)}.`)
+    else if ("equals" in conditional.when && (!discriminator.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type))) errors.push(`Conditional API ${componentName}.${conditional.when.propName} has enum prop without value: ${String(conditional.when.equals)}.`)
+    else if ("presence" in conditional.when && discriminator.required) errors.push(`Conditional API ${componentName}.${conditional.when.propName} cannot use presence discrimination on a required prop.`)
+    const caseKey = conditionalApiConditionKey(conditional.when)
+    if (cases.has(caseKey)) errors.push(`Component ${componentName} has conflicting conditional API case for ${conditionalApiConditionLabel(conditional.when)}.`)
     cases.add(caseKey)
 
-    const inheritedBranchExists = inheritedContracts(component, authority).some((contract) => (contract.conditionalApi ?? []).some((candidate) => candidate.when.propName === conditional.when.propName && candidate.when.equals === conditional.when.equals))
+    const inheritedBranchExists = inheritedContracts(component, authority).some((contract) => (contract.conditionalApi ?? []).some((candidate) => sameConditionalApiCondition(candidate.when, conditional.when)))
     const inheritedBranch = inheritedBranchExists ? resolveConditionalApiShapeAtStage(component, conditional.when, authority, false) : undefined
     const effectiveBaseProps: Map<string, EffectivePublicProp> = inheritedBranch
       ? new Map(inheritedBranch.props.map((prop) => [prop.name, prop]))
@@ -250,9 +357,15 @@ function validateConditionalApi(errors: string[], family: ComponentFamilyContrac
       else if (!base.payload || !strictlyNarrowsStructuredPropType(refinement.payload, base.payload)) errors.push(`Conditional API ${componentName}.${conditional.when.propName} refines event ${refinement.eventPropName} with a payload that does not narrow its ${inheritedBranch ? "selected branch" : "base payload"}.`)
     }
 
-    if (component.conditionalApi.filter((candidate) => candidate.when.propName === conditional.when.propName && candidate.when.equals === conditional.when.equals).length === 1) {
+    if (component.conditionalApi.filter((candidate) => sameConditionalApiCondition(candidate.when, conditional.when)).length === 1) {
       const effective = resolveConditionalApiShape(component, conditional.when, authority)
       validateStateChannels(errors, family, componentName, conditional.stateChannels, new Map(effective.props.map((prop) => [prop.name, prop])), new Map(effective.events.map((event) => [event.propName, event])))
+    }
+  }
+  for (const propName of new Set(component.conditionalApi.filter((conditional) => "presence" in conditional.when).map((conditional) => conditional.when.propName))) {
+    const presenceCases = component.conditionalApi.filter((conditional) => conditional.when.propName === propName && "presence" in conditional.when)
+    if (presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "present").length !== 1 || presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "absent").length !== 1) {
+      errors.push(`Component ${componentName} presence discriminator ${propName} must define exactly one present and one absent case.`)
     }
   }
 }
@@ -332,6 +445,7 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
     const tokenDependencyKeys = new Set<string>()
     for (const token of component.tokenDependencies) {
       hasEvidence(errors, token.evidenceRefs, family.evidence, `Token dependency ${entry.name}.${token.tokenId}`)
+      validateTokenCondition(errors, entry.name, token.tokenId, token.when)
       if (token.sourceContext) {
         const applicabilityIsValid = Array.isArray(token.sourceContext.applicability) && token.sourceContext.applicability.every((modifier) => typeof modifier === "string" && modifier.length > 0)
         const targetIsValid = token.sourceContext.target === undefined || (token.sourceContext.target.kind === "pseudo-element" && (token.sourceContext.target.name === "after" || token.sourceContext.target.name === "before"))
@@ -339,8 +453,7 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
         if (!targetIsValid) errors.push(`Component ${entry.name} token dependency ${token.tokenId} has invalid source context target.`)
         if (applicabilityIsValid && token.sourceContext.applicability.length === 0 && token.sourceContext.target === undefined) errors.push(`Component ${entry.name} token dependency ${token.tokenId} has empty source context.`)
       }
-      const normalizedSourceContext = token.sourceContext && Array.isArray(token.sourceContext.applicability) ? { applicability: [...token.sourceContext.applicability], ...(token.sourceContext.target ? { target: { kind: token.sourceContext.target.kind, name: token.sourceContext.target.name } } : {}) } : token.sourceContext
-      const key = JSON.stringify({ tokenId: token.tokenId, ...(token.when ? { when: token.when } : {}), ...(normalizedSourceContext ? { sourceContext: normalizedSourceContext } : {}), ...(token.viaDerivedRule ? { viaDerivedRule: token.viaDerivedRule } : {}) })
+      const key = stableSerialize({ tokenId: token.tokenId, ...(token.when ? { when: token.when } : {}), ...(token.sourceContext ? { sourceContext: token.sourceContext } : {}), ...(token.viaDerivedRule ? { viaDerivedRule: token.viaDerivedRule } : {}) })
       if (tokenDependencyKeys.has(key)) errors.push(`Component ${entry.name} has duplicate token dependency: ${token.tokenId}.`)
       tokenDependencyKeys.add(key)
       if (!authority.tokenIds.has(token.tokenId)) errors.push(`Component ${entry.name} references unknown token: ${token.tokenId}.`)
@@ -382,9 +495,10 @@ export function validateInheritedInterfaceInvariants(contract: InheritedInterfac
   for (const conditional of contract.conditionalApi ?? []) {
     hasEvidence(errors, conditional.evidenceRefs, contract.evidence, `Inherited interface ${contract.id}.${conditional.when.propName}`)
     const discriminator = props.get(conditional.when.propName)
-    if (!discriminator?.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type)) errors.push(`Inherited interface ${contract.id} has invalid discriminator ${conditional.when.propName}=${String(conditional.when.equals)}.`)
-    const caseKey = `${conditional.when.propName}:${JSON.stringify(conditional.when.equals)}`
-    if (cases.has(caseKey)) errors.push(`Inherited interface ${contract.id} has conflicting conditional API case for ${conditional.when.propName}=${String(conditional.when.equals)}.`)
+    if ("equals" in conditional.when && (!discriminator?.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type))) errors.push(`Inherited interface ${contract.id} has invalid discriminator ${conditional.when.propName}=${String(conditional.when.equals)}.`)
+    else if ("presence" in conditional.when && discriminator?.required) errors.push(`Inherited interface ${contract.id} cannot use presence discrimination on required prop ${conditional.when.propName}.`)
+    const caseKey = conditionalApiConditionKey(conditional.when)
+    if (cases.has(caseKey)) errors.push(`Inherited interface ${contract.id} has conflicting conditional API case for ${conditionalApiConditionLabel(conditional.when)}.`)
     cases.add(caseKey)
     for (const refinement of conditional.propRefinements) {
       const base = props.get(refinement.propName); hasEvidence(errors, refinement.evidenceRefs, contract.evidence, `Inherited interface prop refinement ${contract.id}.${refinement.propName}`)
@@ -396,6 +510,12 @@ export function validateInheritedInterfaceInvariants(contract: InheritedInterfac
       const base = events.get(refinement.eventPropName); hasEvidence(errors, refinement.evidenceRefs, contract.evidence, `Inherited interface event refinement ${contract.id}.${refinement.eventPropName}`)
       if (!base) errors.push(`Inherited interface ${contract.id}.${conditional.when.propName} refines unknown event: ${refinement.eventPropName}.`)
       else if (!base.payload || !strictlyNarrowsStructuredPropType(refinement.payload, base.payload)) errors.push(`Inherited interface ${contract.id}.${conditional.when.propName} refines event ${refinement.eventPropName} with a payload that does not narrow its base payload.`)
+    }
+  }
+  for (const propName of new Set((contract.conditionalApi ?? []).filter((conditional) => "presence" in conditional.when).map((conditional) => conditional.when.propName))) {
+    const presenceCases = (contract.conditionalApi ?? []).filter((conditional) => conditional.when.propName === propName && "presence" in conditional.when)
+    if (presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "present").length !== 1 || presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "absent").length !== 1) {
+      errors.push(`Inherited interface ${contract.id} presence discriminator ${propName} must define exactly one present and one absent case.`)
     }
   }
   return errors

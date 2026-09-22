@@ -20,10 +20,6 @@
     "tokens": {
       "kind": "token-contract",
       "source": "shadcn-radix-token-contract-001"
-    },
-    "runtime": {
-      "kind": "runtime-test",
-      "source": "src/components/ui/tabs.stories.tsx#LineVariant"
     }
   },
   "exports": [
@@ -32,8 +28,7 @@
       "kind": "component",
       "authorableJsx": true,
       "evidenceRefs": [
-        "source",
-        "runtime"
+        "source"
       ],
       "component": {
         "localProps": [],
@@ -126,8 +121,7 @@
       "kind": "component",
       "authorableJsx": true,
       "evidenceRefs": [
-        "source",
-        "runtime"
+        "source"
       ],
       "component": {
         "localProps": [
@@ -170,32 +164,28 @@
           },
           {
             "tokenId": "radius.lg",
-            "when": {
-              "propName": "variant",
-              "equals": "default"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
           },
           {
             "tokenId": "color.muted",
-            "when": {
-              "propName": "variant",
-              "equals": "default"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
+            ],
             "when": {
               "propName": "variant",
               "equals": "default"
-            },
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 1
@@ -203,22 +193,26 @@
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
             "when": {
               "propName": "variant",
               "equals": "line"
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
+            }
           }
         ],
         "rendering": {
@@ -266,8 +260,7 @@
       "kind": "component",
       "authorableJsx": true,
       "evidenceRefs": [
-        "source",
-        "runtime"
+        "source"
       ],
       "component": {
         "localProps": [],
@@ -333,6 +326,33 @@
           },
           {
             "tokenId": "color.background",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "active"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "active"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -340,6 +360,16 @@
           },
           {
             "tokenId": "shadow.sm",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "active"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -361,6 +391,10 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
             "sourceContext": {
               "applicability": [
                 "group-data-[orientation=horizontal]/tabs"
@@ -370,10 +404,6 @@
                 "name": "after"
               }
             },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 0
-            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -381,6 +411,10 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0.5
+            },
             "sourceContext": {
               "applicability": [
                 "group-data-[orientation=horizontal]/tabs"
@@ -390,10 +424,6 @@
                 "name": "after"
               }
             },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 0.5
-            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -401,26 +431,10 @@
           },
           {
             "tokenId": "spacing.unit",
-            "sourceContext": {
-              "applicability": [
-                "group-data-[orientation=vertical]/tabs"
-              ],
-              "target": {
-                "kind": "pseudo-element",
-                "name": "after"
-              }
-            },
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 0
             },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
             "sourceContext": {
               "applicability": [
                 "group-data-[orientation=vertical]/tabs"
@@ -430,10 +444,6 @@
                 "name": "after"
               }
             },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 0.5
-            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -441,18 +451,38 @@
           },
           {
             "tokenId": "spacing.unit",
-            "sourceContext": {
-              "applicability": [
-                "group-data-[orientation=vertical]/tabs"
-              ],
-              "target": {
-                "kind": "pseudo-element",
-                "name": "after"
-              }
-            },
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": -1
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[orientation=vertical]/tabs"
+              ],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0.5
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[orientation=vertical]/tabs"
+              ],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
             },
             "evidenceRefs": [
               "source",

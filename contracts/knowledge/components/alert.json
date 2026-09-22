@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "alert-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "alert"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays a persistent callout for information that needs the user's attention.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.alert.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Alert for inline information that should remain visible in the page rather than disappearing automatically.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use the destructive variant for error or destructive-state callouts.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert.docs"
+        ]
+      }
+    }
+  ]
+}

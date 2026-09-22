@@ -11,7 +11,7 @@ type Provenance = {
 
 const provenance = JSON.parse(readFileSync(new URL("../provenance/seed-components.json", import.meta.url), "utf8")) as Provenance
 
-describe("Phase 1 component provenance", () => {
+describe("canonical component provenance", () => {
   test("pins every included component to a local file and the exact upstream revision", () => {
     expect(provenance.upstream).toMatchObject({
       repository: "shadcn-ui/ui",
@@ -20,12 +20,12 @@ describe("Phase 1 component provenance", () => {
     })
     expect(provenance.sourceResolution.cliVersionIsInsufficient).toBe(true)
 
-    for (const component of Object.values(provenance.components)) {
+    for (const [id, component] of Object.entries(provenance.components)) {
       expect(existsSync(new URL(`../${component.canonicalPath}`, import.meta.url))).toBe(true)
       expect(component.canonicalBlobSha).toBe(
         execFileSync("git", ["hash-object", component.canonicalPath], { encoding: "utf8" }).trim()
       )
-      expect(component.implementationKind).toBe("semantic-token-normalized-derivative")
+      expect(component.implementationKind).toBe(id === "collapsible" ? "upstream-wrapper" : "semantic-token-normalized-derivative")
     }
   })
 

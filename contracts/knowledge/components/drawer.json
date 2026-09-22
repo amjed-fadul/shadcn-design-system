@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "drawer-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "drawer"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A drawer surface that slides in from an edge of the viewport.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.drawer.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Drawer for contextual content or actions that should appear from a screen edge while preserving the current page context.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.drawer.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Drawer with DrawerTrigger and DrawerContent; structure content with DrawerHeader, DrawerTitle, DrawerDescription, and DrawerFooter, and use DrawerClose for an explicit close control.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.drawer.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Keep persistent actions outside the scrollable content region when building a scrollable drawer.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.drawer.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use the direction prop to place the drawer on top, right, bottom, or left.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.drawer.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Drawer can be paired with Dialog for responsive patterns that use Dialog on desktop and Drawer on smaller screens.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.drawer.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Drawer supports RTL layouts.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.drawer.docs"
+        ]
+      }
+    }
+  ]
+}

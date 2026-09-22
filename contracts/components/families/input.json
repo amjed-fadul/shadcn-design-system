@@ -1,1 +1,225 @@
-{"schemaVersion":1,"id":"input","source":{"canonicalPath":"src/components/ui/input.tsx","canonicalBlobSha":"b136f1b9dd57c87fa67a09c4f7170702586cc325","implementationKind":"semantic-token-normalized-derivative","upstreamPath":"apps/v4/registry/bases/radix/ui/input.tsx","upstreamBlobSha":"d00c3b57fca65cbc6628e654be961fbefb01d86a"},"evidence":{"source":{"kind":"canonical-source","source":"src/components/ui/input.tsx@b136f1b9dd57c87fa67a09c4f7170702586cc325"},"tokens":{"kind":"token-contract","source":"shadcn-radix-token-contract-001"}},"exports":[{"name":"Input","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.input"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":8},"evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":0},"evidenceRefs":["source","tokens"]},{"tokenId":"radius.md","evidenceRefs":["source","tokens"]},{"tokenId":"color.input","evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2.5},"evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1},"evidenceRefs":["source","tokens"]},{"tokenId":"font-size.base","evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":6},"evidenceRefs":["source","tokens"]},{"tokenId":"font-size.sm","evidenceRefs":["source","tokens"]},{"tokenId":"font-weight.medium","evidenceRefs":["source","tokens"]},{"tokenId":"color.foreground","evidenceRefs":["source","tokens"]},{"tokenId":"color.muted-foreground","evidenceRefs":["source","tokens"]},{"tokenId":"color.ring","evidenceRefs":["source","tokens"]},{"tokenId":"color.destructive","evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"input"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"input","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[{"feature":"native host semantics","owner":"native","mechanism":"input","evidenceRefs":["source"]},{"feature":"accessible name","owner":"author","mechanism":"author-provided labeling","evidenceRefs":["source"]}],"inheritedPropDefaults":[]}}],"unresolved":[]}
+{
+  "schemaVersion": 1,
+  "id": "input",
+  "source": {
+    "canonicalPath": "src/components/ui/input.tsx",
+    "canonicalBlobSha": "b136f1b9dd57c87fa67a09c4f7170702586cc325",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/input.tsx",
+    "upstreamBlobSha": "d00c3b57fca65cbc6628e654be961fbefb01d86a"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/input.tsx@b136f1b9dd57c87fa67a09c4f7170702586cc325"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Input",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.input"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.base",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 6
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "input"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "input",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "native host semantics",
+            "owner": "native",
+            "mechanism": "input",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "accessible name",
+            "owner": "author",
+            "mechanism": "author-provided labeling",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    }
+  ],
+  "unresolved": []
+}

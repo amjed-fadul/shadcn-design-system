@@ -1,0 +1,4073 @@
+{
+  "schemaVersion": 1,
+  "id": "radix.alert-dialog.action",
+  "source": {
+    "kind": "package-declaration",
+    "package": "@radix-ui/react-alert-dialog",
+    "version": "1.1.23",
+    "declarationPath": "node_modules/@radix-ui/react-alert-dialog/dist/index.d.ts",
+    "declarationSha256": "31c30cc54e8c3da37c8e2e40e5658471f65915df22d348990d1601901e8c9ff3",
+    "symbol": "Action"
+  },
+  "evidence": {
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "node_modules/@radix-ui/react-alert-dialog/dist/index.d.ts@31c30cc54e8c3da37c8e2e40e5658471f65915df22d348990d1601901e8c9ff3"
+    }
+  },
+  "props": [
+    {
+      "name": "about",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "accessKey",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-activedescendant",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-atomic",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-autocomplete",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "none",
+          "inline",
+          "list",
+          "both"
+        ]
+      },
+      "typeText": "\"none\" | \"inline\" | \"list\" | \"both\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-braillelabel",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-brailleroledescription",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-busy",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-checked",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "mixed"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\" | \"mixed\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-colcount",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-colindex",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-colindextext",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-colspan",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-controls",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-current",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "time"
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "page"
+          },
+          {
+            "kind": "literal",
+            "value": "step"
+          },
+          {
+            "kind": "literal",
+            "value": "location"
+          },
+          {
+            "kind": "literal",
+            "value": "date"
+          }
+        ]
+      },
+      "typeText": "boolean | \"time\" | \"true\" | \"false\" | \"page\" | \"step\" | \"location\" | \"date\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-describedby",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-description",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-details",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-disabled",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-dropeffect",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "link",
+          "none",
+          "copy",
+          "execute",
+          "move",
+          "popup"
+        ]
+      },
+      "typeText": "\"link\" | \"none\" | \"copy\" | \"execute\" | \"move\" | \"popup\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-errormessage",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-expanded",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-flowto",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-grabbed",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-haspopup",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "dialog"
+          },
+          {
+            "kind": "literal",
+            "value": "menu"
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "listbox"
+          },
+          {
+            "kind": "literal",
+            "value": "tree"
+          },
+          {
+            "kind": "literal",
+            "value": "grid"
+          }
+        ]
+      },
+      "typeText": "boolean | \"dialog\" | \"menu\" | \"true\" | \"false\" | \"listbox\" | \"tree\" | \"grid\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-hidden",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-invalid",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "grammar"
+          },
+          {
+            "kind": "literal",
+            "value": "spelling"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\" | \"grammar\" | \"spelling\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-keyshortcuts",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-label",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-labelledby",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-level",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-live",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "off",
+          "assertive",
+          "polite"
+        ]
+      },
+      "typeText": "\"off\" | \"assertive\" | \"polite\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-modal",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-multiline",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-multiselectable",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-orientation",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "typeText": "\"horizontal\" | \"vertical\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-owns",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-placeholder",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-posinset",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-pressed",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "mixed"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\" | \"mixed\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-readonly",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-relevant",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "text",
+          "additions",
+          "additions removals",
+          "additions text",
+          "all",
+          "removals",
+          "removals additions",
+          "removals text",
+          "text additions",
+          "text removals"
+        ]
+      },
+      "typeText": "\"text\" | \"additions\" | \"additions removals\" | \"additions text\" | \"all\" | \"removals\" | \"removals additions\" | \"removals text\" | \"text additions\" | \"text removals\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-required",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-roledescription",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-rowcount",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-rowindex",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-rowindextext",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-rowspan",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-selected",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-setsize",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-sort",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "none",
+          "ascending",
+          "descending",
+          "other"
+        ]
+      },
+      "typeText": "\"none\" | \"ascending\" | \"descending\" | \"other\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-valuemax",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-valuemin",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-valuenow",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "aria-valuetext",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "asChild",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "autoCapitalize",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "autoCorrect",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "autoFocus",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "autoSave",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "children",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Iterable<React.ReactNode>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactPortal"
+          }
+        ]
+      },
+      "typeText": "React.ReactNode",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "className",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "color",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "content",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "contentEditable",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          },
+          {
+            "kind": "literal",
+            "value": "inherit"
+          },
+          {
+            "kind": "literal",
+            "value": "plaintext-only"
+          }
+        ]
+      },
+      "typeText": "(boolean | \"true\" | \"false\") | \"inherit\" | \"plaintext-only\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "contextMenu",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "dangerouslySetInnerHTML",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "{ __html: string | TrustedHTML; }"
+      },
+      "typeText": "{ __html: string | TrustedHTML; }",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "datatype",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "defaultChecked",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "defaultValue",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "array",
+            "item": {
+              "kind": "string"
+            }
+          }
+        ]
+      },
+      "typeText": "string | number | readonly string[]",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "dir",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "disabled",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "draggable",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "form",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "formAction",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "formEncType",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "formMethod",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "formNoValidate",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "formTarget",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "hidden",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "id",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "inlist",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "any"
+      },
+      "typeText": "any",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "inputMode",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "search",
+          "text",
+          "none",
+          "tel",
+          "url",
+          "email",
+          "numeric",
+          "decimal"
+        ]
+      },
+      "typeText": "\"search\" | \"text\" | \"none\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "is",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "itemID",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "itemProp",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "itemRef",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "itemScope",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "itemType",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "key",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "bigint"
+          }
+        ]
+      },
+      "typeText": "React.Key",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "lang",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "name",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "nonce",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAbort",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAbortCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAnimationEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.AnimationEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.AnimationEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAnimationEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.AnimationEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.AnimationEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAnimationIteration",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.AnimationEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.AnimationEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAnimationIterationCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.AnimationEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.AnimationEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAnimationStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.AnimationEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.AnimationEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAnimationStartCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.AnimationEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.AnimationEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAuxClick",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onAuxClickCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onBeforeInput",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onBeforeInputCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onBlur",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FocusEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FocusEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onBlurCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FocusEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FocusEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCanPlay",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCanPlayCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCanPlayThrough",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCanPlayThroughCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onChange",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onChangeCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onClick",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onClickCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCompositionEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.CompositionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.CompositionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCompositionEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.CompositionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.CompositionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCompositionStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.CompositionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.CompositionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCompositionStartCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.CompositionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.CompositionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCompositionUpdate",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.CompositionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.CompositionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCompositionUpdateCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.CompositionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.CompositionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onContextMenu",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onContextMenuCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCopy",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ClipboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ClipboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCopyCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ClipboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ClipboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCut",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ClipboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ClipboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onCutCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ClipboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ClipboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDoubleClick",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDoubleClickCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDrag",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragEnter",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragEnterCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragExit",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragExitCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragLeave",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragLeaveCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragOver",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragOverCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDragStartCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDrop",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDropCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.DragEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.DragEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDurationChange",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onDurationChangeCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onEmptied",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onEmptiedCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onEncrypted",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onEncryptedCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onEnded",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onEndedCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onError",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onErrorCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onFocus",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FocusEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FocusEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onFocusCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FocusEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FocusEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onGotPointerCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onGotPointerCaptureCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onInput",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onInputCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onInvalid",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onInvalidCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onKeyDown",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.KeyboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.KeyboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onKeyDownCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.KeyboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.KeyboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onKeyPress",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.KeyboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.KeyboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onKeyPressCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.KeyboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.KeyboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onKeyUp",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.KeyboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.KeyboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onKeyUpCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.KeyboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.KeyboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoad",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoadCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoadedData",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoadedDataCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoadedMetadata",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoadedMetadataCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoadStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLoadStartCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLostPointerCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onLostPointerCaptureCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseDown",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseDownCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseEnter",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseLeave",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseMove",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseMoveCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseOut",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseOutCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseOver",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseOverCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseUp",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onMouseUpCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.MouseEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.MouseEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPaste",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ClipboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ClipboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPasteCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ClipboardEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ClipboardEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPause",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPauseCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPlay",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPlayCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPlaying",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPlayingCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerCancel",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerCancelCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerDown",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerDownCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerEnter",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerLeave",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerMove",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerMoveCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerOut",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerOutCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerOver",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerOverCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerUp",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onPointerUpCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.PointerEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.PointerEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onProgress",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onProgressCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onRateChange",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onRateChangeCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onReset",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onResetCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onResize",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onResizeCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScroll",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.UIEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.UIEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScrollCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.UIEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.UIEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSeeked",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSeekedCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSeeking",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSeekingCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSelect",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSelectCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onStalled",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onStalledCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSubmit",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSubmitCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.FormEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.FormEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSuspend",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onSuspendCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTimeUpdate",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTimeUpdateCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchCancel",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchCancelCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchMove",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchMoveCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTouchStartCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TouchEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TouchEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onVolumeChange",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onVolumeChangeCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onWaiting",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onWaitingCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ReactEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.ReactEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onWheel",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.WheelEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.WheelEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onWheelCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.WheelEventHandler<HTMLButtonElement>"
+      },
+      "typeText": "React.WheelEventHandler<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "prefix",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "property",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "radioGroup",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "ref",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "(instance: HTMLButtonElement) => void | React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.RefObject<HTMLButtonElement>"
+          }
+        ]
+      },
+      "typeText": "React.LegacyRef<HTMLButtonElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "rel",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "resource",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "results",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "rev",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "role",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": "button"
+          },
+          {
+            "kind": "literal",
+            "value": "form"
+          },
+          {
+            "kind": "literal",
+            "value": "img"
+          },
+          {
+            "kind": "literal",
+            "value": "article"
+          },
+          {
+            "kind": "literal",
+            "value": "dialog"
+          },
+          {
+            "kind": "literal",
+            "value": "figure"
+          },
+          {
+            "kind": "literal",
+            "value": "link"
+          },
+          {
+            "kind": "literal",
+            "value": "main"
+          },
+          {
+            "kind": "literal",
+            "value": "menu"
+          },
+          {
+            "kind": "literal",
+            "value": "menuitem"
+          },
+          {
+            "kind": "literal",
+            "value": "option"
+          },
+          {
+            "kind": "literal",
+            "value": "search"
+          },
+          {
+            "kind": "literal",
+            "value": "table"
+          },
+          {
+            "kind": "literal",
+            "value": "switch"
+          },
+          {
+            "kind": "literal",
+            "value": "none"
+          },
+          {
+            "kind": "literal",
+            "value": "list"
+          },
+          {
+            "kind": "literal",
+            "value": "listbox"
+          },
+          {
+            "kind": "literal",
+            "value": "tree"
+          },
+          {
+            "kind": "literal",
+            "value": "grid"
+          },
+          {
+            "kind": "literal",
+            "value": "alert"
+          },
+          {
+            "kind": "literal",
+            "value": "alertdialog"
+          },
+          {
+            "kind": "literal",
+            "value": "application"
+          },
+          {
+            "kind": "literal",
+            "value": "banner"
+          },
+          {
+            "kind": "literal",
+            "value": "cell"
+          },
+          {
+            "kind": "literal",
+            "value": "checkbox"
+          },
+          {
+            "kind": "literal",
+            "value": "columnheader"
+          },
+          {
+            "kind": "literal",
+            "value": "combobox"
+          },
+          {
+            "kind": "literal",
+            "value": "complementary"
+          },
+          {
+            "kind": "literal",
+            "value": "contentinfo"
+          },
+          {
+            "kind": "literal",
+            "value": "definition"
+          },
+          {
+            "kind": "literal",
+            "value": "directory"
+          },
+          {
+            "kind": "literal",
+            "value": "document"
+          },
+          {
+            "kind": "literal",
+            "value": "feed"
+          },
+          {
+            "kind": "literal",
+            "value": "gridcell"
+          },
+          {
+            "kind": "literal",
+            "value": "group"
+          },
+          {
+            "kind": "literal",
+            "value": "heading"
+          },
+          {
+            "kind": "literal",
+            "value": "listitem"
+          },
+          {
+            "kind": "literal",
+            "value": "log"
+          },
+          {
+            "kind": "literal",
+            "value": "marquee"
+          },
+          {
+            "kind": "literal",
+            "value": "math"
+          },
+          {
+            "kind": "literal",
+            "value": "menubar"
+          },
+          {
+            "kind": "literal",
+            "value": "menuitemcheckbox"
+          },
+          {
+            "kind": "literal",
+            "value": "menuitemradio"
+          },
+          {
+            "kind": "literal",
+            "value": "navigation"
+          },
+          {
+            "kind": "literal",
+            "value": "note"
+          },
+          {
+            "kind": "literal",
+            "value": "presentation"
+          },
+          {
+            "kind": "literal",
+            "value": "progressbar"
+          },
+          {
+            "kind": "literal",
+            "value": "radio"
+          },
+          {
+            "kind": "literal",
+            "value": "radiogroup"
+          },
+          {
+            "kind": "literal",
+            "value": "region"
+          },
+          {
+            "kind": "literal",
+            "value": "row"
+          },
+          {
+            "kind": "literal",
+            "value": "rowgroup"
+          },
+          {
+            "kind": "literal",
+            "value": "rowheader"
+          },
+          {
+            "kind": "literal",
+            "value": "scrollbar"
+          },
+          {
+            "kind": "literal",
+            "value": "searchbox"
+          },
+          {
+            "kind": "literal",
+            "value": "separator"
+          },
+          {
+            "kind": "literal",
+            "value": "slider"
+          },
+          {
+            "kind": "literal",
+            "value": "spinbutton"
+          },
+          {
+            "kind": "literal",
+            "value": "status"
+          },
+          {
+            "kind": "literal",
+            "value": "tab"
+          },
+          {
+            "kind": "literal",
+            "value": "tablist"
+          },
+          {
+            "kind": "literal",
+            "value": "tabpanel"
+          },
+          {
+            "kind": "literal",
+            "value": "term"
+          },
+          {
+            "kind": "literal",
+            "value": "textbox"
+          },
+          {
+            "kind": "literal",
+            "value": "timer"
+          },
+          {
+            "kind": "literal",
+            "value": "toolbar"
+          },
+          {
+            "kind": "literal",
+            "value": "tooltip"
+          },
+          {
+            "kind": "literal",
+            "value": "treegrid"
+          },
+          {
+            "kind": "literal",
+            "value": "treeitem"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "string & {}"
+          }
+        ]
+      },
+      "typeText": "React.AriaRole",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "security",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "slot",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "spellCheck",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "literal",
+            "value": "true"
+          },
+          {
+            "kind": "literal",
+            "value": "false"
+          }
+        ]
+      },
+      "typeText": "boolean | \"true\" | \"false\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "style",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.CSSProperties"
+      },
+      "typeText": "React.CSSProperties",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "suppressContentEditableWarning",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "suppressHydrationWarning",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "tabIndex",
+      "required": false,
+      "type": {
+        "kind": "number"
+      },
+      "typeText": "number",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "title",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "translate",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "yes",
+          "no"
+        ]
+      },
+      "typeText": "\"yes\" | \"no\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "type",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "button",
+          "submit",
+          "reset"
+        ]
+      },
+      "typeText": "\"button\" | \"submit\" | \"reset\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "typeof",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "unselectable",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "off",
+          "on"
+        ]
+      },
+      "typeText": "\"off\" | \"on\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "value",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "array",
+            "item": {
+              "kind": "string"
+            }
+          }
+        ]
+      },
+      "typeText": "string | number | readonly string[]",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "vocab",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "events": [],
+  "conditionalApi": [],
+  "unresolved": []
+}

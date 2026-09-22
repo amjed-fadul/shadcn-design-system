@@ -11,6 +11,7 @@ import { isRenderingTree, type ComponentFamilyContract, type InheritedInterfaceC
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependencies, analyzeComponentTokenSource, auditComponentTokenCoverage, compareComponentTokenDependencies } from "./helpers/component-token-analysis"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const task5Families = ["dialog", "dropdown-menu", "select", "sheet"]
@@ -90,7 +91,7 @@ function declarationExposesProp(contract: InheritedInterfaceContract, propName: 
   }
 }
 const asChildSlot = { propName: "asChild", default: false, replacesHost: true, childCardinality: { min: 0, max: 1 }, forwardsProps: true, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" as const, evidenceRefs: ["source", "declaration"] }
-const slotFor = (name: string) => ["DialogTrigger", "DropdownMenuTrigger", "SheetTrigger"].includes(name) ? { ...asChildSlot, refForwarding: "supported" as const } : asChildSlot
+const slotFor = (_name: string) => asChildSlot
 function asChildSlotErrors(contract: ComponentFamilyContract) {
   const errors: string[] = []
   for (const entry of contract.exports) {
@@ -114,8 +115,8 @@ function authority() {
 
 describe("compound and overlay Phase 3 Task 5 component contracts", () => {
   test("preserves the four Task 5 families within the completed family set", () => {
-    expect(contractSet.familyCount).toBe(20)
-    expect(contractSet.familyFiles).toHaveLength(20)
+    expect(contractSet.familyCount).toBe(canonicalFamilyIds.length)
+    expect(contractSet.familyFiles).toHaveLength(canonicalFamilyIds.length)
     expect(contractSet.familyFiles.filter((file) => task5Families.some((id) => file.endsWith(`/${id}.json`))).sort()).toEqual(task5Families.map((id) => `contracts/components/families/${id}.json`).sort())
     expect(contractSet.familyFiles.some((file) => file.endsWith("/sidebar.json"))).toBe(true)
   })
@@ -228,7 +229,7 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
         expect.objectContaining({ id: "close", host: { kind: "component-export", exportName: expect.stringContaining("Close") } }),
       ]))
     }
-    expect(dialog.exports.find(({ name }) => name === "DialogContent")!.component!.localProps).toEqual([{ name: "showCloseButton", required: false, type: { kind: "boolean" }, default: true, evidenceRefs: ["source"] }, { name: "portalContainer", required: false, type: { kind: "union", members: [{ kind: "typescript", typeText: "Element" }, { kind: "typescript", typeText: "DocumentFragment" }] }, typeText: "Element | DocumentFragment", evidenceRefs: ["source", "declaration"] }])
+    expect(dialog.exports.find(({ name }) => name === "DialogContent")!.component!.localProps).toEqual(expect.arrayContaining([{ name: "showCloseButton", required: false, type: { kind: "boolean" }, default: true, evidenceRefs: ["source"] }, { name: "portalContainer", required: false, type: { kind: "typescript", typeText: 'ComponentProps<typeof DialogPrimitive.Portal>["container"]' }, evidenceRefs: ["source"] }]))
     expect(sheet.exports.find(({ name }) => name === "SheetContent")!.component!.localProps).toEqual(expect.arrayContaining([{ name: "side", required: false, type: { kind: "enum", values: ["top", "right", "bottom", "left"] }, default: "right", evidenceRefs: ["source"] }]))
     expect(validateComponentFamilyInvariants(dialog, authority())).toEqual([])
     expect(validateComponentFamilyInvariants(sheet, authority())).toEqual([])

@@ -65,6 +65,9 @@ export function discoverImplementationInputs(root: string, options: ReleaseInput
   for (const file of readdirSync(root)) if (/^(README|LICEN[CS]E|COPYING)(\.|$)/i.test(file) || [".npmignore", ".gitignore", ".npmrc"].includes(file) || /^\.env(?:\.|$)/.test(file)) add(file)
   walk("scripts")
   for (const directory of ["contracts/components", "contracts/tokens"]) walk(directory)
+  // Tailwind's library CSS pass observes UI source, including story files;
+  // bind every observed byte even when stories are excluded from declarations.
+  walk("src/components/ui")
   if (existsSync(path.join(root, "provenance"))) for (const entry of readdirSync(path.join(root, "provenance"), { withFileTypes: true })) if (!entry.isDirectory()) add(`provenance/${entry.name}`)
   const readConfig = (file: string): ts.ParsedCommandLine => {
     const host: ts.ParseConfigFileHost = { ...ts.sys, readFile(file) { add(file); return ts.sys.readFile(file) }, onUnRecoverableConfigFileDiagnostic(diagnostic) { throw new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")) } }
@@ -95,6 +98,7 @@ export function discoverImplementationInputs(root: string, options: ReleaseInput
       else if (specifier.startsWith(".") || specifier.startsWith("@/")) {
         const asset = specifier.startsWith("@/") ? path.join(root, "src", specifier.slice(2)) : path.resolve(path.dirname(full), specifier)
         if (existsSync(asset)) add(asset)
+        else if (normalized(root, asset) === selfOutputPath) return // generated release is the verified output, not an input
         else throw new Error(`INPUT_UNRESOLVED: ${file} -> ${specifier}`)
       }
     }
@@ -161,7 +165,7 @@ export function verifyRepositoryRelease(root: string, expectedReleaseSha256?: st
   // also mandatory in library-data.ts, before Vite emits packaged release data.
   const release = loadExecutableRelease(raw, { expectedProjection: raw.projection, requirePackageIdentity: true })
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
-  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.4" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
+  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.5" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
   verifyImplementationManifest(root, release.implementationInputs)
   return release
 }

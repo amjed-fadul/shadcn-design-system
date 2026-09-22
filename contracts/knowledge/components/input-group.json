@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "input-group-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "input-group"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Adds addons, buttons, and helper content to inputs.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.input-group.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Input Group when an input or textarea needs adjacent icons, text, actions, loading state, or helper content within one visual control.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.input-group.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Place InputGroupInput or InputGroupTextarea before InputGroupAddon in the DOM for focus navigation; use align to change only the visual position.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.input-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "For custom controls, set data-slot=\"input-group-control\" so group focus, invalid, and addon-focus behavior can target the control.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.input-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use inline-start or inline-end addons with InputGroupInput and block-start or block-end addons with InputGroupTextarea.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.input-group.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "InputGroupAddon align supports inline-start, inline-end, block-start, and block-end.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.input-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "InputGroupButton supports xs, sm, icon-xs, and icon-sm sizes and defaults to the ghost variant.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.input-group.docs"
+        ]
+      }
+    }
+  ]
+}

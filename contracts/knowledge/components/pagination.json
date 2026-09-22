@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "pagination-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "pagination"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Pagination with page navigation, next and previous links.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.pagination.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Pagination when a collection or result set is split across discrete pages.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.pagination.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Pagination with PaginationContent and PaginationItem children containing page links, previous/next links, or PaginationEllipsis.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.pagination.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Set isActive on the current PaginationLink so it receives current-page semantics.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.pagination.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use only PaginationPrevious and PaginationNext for an icons-only or compact pagination control.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.pagination.docs"
+        ]
+      }
+    },
+    {
+      "statement": "PaginationPrevious and PaginationNext expose a text prop for localized visible labels; override aria-label as needed for localized accessible labels.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.pagination.docs"
+        ]
+      }
+    }
+  ]
+}

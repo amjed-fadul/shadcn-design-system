@@ -5,28 +5,46 @@
   },
   "familySource": {
     "path": "provenance/seed-components.json",
-    "blobSha": "daa39b1d596d8b0c7b1100c672fd618cfcb1d324",
-    "familyCount": 20,
+    "blobSha": "caa7a86b9ac3bb22005ebf50dd178df351b0ffbb",
+    "familyCount": 38,
     "familyIds": [
       "accordion",
+      "alert",
+      "alert-dialog",
+      "avatar",
       "badge",
+      "breadcrumb",
       "button",
       "card",
       "checkbox",
+      "collapsible",
+      "command",
       "dialog",
+      "drawer",
       "dropdown-menu",
+      "empty",
+      "field",
       "input",
+      "input-group",
       "label",
+      "pagination",
+      "popover",
+      "progress",
+      "radio-group",
       "scroll-area",
       "select",
       "separator",
       "sheet",
       "sidebar",
       "skeleton",
+      "slider",
+      "spinner",
       "switch",
       "table",
       "tabs",
       "textarea",
+      "toggle",
+      "toggle-group",
       "tooltip"
     ]
   },
@@ -51,6 +69,29 @@
     },
     "class-variance-authority": {
       "version": "0.7.1"
+    },
+    "cmdk": {
+      "version": "1.1.1"
+    },
+    "vaul": {
+      "version": "1.1.2"
     }
-  }
+  },
+  "capabilityIds": [
+    "alert-dialog.context",
+    "avatar-group.context",
+    "avatar.context",
+    "collapsible.context",
+    "command.context",
+    "dialog.context",
+    "drawer.context",
+    "dropdown-menu.context",
+    "dropdown-menu.subcontext",
+    "popover.context",
+    "radio-group.context",
+    "select.context",
+    "sheet.context",
+    "sidebar.context",
+    "toggle-group.context"
+  ]
 }

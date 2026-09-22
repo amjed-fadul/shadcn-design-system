@@ -233,7 +233,7 @@ describe("production validator against immutable release", () => {
 
     expect(() => loadExecutableRelease(candidate, {
       expectedProjection: release.projection,
-      expectedReleaseId: "shadcn-radix-release-004",
+      expectedReleaseId: "shadcn-radix-release-005",
     })).toThrowError(/PROJECTION_MISMATCH|HASH_MISMATCH/)
   })
 })

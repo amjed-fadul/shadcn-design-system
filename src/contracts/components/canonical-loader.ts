@@ -11,14 +11,7 @@ import type { ComponentContractSet } from "./types"
 
 const repositoryRoot = fileURLToPath(new URL("../../../", import.meta.url))
 const canonicalFamilyFiles = componentContractSource.familySource.familyIds.map((familyId) => `contracts/components/families/${familyId}.json`)
-const canonicalCapabilityIds = new Set([
-  "dialog.context",
-  "dropdown-menu.context",
-  "dropdown-menu.subcontext",
-  "select.context",
-  "sheet.context",
-  "sidebar.context",
-])
+const canonicalCapabilityIds = new Set(componentContractSource.capabilityIds)
 
 const canonicalSource: ComponentContractArtifactSource = {
   readJson(path) {
@@ -34,10 +27,11 @@ const canonicalSource: ComponentContractArtifactSource = {
 
 function canonicalContractSetErrors(contractSet: ComponentContractSet): string[] {
   const errors: string[] = []
-  if (contractSet.familyCount !== 20 || contractSet.familyFiles.length !== 20) errors.push("The component contract set must contain exactly 20 families.")
+  const expectedCount = componentContractSource.familySource.familyCount
+  if (contractSet.familyCount !== expectedCount || contractSet.familyFiles.length !== expectedCount) errors.push(`The component contract set must match the pinned family count: ${expectedCount}.`)
   const actual = [...contractSet.familyFiles].sort()
   const expected = [...canonicalFamilyFiles].sort()
-  if (actual.length !== expected.length || actual.some((path, index) => path !== expected[index])) errors.push("Family manifest does not match the canonical Phase 3 family scope.")
+  if (actual.length !== expected.length || actual.some((path, index) => path !== expected[index])) errors.push("Family manifest does not match the pinned canonical family scope.")
   return errors
 }
 

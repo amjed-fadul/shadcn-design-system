@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "breadcrumb-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "breadcrumb"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays the path to the current resource using a hierarchy of links.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.breadcrumb.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Breadcrumb when users need to understand or navigate the hierarchy leading to the current resource.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.breadcrumb.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Breadcrumb with BreadcrumbList, BreadcrumbItem, BreadcrumbLink, separators between items, and one BreadcrumbPage for the current page.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.breadcrumb.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use BreadcrumbLink asChild when the product routing library provides its own link component.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.breadcrumb.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Pass children to BreadcrumbSeparator to replace the default separator.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.breadcrumb.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use BreadcrumbEllipsis for a collapsed middle section when the breadcrumb path is too long.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.breadcrumb.docs"
+        ]
+      }
+    }
+  ]
+}

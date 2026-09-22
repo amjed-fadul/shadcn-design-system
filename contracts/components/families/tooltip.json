@@ -219,22 +219,11 @@
             "name": "portalContainer",
             "required": false,
             "type": {
-              "kind": "union",
-              "members": [
-                {
-                  "kind": "typescript",
-                  "typeText": "Element"
-                },
-                {
-                  "kind": "typescript",
-                  "typeText": "DocumentFragment"
-                }
-              ]
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof TooltipPrimitive.Portal>[\"container\"]"
             },
-            "typeText": "Element | DocumentFragment",
             "evidenceRefs": [
-              "source",
-              "declaration"
+              "source"
             ]
           }
         ],
