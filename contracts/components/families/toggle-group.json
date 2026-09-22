@@ -927,6 +927,7 @@
                 {
                   "name": "data-spacing",
                   "source": "primitive-state",
+                  "prop": "context.spacing",
                   "evidenceRefs": [
                     "source"
                   ]

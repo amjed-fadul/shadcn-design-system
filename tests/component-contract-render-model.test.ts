@@ -11,8 +11,33 @@ const breadcrumb = fileURLToPath(new URL("../src/components/ui/breadcrumb.tsx", 
 const breadcrumbContract = JSON.parse(readFileSync(fileURLToPath(new URL("../contracts/components/families/breadcrumb.json", import.meta.url)), "utf8"))
 const slider = fileURLToPath(new URL("../src/components/ui/slider.tsx", import.meta.url))
 const sliderContract = JSON.parse(readFileSync(fileURLToPath(new URL("../contracts/components/families/slider.json", import.meta.url)), "utf8"))
+const field = fileURLToPath(new URL("../src/components/ui/field.tsx", import.meta.url))
+const toggleGroup = fileURLToPath(new URL("../src/components/ui/toggle-group.tsx", import.meta.url))
 
 describe("generic render-model alternatives and factual aliases", () => {
+  test("normalizes a single surviving branch after a source null return", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(field, "FieldError")
+
+    expect(tree.unresolved).toEqual(["Unsupported JSX child expression: content"])
+    expect(tree.unresolvedFindings).toEqual([expect.objectContaining({ expressionKind: "Identifier", sourceText: "content" })])
+    expect(tree).toMatchObject({
+      root: expect.objectContaining({
+        tag: "div",
+        dataAttributes: [{ name: "data-slot", source: "literal", value: "field-error" }],
+      }),
+    })
+    expect(tree.alternatives).toBeUndefined()
+  })
+
+  test("records direct local property access as primitive-state provenance", () => {
+    const tree = sourceAnalysis.analyzeJsxRenderTree(toggleGroup, "ToggleGroupItem")
+
+    expect(tree.unresolved).toEqual([])
+    expect(tree.root?.dataAttributes).toEqual(expect.arrayContaining([
+      { name: "data-spacing", source: "primitive-state", prop: "context.spacing" },
+    ]))
+  })
+
   test("preserves every conditional host alias alternative and its predicate", () => {
     const tree = sourceAnalysis.analyzeJsxRenderTree(fixture, "ConditionalHostAliasFixture")
 

@@ -221,6 +221,17 @@ function tracedPropSpread(expression: ts.Expression, publicBindings: Set<string>
   return values.length > 0 && values.every((value) => value.name === values[0].name) ? values[0] : undefined
 }
 
+function directDataAttributeReference(expression: ts.Expression, file: ts.SourceFile, publicBindings: Set<string>): JsxDataAttribute | undefined {
+  if (!ts.isPropertyAccessExpression(expression)) return undefined
+  let root: ts.Expression = expression
+  while (ts.isPropertyAccessExpression(root)) root = root.expression
+  if (!ts.isIdentifier(root)) return undefined
+  const prop = expression.getText(file)
+  return publicBindings.has(root.text)
+    ? { name: "", source: "prop", prop }
+    : { name: "", source: "primitive-state", prop }
+}
+
 function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved, scope: JsxScope) {
   let receivesPublicProps = false
   const dataAttributes: JsxRenderNode["dataAttributes"] = []
@@ -239,6 +250,11 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
       const expression = property.initializer && ts.isJsxExpression(property.initializer) ? property.initializer.expression : undefined
       if (expression && ts.isIdentifier(expression)) {
         dataAttributes.push(publicBindings.has(expression.text) ? { name: property.name.text, source: "prop", prop: expression.text } : { name: property.name.text, source: "primitive-state", prop: expression.text })
+        continue
+      }
+      const propertyReference = expression && directDataAttributeReference(expression, file, publicBindings)
+      if (propertyReference) {
+        dataAttributes.push({ ...propertyReference, name: property.name.text })
         continue
       }
       const values = expression && conditionalValue(expression, publicBindings)
@@ -350,7 +366,8 @@ function mappedJsxChildren(expression: ts.CallExpression, file: ts.SourceFile, u
 }
 
 function jsxExpressionBranches(expression: ts.Expression | undefined, file: ts.SourceFile, unresolved: JsxUnresolved, publicBindings: Set<string>, scope: JsxScope): JsxBranch<JsxRenderNode[]>[] {
-  if (!expression || ts.isIdentifier(expression) && expression.text === "children") return [branch([])]
+  if (!expression || expression.kind === ts.SyntaxKind.NullKeyword) return [branch([])]
+  if (ts.isIdentifier(expression) && expression.text === "children") return [branch([])]
   if (ts.isIdentifier(expression) && scope.aliases.has(expression.text)) return structuredClone(scope.aliases.get(expression.text)!)
   if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return jsxExpressionBranches(expression.expression, file, unresolved, publicBindings, scope)
   if (ts.isConditionalExpression(expression)) {
@@ -564,7 +581,8 @@ export function analyzeJsxRenderTree(sourcePath: string, exportName: string): Js
     }
   }
   if (!roots.length) recordUnresolved(unresolved, declaration, file, `No JSX root found for ${exportName}`)
-  if (roots.length === 1 && !roots[0].when && !roots[0].otherwise) return { root: roots[0].root, unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
+  const hasNullReturn = expressions.some(({ expression }) => expression.kind === ts.SyntaxKind.NullKeyword)
+  if (roots.length === 1 && (!roots[0].when && !roots[0].otherwise || hasNullReturn)) return { root: roots[0].root, unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
   return { alternatives: roots.map(({ when, otherwise, root }) => when ? { when, root } : { otherwise: otherwise ?? true, root }), unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
 }
 

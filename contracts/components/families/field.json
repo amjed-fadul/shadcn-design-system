@@ -1131,47 +1131,33 @@
           }
         ],
         "rendering": {
-          "alternatives": [
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
             {
-              "when": {
-                "source": "state",
-                "name": "content",
-                "truthiness": "truthy"
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
               },
-              "rendering": {
-                "rootNodeId": "host",
-                "publicPropsTargetNodeId": "host",
-                "nodes": [
-                  {
-                    "id": "host",
-                    "host": {
-                      "kind": "intrinsic",
-                      "tag": "div"
-                    },
-                    "receivesPublicProps": true,
-                    "dataAttributes": [
-                      {
-                        "name": "data-slot",
-                        "source": "literal",
-                        "value": "field-error",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
-                    "children": [],
-                    "evidenceRefs": [
-                      "source"
-                    ]
-                  }
-                ],
-                "portalBoundaries": []
-              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "field-error",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
               "evidenceRefs": [
                 "source"
               ]
             }
-          ]
+          ],
+          "portalBoundaries": []
         },
         "accessibility": [
           {
@@ -1195,5 +1181,24 @@
       }
     }
   ],
-  "unresolved": []
+  "unresolved": [
+    {
+      "topic": "jsx-rendering",
+      "scope": "FieldError",
+      "reason": "Unsupported JSX child expression: content",
+      "source": {
+        "sourcePath": "src/components/ui/field.tsx",
+        "start": 6092,
+        "end": 6099,
+        "expressionKind": "Identifier",
+        "sourceText": "content"
+      },
+      "evidenceAttempted": [
+        "source-analysis"
+      ],
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ]
 }

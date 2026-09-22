@@ -35,7 +35,7 @@ type SourceFacts = {
   bindingDefaults: Map<string, unknown>
   typeFacts: Map<string, { typeText: string; values: string[] }>
   jsx: Array<ts.JsxElement | ts.JsxSelfClosingElement>
-  dataAttributes: Array<{ name: string; value?: unknown; expressionKind: string }>
+  dataAttributes: Array<{ name: string; value?: unknown; expressionKind: string; expression?: string }>
   portalCount: number
   propSpreadCount: number
   directUsesSlot: boolean
@@ -43,9 +43,19 @@ type SourceFacts = {
   conditionalSource: boolean
   renderAlternativePredicates: AnyRecord[]
   renderBranches: IndependentRenderBranch[]
+  renderUnresolved: IndependentRenderUnresolved[]
   mappedRenderEvidence: Array<{ tag: string; parentTag?: string; collection: string; slot?: string; parentSlot?: string }>
   propSurfaceError?: string
   localPropFacts: Map<string, IndependentLocalPropFact>
+}
+
+type IndependentRenderUnresolved = {
+  sourcePath: string
+  start: number
+  end: number
+  expressionKind: string
+  sourceText: string
+  reason: string
 }
 
 type IndependentRenderNode = {
@@ -532,6 +542,19 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
           prop: attribute.initializer.expression.text,
         })
       }
+      else if (attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression && ts.isPropertyAccessExpression(attribute.initializer.expression)) {
+        let root: ts.Expression = attribute.initializer.expression
+        while (ts.isPropertyAccessExpression(root)) root = root.expression
+        if (ts.isIdentifier(root)) {
+          dataAttributes.push({
+            name,
+            source: bindings.has(root.text) ? "prop" : "primitive-state",
+            prop: attribute.initializer.expression.getText(sourceFile),
+          })
+        } else {
+          dataAttributes.push({ name, source: "unresolved", expression: attribute.initializer.expression.getText(sourceFile) })
+        }
+      }
       else if (attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression && ts.isConditionalExpression(attribute.initializer.expression)) {
         const condition = renderCondition(attribute.initializer.expression.condition)
         const whenTrue = renderValue(attribute.initializer.expression.whenTrue)
@@ -849,6 +872,33 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     })
   }
   const jsx = functionLike ? jsxNodes(functionLike) : []
+  const jsxAliases = new Set<string>()
+  const containsDirectJsx = (expression: ts.Expression): boolean => {
+    if (ts.isJsxElement(expression) || ts.isJsxSelfClosingElement(expression) || ts.isJsxFragment(expression)) return true
+    if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return containsDirectJsx(expression.expression)
+    return ts.isConditionalExpression(expression) && (containsDirectJsx(expression.whenTrue) || containsDirectJsx(expression.whenFalse))
+  }
+  if (functionLike?.body) walkComponent(functionLike.body, (node) => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && containsDirectJsx(node.initializer)) jsxAliases.add(node.name.text)
+  })
+  const renderUnresolved: IndependentRenderUnresolved[] = []
+  const nonJsxBindings = new Set([...typeFacts.entries()]
+    .filter(([name, fact]) => bindings.has(name) && /^(?:string|number|boolean)(?:\s*\|\s*undefined)?$/.test(fact.typeText.trim()))
+    .map(([name]) => name))
+  for (const node of jsx) {
+    if (!ts.isJsxElement(node)) continue
+    for (const child of node.children) {
+      if (!ts.isJsxExpression(child) || !child.expression || !ts.isIdentifier(child.expression) || child.expression.text === "children" || jsxAliases.has(child.expression.text) || nonJsxBindings.has(child.expression.text)) continue
+      renderUnresolved.push({
+        sourcePath: sourceFile.fileName,
+        start: child.expression.getStart(sourceFile),
+        end: child.expression.getEnd(),
+        expressionKind: ts.SyntaxKind[child.expression.kind],
+        sourceText: child.expression.getText(sourceFile),
+        reason: `Unsupported JSX child expression: ${child.expression.getText(sourceFile)}`,
+      })
+    }
+  }
   const dataAttributes: SourceFacts["dataAttributes"] = []
   let propSpreadCount = 0
   let directUsesSlot = false
@@ -874,7 +924,14 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
         dataAttributes.push({
           name,
           value: literalValue(expression),
-          expressionKind: ts.isConditionalExpression(expression) ? "conditional" : ts.isIdentifier(expression) ? "identifier" : "other",
+          ...(ts.isPropertyAccessExpression(expression) ? { expression: expression.getText(sourceFile) } : {}),
+          expressionKind: ts.isConditionalExpression(expression)
+            ? "conditional"
+            : ts.isIdentifier(expression)
+              ? "identifier"
+              : ts.isPropertyAccessExpression(expression)
+                ? "property-access"
+                : "other",
         })
       }
     }
@@ -905,6 +962,7 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     conditionalSource: /\bif\s*\(|\?|&&/.test(bodyText),
     renderAlternativePredicates: functionLike ? renderAlternativePredicates(functionLike) : [],
     renderBranches: functionLike ? independentRenderBranches(functionLike, sourceFile, restBindings) : [],
+    renderUnresolved,
     mappedRenderEvidence: functionLike ? mappedRenderEvidence(functionLike) : [],
     ...(propSurfaceError ? { propSurfaceError } : {}),
     localPropFacts,
@@ -2152,6 +2210,24 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       }
       if (!exported.component) continue
       const source = componentSourceFacts(sourceFile, declaration)
+      const unresolvedKey = (finding: IndependentRenderUnresolved | AnyRecord) => {
+        const source = "source" in finding && finding.source ? finding.source : finding
+        return JSON.stringify({
+        topic: "jsx-rendering",
+        scope: exported.name,
+        reason: finding.reason,
+        sourcePath: source.sourcePath,
+        start: source.start,
+        end: source.end,
+        expressionKind: source.expressionKind,
+        sourceText: source.sourceText,
+        })
+      }
+      const expectedRenderUnresolved = source.renderUnresolved.map((finding) => unresolvedKey({ ...finding, sourcePath: family.source.canonicalPath }))
+      const actualRenderUnresolved = (family.unresolved ?? []).filter((finding: AnyRecord) => finding.topic === "jsx-rendering" && finding.scope === exported.name).map(unresolvedKey)
+      if (JSON.stringify(actualRenderUnresolved.sort()) !== JSON.stringify(expectedRenderUnresolved.sort())) {
+        errors.push(`${family.id}.${exported.name}: unresolved JSX render evidence differs from the canonical AST`)
+      }
       if (source.propSurfaceError) errors.push(`${family.id}.${exported.name}: ${source.propSurfaceError}`)
       const variants = cvaFacts(sourceFile, source.sourceText, source.declaration)
       const sourceProps = new Set([...source.bindings].filter((name) => !source.restBindings.has(name)).concat([...source.typeFacts.keys(), ...variants.variants.keys()]))
@@ -2248,7 +2324,10 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         if (attribute.expressionKind === "identifier" && !matching.some((candidate) => ["prop", "primitive-state"].includes(candidate.source))) {
           errors.push(`${family.id}.${exported.name}: derived ${attribute.name} target is omitted`)
         }
-        if (attribute.expressionKind === "other" && !matching.some((candidate) => ["derived-condition", "primitive-state"].includes(candidate.source))) errors.push(`${family.id}.${exported.name}: unresolved data attribute expression ${attribute.name}`)
+        if (attribute.expressionKind === "property-access" && !matching.some((candidate) => ["prop", "primitive-state"].includes(candidate.source) && candidate.prop === attribute.expression)) {
+          errors.push(`${family.id}.${exported.name}: derived ${attribute.name} property access target is omitted`)
+        }
+        if (attribute.expressionKind === "other" && !matching.some((candidate) => candidate.source === "derived-condition")) errors.push(`${family.id}.${exported.name}: unresolved data attribute expression ${attribute.name}`)
       }
       const directSlotValues = [...new Set(directDataAttributes.filter((attribute) => attribute.name === "data-slot").map((attribute) => attribute.value))].sort()
       const contractSlotValues = [...new Set(contractAttributes.filter((attribute) => attribute.name === "data-slot").map((attribute) => attribute.value))].sort()
@@ -2262,7 +2341,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         const contractPredicates = "alternatives" in exported.component.rendering
           ? exported.component.rendering.alternatives.map((alternative: AnyRecord) => normalizedPredicate(alternative.when ?? { otherwise: true }))
           : []
-        const sourcePredicates = source.renderAlternativePredicates.map(normalizedPredicate)
+        const sourcePredicates = source.renderUnresolved.length ? [] : source.renderAlternativePredicates.map(normalizedPredicate)
         const predicatesMatch = JSON.stringify(contractPredicates) === JSON.stringify(sourcePredicates)
         if (!predicatesMatch) errors.push(`${family.id}.${exported.name}: render alternative predicates differ from the canonical AST`)
         if (predicatesMatch && "alternatives" in exported.component.rendering) {
@@ -2272,6 +2351,11 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
               errors.push(`${family.id}.${exported.name}: render alternative tree ${index} differs from the canonical AST`)
             }
           })
+        }
+      } else if (source.renderBranches.length === 1) {
+        const sourceTree = source.renderBranches[0]?.tree
+        if (!sourceTree || !independentRenderTreeMatches(sourceTree, exported.component.rendering)) {
+          errors.push(`${family.id}.${exported.name}: render tree differs from the canonical AST`)
         }
       }
       const expectedPortalCount = source.portalCount
@@ -2322,7 +2406,17 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       }
       if (source.propSpreadCount === 0) errors.push(`${family.id}.${exported.name}: public props spread is absent from source`)
     }
-    if ((family.unresolved ?? []).length !== 0) errors.push(`${family.id}: contract contains unresolved source facts the direct audit did not find`)
+    const recognizedUnresolved = new Set<string>()
+    for (const exported of family.exports ?? []) {
+      const declaration = declarationFor(sourceFacts(resolve(root, family.source.canonicalPath)).sourceFile, exported.name)
+      if (!declaration || !exported.component) continue
+      const source = componentSourceFacts(sourceFacts(resolve(root, family.source.canonicalPath)).sourceFile, declaration)
+      for (const finding of source.renderUnresolved) recognizedUnresolved.add(JSON.stringify({ topic: "jsx-rendering", scope: exported.name, reason: finding.reason, sourcePath: family.source.canonicalPath, start: finding.start, end: finding.end, expressionKind: finding.expressionKind, sourceText: finding.sourceText }))
+    }
+    for (const finding of family.unresolved ?? []) {
+      const key = finding.source ? JSON.stringify({ topic: finding.topic, scope: finding.scope, reason: finding.reason, sourcePath: finding.source.sourcePath, start: finding.source.start, end: finding.source.end, expressionKind: finding.source.expressionKind, sourceText: finding.source.sourceText }) : undefined
+      if (!key || !recognizedUnresolved.has(key)) errors.push(`${family.id}: contract contains unresolved source facts the direct audit did not find`)
+    }
   }
   return errors
 }
@@ -2690,6 +2784,19 @@ describe("Phase 3 Task 10 independent review", () => {
     const wrongDerivedCondition = structuredClone(rendering)
     wrongDerivedCondition.nodes[0].dataAttributes[1].condition.equals = "closed"
     expect(independentRenderTreeMatches(facts.renderBranches[1].tree!, wrongDerivedCondition)).toBe(false)
+  })
+
+  test("independent render oracle preserves ToggleGroupItem property-access provenance", () => {
+    const baseline = loadArtifacts()
+    expect(directSourceErrors(baseline.families, baseline.interfaces)).toEqual([])
+
+    const mutated = clone(baseline)
+    const item = exportByName(familyById(mutated, "toggle-group"), "ToggleGroupItem").component
+    item.rendering.nodes[0].dataAttributes.find((attribute: AnyRecord) => attribute.name === "data-spacing").prop = "context.spacing()"
+
+    expect(directSourceErrors(mutated.families, mutated.interfaces)).toContain(
+      "toggle-group.ToggleGroupItem: derived data-spacing property access target is omitted",
+    )
   })
 
   test("independent conjunction canonicalization rejects complements and deduplicates identical atoms", () => {
