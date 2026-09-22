@@ -74,13 +74,26 @@ describe("component contract semantic invariants", () => {
     const token = (all: any[]) => changed((family: any) => {
       family.exports[0].component.tokenDependencies[0].when = { all }
     })
-    const self = { subject: "data", scope: "self", relation: "attribute", propName: "state", equals: "open" }
-    const group = { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "state", equals: "closed" }
+    const self = { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "open" }
+    const group = { subject: "data", path: [{ kind: "group", name: "root" }], propName: "state", equals: "closed" }
 
     expect(validateComponentFamilyInvariants(token([self]), authority)).toContain("Component Example token color.primary conjunction must contain at least two conditions.")
     expect(validateComponentFamilyInvariants(token([self, { ...self }]), authority)).toContain("Component Example token color.primary condition contains duplicate predicates.")
     expect(validateComponentFamilyInvariants(token([self, { ...self, equals: "closed" }]), authority)).toContain("Component Example token color.primary condition contains contradictory predicates.")
     expect(validateComponentFamilyInvariants(token([self, group]), authority)).toEqual([])
+  })
+
+  test("validates utility condition path naming semantics after schema bypass", () => {
+    const token = (path: any[]) => changed((family: any) => {
+      family.exports[0].component.tokenDependencies[0].when = { subject: "data", path, propName: "state", equals: "open" }
+    })
+
+    expect(validateComponentFamilyInvariants(token([{ kind: "has" }, { kind: "group", name: "root" }]), authority)).toEqual([])
+    expect(validateComponentFamilyInvariants(token([{ kind: "self", name: "root" }]), authority)).toContain("Component Example token color.primary condition has an invalid named self relation path segment.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "in", name: "root" }]), authority)).toContain("Component Example token color.primary condition has an invalid named in relation path segment.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "group", name: "not/name" }]), authority)).toContain("Component Example token color.primary condition has an invalid relation path name: not/name.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "peer", name: "inner" }, { kind: "group", name: "outer" }]), authority)).toContain("Component Example token color.primary condition has multiple named relation path segments.")
+    expect(validateComponentFamilyInvariants(token([{ kind: "group" }, { kind: "peer", name: "inner" }]), authority)).toContain("Component Example token color.primary condition relation path name must target its first group or peer segment.")
   })
 
   test("accepts a portal boundary targeting a reachable render node", () => {

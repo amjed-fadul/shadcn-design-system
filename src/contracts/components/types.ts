@@ -1,6 +1,7 @@
 export type ComponentExportKind = "component" | "hook" | "helper"
 export type EvidenceKind = "canonical-source" | "inherited-interface" | "runtime-test" | "token-contract"
 type AtLeastTwo<T> = [T, T, ...T[]]
+type AtLeastOne<T> = [T, ...T[]]
 
 export type StructuredPropType =
   | { kind: "boolean" }
@@ -22,9 +23,14 @@ export type ConditionalPropRefinement = EvidenceRef & ({ propName: string; avail
 export type ConditionalEventRefinement = EvidenceRef & { eventPropName: string; payload: StructuredPropType }
 export type ConditionalApiCase = EvidenceRef & { when: { propName: string; equals: string | number | boolean }; propRefinements: ConditionalPropRefinement[]; eventRefinements: ConditionalEventRefinement[]; stateChannels: StateChannel[] }
 export type EventContract = EvidenceRef & { propName: string; payload?: StructuredPropType }
+export type TokenConditionRelationshipSegment =
+  | { kind: "has" | "in"; name?: never }
+  | { kind: "group" | "peer"; name?: string }
+export type TokenConditionPathSegment = { kind: "self"; name?: never } | TokenConditionRelationshipSegment
+export type TokenConditionPath = [{ kind: "self"; name?: never }] | AtLeastOne<TokenConditionRelationshipSegment>
 export type TokenConditionAtom = (
-  | { subject?: never; scope?: never; relation?: never; name?: never }
-  | { subject: "data" | "aria"; scope: "self" | "group" | "peer" | "in"; relation: "attribute" | "has"; name?: string }
+  | { subject?: never; path?: never }
+  | { subject: "data" | "aria"; path: TokenConditionPath }
 ) & { propName: string; equals: string | number | boolean; all?: never }
 export type TokenCondition = TokenConditionAtom | { all: AtLeastTwo<TokenConditionAtom>; propName?: never; equals?: never }
 export type TokenDependency = EvidenceRef & { tokenId: string; when?: TokenCondition; viaDerivedRule?: { id: string; multiplier: number } }

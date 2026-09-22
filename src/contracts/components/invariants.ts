@@ -16,9 +16,36 @@ function tokenConditionSubject({ equals: _equals, ...identity }: TokenConditionA
   return stableSerialize(identity)
 }
 
+function validateTokenConditionAtomPath(errors: string[], componentName: string, tokenId: string, atom: TokenConditionAtom): void {
+  if (!("subject" in atom)) return
+  const path = atom.path as Array<{ kind?: unknown; name?: unknown }> | undefined
+  if (!Array.isArray(path) || path.length === 0) {
+    errors.push(`Component ${componentName} token ${tokenId} condition has an empty relation path.`)
+    return
+  }
+  const names: number[] = []
+  for (const [index, segment] of path.entries()) {
+    if (typeof segment !== "object" || segment === null || !["self", "has", "in", "group", "peer"].includes(String(segment.kind))) {
+      errors.push(`Component ${componentName} token ${tokenId} condition has an invalid relation path segment.`)
+      continue
+    }
+    if ("name" in segment) {
+      names.push(index)
+      if (segment.kind !== "group" && segment.kind !== "peer") errors.push(`Component ${componentName} token ${tokenId} condition has an invalid named ${String(segment.kind)} relation path segment.`)
+      if (typeof segment.name !== "string" || !/^[A-Za-z0-9_-]+$/.test(segment.name)) errors.push(`Component ${componentName} token ${tokenId} condition has an invalid relation path name: ${String(segment.name)}.`)
+    }
+  }
+  if (path.some((segment) => segment.kind === "self") && (path.length !== 1 || path[0]?.kind !== "self")) errors.push(`Component ${componentName} token ${tokenId} condition has self in a compound relation path.`)
+  if (names.length > 1) errors.push(`Component ${componentName} token ${tokenId} condition has multiple named relation path segments.`)
+  const firstNameable = path.findIndex((segment) => segment.kind === "group" || segment.kind === "peer")
+  if (names.length === 1 && names[0] !== firstNameable) errors.push(`Component ${componentName} token ${tokenId} condition relation path name must target its first group or peer segment.`)
+}
+
 function validateTokenCondition(errors: string[], componentName: string, tokenId: string, when: ComponentDefinition["tokenDependencies"][number]["when"]): void {
-  if (!when || !("all" in when)) return
-  const atoms = when.all as TokenConditionAtom[]
+  if (!when) return
+  const atoms = "all" in when ? when.all as TokenConditionAtom[] : [when as TokenConditionAtom]
+  for (const atom of atoms) validateTokenConditionAtomPath(errors, componentName, tokenId, atom)
+  if (!("all" in when)) return
   if (atoms.length < 2) errors.push(`Component ${componentName} token ${tokenId} conjunction must contain at least two conditions.`)
   if (atoms.some((atom, index) => atoms.findIndex((candidate) => stableSerialize(candidate) === stableSerialize(atom)) !== index)) {
     errors.push(`Component ${componentName} token ${tokenId} condition contains duplicate predicates.`)

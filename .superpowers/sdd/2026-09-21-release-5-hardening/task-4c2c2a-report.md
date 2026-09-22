@@ -100,3 +100,34 @@ Final focused compatibility command covered the production parser, schema, invar
 - Production and independent scanners, value decoders, merge logic, and token resolution remain separate.
 - Conjunction order is semantic and remains order-sensitive; object property insertion order is not semantic and is normalized only for equality keys.
 - No family/path exception, finding suppression, allowlist keyed to a component, contract-derived truth, manual token fact, weakened equality, 4C2C2B expression support, family cleanup, or 4C3 work was introduced.
+
+## Fix Round 2 — ordered compound relation paths
+
+### Root cause and representation
+
+The Fix Round 1 utility atom reduced a variant to one `scope` plus one `relation`. That shape could express `group-has-data-*`, but not Tailwind-valid compositions whose order changes selector meaning, including `has-group-data-*/name`, `has-peer-data-*/name`, `group-in-data-*/name`, and `has-in-data-*`. Its regular expression also terminated arbitrary attribute content at the first `]`, including an escaped closing bracket.
+
+Utility atoms now carry an ordered `path`. A direct attribute uses `[{ kind: "self" }]`; compound variants preserve each relation in source order, for example `has-group-data-*/root` becomes `[{ kind: "has" }, { kind: "group", name: "root" }]`. Only `group` and `peer` path segments can carry a static name. The parser attaches the one trailing Tailwind modifier to the first nameable segment, matching Tailwind's nested compound parse, and rejects a name when no group/peer segment exists. The type and schema exclude names from self/has/in segments; the invariant layer also rejects malformed, multiply named, or incorrectly positioned names after schema bypass.
+
+Production and independent implementations each use their own escape-aware arbitrary-content scanner. They distinguish structural brackets from escaped `\\[` and `\\]`, split the attribute/value boundary only at an unescaped `=`, preserve the decoded literal bracket, and continue to fail closed for unescaped nesting, malformed escapes, interpolation, unsupported relations, and invalid names.
+
+### Strict RED / GREEN evidence
+
+The new focused selection began at **4/4 failures / 154 skipped**, one failure each in production parsing, independent parsing, schema validation, and runtime invariants. Tailwind **4.3.3** compiled every positive candidate. The production and independent failures retained only the previously representable group-has case and omitted the other compound/escape cases; the schema rejected the new path, while invariants accepted illegal self/in names.
+
+The Tailwind-backed tests cover both `has -> group` and `group -> has` orderings, `has -> peer`, `group -> in`, `has -> in`, and exact decoded opening/closing brackets. The new behavior is **4/4 green**. The full bounded compatibility command covering production conditions, schema, invariants, imported CVA, and unresolved reconciliation is **5 files passed; 117/117 tests passed**.
+
+### Independent audit and final gates
+
+- Full independent review: **53 passed / 2 expected residual failures**. The direct audit remains exactly **263 findings** and the separate evidence orphan remains `collapsible.json:tokens`; compound-path support did not create or suppress corpus debt.
+- `npm run typecheck`: **exit 0**.
+- `git diff --check`: **exit 0** before commit.
+- Release-001 base/current blobs remain `75b59166086e9de0c67656fe64712a8cc70aa6e3` / `75b59166086e9de0c67656fe64712a8cc70aa6e3`.
+- The scoped diff for `contracts/components/families`, `contracts/tokens`, and `provenance/releases` is empty.
+- Per controller instruction, no components or full-suite run was performed in this round.
+
+### Round-2 self-review
+
+- Ordered path identity participates in the existing stable condition key, so relation-order drift, names, duplicates, and contradictions remain exact.
+- Production and independent scanners remain separate; neither derives expected facts from family contracts.
+- No family JSON, token contract, release artifact, expression parsing, manual fact list, component exception, finding filter, or 4C3 work was added.

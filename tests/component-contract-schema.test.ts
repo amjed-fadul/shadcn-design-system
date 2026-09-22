@@ -91,8 +91,8 @@ describe("component contract JSON Schemas", () => {
     family.exports[0].component.tokenDependencies.push({
       tokenId: "spacing.unit",
       when: { all: [
-        { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "orientation", equals: "vertical" },
-        { subject: "data", scope: "self", relation: "attribute", propName: "spacing", equals: 0 },
+        { subject: "data", path: [{ kind: "group", name: "root" }], propName: "orientation", equals: "vertical" },
+        { subject: "data", path: [{ kind: "self" }], propName: "spacing", equals: 0 },
       ] },
       viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
       evidenceRefs: ["source"],
@@ -104,8 +104,24 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, malformed)).toBe(false)
 
     const incompleteScopedAtom = structuredClone(family)
-    delete incompleteScopedAtom.exports[0].component.tokenDependencies[0].when.all[0].scope
+    delete incompleteScopedAtom.exports[0].component.tokenDependencies[0].when.all[0].path
     expect(validate(familySchema, incompleteScopedAtom)).toBe(false)
+  })
+
+  test("accepts ordered utility relation paths and rejects names on unnamed segments", () => {
+    const family = validFamily()
+    family.exports[0].component.tokenDependencies.push({
+      tokenId: "color.primary",
+      when: { subject: "data", path: [{ kind: "has" }, { kind: "group", name: "root" }], propName: "state", equals: "open" },
+      evidenceRefs: ["source"],
+    })
+    expect(validate(familySchema, family)).toBe(true)
+
+    for (const kind of ["self", "in"] as const) {
+      const malformed = structuredClone(family)
+      malformed.exports[0].component.tokenDependencies[0].when.path = [{ kind, name: "root" }]
+      expect(validate(familySchema, malformed)).toBe(false)
+    }
   })
 
   test("accepts an evidence-backed cross-family component host", () => {

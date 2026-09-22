@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import ts from "typescript"
 
-import type { SourceExpressionIdentity, TokenCondition, TokenConditionAtom, TokenDependency } from "./types"
+import type { SourceExpressionIdentity, TokenCondition, TokenConditionAtom, TokenConditionPath, TokenConditionRelationshipSegment, TokenDependency } from "./types"
 
 export type ClassSource = { classNames: string; propName?: string; equals?: string; source: SourceExpressionIdentity }
 export type UnresolvedClassSource = SourceExpressionIdentity & { reason: string }
@@ -58,7 +58,6 @@ function publicPropBindings(functionLike: Pick<ts.SignatureDeclarationBase, "par
 }
 
 const operationalVariant = /^(?:\*|\*\*|dark|rtl|ltr|portrait|landscape|print|motion-safe|motion-reduce|contrast-more|contrast-less|forced-colors|sm|md|lg|xl|2xl|first|last|only|odd|even|first-of-type|last-of-type|only-of-type|empty|hover|focus|focus-within|focus-visible|active|visited|target|disabled|enabled|checked|indeterminate|default|required|valid|invalid|in-range|out-of-range|placeholder|placeholder-shown|autofill|read-only|open|before|after|first-letter|first-line|marker|selection|file|backdrop|(?:group|peer)-(?:hover|focus|focus-within|focus-visible|active|visited|disabled|enabled|checked|open)(?:\/[A-Za-z0-9_-]+)?|@[a-z][A-Za-z0-9_-]*(?:\/[A-Za-z0-9_-]+)?)$/
-const attributeVariant = /^(?:(group|peer|in)-)?(has-)?(data|aria)-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))(?:\/([A-Za-z0-9_-]+))?$/
 
 function conditionValue(value: string | undefined): string | number | boolean | undefined {
   if (value === undefined) return true
@@ -71,11 +70,75 @@ function conditionValue(value: string | undefined): string | number | boolean | 
     if (character === "_" || character === ":") return undefined
     decoded += character
   }
-  if (escaped || /[\s\[\]{}$`'"]/.test(decoded)) return undefined
+  if (escaped || /[\s{}$`'"]/.test(decoded)) return undefined
   if (decoded === "true") return true
   if (decoded === "false") return false
   if (/^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(decoded)) return Number(decoded)
   return decoded
+}
+
+function attributeCondition(prefix: string): TokenConditionAtom | undefined {
+  const root = /^(?:((?:(?:group|peer|in|has)-)+))?(data|aria)-(.+)$/.exec(prefix)
+  if (!root) return undefined
+  const suffix = root[3]
+  let propName: string
+  let rawValue: string | undefined
+  let name: string | undefined
+
+  if (suffix.startsWith("[")) {
+    let closing = -1
+    let escaped = false
+    for (let index = 1; index < suffix.length; index += 1) {
+      const character = suffix[index]
+      if (escaped) { escaped = false; continue }
+      if (character === "\\") { escaped = true; continue }
+      if (character === "[") return undefined
+      if (character === "]") { closing = index; break }
+    }
+    if (escaped || closing < 0) return undefined
+    const tail = suffix.slice(closing + 1)
+    if (tail) {
+      const nameMatch = /^\/([A-Za-z0-9_-]+)$/.exec(tail)
+      if (!nameMatch) return undefined
+      name = nameMatch[1]
+    }
+    const content = suffix.slice(1, closing)
+    let separator = -1
+    escaped = false
+    for (let index = 0; index < content.length; index += 1) {
+      const character = content[index]
+      if (escaped) { escaped = false; continue }
+      if (character === "\\") { escaped = true; continue }
+      if (character === "=" && separator < 0) separator = index
+    }
+    if (escaped) return undefined
+    propName = separator < 0 ? content : content.slice(0, separator)
+    rawValue = separator < 0 ? undefined : content.slice(separator + 1)
+  } else {
+    const shorthand = /^([A-Za-z_][A-Za-z0-9_-]*)(?:\/([A-Za-z0-9_-]+))?$/.exec(suffix)
+    if (!shorthand) return undefined
+    propName = shorthand[1]
+    name = shorthand[2]
+  }
+  if (!/^[A-Za-z_][A-Za-z0-9_-]*$/.test(propName)) return undefined
+
+  let path: TokenConditionPath
+  if (!root[1]) {
+    if (name) return undefined
+    path = [{ kind: "self" }]
+  } else {
+    const relationKinds = root[1].slice(0, -1).split("-") as Array<TokenConditionRelationshipSegment["kind"]>
+    const segments = relationKinds.map((kind): TokenConditionRelationshipSegment => ({ kind }))
+    if (name) {
+      const namedIndex = segments.findIndex(({ kind }) => kind === "group" || kind === "peer")
+      if (namedIndex < 0) return undefined
+      segments[namedIndex] = { kind: segments[namedIndex].kind as "group" | "peer", name }
+    }
+    path = [segments[0], ...segments.slice(1)]
+  }
+  const equals = conditionValue(rawValue)
+  if (equals === undefined) return undefined
+  return { subject: root[2] as "data" | "aria", path, propName, equals }
 }
 
 function conditionSubjectKey({ equals: _equals, ...identity }: TokenConditionAtom): string {
@@ -126,22 +189,9 @@ export function parseTailwindTokenUtility(rawUtility: string): { utility: string
   const utility = segments.at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
   const conditions: TokenCondition[] = []
   for (const prefix of segments.slice(0, -1)) {
-    const attributeMatch = prefix.match(attributeVariant)
-    if (attributeMatch) {
-      const scope = attributeMatch[1] ?? "self"
-      const relation = attributeMatch[2] ? "has" : "attribute"
-      const name = attributeMatch[7]
-      if (name && scope !== "group" && scope !== "peer") return undefined
-      const equals = conditionValue(attributeMatch[5])
-      if (equals === undefined) return undefined
-      conditions.push({
-        subject: attributeMatch[3] as "data" | "aria",
-        scope: scope as "self" | "group" | "peer" | "in",
-        relation,
-        ...(name ? { name } : {}),
-        propName: attributeMatch[4] ?? attributeMatch[6],
-        equals,
-      })
+    const condition = attributeCondition(prefix)
+    if (condition) {
+      conditions.push(condition)
       continue
     }
     if (prefix.includes("data-") || prefix.includes("aria-") || prefix.includes("${") || prefix.startsWith("[") || !operationalVariant.test(prefix)) return undefined

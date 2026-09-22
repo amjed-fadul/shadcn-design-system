@@ -1546,10 +1546,64 @@ function independentScalar(value: string | undefined): string | number | boolean
     if (character === "_" || character === ":") return undefined
     decoded += character
   }
-  if (escaped || [...decoded].some((character) => " []{}$`'\"".includes(character))) return undefined
+  if (escaped || [...decoded].some((character) => " {}$`'\"".includes(character))) return undefined
   if (decoded === "true" || decoded === "false") return decoded === "true"
   if (/^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(decoded)) return Number(decoded)
   return decoded
+}
+
+function independentAttributeCondition(prefix: string): AnyRecord | undefined {
+  const root = /^(?:((?:(?:group|peer|in|has)-)+))?(data|aria)-(.+)$/.exec(prefix)
+  if (!root) return undefined
+  const kinds = root[1] ? root[1].split("-").filter(Boolean) : ["self"]
+  const suffix = root[3]
+  let property: string
+  let encodedValue: string | undefined
+  let modifier: string | undefined
+
+  if (suffix[0] === "[") {
+    let end = -1
+    let escaped = false
+    for (let cursor = 1; cursor < suffix.length; cursor += 1) {
+      const character = suffix[cursor]
+      if (escaped) { escaped = false; continue }
+      if (character === "\\") { escaped = true; continue }
+      if (character === "[") return undefined
+      if (character === "]") { end = cursor; break }
+    }
+    if (escaped || end < 0) return undefined
+    const remainder = suffix.slice(end + 1)
+    if (remainder) {
+      if (!/^\/[A-Za-z0-9_-]+$/.test(remainder)) return undefined
+      modifier = remainder.slice(1)
+    }
+    const arbitrary = suffix.slice(1, end)
+    let equals = -1
+    escaped = false
+    for (let cursor = 0; cursor < arbitrary.length; cursor += 1) {
+      const character = arbitrary[cursor]
+      if (escaped) { escaped = false; continue }
+      if (character === "\\") { escaped = true; continue }
+      if (character === "=" && equals < 0) equals = cursor
+    }
+    if (escaped) return undefined
+    property = equals < 0 ? arbitrary : arbitrary.slice(0, equals)
+    encodedValue = equals < 0 ? undefined : arbitrary.slice(equals + 1)
+  } else {
+    const shorthand = /^([A-Za-z_][A-Za-z0-9_-]*)(?:\/([A-Za-z0-9_-]+))?$/.exec(suffix)
+    if (!shorthand) return undefined
+    property = shorthand[1]
+    modifier = shorthand[2]
+  }
+  if (!/^[A-Za-z_][A-Za-z0-9_-]*$/.test(property)) return undefined
+  const path = kinds.map((kind) => ({ kind }))
+  if (modifier) {
+    const target = path.findIndex((segment) => segment.kind === "group" || segment.kind === "peer")
+    if (target < 0) return undefined
+    path[target] = { kind: path[target].kind, name: modifier } as typeof path[number]
+  }
+  const equals = independentScalar(encodedValue)
+  return equals === undefined ? undefined : { subject: root[2], path, propName: property, equals }
 }
 
 function independentUtilityCondition(raw: string): { utility: string; atoms: AnyRecord[] } | undefined {
@@ -1557,18 +1611,11 @@ function independentUtilityCondition(raw: string): { utility: string; atoms: Any
   if (!segments) return undefined
   const atoms: AnyRecord[] = []
   for (const prefix of segments.slice(0, -1)) {
-    const attribute = /^(?:(group|peer|in)-)?(has-)?(data|aria)-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))(?:\/([A-Za-z0-9_-]+))?$/.exec(prefix)
-    if (attribute) {
-      const scope = attribute[1] ?? "self"
-      const relation = attribute[2] ? "has" : "attribute"
-      const name = attribute[7]
-      if (name && scope !== "group" && scope !== "peer") return undefined
-      const equals = independentScalar(attribute[5])
-      if (equals === undefined) return undefined
-      const atom = { subject: attribute[3], scope, relation, ...(name ? { name } : {}), propName: attribute[4] ?? attribute[6], equals }
+    const atom = independentAttributeCondition(prefix)
+    if (atom) {
       const identity = independentStableKey({ ...atom, equals: undefined })
       const prior = atoms.find((candidate) => independentStableKey({ ...candidate, equals: undefined }) === identity)
-      if (prior && prior.equals !== equals) return undefined
+      if (prior && prior.equals !== atom.equals) return undefined
       if (!prior) atoms.push(atom)
       continue
     }
@@ -2439,20 +2486,20 @@ describe("Phase 3 Task 10 independent review", () => {
     ])
 
     expect(facts).toEqual(expect.arrayContaining([
-      { tokenId: "radius.md", when: { subject: "data", scope: "self", relation: "attribute", propName: "size", equals: "sm" } },
+      { tokenId: "radius.md", when: { subject: "data", path: [{ kind: "self" }], propName: "size", equals: "sm" } },
       {
         tokenId: "spacing.unit",
         when: { all: [
-          { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "orientation", equals: "vertical" },
-          { subject: "data", scope: "self", relation: "attribute", propName: "spacing", equals: 0 },
+          { subject: "data", path: [{ kind: "group", name: "root" }], propName: "orientation", equals: "vertical" },
+          { subject: "data", path: [{ kind: "self" }], propName: "spacing", equals: 0 },
         ] },
         viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
       },
       {
         tokenId: "color.background",
-        when: { all: [{ propName: "tone", equals: "default" }, { subject: "data", scope: "self", relation: "attribute", propName: "state", equals: "open" }] },
+        when: { all: [{ propName: "tone", equals: "default" }, { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "open" }] },
       },
-      { tokenId: "color.destructive", when: { subject: "aria", scope: "self", relation: "attribute", propName: "invalid", equals: true } },
+      { tokenId: "color.destructive", when: { subject: "aria", path: [{ kind: "self" }], propName: "invalid", equals: true } },
     ]))
   })
 
@@ -2462,15 +2509,15 @@ describe("Phase 3 Task 10 independent review", () => {
       sourcePath: "fixture.tsx",
     }])).toEqual(expect.arrayContaining([
       { tokenId: "radius.md", when: { all: [
-        { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "size", equals: "sm" },
-        { subject: "data", scope: "self", relation: "attribute", propName: "size", equals: "lg" },
+        { subject: "data", path: [{ kind: "group", name: "root" }], propName: "size", equals: "sm" },
+        { subject: "data", path: [{ kind: "self" }], propName: "size", equals: "lg" },
       ] } },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "group", relation: "attribute", name: "root", propName: "expanded", equals: true } },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "peer", relation: "attribute", name: "item", propName: "checked", equals: true } },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "in", relation: "attribute", propName: "busy", equals: true } },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "self", relation: "has", propName: "label", equals: "x" } },
-      { tokenId: "radius.lg", when: { subject: "data", scope: "group", relation: "has", name: "root", propName: "slot", equals: "media" } },
-      { tokenId: "radius.lg", when: { subject: "data", scope: "self", relation: "attribute", propName: "label", equals: "some_value" } },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "group", name: "root" }], propName: "expanded", equals: true } },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "peer", name: "item" }], propName: "checked", equals: true } },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "in" }], propName: "busy", equals: true } },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "has" }], propName: "label", equals: "x" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "group", name: "root" }, { kind: "has" }], propName: "slot", equals: "media" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "self" }], propName: "label", equals: "some_value" } },
       { tokenId: "font-size.sm" },
     ]))
 
@@ -2478,6 +2525,21 @@ describe("Phase 3 Task 10 independent review", () => {
       classNames: "in-data-[state=open]/root:rounded-md not-data-[state=open]:rounded-md rounded-md\\",
       sourcePath: "fixture.tsx",
     }])).toEqual([])
+  })
+
+  test("independent utility grammar preserves compound relation order and escaped brackets", () => {
+    expect(independentImportedTokenDependencies([{
+      classNames: "has-group-data-[state=open]/root:rounded-lg group-has-data-[state=open]/root:rounded-lg has-peer-data-[state=open]/item:rounded-lg group-in-data-[state=open]/root:rounded-lg has-in-data-[state=open]:rounded-lg data-[label=a\\[b]:rounded-lg data-[label=a\\]b]:rounded-lg",
+      sourcePath: "fixture.tsx",
+    }])).toEqual([
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "has" }, { kind: "group", name: "root" }], propName: "state", equals: "open" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "group", name: "root" }, { kind: "has" }], propName: "state", equals: "open" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "has" }, { kind: "peer", name: "item" }], propName: "state", equals: "open" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "group", name: "root" }, { kind: "in" }], propName: "state", equals: "open" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "has" }, { kind: "in" }], propName: "state", equals: "open" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "self" }], propName: "label", equals: "a[b" } },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "self" }], propName: "label", equals: "a]b" } },
+    ])
   })
 
   test("independent token resolution matches complete utility identities", () => {
@@ -2501,7 +2563,7 @@ describe("Phase 3 Task 10 independent review", () => {
 
     const errors = directSourceErrors(artifacts.families, artifacts.interfaces)
       .filter((error) => error.includes("checkbox.Checkbox: conditional utility token fact differs"))
-    expect(errors).toContainEqual(expect.stringContaining('missing {"tokenId":"color.primary","when":{"equals":"checked","propName":"state","relation":"attribute","scope":"self","subject":"data"}}'))
+    expect(errors).toContainEqual(expect.stringContaining('missing {"tokenId":"color.primary","when":{"equals":"checked","path":[{"kind":"self"}],"propName":"state","subject":"data"}}'))
     expect(errors).toContainEqual(expect.stringContaining('invented {"tokenId":"color.primary","when":{"equals":"unchecked","propName":"state"}}'))
   })
 
@@ -2675,7 +2737,7 @@ describe("Phase 3 Task 10 independent review", () => {
       .filter((error) => error.includes("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
     const baselineArtifacts = loadArtifacts()
     const baselineErrors = importedErrors(baselineArtifacts)
-    expect(baselineErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"when":{"equals":0,"name":"toggle-group","propName":"spacing","relation":"attribute","scope":"group","subject":"data"}}'))
+    expect(baselineErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"when":{"equals":0,"path":[{"kind":"group","name":"toggle-group"}],"propName":"spacing","subject":"data"}}'))
     expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2}}'))
     expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5}}'))
 

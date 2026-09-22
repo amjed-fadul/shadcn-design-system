@@ -82,12 +82,24 @@
         { "$ref": "#/$defs/apiCondition" },
         {
           "type": "object", "additionalProperties": false,
-          "required": ["subject", "scope", "relation", "propName", "equals"],
+          "required": ["subject", "path", "propName", "equals"],
           "properties": {
-            "subject": { "enum": ["data", "aria"] }, "scope": { "enum": ["self", "group", "peer", "in"] }, "relation": { "enum": ["attribute", "has"] }, "name": { "type": "string" },
+            "subject": { "enum": ["data", "aria"] }, "path": { "$ref": "#/$defs/tokenConditionPath" },
             "propName": { "type": "string" }, "equals": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] }
           }
         }
+      ]
+    },
+    "tokenConditionPath": {
+      "oneOf": [
+        { "type": "array", "minItems": 1, "maxItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "self" } } } },
+        { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/tokenConditionPathSegment" } }
+      ]
+    },
+    "tokenConditionPathSegment": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "enum": ["has", "in"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "enum": ["group", "peer"] }, "name": { "type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9_-]+$" } } }
       ]
     },
     "conditional": {

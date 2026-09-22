@@ -32,18 +32,18 @@ describe("conditional Tailwind token utility analysis", () => {
     expect(analyzer.analyzeTailwindTokenDependencies(
       "data-[size=sm]:rounded-md group-data-[orientation=vertical]/root:data-[spacing=0]:gap-2 dark:hover:data-[state=open]:bg-background aria-invalid:bg-destructive",
     )).toEqual([
-      { tokenId: "radius.md", when: { subject: "data", scope: "self", relation: "attribute", propName: "size", equals: "sm" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.md", when: { subject: "data", path: [{ kind: "self" }], propName: "size", equals: "sm" }, evidenceRefs: ["source"] },
       {
         tokenId: "spacing.unit",
         when: { all: [
-          { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "orientation", equals: "vertical" },
-          { subject: "data", scope: "self", relation: "attribute", propName: "spacing", equals: 0 },
+          { subject: "data", path: [{ kind: "group", name: "root" }], propName: "orientation", equals: "vertical" },
+          { subject: "data", path: [{ kind: "self" }], propName: "spacing", equals: 0 },
         ] },
         viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
         evidenceRefs: ["source"],
       },
-      { tokenId: "color.background", when: { subject: "data", scope: "self", relation: "attribute", propName: "state", equals: "open" }, evidenceRefs: ["source"] },
-      { tokenId: "color.destructive", when: { subject: "aria", scope: "self", relation: "attribute", propName: "invalid", equals: true }, evidenceRefs: ["source"] },
+      { tokenId: "color.background", when: { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "open" }, evidenceRefs: ["source"] },
+      { tokenId: "color.destructive", when: { subject: "aria", path: [{ kind: "self" }], propName: "invalid", equals: true }, evidenceRefs: ["source"] },
     ])
   })
 
@@ -51,12 +51,12 @@ describe("conditional Tailwind token utility analysis", () => {
     expect(analyzer.analyzeComponentTokenDependenciesForExport(fixturePath, "RecipeAndUtilityConditionFixture")).toEqual(expect.arrayContaining([
       {
         tokenId: "color.background",
-        when: { all: [{ propName: "tone", equals: "default" }, { subject: "data", scope: "self", relation: "attribute", propName: "state", equals: "open" }] },
+        when: { all: [{ propName: "tone", equals: "default" }, { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "open" }] },
         evidenceRefs: ["source"],
       },
       {
         tokenId: "color.destructive",
-        when: { all: [{ propName: "tone", equals: "danger" }, { subject: "data", scope: "self", relation: "attribute", propName: "state", equals: "closed" }] },
+        when: { all: [{ propName: "tone", equals: "danger" }, { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "closed" }] },
         evidenceRefs: ["source"],
       },
     ]))
@@ -91,7 +91,7 @@ describe("conditional Tailwind token utility analysis", () => {
 
   test("deduplicates repeated conditions and rejects contradictory conjunctions", () => {
     expect(analyzer.analyzeTailwindTokenDependencies("data-[size=sm]:data-[size=sm]:rounded-md")).toEqual([
-      { tokenId: "radius.md", when: { subject: "data", scope: "self", relation: "attribute", propName: "size", equals: "sm" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.md", when: { subject: "data", path: [{ kind: "self" }], propName: "size", equals: "sm" }, evidenceRefs: ["source"] },
     ])
     expect(analyzer.analyzeTailwindTokenDependencies("data-[size=sm]:data-[size=lg]:rounded-md")).toEqual([])
   })
@@ -112,17 +112,40 @@ describe("conditional Tailwind token utility analysis", () => {
       {
         tokenId: "radius.md",
         when: { all: [
-          { subject: "data", scope: "group", relation: "attribute", name: "root", propName: "size", equals: "sm" },
-          { subject: "data", scope: "self", relation: "attribute", propName: "size", equals: "lg" },
+          { subject: "data", path: [{ kind: "group", name: "root" }], propName: "size", equals: "sm" },
+          { subject: "data", path: [{ kind: "self" }], propName: "size", equals: "lg" },
         ] },
         evidenceRefs: ["source"],
       },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "group", relation: "attribute", name: "root", propName: "expanded", equals: true }, evidenceRefs: ["source"] },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "peer", relation: "attribute", name: "item", propName: "checked", equals: true }, evidenceRefs: ["source"] },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "in", relation: "attribute", propName: "busy", equals: true }, evidenceRefs: ["source"] },
-      { tokenId: "radius.lg", when: { subject: "aria", scope: "self", relation: "has", propName: "label", equals: "x" }, evidenceRefs: ["source"] },
-      { tokenId: "radius.lg", when: { subject: "data", scope: "group", relation: "has", name: "root", propName: "slot", equals: "media" }, evidenceRefs: ["source"] },
-      { tokenId: "radius.lg", when: { subject: "data", scope: "self", relation: "attribute", propName: "label", equals: "some_value" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "group", name: "root" }], propName: "expanded", equals: true }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "peer", name: "item" }], propName: "checked", equals: true }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "in" }], propName: "busy", equals: true }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "aria", path: [{ kind: "has" }], propName: "label", equals: "x" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "group", name: "root" }, { kind: "has" }], propName: "slot", equals: "media" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "self" }], propName: "label", equals: "some_value" }, evidenceRefs: ["source"] },
+    ])
+  })
+
+  test("preserves ordered compound relationship paths and escaped bracket values", () => {
+    const valid = [
+      "has-group-data-[state=open]/root:rounded-lg",
+      "group-has-data-[state=open]/root:rounded-lg",
+      "has-peer-data-[state=open]/item:rounded-lg",
+      "group-in-data-[state=open]/root:rounded-lg",
+      "has-in-data-[state=open]:rounded-lg",
+      "data-[label=a\\[b]:rounded-lg",
+      "data-[label=a\\]b]:rounded-lg",
+    ]
+    expect(valid.map((candidate) => tailwind.candidatesToCss([candidate])[0])).not.toContain(null)
+
+    expect(analyzer.analyzeTailwindTokenDependencies(valid.join(" "))).toEqual([
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "has" }, { kind: "group", name: "root" }], propName: "state", equals: "open" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "group", name: "root" }, { kind: "has" }], propName: "state", equals: "open" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "has" }, { kind: "peer", name: "item" }], propName: "state", equals: "open" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "group", name: "root" }, { kind: "in" }], propName: "state", equals: "open" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "has" }, { kind: "in" }], propName: "state", equals: "open" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "self" }], propName: "label", equals: "a[b" }, evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", when: { subject: "data", path: [{ kind: "self" }], propName: "label", equals: "a]b" }, evidenceRefs: ["source"] },
     ])
   })
 
