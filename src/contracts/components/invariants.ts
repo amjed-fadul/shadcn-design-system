@@ -175,6 +175,7 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
     hasEvidence(errors, child.evidenceRefs, family.evidence, `Render child ${componentName}.${node.id}->${child.nodeId}`)
     if (!ids.has(child.nodeId)) errors.push(`Component ${componentName} render node ${node.id} references unknown child: ${child.nodeId}.`)
     if (child.when) {
+      validateRenderCondition(errors, componentName, `render child ${node.id}->${child.nodeId}`, child.when, props)
       for (const condition of atomicRenderConditions(child.when)) {
         if (isPublicRenderCondition(condition)) {
           if (!props.has(condition.propName)) errors.push(`Component ${componentName} render child condition references unknown prop: ${condition.propName}.`)

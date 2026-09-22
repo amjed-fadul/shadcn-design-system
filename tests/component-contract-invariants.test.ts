@@ -96,6 +96,17 @@ describe("component contract semantic invariants", () => {
   })
 
   test.each([
+    ["duplicate", { all: [{ propName: "tone", equals: "quiet" }, { propName: "tone", equals: "quiet" }] }, "Component Example render child root->child condition contains duplicate predicates."],
+    ["contradictory", { all: [{ propName: "tone", equals: "quiet" }, { propName: "tone", equals: "loud" }] }, "Component Example render child root->child condition contains contradictory predicates."],
+    ["recursively nested duplicate", { all: [{ all: [{ propName: "tone", equals: "quiet" }, { propName: "tone", equals: "quiet" }] }, { source: "state", name: "ready", equals: true }] }, "Component Example render child root->child condition contains duplicate predicates."],
+  ])("rejects a %s child conjunction", (_name, when, expected) => {
+    const family = withConditionalChild() as any
+    family.exports[0].component.rendering.nodes[0].children[0].when = when
+
+    expect(validateComponentFamilyInvariants(family, authority)).toContain(expected)
+  })
+
+  test.each([
     ["wrong boolean condition type", (f: any) => { f.exports[0].component.localProps[0].type = { kind: "boolean" } }, "Component Example render child condition for root->child has boolean prop tone but equals is not boolean."],
     ["illegal enum condition literal", (f: any) => { f.exports[0].component.rendering.nodes[0].children[0].when.equals = "loud" }, "Component Example render child condition for root->child has enum prop tone without value: loud."],
     ["missing child edge evidence", (f: any) => { f.exports[0].component.rendering.nodes[0].children[0].evidenceRefs = [] }, "Render child Example.root->child is missing evidence references."],

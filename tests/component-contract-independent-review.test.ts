@@ -53,7 +53,16 @@ type IndependentRenderNode = {
   importBinding?: { importedName: string; moduleSpecifier: string }
   portal: boolean
   receivesPublicProps: boolean
-  dataAttributes: Array<{ name: string; source: string; value?: unknown; prop?: string }>
+  dataAttributes: Array<{
+    name: string
+    source: string
+    value?: unknown
+    prop?: string
+    condition?: AnyRecord
+    whenTrue?: { source: string; value?: unknown; name?: string }
+    whenFalse?: { source: string; value?: unknown; name?: string }
+    expression?: string
+  }>
   children: Array<{ node: IndependentRenderNode; when?: AnyRecord }>
 }
 type IndependentRenderBranch = { predicate: AnyRecord; tree?: IndependentRenderNode }
@@ -465,6 +474,23 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
     while (ts.isPropertyAccessExpression(root)) root = root.expression
     return ts.isIdentifier(root) ? imports.get(root.text) : undefined
   }
+  const renderValue = (expression: ts.Expression): { source: string; value?: unknown; name?: string } | undefined => {
+    const value = literalValue(expression)
+    if (value !== undefined && value !== null) return { source: "literal", value }
+    if (ts.isIdentifier(expression)) return { source: bindings.has(expression.text) ? "prop" : "state", name: expression.text }
+    return undefined
+  }
+  const renderCondition = (expression: ts.Expression): AnyRecord | undefined => {
+    const direct = independentRenderCondition(expression, bindings)
+    if (direct) return direct
+    if (!ts.isBinaryExpression(expression) || ![ts.SyntaxKind.EqualsEqualsEqualsToken, ts.SyntaxKind.EqualsEqualsToken].includes(expression.operatorToken.kind)) return undefined
+    const leftValue = literalValue(expression.left)
+    return ts.isIdentifier(expression.right) && leftValue !== undefined && leftValue !== null
+      ? bindings.has(expression.right.text)
+        ? { propName: expression.right.text, equals: leftValue }
+        : { source: "state", name: expression.right.text, equals: leftValue }
+      : undefined
+  }
   const renderNode = (expression: ts.Expression, predicate: AnyRecord, edgeWhen?: AnyRecord): { node: IndependentRenderNode; when?: AnyRecord } | undefined => {
     const selected = selectedExpression(expression, predicate)
     if (!ts.isJsxElement(selected) && !ts.isJsxSelfClosingElement(selected) && !ts.isJsxFragment(selected)) return undefined
@@ -504,7 +530,21 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
           prop: attribute.initializer.expression.text,
         })
       }
-      else dataAttributes.push({ name, source: "other" })
+      else if (attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression && ts.isConditionalExpression(attribute.initializer.expression)) {
+        const condition = renderCondition(attribute.initializer.expression.condition)
+        const whenTrue = renderValue(attribute.initializer.expression.whenTrue)
+        const whenFalse = renderValue(attribute.initializer.expression.whenFalse)
+        dataAttributes.push(condition && whenTrue && whenFalse
+          ? { name, source: "conditional-value", condition, whenTrue, whenFalse }
+          : { name, source: "unresolved", expression: attribute.initializer.expression.getText(sourceFile) })
+      }
+      else if (attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression) {
+        const condition = renderCondition(attribute.initializer.expression)
+        dataAttributes.push(condition
+          ? { name, source: "derived-condition", condition }
+          : { name, source: "unresolved", expression: attribute.initializer.expression.getText(sourceFile) })
+      }
+      else dataAttributes.push({ name, source: "unresolved", expression: "true" })
     }
     const effectiveTag = resolvedTag ?? tag
     const children = ts.isJsxElement(selected) ? selected.children.flatMap((child) => renderChild(child, predicate)) : []
@@ -972,6 +1012,10 @@ function comparableIndependentAttribute(attribute: AnyRecord): AnyRecord {
     source: attribute.source,
     ...(Object.hasOwn(attribute, "value") ? { value: attribute.value } : {}),
     ...(Object.hasOwn(attribute, "prop") ? { prop: attribute.prop } : {}),
+    ...(attribute.condition ? { condition: normalizedPredicate(attribute.condition) } : {}),
+    ...(attribute.whenTrue ? { whenTrue: attribute.whenTrue } : {}),
+    ...(attribute.whenFalse ? { whenFalse: attribute.whenFalse } : {}),
+    ...(attribute.expression ? { expression: attribute.expression } : {}),
   }
 }
 
@@ -990,8 +1034,6 @@ function independentRenderTreeMatches(source: IndependentRenderNode, rendering: 
     if (sourceNode.dataAttributes.length !== contractAttributes.length) return false
     if (!sourceNode.dataAttributes.every((attribute, index) => {
       const candidate = comparableIndependentAttribute(contractAttributes[index])
-      if (attribute.name !== candidate.name) return false
-      if (attribute.source === "other") return true
       return JSON.stringify(comparableIndependentAttribute(attribute)) === JSON.stringify(candidate)
     })) return false
     const contractChildren = contractNode.children ?? []
@@ -1695,6 +1737,40 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(independentRenderTreeMatches(facts.renderBranches[2].tree!, divRendering)).toBe(true)
     expect(independentRenderTreeMatches(facts.renderBranches[1].tree!, divRendering)).toBe(false)
     expect(independentRenderTreeMatches(facts.renderBranches[2].tree!, portalRendering)).toBe(false)
+  })
+
+  test("independent branch-tree oracle compares fixed-branch conditional and derived data facts", () => {
+    const { sourceFile } = sourceFacts(join(root, "tests/fixtures/component-analysis-completeness-fixture.tsx"))
+    const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "ConditionalDataBranchFixture")!)
+    const rendering: AnyRecord = {
+      rootNodeId: "host",
+      publicPropsTargetNodeId: "host",
+      nodes: [{
+        id: "host",
+        host: { kind: "unresolved" },
+        receivesPublicProps: true,
+        dataAttributes: [
+          {
+            name: "data-state",
+            source: "conditional-value",
+            condition: { propName: "state", equals: "open" },
+            whenTrue: { source: "literal", value: "visible" },
+            whenFalse: { source: "literal", value: "hidden" },
+          },
+          { name: "data-open", source: "derived-condition", condition: { propName: "state", equals: "open" } },
+        ],
+        children: [],
+      }],
+      portalBoundaries: [],
+    }
+
+    expect(independentRenderTreeMatches(facts.renderBranches[1].tree!, rendering)).toBe(true)
+    const wrongConditionalBranch = structuredClone(rendering)
+    wrongConditionalBranch.nodes[0].dataAttributes[0].condition.equals = "closed"
+    expect(independentRenderTreeMatches(facts.renderBranches[1].tree!, wrongConditionalBranch)).toBe(false)
+    const wrongDerivedCondition = structuredClone(rendering)
+    wrongDerivedCondition.nodes[0].dataAttributes[1].condition.equals = "closed"
+    expect(independentRenderTreeMatches(facts.renderBranches[1].tree!, wrongDerivedCondition)).toBe(false)
   })
 
   test("independent conjunction canonicalization rejects complements and deduplicates identical atoms", () => {
