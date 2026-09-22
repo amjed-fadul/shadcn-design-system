@@ -143,6 +143,330 @@
           },
           {
             "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "on"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 9
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -160,118 +484,6 @@
             ]
           },
           {
-            "tokenId": "color.input",
-            "when": {
-              "propName": "variant",
-              "equals": "outline"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 8
-            },
-            "when": {
-              "propName": "size",
-              "equals": "default"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2.5
-            },
-            "when": {
-              "propName": "size",
-              "equals": "default"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2
-            },
-            "when": {
-              "propName": "size",
-              "equals": "default"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 7
-            },
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "radius.md",
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2.5
-            },
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1.5
-            },
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -280,51 +492,6 @@
             "when": {
               "propName": "size",
               "equals": "sm"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 9
-            },
-            "when": {
-              "propName": "size",
-              "equals": "lg"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2.5
-            },
-            "when": {
-              "propName": "size",
-              "equals": "lg"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2
-            },
-            "when": {
-              "propName": "size",
-              "equals": "lg"
             },
             "evidenceRefs": [
               "source",

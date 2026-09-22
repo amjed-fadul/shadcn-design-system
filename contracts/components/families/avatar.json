@@ -99,6 +99,16 @@
               "id": "spacing.multiplier",
               "multiplier": 10
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "size",
+              "equals": "lg"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -109,6 +119,16 @@
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 6
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
             },
             "evidenceRefs": [
               "source",
@@ -256,13 +276,6 @@
             ]
           },
           {
-            "tokenId": "color.muted-foreground",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "font-size.sm",
             "evidenceRefs": [
               "source",
@@ -270,7 +283,25 @@
             ]
           },
           {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "font-size.xs",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -381,6 +412,17 @@
               "id": "spacing.multiplier",
               "multiplier": 2
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -392,6 +434,17 @@
               "id": "spacing.multiplier",
               "multiplier": 2.5
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar"
+                }
+              ],
+              "propName": "size",
+              "equals": "default"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -402,6 +455,61 @@
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 3
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar"
+                }
+              ],
+              "propName": "size",
+              "equals": "lg"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar"
+                }
+              ],
+              "propName": "size",
+              "equals": "default"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar"
+                }
+              ],
+              "propName": "size",
+              "equals": "lg"
             },
             "evidenceRefs": [
               "source",
@@ -467,18 +575,17 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "color.background",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "slot",
+              "equals": "avatar"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -561,14 +668,14 @@
             ]
           },
           {
-            "tokenId": "color.muted-foreground",
+            "tokenId": "font-size.sm",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "font-size.sm",
+            "tokenId": "color.muted-foreground",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -587,6 +694,20 @@
               "id": "spacing.multiplier",
               "multiplier": 10
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar-group"
+                },
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "size",
+              "equals": "lg"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -597,6 +718,20 @@
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 6
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar-group"
+                },
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
             },
             "evidenceRefs": [
               "source",
@@ -620,6 +755,20 @@
               "id": "spacing.multiplier",
               "multiplier": 5
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar-group"
+                },
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "size",
+              "equals": "lg"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -630,6 +779,20 @@
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 3
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "avatar-group"
+                },
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
             },
             "evidenceRefs": [
               "source",

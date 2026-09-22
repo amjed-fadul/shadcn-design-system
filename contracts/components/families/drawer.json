@@ -454,6 +454,16 @@
               "id": "spacing.multiplier",
               "multiplier": 0
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "top"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -465,6 +475,149 @@
               "id": "spacing.multiplier",
               "multiplier": 24
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "top"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "bottom"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 24
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "bottom"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "right"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "right"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "left"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "left"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -472,6 +625,33 @@
           },
           {
             "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "top"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "vaul-drawer-direction",
+              "equals": "bottom"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -493,24 +673,6 @@
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 2
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "color.muted",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 3
             },
             "evidenceRefs": [
               "source",
@@ -975,18 +1137,5 @@
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "Vaul snap-point presence union",
-      "scope": "Drawer Root API",
-      "reason": "The Vaul Root declaration conditionally relates fadeFromIndex to snapPoints by prop presence. The current literal-discriminator conditional schema cannot encode this relation without flattening it.",
-      "evidenceAttempted": [
-        "vaul 1.1.2 declaration",
-        "vaul.drawer.root inherited interface"
-      ],
-      "evidenceRefs": [
-        "declaration"
-      ]
-    }
-  ]
+  "unresolved": []
 }

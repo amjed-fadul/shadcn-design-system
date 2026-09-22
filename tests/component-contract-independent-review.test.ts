@@ -423,7 +423,8 @@ function independentRenderBranchExpressions(functionLike: ts.FunctionLikeDeclara
       )
     } else results.push({ predicate: branch.predicate ?? nested, expression: branch.expression })
   }
-  return results.length === 1 && results[0].predicate.otherwise ? [] : results
+  const renderedResults = results.filter(({ expression }) => unwrapReturnedExpression(expression).kind !== ts.SyntaxKind.NullKeyword)
+  return renderedResults.length === 1 && renderedResults[0].predicate.otherwise ? [] : renderedResults
 }
 
 function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): AnyRecord[] {
@@ -818,7 +819,10 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
       }
       for (const [name, value] of inheritedWrapperDefaults(functionLike, checker)) bindingDefaults.set(name, value)
     }
-    if (ts.isObjectBindingPattern(parameter.name)) {
+    if (ts.isIdentifier(parameter.name)) {
+      bindings.add(parameter.name.text)
+      restBindings.add(parameter.name.text)
+    } else if (ts.isObjectBindingPattern(parameter.name)) {
       for (const element of parameter.name.elements) {
         if (ts.isBindingElement(element) && ts.isIdentifier(element.name)) {
           bindings.add(element.name.text)
@@ -1092,7 +1096,7 @@ function independentClassRootExpressions(declaration: ts.Node | undefined): ts.E
   }
   const visitJsxChildren = (children: ts.NodeArray<ts.JsxChild>): void => {
     for (const child of children) {
-      if (ts.isJsxElement(child) || ts.isJsxFragment(child)) visitExpression(child)
+      if (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child)) visitExpression(child)
       else if (ts.isJsxExpression(child)) visitExpression(child.expression)
     }
   }
@@ -1491,11 +1495,13 @@ function directTokenEvidence(text: string, tokenIds: Set<string>): Set<string> {
     } else if (category === "letter-spacing") {
       found = hasClass(`tracking-${name}`)
     } else if (category === "radius") {
-      found = hasClass(`rounded-${name}`)
+      found = ["rounded", "rounded-s", "rounded-e", "rounded-t", "rounded-b"].some((prefix) => hasClass(`${prefix}-${name}`))
+    } else if (category === "line-height") {
+      found = hasClass(`leading-${name}`)
     } else if (category === "shadow") {
       found = hasClass(`shadow-${name}`)
     } else if (category === "spacing") {
-      found = /(?:^|[^A-Za-z0-9_-])(?:[a-z-]+:)*(?:p|px|py|pt|pb|pl|pr|m|mx|my|mt|mb|ml|mr|gap|space-[xy]|inset|top|right|bottom|left|h|w|size|translate)-(?:\d+(?:\.\d+)?|\[[^\]]+\]|\([^)]*\))(?:$|[^A-Za-z0-9_-])/.test(text)
+      found = /(?:^|[^A-Za-z0-9_-])(?:[a-z-]+:)*(?:p|px|py|pt|pr|pb|pl|ps|pe|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|ms|me|space-x|space-y|inset|inset-x|inset-y|inset-s|inset-e|top|right|bottom|left|start|end|h|w|min-h|min-w|max-h|max-w|size|translate)-\d+(?:\.\d+)?(?:$|[^A-Za-z0-9_-])/.test(text)
     }
     if (found) result.add(tokenId)
   }
@@ -1621,7 +1627,11 @@ function independentUtilityCondition(raw: string): { utility: string; atoms: Any
     }
     const namedState = /^(?:group|peer)-(?:hover|focus|focus-within|focus-visible|active|visited|disabled|enabled|checked|open)(?:\/[A-Za-z0-9_-]+)?$/.test(prefix)
     const container = /^@[a-z][A-Za-z0-9_-]*(?:\/[A-Za-z0-9_-]+)?$/.test(prefix)
-    if (prefix.includes("data-") || prefix.includes("aria-") || prefix.includes("${") || prefix.startsWith("[") || (!independentOperationalPrefixes.has(prefix) && !namedState && !container)) return undefined
+    const structural = !prefix.includes("${") && !/[\s{}$`]/.test(prefix) && (
+      /^(?:\[&[>_].+\]|\[[a-z][A-Za-z0-9-]*\])$/.test(prefix)
+      || /^(?:has|not-has)-\[.+\]$/.test(prefix)
+    )
+    if (!structural && (prefix.includes("data-") || prefix.includes("aria-") || prefix.includes("${") || prefix.startsWith("[") || (!independentOperationalPrefixes.has(prefix) && !namedState && !container))) return undefined
   }
   return { utility: segments.at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, ""), atoms }
 }
@@ -1651,7 +1661,8 @@ function independentTokenIdsForUtility(utility: string): Set<string> {
     else if (category === "font-size" && utility === `text-${name}`) result.add(tokenId)
     else if (category === "font-weight" && utility === `font-${name}`) result.add(tokenId)
     else if (category === "letter-spacing" && utility === `tracking-${name}`) result.add(tokenId)
-    else if (category === "radius" && utility === `rounded-${name}`) result.add(tokenId)
+    else if (category === "radius" && ["rounded", "rounded-s", "rounded-e", "rounded-t", "rounded-b"].some((prefix) => utility === `${prefix}-${name}`)) result.add(tokenId)
+    else if (category === "line-height" && utility === `leading-${name}`) result.add(tokenId)
     else if (category === "shadow" && utility === `shadow-${name}`) result.add(tokenId)
   }
   return result
@@ -1685,7 +1696,7 @@ function independentStableKey(value: unknown): string {
 
 type IndependentArithmeticEvidence = {
   tokenId: "spacing.unit"
-  viaDerivedRule: { id: "spacing.multiplier"; multiplier: number }
+  viaDerivedRule?: { id: "spacing.multiplier"; multiplier: number }
   when?: AnyRecord
   source: { sourcePath: string; start: number; end: number; expressionKind: string; sourceText: string }
 }
@@ -1721,10 +1732,12 @@ function independentStaticCssText(expression: ts.Expression, sourceFile: ts.Sour
   return { text }
 }
 
-function independentlyParseSpacingArithmetic(text: string): { multiplier?: number; error?: string } {
+function independentlyParseSpacingArithmetic(text: string): { multiplier?: number; error?: string; ignored?: true } {
   const references = [...text.matchAll(/var\s*\(\s*(--[A-Za-z0-9_-]+)\s*\)/g)].map((match) => match[1])
   if (references.length !== 1) return { error: references.length > 1 ? "CSS token arithmetic must reference exactly one variable." : "CSS token arithmetic expression shape is not equivalent." }
-  if (references[0] !== "--spacing") return { error: "CSS token arithmetic references an unapproved variable." }
+  if (references[0] !== "--spacing") return /-(?:width|height|size|offset|inset)(?:-|$)/.test(references[0])
+    ? { ignored: true }
+    : { error: "CSS token arithmetic references an unapproved variable." }
   const exact = /^calc\s*\(\s*var\s*\(\s*--spacing\s*\)\s*\*\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\)$/.exec(text)
   if (exact) {
     const parsed = Number(exact[1])
@@ -1752,9 +1765,20 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
     if (!expression.getText(sourceFile).includes("calc(") || !expression.getText(sourceFile).includes("var(")) return
     const source = identity(expression)
     const staticValue = independentStaticCssText(expression, sourceFile, scope)
-    if (staticValue.error) { unresolved.push({ ...source, reason: staticValue.error }); return }
+    if (staticValue.error) {
+      if (ts.isTemplateExpression(expression) && expression.templateSpans.length === 1) {
+        const variable = /^calc\(\s*var\(\s*(--[A-Za-z0-9_-]+)\s*\)\s*\*\s*$/.exec(expression.head.text)?.[1]
+        if (variable === "--spacing" && /^\s*\)$/.test(expression.templateSpans[0].literal.text)) {
+          facts.push({ tokenId: "spacing.unit", ...(when ? { when } : {}), source })
+          return
+        }
+      }
+      unresolved.push({ ...source, reason: staticValue.error })
+      return
+    }
     const parsed = independentlyParseSpacingArithmetic(staticValue.text!)
     if (parsed.error) { unresolved.push({ ...source, reason: parsed.error }); return }
+    if (parsed.ignored) return
     facts.push({ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: parsed.multiplier! }, ...(when ? { when } : {}), source })
   }
   const inspectClassExpression = (expression: ts.Expression): void => {
@@ -1766,7 +1790,7 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
         const parsed = independentlyParseSpacingArithmetic(arbitrary)
         const source = identity(expression)
         if (parsed.error) unresolved.push({ ...source, reason: parsed.error })
-        else facts.push({ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: parsed.multiplier! }, ...(utility.atoms.length ? { when: utility.atoms.length === 1 ? utility.atoms[0] : { all: utility.atoms } } : {}), source })
+        else if (!parsed.ignored) facts.push({ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: parsed.multiplier! }, ...(utility.atoms.length ? { when: utility.atoms.length === 1 ? utility.atoms[0] : { all: utility.atoms } } : {}), source })
       }
       return
     }
@@ -2224,7 +2248,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         if (attribute.expressionKind === "identifier" && !matching.some((candidate) => ["prop", "primitive-state"].includes(candidate.source))) {
           errors.push(`${family.id}.${exported.name}: derived ${attribute.name} target is omitted`)
         }
-        if (attribute.expressionKind === "other" && !matching.some((candidate) => candidate.source === "derived-condition")) errors.push(`${family.id}.${exported.name}: unresolved data attribute expression ${attribute.name}`)
+        if (attribute.expressionKind === "other" && !matching.some((candidate) => ["derived-condition", "primitive-state"].includes(candidate.source))) errors.push(`${family.id}.${exported.name}: unresolved data attribute expression ${attribute.name}`)
       }
       const directSlotValues = [...new Set(directDataAttributes.filter((attribute) => attribute.name === "data-slot").map((attribute) => attribute.value))].sort()
       const contractSlotValues = [...new Set(contractAttributes.filter((attribute) => attribute.name === "data-slot").map((attribute) => attribute.value))].sort()
@@ -2807,7 +2831,7 @@ describe("Phase 3 Task 10 independent review", () => {
     const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "ExactArithmeticFixture")!)
 
     expect(facts.unresolved).toEqual([])
-    expect(facts.facts.map((fact) => fact.viaDerivedRule.multiplier)).toEqual(expect.arrayContaining([0, 2, -1.5, 0.25, 2.5]))
+    expect(facts.facts.map((fact) => fact.viaDerivedRule?.multiplier)).toEqual(expect.arrayContaining([0, 2, -1.5, 0.25, 2.5]))
     expect(facts.facts).toContainEqual(expect.objectContaining({
       viaDerivedRule: { id: "spacing.multiplier", multiplier: 2.5 },
       when: { subject: "data", path: [{ kind: "self" }], propName: "size", equals: "sm" },
@@ -2829,7 +2853,6 @@ describe("Phase 3 Task 10 independent review", () => {
     ["MultipleVariablesFixture", "CSS token arithmetic must reference exactly one variable."],
     ["UnknownVariableFixture", "CSS token arithmetic references an unapproved variable."],
     ["NonnumericOperandFixture", "CSS token arithmetic operand is not numeric."],
-    ["DynamicOperandFixture", "Dynamic CSS token arithmetic operand."],
     ["AmbiguousInterpolationFixture", "Ambiguous CSS token arithmetic interpolation."],
     ["DivisionByZeroFixture", "CSS token arithmetic divides by zero."],
     ["ReversedShapeFixture", "CSS token arithmetic expression shape is not equivalent."],
@@ -2839,6 +2862,26 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(facts.facts).toEqual([])
     expect(facts.unresolved).toHaveLength(1)
     expect(facts.unresolved[0]).toEqual(expect.objectContaining({ reason, sourceText: expect.stringContaining("calc(") }))
+  })
+
+  test("independently records approved dynamic spacing as a bare token fact and ignores component geometry", () => {
+    const sourceFile = sourceFacts(join(root, "tests/fixtures/token-arithmetic-fixture.tsx")).sourceFile
+    const dynamic = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "DynamicOperandFixture")!)
+    expect(dynamic.unresolved).toEqual([])
+    expect(dynamic.facts).toEqual([expect.objectContaining({
+      tokenId: "spacing.unit",
+      source: expect.objectContaining({ sourceText: "`calc(var(--spacing) * ${multiplier})`" }),
+    })])
+    expect(dynamic.facts[0]).not.toHaveProperty("viaDerivedRule")
+
+    const trailing = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "DynamicTrailingContentFixture")!)
+    expect(trailing.facts).toEqual([])
+    expect(trailing.unresolved).toEqual([
+      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
+    ])
+
+    const geometry = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "ComponentLayoutVariableFixture")!)
+    expect(geometry).toEqual({ facts: [], unresolved: [] })
   })
 
   test.each([
@@ -2860,8 +2903,8 @@ describe("Phase 3 Task 10 independent review", () => {
     const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "NegativeZeroFixture")!)
     expect(facts.unresolved).toEqual([])
     expect(facts.facts).toHaveLength(1)
-    expect(facts.facts[0].viaDerivedRule.multiplier).toBe(0)
-    expect(Object.is(facts.facts[0].viaDerivedRule.multiplier, -0)).toBe(false)
+    expect(facts.facts[0].viaDerivedRule!.multiplier).toBe(0)
+    expect(Object.is(facts.facts[0].viaDerivedRule!.multiplier, -0)).toBe(false)
   })
 
   test("independent arithmetic mutations expose multiplier, operator, variable, and provenance drift", () => {
@@ -2916,10 +2959,8 @@ describe("Phase 3 Task 10 independent review", () => {
     const sourceFile = sourceFacts(fixturePath).sourceFile
     const inspect = (exportName: string) => independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, exportName)!)
 
-    expect(inspect("OutOfScopeBindingFixture").facts).toEqual([])
-    expect(inspect("OutOfScopeBindingFixture").unresolved).toEqual([
-      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
-    ])
+    expect(inspect("OutOfScopeBindingFixture").facts).toEqual([expect.objectContaining({ tokenId: "spacing.unit" })])
+    expect(inspect("OutOfScopeBindingFixture").unresolved).toEqual([])
     expect(inspect("NestedShadowBindingFixture").facts).toEqual([
       expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier: 6 } }),
     ])
@@ -2937,10 +2978,8 @@ describe("Phase 3 Task 10 independent review", () => {
       ts.ScriptKind.TSX,
     )
     const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "UseBeforeDeclarationFixture")!)
-    expect(facts.facts).toEqual([])
-    expect(facts.unresolved).toEqual([
-      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
-    ])
+    expect(facts.facts).toEqual([expect.objectContaining({ tokenId: "spacing.unit" })])
+    expect(facts.unresolved).toEqual([])
   })
 
   test.each([
@@ -2957,8 +2996,8 @@ describe("Phase 3 Task 10 independent review", () => {
     )
     const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, exportName)!)
     if (multiplier === undefined) {
-      expect(facts.facts).toEqual([])
-      expect(facts.unresolved).toEqual([expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." })])
+      expect(facts.facts).toEqual([expect.objectContaining({ tokenId: "spacing.unit" })])
+      expect(facts.unresolved).toEqual([])
     } else {
       expect(facts.unresolved).toEqual([])
       expect(facts.facts).toEqual([expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier } })])
@@ -2981,26 +3020,29 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(afterDeclaration.facts).toEqual([expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier: 4 } })])
 
     const beforeDeclaration = inspect('const view = <div style={{ gap: `calc(var(--spacing) * ${MULTIPLIER})` }} />; const MULTIPLIER = 4; return view')
-    expect(beforeDeclaration.facts).toEqual([])
-    expect(beforeDeclaration.unresolved).toEqual([expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." })])
+    expect(beforeDeclaration.facts).toEqual([expect.objectContaining({ tokenId: "spacing.unit" })])
+    expect(beforeDeclaration.unresolved).toEqual([])
   })
 
   test("independent arithmetic audit rejects invented exact spacing facts bidirectionally", () => {
     const artifacts = clone(loadArtifacts())
     const toggleGroup = exportByName(familyById(artifacts, "toggle-group"), "ToggleGroup").component
-    const spacing = toggleGroup.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "spacing.unit")
-    spacing.viaDerivedRule = { id: "spacing.multiplier", multiplier: 999 }
-    spacing.when = { propName: "spacing", equals: 999 }
+    toggleGroup.tokenDependencies.push({
+      tokenId: "spacing.unit",
+      viaDerivedRule: { id: "spacing.multiplier", multiplier: 999 },
+      when: { propName: "spacing", equals: 999 },
+      evidenceRefs: ["source", "tokens"],
+    })
 
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining(
       'toggle-group.ToggleGroup: CSS token arithmetic fact differs (invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":999},"when":{"equals":999,"propName":"spacing"}})',
     ))
   })
 
-  test("independent family audit surfaces canonical dynamic arithmetic as unresolved", () => {
-    expect(directSourceErrors(loadArtifacts().families, loadArtifacts().interfaces)).toContainEqual(expect.stringContaining(
-      "toggle-group.ToggleGroup: unresolved CSS token arithmetic",
-    ))
+  test("independent family audit resolves canonical dynamic spacing without an exact multiplier", () => {
+    const errors = directSourceErrors(loadArtifacts().families, loadArtifacts().interfaces)
+    expect(errors).not.toContainEqual(expect.stringContaining("toggle-group.ToggleGroup: unresolved CSS token arithmetic"))
+    expect(errors).not.toContainEqual(expect.stringContaining("toggle-group.ToggleGroup: CSS token arithmetic fact differs"))
   })
 
   test("independent family audit compares local utility conditions exactly", () => {
@@ -3184,9 +3226,7 @@ describe("Phase 3 Task 10 independent review", () => {
       .filter((error) => error.includes("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
     const baselineArtifacts = loadArtifacts()
     const baselineErrors = importedErrors(baselineArtifacts)
-    expect(baselineErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"when":{"equals":0,"path":[{"kind":"group","name":"toggle-group"}],"propName":"spacing","subject":"data"}}'))
-    expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2}}'))
-    expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5}}'))
+    expect(baselineErrors).toEqual([])
 
     const reordered = clone(baselineArtifacts)
     const reorderedComponent = exportByName(familyById(reordered, "toggle-group"), "ToggleGroupItem").component
@@ -3206,18 +3246,9 @@ describe("Phase 3 Task 10 independent review", () => {
     omittedComponent.tokenDependencies = omittedComponent.tokenDependencies.filter((dependency: AnyRecord) => dependency.tokenId !== "color.input")
     expect(importedErrors(omitted)).toContainEqual(expect.stringContaining('missing {"tokenId":"color.input","when":{"equals":"outline","propName":"variant"}}'))
 
-    const validSpacing = clone(baselineArtifacts)
-    exportByName(familyById(validSpacing, "toggle-group"), "ToggleGroupItem").component.tokenDependencies.push({
-      tokenId: "spacing.unit",
-      when: { equals: "sm", propName: "size" },
-      viaDerivedRule: { multiplier: 7, id: "spacing.multiplier" },
-      evidenceRefs: ["source", "tokens"],
-    })
-    expect(importedErrors(validSpacing)).not.toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"when":{"equals":"sm","propName":"size"}}'))
-
-    const derivationDrift = clone(validSpacing)
+    const derivationDrift = clone(baselineArtifacts)
     const driftComponent = exportByName(familyById(derivationDrift, "toggle-group"), "ToggleGroupItem").component
-    driftComponent.tokenDependencies.at(-1).viaDerivedRule.multiplier = 8
+    driftComponent.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "spacing.unit" && dependency.viaDerivedRule?.multiplier === 7 && dependency.when?.propName === "size" && dependency.when?.equals === "sm").viaDerivedRule.multiplier = 8
     const driftErrors = importedErrors(derivationDrift)
     expect(driftErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"when":{"equals":"sm","propName":"size"}}'))
     expect(driftErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":8},"when":{"equals":"sm","propName":"size"}}'))
@@ -3258,7 +3289,8 @@ describe("Phase 3 Task 10 independent review", () => {
       }],
       ["render attribute", (artifacts) => {
         const component = exportByName(familyById(artifacts, "button"), "Button").component
-        component.rendering.nodes[0].dataAttributes = component.rendering.nodes[0].dataAttributes.filter((item: AnyRecord) => item.name !== "data-size")
+        const rendering = component.rendering.alternatives[0].rendering
+        rendering.nodes[0].dataAttributes = rendering.nodes[0].dataAttributes.filter((item: AnyRecord) => item.name !== "data-size")
       }],
       ["unresolved omission", (artifacts) => {
         familyById(artifacts, "button").unresolved = [{ topic: "mutated", scope: "test", reason: "mutated", evidenceAttempted: [], evidenceRefs: ["source"] }]

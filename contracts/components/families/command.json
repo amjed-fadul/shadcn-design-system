@@ -227,6 +227,30 @@
               "id": "spacing.multiplier",
               "multiplier": 12
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "slot",
+              "equals": "command-input-wrapper"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -244,14 +268,11 @@
             ]
           },
           {
-            "tokenId": "font-weight.medium",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "color.muted-foreground",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 5
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -261,7 +282,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 5
+              "multiplier": 12
             },
             "evidenceRefs": [
               "source",
@@ -840,22 +861,7 @@
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1.5
-            },
+            "tokenId": "color.muted-foreground",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -876,7 +882,22 @@
             ]
           },
           {
-            "tokenId": "color.muted-foreground",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1081,6 +1102,16 @@
           },
           {
             "tokenId": "color.accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "selected",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1088,6 +1119,23 @@
           },
           {
             "tokenId": "color.accent-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "selected",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1099,13 +1147,6 @@
               "id": "spacing.multiplier",
               "multiplier": 4
             },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "color.muted-foreground",
             "evidenceRefs": [
               "source",
               "tokens"

@@ -169,6 +169,18 @@ describe("conditional Tailwind token utility analysis", () => {
     })
   })
 
+  test("keeps safe structural selectors as bare token evidence without decoding ambiguous data predicates", () => {
+    expect(analyzer.analyzeTailwindTokenDependencies(
+      "[&>svg]:gap-2 [&_p]:text-sm [&>a:hover]:bg-background [&_[cmdk-group-heading]]:rounded-lg has-[[data-state=checked]]:bg-destructive",
+    )).toEqual([
+      { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 }, evidenceRefs: ["source"] },
+      { tokenId: "font-size.sm", evidenceRefs: ["source"] },
+      { tokenId: "color.background", evidenceRefs: ["source"] },
+      { tokenId: "radius.lg", evidenceRefs: ["source"] },
+      { tokenId: "color.destructive", evidenceRefs: ["source"] },
+    ])
+  })
+
   test("compares token conditions with stable object-key ordering and ordered conjunctions", () => {
     const exact = analyzer.analyzeComponentTokenDependenciesForExport(fixturePath, "ConditionalUtilityFixture")
     const reordered = structuredClone(exact)

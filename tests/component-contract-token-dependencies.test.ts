@@ -73,7 +73,7 @@ describe("Phase 3 Task 7 cross-family token dependency closure", () => {
     for (const family of families) for (const entry of family.exports) for (const dependency of entry.component?.tokenDependencies ?? []) {
       expect(approvedTokenIds.has(dependency.tokenId), `${family.id}.${entry.name} ${dependency.tokenId}`).toBe(true)
       if (dependency.viaDerivedRule) expect(approvedDerivedRuleIds.has(dependency.viaDerivedRule.id), `${family.id}.${entry.name} ${dependency.viaDerivedRule.id}`).toBe(true)
-      if (dependency.tokenId === "spacing.unit") expect(dependency.viaDerivedRule?.id).toBe("spacing.multiplier")
+      if (dependency.tokenId === "spacing.unit" && dependency.viaDerivedRule) expect(dependency.viaDerivedRule.id).toBe("spacing.multiplier")
     }
   })
 

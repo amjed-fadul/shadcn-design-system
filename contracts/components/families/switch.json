@@ -103,6 +103,33 @@
           },
           {
             "tokenId": "color.primary",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "checked"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "unchecked"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -117,6 +144,16 @@
           },
           {
             "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -128,6 +165,16 @@
               "id": "spacing.multiplier",
               "multiplier": 3.5
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -138,6 +185,57 @@
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 6
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "unchecked"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "checked"
             },
             "evidenceRefs": [
               "source",
@@ -156,32 +254,22 @@
             ]
           },
           {
-            "tokenId": "color.background",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 3
             },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "color.foreground",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "color.primary-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "switch"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
+            },
             "evidenceRefs": [
               "source",
               "tokens"

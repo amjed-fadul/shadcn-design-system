@@ -16,10 +16,6 @@
     "declaration": {
       "kind": "inherited-interface",
       "source": "radix.collapsible.root"
-    },
-    "tokens": {
-      "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-001"
     }
   },
   "exports": [

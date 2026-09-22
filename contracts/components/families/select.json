@@ -152,24 +152,6 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "radius.md",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -192,6 +174,13 @@
             ]
           },
           {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.popover",
             "evidenceRefs": [
               "source",
@@ -207,6 +196,17 @@
           },
           {
             "tokenId": "shadow.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -483,6 +483,13 @@
         "events": [],
         "tokenDependencies": [
           {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -523,14 +530,17 @@
             ]
           },
           {
-            "tokenId": "radius.sm",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "color.accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -538,6 +548,16 @@
           },
           {
             "tokenId": "color.accent-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -732,18 +752,18 @@
             ]
           },
           {
-            "tokenId": "font-size.xs",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1.5
-            },
+            "tokenId": "font-size.xs",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1184,17 +1204,6 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 4
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
               "multiplier": 8
             },
             "evidenceRefs": [
@@ -1276,6 +1285,17 @@
           },
           {
             "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
             "evidenceRefs": [
               "source",
               "tokens"

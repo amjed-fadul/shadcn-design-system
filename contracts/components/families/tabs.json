@@ -152,32 +152,28 @@
           },
           {
             "tokenId": "radius.lg",
-            "when": {
-              "propName": "variant",
-              "equals": "default"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
           },
           {
             "tokenId": "color.muted",
-            "when": {
-              "propName": "variant",
-              "equals": "default"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
+            ],
             "when": {
               "propName": "variant",
               "equals": "default"
-            },
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 1
@@ -185,22 +181,26 @@
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
             "when": {
               "propName": "variant",
               "equals": "line"
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
+            }
           }
         ],
         "rendering": {
@@ -314,6 +314,33 @@
           },
           {
             "tokenId": "color.background",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "active"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "active"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -321,6 +348,16 @@
           },
           {
             "tokenId": "shadow.sm",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "active"
+            },
             "evidenceRefs": [
               "source",
               "tokens"

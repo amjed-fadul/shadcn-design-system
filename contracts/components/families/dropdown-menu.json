@@ -194,6 +194,16 @@
           },
           {
             "tokenId": "color.accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -214,7 +224,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 4
+              "multiplier": 3.5
             },
             "evidenceRefs": [
               "source",
@@ -225,7 +235,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 3.5
+              "multiplier": 4
             },
             "evidenceRefs": [
               "source",
@@ -669,6 +679,16 @@
           },
           {
             "tokenId": "color.accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -676,6 +696,16 @@
           },
           {
             "tokenId": "color.accent-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -826,17 +856,6 @@
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 8
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "font-size.xs",
             "evidenceRefs": [
               "source",
@@ -852,6 +871,17 @@
           },
           {
             "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1140,6 +1170,16 @@
           },
           {
             "tokenId": "color.accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1311,18 +1351,18 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "color.muted",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1
-            },
+            "tokenId": "color.muted",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1390,14 +1430,14 @@
             ]
           },
           {
-            "tokenId": "color.muted-foreground",
+            "tokenId": "letter-spacing.widest",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "letter-spacing.widest",
+            "tokenId": "color.muted-foreground",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1568,18 +1608,18 @@
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1
-            },
+            "tokenId": "color.popover",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "color.popover",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1725,6 +1765,16 @@
           },
           {
             "tokenId": "color.accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "open"
+            },
             "evidenceRefs": [
               "source",
               "tokens"

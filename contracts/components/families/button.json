@@ -1,1 +1,1287 @@
-{"schemaVersion":1,"id":"button","source":{"canonicalPath":"src/components/ui/button.tsx","canonicalBlobSha":"1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc","implementationKind":"semantic-token-normalized-derivative","upstreamPath":"apps/v4/registry/bases/radix/ui/button.tsx","upstreamBlobSha":"374f63faac54b8527ff989cbaa80c69afe51ba1f"},"evidence":{"source":{"kind":"canonical-source","source":"src/components/ui/button.tsx@1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc"},"interface":{"kind":"inherited-interface","source":"html.button"},"tokens":{"kind":"token-contract","source":"shadcn-radix-token-contract-001"}},"exports":[{"name":"Button","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[{"name":"variant","required":false,"type":{"kind":"enum","values":["default","outline","secondary","ghost","destructive","link"]},"default":"default","evidenceRefs":["source"]},{"name":"size","required":false,"type":{"kind":"enum","values":["default","xs","sm","lg","icon","icon-xs","icon-sm","icon-lg"]},"default":"default","evidenceRefs":["source"]},{"name":"asChild","required":false,"type":{"kind":"boolean"},"default":false,"evidenceRefs":["source"]}],"inherits":["html.button"],"slots":[{"propName":"asChild","default":false,"replacesHost":true,"childCardinality":{"min":0,"max":1},"forwardsProps":true,"childRequires":["multiple children require a Radix Slottable that resolves to one React element"],"refForwarding":"unresolved","evidenceRefs":["source"]}],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"radius.md","evidenceRefs":["source","tokens"]},{"tokenId":"font-size.sm","evidenceRefs":["source","tokens"]},{"tokenId":"font-weight.medium","evidenceRefs":["source","tokens"]},{"tokenId":"color.ring","evidenceRefs":["source","tokens"]},{"tokenId":"color.destructive","evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":4},"evidenceRefs":["source","tokens"]},{"tokenId":"color.primary","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"default"}},{"tokenId":"color.primary-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"default"}},{"tokenId":"color.border","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.background","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.accent","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.accent-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.secondary","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"secondary"}},{"tokenId":"color.secondary-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"secondary"}},{"tokenId":"color.accent","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"ghost"}},{"tokenId":"color.accent-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"ghost"}},{"tokenId":"color.destructive","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"destructive"}},{"tokenId":"color.primary","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"link"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":8},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"default"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"default"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"default"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"default"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":6},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"radius.sm","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"font-size.xs","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"radius.md","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":3},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"xs"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"radius.sm","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"font-size.xs","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"radius.md","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":3.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"sm"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":9},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"lg"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"lg"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2.5},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"lg"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"lg"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":8},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":6},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-xs"}},{"tokenId":"radius.sm","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-xs"}},{"tokenId":"radius.md","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-xs"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":3},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-xs"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-sm"}},{"tokenId":"radius.sm","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-sm"}},{"tokenId":"radius.md","evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-sm"}},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":9},"evidenceRefs":["source","tokens"],"when":{"propName":"size","equals":"icon-lg"}}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"button"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"button","evidenceRefs":["source"]},{"name":"data-variant","source":"prop","prop":"variant","evidenceRefs":["source"]},{"name":"data-size","source":"prop","prop":"size","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[{"feature":"native host semantics","owner":"native","mechanism":"button","evidenceRefs":["source"]},{"feature":"accessible name","owner":"author","mechanism":"author-provided content or labeling","evidenceRefs":["interface"]},{"feature":"host semantic suitability under asChild","owner":"author","mechanism":"replacement child must carry appropriate semantics for the intended interaction","evidenceRefs":["source"]}],"inheritedPropDefaults":[]}},{"name":"buttonVariants","kind":"helper","authorableJsx":false,"evidenceRefs":["source"]}],"unresolved":[]}
+{
+  "schemaVersion": 1,
+  "id": "button",
+  "source": {
+    "canonicalPath": "src/components/ui/button.tsx",
+    "canonicalBlobSha": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
+    "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/button.tsx@1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc"
+    },
+    "interface": {
+      "kind": "inherited-interface",
+      "source": "html.button"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Button",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "outline",
+                "secondary",
+                "ghost",
+                "destructive",
+                "link"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "xs",
+                "sm",
+                "lg",
+                "icon",
+                "icon-xs",
+                "icon-sm",
+                "icon-lg"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.button"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "color.primary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "color.border",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.accent",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.accent",
+            "when": {
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "outline"
+                },
+                {
+                  "subject": "aria",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "expanded",
+                  "equals": true
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.accent-foreground",
+            "when": {
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "outline"
+                },
+                {
+                  "subject": "aria",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "expanded",
+                  "equals": true
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.secondary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "secondary"
+            }
+          },
+          {
+            "tokenId": "color.secondary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "secondary"
+            }
+          },
+          {
+            "tokenId": "color.secondary",
+            "when": {
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "secondary"
+                },
+                {
+                  "subject": "aria",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "expanded",
+                  "equals": true
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.secondary-foreground",
+            "when": {
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "secondary"
+                },
+                {
+                  "subject": "aria",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "expanded",
+                  "equals": true
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.accent",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "ghost"
+            }
+          },
+          {
+            "tokenId": "color.accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "ghost"
+            }
+          },
+          {
+            "tokenId": "color.accent",
+            "when": {
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "ghost"
+                },
+                {
+                  "subject": "aria",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "expanded",
+                  "equals": true
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.accent-foreground",
+            "when": {
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "ghost"
+                },
+                {
+                  "subject": "aria",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "expanded",
+                  "equals": true
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "destructive"
+            }
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "link"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 6
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            }
+          },
+          {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            }
+          },
+          {
+            "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            }
+          },
+          {
+            "tokenId": "radius.md",
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "xs"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "in"
+                    }
+                  ],
+                  "propName": "slot",
+                  "equals": "button-group"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "xs"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "xs"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "radius.md",
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "in"
+                    }
+                  ],
+                  "propName": "slot",
+                  "equals": "button-group"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 9
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "icon"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 6
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "icon-xs"
+            }
+          },
+          {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "icon-xs"
+            }
+          },
+          {
+            "tokenId": "radius.md",
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "icon-xs"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "in"
+                    }
+                  ],
+                  "propName": "slot",
+                  "equals": "button-group"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "icon-sm"
+            }
+          },
+          {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "icon-sm"
+            }
+          },
+          {
+            "tokenId": "radius.md",
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "icon-sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "in"
+                    }
+                  ],
+                  "propName": "slot",
+                  "equals": "button-group"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 9
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "icon-lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "when": {
+              "propName": "size",
+              "equals": "icon-xs"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "alternatives": [
+            {
+              "when": {
+                "propName": "asChild",
+                "equals": true
+              },
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "button"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": [
+          {
+            "feature": "native host semantics",
+            "owner": "native",
+            "mechanism": "button",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "accessible name",
+            "owner": "author",
+            "mechanism": "author-provided content or labeling",
+            "evidenceRefs": [
+              "interface"
+            ]
+          },
+          {
+            "feature": "host semantic suitability under asChild",
+            "owner": "author",
+            "mechanism": "replacement child must carry appropriate semantics for the intended interaction",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "buttonVariants",
+      "kind": "helper",
+      "authorableJsx": false,
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ],
+  "unresolved": []
+}

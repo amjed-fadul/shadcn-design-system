@@ -101,19 +101,5 @@
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "native SVG inherited interface",
-      "scope": "Spinner public props and rendered Lucide SVG host",
-      "reason": "Spinner accepts React.ComponentProps<\"svg\">, but release.4 does not yet register an html.svg inherited-interface contract. The interface must be generated from the pinned @types/react 18.3.3 declaration before release.5 cutover.",
-      "evidenceAttempted": [
-        "canonical Spinner source",
-        "existing release.4 inherited-interface registry",
-        "@types/react 18.3.3 declaration identity already pinned by existing intrinsic contracts"
-      ],
-      "evidenceRefs": [
-        "source"
-      ]
-    }
-  ]
+  "unresolved": []
 }

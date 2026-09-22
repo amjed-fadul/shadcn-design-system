@@ -28,12 +28,20 @@ function UnknownVariableFixture() {
   return <div style={{ gap: "calc(var(--unknown-spacing) * 2)" }} />
 }
 
+function ComponentLayoutVariableFixture() {
+  return <div style={{ width: "calc(var(--component-width) * -1)" }} />
+}
+
 function NonnumericOperandFixture() {
   return <div style={{ gap: "calc(var(--spacing) * two)" }} />
 }
 
 function DynamicOperandFixture({ multiplier }: { multiplier: number }) {
   return <div style={{ gap: `calc(var(--spacing) * ${multiplier})` }} />
+}
+
+function DynamicTrailingContentFixture({ multiplier }: { multiplier: number }) {
+  return <div style={{ gap: `calc(var(--spacing) * ${multiplier}) + 1px` }} />
 }
 
 function AmbiguousInterpolationFixture() {
@@ -50,8 +58,10 @@ function ReversedShapeFixture() {
 
 export {
   AmbiguousInterpolationFixture,
+  ComponentLayoutVariableFixture,
   DivisionByZeroFixture,
   DynamicOperandFixture,
+  DynamicTrailingContentFixture,
   ExactArithmeticFixture,
   MultipleVariablesFixture,
   NonnumericOperandFixture,

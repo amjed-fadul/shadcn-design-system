@@ -1,1 +1,476 @@
-{"schemaVersion":1,"id":"badge","source":{"canonicalPath":"src/components/ui/badge.tsx","canonicalBlobSha":"6bad35c93c25d6e6727f7a29da54ef6b548648d1","implementationKind":"semantic-token-normalized-derivative","upstreamPath":"apps/v4/registry/bases/radix/ui/badge.tsx","upstreamBlobSha":"ccca32ca0046ed2b8da4057d4d7c6ef3dc307ffb"},"evidence":{"source":{"kind":"canonical-source","source":"src/components/ui/badge.tsx@6bad35c93c25d6e6727f7a29da54ef6b548648d1"},"tokens":{"kind":"token-contract","source":"shadcn-radix-token-contract-001"}},"exports":[{"name":"Badge","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[{"name":"variant","required":false,"type":{"kind":"enum","values":["default","secondary","destructive","outline","ghost","link"]},"default":"default","evidenceRefs":["source"]},{"name":"asChild","required":false,"type":{"kind":"boolean"},"default":false,"evidenceRefs":["source"]}],"inherits":["html.span"],"slots":[{"propName":"asChild","default":false,"replacesHost":true,"childCardinality":{"min":0,"max":1},"forwardsProps":true,"childRequires":["multiple children require a Radix Slottable that resolves to one React element"],"refForwarding":"unresolved","evidenceRefs":["source"]}],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":5},"evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1},"evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":0.5},"evidenceRefs":["source","tokens"]},{"tokenId":"font-size.xs","evidenceRefs":["source","tokens"]},{"tokenId":"font-weight.medium","evidenceRefs":["source","tokens"]},{"tokenId":"color.ring","evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5},"evidenceRefs":["source","tokens"]},{"tokenId":"color.destructive","evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":3},"evidenceRefs":["source","tokens"]},{"tokenId":"color.primary","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"default"}},{"tokenId":"color.primary-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"default"}},{"tokenId":"color.secondary","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"secondary"}},{"tokenId":"color.secondary-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"secondary"}},{"tokenId":"color.destructive","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"destructive"}},{"tokenId":"color.border","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.accent","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.accent-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"outline"}},{"tokenId":"color.accent","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"ghost"}},{"tokenId":"color.accent-foreground","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"ghost"}},{"tokenId":"color.primary","evidenceRefs":["source","tokens"],"when":{"propName":"variant","equals":"link"}}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"span"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"badge","evidenceRefs":["source"]},{"name":"data-variant","source":"prop","prop":"variant","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[{"feature":"host semantic suitability under asChild","owner":"author","mechanism":"replacement child must carry appropriate semantics for the intended use","evidenceRefs":["source"]}],"inheritedPropDefaults":[]}},{"name":"badgeVariants","kind":"helper","authorableJsx":false,"evidenceRefs":["source"]}],"unresolved":[]}
+{
+  "schemaVersion": 1,
+  "id": "badge",
+  "source": {
+    "canonicalPath": "src/components/ui/badge.tsx",
+    "canonicalBlobSha": "6bad35c93c25d6e6727f7a29da54ef6b548648d1",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/badge.tsx",
+    "upstreamBlobSha": "ccca32ca0046ed2b8da4057d4d7c6ef3dc307ffb"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/badge.tsx@6bad35c93c25d6e6727f7a29da54ef6b548648d1"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Badge",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "secondary",
+                "destructive",
+                "outline",
+                "ghost",
+                "link"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.span"
+        ],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "icon",
+              "equals": "inline-end"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "icon",
+              "equals": "inline-start"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "color.primary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "color.secondary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "secondary"
+            }
+          },
+          {
+            "tokenId": "color.secondary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "secondary"
+            }
+          },
+          {
+            "tokenId": "color.destructive",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "destructive"
+            }
+          },
+          {
+            "tokenId": "color.border",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.accent",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "ghost"
+            }
+          },
+          {
+            "tokenId": "color.accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "ghost"
+            }
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "link"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.accent",
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.accent-foreground",
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "alternatives": [
+            {
+              "when": {
+                "propName": "asChild",
+                "equals": true
+              },
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "badge",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "span"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "badge",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        },
+        "accessibility": [
+          {
+            "feature": "host semantic suitability under asChild",
+            "owner": "author",
+            "mechanism": "replacement child must carry appropriate semantics for the intended use",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "badgeVariants",
+      "kind": "helper",
+      "authorableJsx": false,
+      "evidenceRefs": [
+        "source"
+      ]
+    }
+  ],
+  "unresolved": []
+}

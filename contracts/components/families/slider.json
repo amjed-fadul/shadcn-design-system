@@ -62,6 +62,16 @@
               "id": "spacing.multiplier",
               "multiplier": 40
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "orientation",
+              "equals": "vertical"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -80,6 +90,27 @@
           },
           {
             "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "orientation",
+              "equals": "vertical"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -271,20 +302,5 @@
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "dynamic Slider Thumb rendering",
-      "scope": "Slider internal render tree",
-      "reason": "The wrapper renders one Radix Slider Thumb per entry in the authored value/defaultValue array, but the current component rendering contract schema has no repeated-node/cardinality representation.",
-      "evidenceAttempted": [
-        "canonical Slider source",
-        "Radix Slider 1.4.7 declaration",
-        "existing component rendering schema"
-      ],
-      "evidenceRefs": [
-        "source",
-        "declaration"
-      ]
-    }
-  ]
+  "unresolved": []
 }

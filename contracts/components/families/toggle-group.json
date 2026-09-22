@@ -73,6 +73,21 @@
             "evidenceRefs": [
               "source"
             ]
+          },
+          {
+            "name": "orientation",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            "default": "horizontal",
+            "evidenceRefs": [
+              "source"
+            ]
           }
         ],
         "inherits": [
@@ -136,13 +151,6 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "spacing.unit",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
@@ -152,9 +160,22 @@
           {
             "tokenId": "radius.md",
             "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
               "propName": "size",
               "equals": "sm"
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -306,6 +327,17 @@
               "id": "spacing.multiplier",
               "multiplier": 2
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "group",
+                  "name": "toggle-group"
+                }
+              ],
+              "propName": "spacing",
+              "equals": 0
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -317,6 +349,78 @@
               "id": "spacing.multiplier",
               "multiplier": 1.5
             },
+            "when": {
+              "all": [
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "group",
+                      "name": "toggle-group"
+                    }
+                  ],
+                  "propName": "spacing",
+                  "equals": 0
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "group",
+                      "name": "toggle-group"
+                    }
+                  ],
+                  "propName": "spacing",
+                  "equals": 0
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -324,6 +428,20 @@
           },
           {
             "tokenId": "radius.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -352,6 +470,33 @@
           },
           {
             "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "on"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -359,9 +504,385 @@
           },
           {
             "tokenId": "color.input",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
             "when": {
               "propName": "variant",
               "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 9
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "all": [
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "group",
+                      "name": "toggle-group"
+                    }
+                  ],
+                  "propName": "orientation",
+                  "equals": "horizontal"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "spacing",
+                  "equals": 0
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "all": [
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "group",
+                      "name": "toggle-group"
+                    }
+                  ],
+                  "propName": "orientation",
+                  "equals": "vertical"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "spacing",
+                  "equals": 0
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
             },
             "evidenceRefs": [
               "source",
@@ -385,6 +906,27 @@
                   "name": "data-slot",
                   "source": "literal",
                   "value": "toggle-group-item",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-variant",
+                  "source": "primitive-state",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-size",
+                  "source": "primitive-state",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-spacing",
+                  "source": "primitive-state",
                   "evidenceRefs": [
                     "source"
                   ]
@@ -421,18 +963,5 @@
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "context-derived Toggle Group item data attributes",
-      "scope": "ToggleGroupItem render facts",
-      "reason": "data-variant, data-size, and data-spacing are derived from ToggleGroupContext with local-prop fallbacks. The current rendering schema cannot represent context-derived data-attribute values without falsely attributing them to a direct prop or primitive state.",
-      "evidenceAttempted": [
-        "canonical Toggle Group source",
-        "current component rendering data-attribute schema"
-      ],
-      "evidenceRefs": [
-        "source"
-      ]
-    }
-  ]
+  "unresolved": []
 }

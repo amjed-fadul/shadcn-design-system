@@ -263,7 +263,25 @@
         "inherits": [
           "html.a"
         ],
-        "slots": [],
+        "slots": [
+          {
+            "propName": "asChild",
+            "default": false,
+            "replacesHost": true,
+            "childCardinality": {
+              "min": 0,
+              "max": 1
+            },
+            "forwardsProps": true,
+            "childRequires": [
+              "multiple children require a Radix Slottable that resolves to one React element"
+            ],
+            "refForwarding": "unresolved",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
         "composition": {
           "requires": [],
           "provides": [],
@@ -510,7 +528,7 @@
             {
               "when": {
                 "propName": "children",
-                "truthiness": "truthy"
+                "nullishness": "non-nullish"
               },
               "rendering": {
                 "rootNodeId": "host",
@@ -546,7 +564,10 @@
               ]
             },
             {
-              "otherwise": true,
+              "when": {
+                "propName": "children",
+                "nullishness": "nullish"
+              },
               "rendering": {
                 "rootNodeId": "host",
                 "publicPropsTargetNodeId": "host",

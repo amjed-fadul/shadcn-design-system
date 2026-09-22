@@ -14,6 +14,16 @@ const analyzer = createTokenSourceAnalyzer({
     : undefined,
 })
 
+const dynamicAnalyzer = createTokenSourceAnalyzer({
+  resolveUtility: () => undefined,
+  resolveDynamicCssVariable: (variable: string) => variable === "--spacing"
+    ? { tokenId: "spacing.unit" }
+    : undefined,
+  resolveCssVariable: (variable: string, multiplier: number) => variable === "--spacing"
+    ? { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier } }
+    : undefined,
+})
+
 type ArithmeticSource = {
   tokenId: string
   viaDerivedRule: { id: string; multiplier: number }
@@ -106,20 +116,52 @@ describe("CSS-variable token arithmetic source analysis", () => {
     expect(unresolved[0].end).toBeGreaterThan(unresolved[0].start)
   })
 
-  test("keeps the canonical dynamic spacing operand unresolved without inventing a default fact", () => {
+  test("records approved dynamic spacing arithmetic as a bare token fact without inventing a multiplier", () => {
+    const dynamicAnalysis = dynamicAnalyzer.analyzeComponentTokenSourceForExport(fixturePath, "DynamicOperandFixture")
+    expect(dynamicAnalysis).toMatchObject({
+      tokenExpressions: [expect.objectContaining({
+        tokenId: "spacing.unit",
+        source: expect.objectContaining({ sourceText: "`calc(var(--spacing) * ${multiplier})`" }),
+      })],
+      unresolved: [],
+    })
+    expect(dynamicAnalyzer.analyzeComponentTokenDependenciesForExport(fixturePath, "DynamicOperandFixture")).toEqual([
+      { tokenId: "spacing.unit", evidenceRefs: ["source"] },
+    ])
+
+    const trailing = dynamicAnalyzer.analyzeComponentTokenSourceForExport(fixturePath, "DynamicTrailingContentFixture")
+    expect(trailing.tokenExpressions).toEqual([])
+    expect(trailing.unresolved).toEqual([
+      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
+    ])
+
     const source = join(process.cwd(), "src/components/ui/toggle-group.tsx")
     const analysis = analyzeComponentTokenSourceForExport(source, "ToggleGroup")
-    expect(analysis.tokenExpressions).toEqual([])
-    expect(analysis.unresolved).toContainEqual(expect.objectContaining({
-      sourcePath: source,
-      expressionKind: "TemplateExpression",
-      sourceText: "`calc(var(--spacing) * ${spacing})`",
-      reason: "Dynamic CSS token arithmetic operand.",
-    }))
-    expect(analyzeComponentTokenDependenciesForExport(source, "ToggleGroup")).not.toContainEqual(expect.objectContaining({
+    expect(analysis.unresolved).toEqual([])
+    expect(analysis.tokenExpressions).toContainEqual(expect.objectContaining({
       tokenId: "spacing.unit",
-      viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
+      source: expect.objectContaining({
+        sourcePath: source,
+        expressionKind: "TemplateExpression",
+        sourceText: "`calc(var(--spacing) * ${spacing})`",
+      }),
     }))
+    expect(analyzeComponentTokenDependenciesForExport(source, "ToggleGroup")).toContainEqual({
+      tokenId: "spacing.unit",
+      evidenceRefs: ["source"],
+    })
+  })
+
+  test("classifies caller-approved component layout variables as non-token geometry", () => {
+    const layoutAnalyzer = createTokenSourceAnalyzer({
+      resolveUtility: () => undefined,
+      classifyCssVariable: (variable) => variable.startsWith("--component-") ? "known-non-token" : undefined,
+      resolveCssVariable: (variable, multiplier) => variable === "--spacing"
+        ? { tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier } }
+        : undefined,
+    })
+    expect(layoutAnalyzer.analyzeComponentTokenSourceForExport(fixturePath, "ComponentLayoutVariableFixture").unresolved).toEqual([])
+    expect(layoutAnalyzer.analyzeComponentTokenDependenciesForExport(fixturePath, "ComponentLayoutVariableFixture")).toEqual([])
   })
 
   test.each([

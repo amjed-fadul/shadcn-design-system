@@ -548,6 +548,16 @@
               "id": "spacing.multiplier",
               "multiplier": 6
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "slot",
+              "equals": "alert-dialog-media"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -707,17 +717,6 @@
           },
           {
             "tokenId": "color.muted",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 8
-            },
             "evidenceRefs": [
               "source",
               "tokens"

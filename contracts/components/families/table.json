@@ -1,1 +1,616 @@
-{"schemaVersion":1,"id":"table","source":{"canonicalPath":"src/components/ui/table.tsx","canonicalBlobSha":"0d8a7c8801cc49dc40196330b9f3aa05f0a1614a","implementationKind":"semantic-token-normalized-derivative","upstreamPath":"apps/v4/registry/bases/radix/ui/table.tsx","upstreamBlobSha":"2fc2f8b89907719013f9c4f08ee4c0d1b435c4bb"},"evidence":{"source":{"kind":"canonical-source","source":"src/components/ui/table.tsx@0d8a7c8801cc49dc40196330b9f3aa05f0a1614a"},"tokens":{"kind":"token-contract","source":"shadcn-radix-token-contract-001"}},"exports":[{"name":"Table","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.table"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"font-size.sm","evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"container","publicPropsTargetNodeId":"table","nodes":[{"id":"container","host":{"kind":"intrinsic","tag":"div"},"receivesPublicProps":false,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-container","evidenceRefs":["source"]}],"children":[{"nodeId":"table","evidenceRefs":["source"]}],"evidenceRefs":["source"]},{"id":"table","host":{"kind":"intrinsic","tag":"table"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}},{"name":"TableBody","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.tbody"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"tbody"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-body","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}},{"name":"TableCaption","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.caption"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":4},"evidenceRefs":["source","tokens"]},{"tokenId":"font-size.sm","evidenceRefs":["source","tokens"]},{"tokenId":"color.muted-foreground","evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"caption"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-caption","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}},{"name":"TableCell","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.td"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"td"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-cell","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}},{"name":"TableFooter","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.tfoot"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"color.muted","evidenceRefs":["source","tokens"]},{"tokenId":"font-weight.medium","evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"tfoot"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-footer","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}},{"name":"TableHead","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.th"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":10},"evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"evidenceRefs":["source","tokens"]},{"tokenId":"font-weight.medium","evidenceRefs":["source","tokens"]},{"tokenId":"color.muted-foreground","evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"th"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-head","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}},{"name":"TableHeader","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.thead"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"thead"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-header","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}},{"name":"TableRow","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.tr"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"color.muted","evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"tr"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"table-row","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[],"inheritedPropDefaults":[]}}],"unresolved":[]}
+{
+  "schemaVersion": 1,
+  "id": "table",
+  "source": {
+    "canonicalPath": "src/components/ui/table.tsx",
+    "canonicalBlobSha": "0d8a7c8801cc49dc40196330b9f3aa05f0a1614a",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/table.tsx",
+    "upstreamBlobSha": "2fc2f8b89907719013f9c4f08ee4c0d1b435c4bb"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/table.tsx@0d8a7c8801cc49dc40196330b9f3aa05f0a1614a"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-001"
+    }
+  },
+  "exports": [
+    {
+      "name": "Table",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.table"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "container",
+          "publicPropsTargetNodeId": "table",
+          "nodes": [
+            {
+              "id": "container",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-container",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "table",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "table",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "table"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "TableBody",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.tbody"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "tbody"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-body",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "TableCaption",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.caption"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "caption"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-caption",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "TableCell",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.td"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "td"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-cell",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "TableFooter",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.tfoot"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "tfoot"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-footer",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "TableHead",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.th"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 10
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "th"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-head",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "TableHeader",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.thead"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "thead"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-header",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "TableRow",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.tr"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "selected"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "tr"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "table-row",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    }
+  ],
+  "unresolved": []
+}

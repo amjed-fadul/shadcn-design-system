@@ -45,6 +45,17 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
               "multiplier": 4
             },
             "evidenceRefs": [
@@ -226,47 +237,47 @@
               "id": "spacing.multiplier",
               "multiplier": 8
             },
-            "when": {
-              "propName": "variant",
-              "equals": "icon"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "icon"
+            }
           },
           {
             "tokenId": "radius.lg",
-            "when": {
-              "propName": "variant",
-              "equals": "icon"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "icon"
+            }
           },
           {
             "tokenId": "color.muted",
-            "when": {
-              "propName": "variant",
-              "equals": "icon"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "icon"
+            }
           },
           {
             "tokenId": "color.foreground",
-            "when": {
-              "propName": "variant",
-              "equals": "icon"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "icon"
+            }
           },
           {
             "tokenId": "spacing.unit",
@@ -439,13 +450,6 @@
             ]
           },
           {
-            "tokenId": "line-height.relaxed",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "color.muted-foreground",
             "evidenceRefs": [
               "source",
@@ -454,6 +458,13 @@
           },
           {
             "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "line-height.relaxed",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -515,6 +526,17 @@
         "conditionalApi": [],
         "events": [],
         "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
           {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {

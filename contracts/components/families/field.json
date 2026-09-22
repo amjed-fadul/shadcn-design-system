@@ -165,6 +165,12 @@
           {
             "tokenId": "font-size.sm",
             "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
               "propName": "variant",
               "equals": "label"
             },
@@ -176,6 +182,12 @@
           {
             "tokenId": "font-size.base",
             "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
               "propName": "variant",
               "equals": "legend"
             },
@@ -274,6 +286,16 @@
               "id": "spacing.multiplier",
               "multiplier": 4
             },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "slot",
+              "equals": "field-group"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -365,6 +387,16 @@
           },
           {
             "tokenId": "color.destructive",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -537,7 +569,21 @@
             ]
           },
           {
-            "tokenId": "line-height.snug",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "slot",
+              "equals": "field"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -565,11 +611,14 @@
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 2.5
-            },
+            "tokenId": "radius.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "line-height.snug",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -743,13 +792,6 @@
             ]
           },
           {
-            "tokenId": "line-height.normal",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "color.muted-foreground",
             "evidenceRefs": [
               "source",
@@ -757,7 +799,25 @@
             ]
           },
           {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "line-height.normal",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -805,7 +865,19 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "children",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ReactNode"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
         "inherits": [
           "html.div"
         ],
@@ -841,7 +913,18 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -850,6 +933,17 @@
           },
           {
             "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1037,33 +1131,47 @@
           }
         ],
         "rendering": {
-          "rootNodeId": "host",
-          "publicPropsTargetNodeId": "host",
-          "nodes": [
+          "alternatives": [
             {
-              "id": "host",
-              "host": {
-                "kind": "intrinsic",
-                "tag": "div"
+              "when": {
+                "source": "state",
+                "name": "content",
+                "truthiness": "truthy"
               },
-              "receivesPublicProps": true,
-              "dataAttributes": [
-                {
-                  "name": "data-slot",
-                  "source": "literal",
-                  "value": "field-error",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                }
-              ],
-              "children": [],
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "field-error",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
               "evidenceRefs": [
                 "source"
               ]
             }
-          ],
-          "portalBoundaries": []
+          ]
         },
         "accessibility": [
           {
@@ -1087,18 +1195,5 @@
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "FieldError conditional render shape",
-      "scope": "FieldError internal rendering",
-      "reason": "FieldError can return null, a single message, authored children, or a deduplicated list based on errors/children. The current rendering schema cannot express array-length and computed-content branches.",
-      "evidenceAttempted": [
-        "canonical Field source",
-        "current component rendering schema"
-      ],
-      "evidenceRefs": [
-        "source"
-      ]
-    }
-  ]
+  "unresolved": []
 }

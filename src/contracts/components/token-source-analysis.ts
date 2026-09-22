@@ -14,6 +14,10 @@ export type ImportedRecipeResolution = Readonly<{ sourcePath: string; exportName
 export type RecipeUnresolvedReason = "dynamicConfiguration" | "configurationProperty" | "dynamicVariants" | "variantProperty" | "dynamicVariantValues" | "variantValueProperty" | "dynamicDefaultVariants" | "defaultVariantProperty" | "defaultVariantValue" | "dynamicCompoundVariants" | "compoundVariant" | "compoundVariantProperty" | "dynamicInvocation" | "invocationProperty" | "unknownVariant" | "unknownVariantValue" | "importAuthority" | "importedExport"
 export type TokenSourceAnalyzerConfig = Readonly<{
   resolveUtility: (utility: string) => TokenUtilityResolution | undefined
+  /** Classifies caller-owned CSS variables that are layout/implementation values, not governed tokens. */
+  classifyCssVariable?: (cssVariable: string) => "known-non-token" | undefined
+  /** Resolves an approved variable reference when its arithmetic operand is runtime data. */
+  resolveDynamicCssVariable?: (cssVariable: string) => Pick<TokenDependency, "tokenId"> | undefined
   classMergeFunctionNames?: readonly string[]
   recipeFunctionNames?: readonly string[]
   recipeVariantsProperty?: string
@@ -190,6 +194,12 @@ function conditionAtoms(condition: TokenCondition | undefined): TokenConditionAt
   return condition.all ?? [condition as TokenConditionAtom]
 }
 
+function isSafeStructuralVariant(prefix: string): boolean {
+  if (prefix.includes("${") || /[\s{}$`]/.test(prefix)) return false
+  return /^(?:\[&[>_].+\]|\[[a-z][A-Za-z0-9-]*\])$/.test(prefix)
+    || /^(?:has|not-has)-\[.+\]$/.test(prefix)
+}
+
 function combineConditions(...conditions: Array<TokenCondition | undefined>): TokenCondition | undefined | false {
   const atoms: TokenConditionAtom[] = []
   for (const atom of conditions.flatMap(conditionAtoms)) {
@@ -234,6 +244,7 @@ export function parseTailwindTokenUtility(rawUtility: string): { utility: string
       conditions.push(condition)
       continue
     }
+    if (isSafeStructuralVariant(prefix)) continue
     if (prefix.includes("data-") || prefix.includes("aria-") || prefix.includes("${") || prefix.startsWith("[") || !operationalVariant.test(prefix)) return undefined
   }
   const when = combineConditions(...conditions)
@@ -292,9 +303,10 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
   const resolveCssArithmeticText = (text: string): TokenUtilityResolution | string | undefined => {
     if (!config.resolveCssVariable || !text.includes("calc(") || !text.includes("var(")) return undefined
     const variables = [...text.matchAll(/var\(\s*(--[A-Za-z0-9_-]+)\s*\)/g)]
-    if (variables.length !== 1) return variables.length > 1
-      ? "CSS token arithmetic must reference exactly one variable."
-      : "CSS token arithmetic expression shape is not equivalent."
+    if (variables.length !== 1) {
+      if (variables.length > 1 && variables.some(([, variable]) => config.resolveCssVariable?.(variable, 1))) return "CSS token arithmetic must reference exactly one variable."
+      return variables.length > 1 ? undefined : "CSS token arithmetic expression shape is not equivalent."
+    }
     const variable = variables[0][1]
     const exact = /^calc\(\s*var\(\s*(--[A-Za-z0-9_-]+)\s*\)\s*\*\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\)$/.exec(text)
     if (exact) {
@@ -302,10 +314,10 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
       if (!Number.isFinite(parsedMultiplier)) return "CSS token arithmetic operand is not a finite decimal."
       const multiplier = Object.is(parsedMultiplier, -0) ? 0 : parsedMultiplier
       const resolution = config.resolveCssVariable(exact[1], multiplier)
-      return resolution ?? "CSS token arithmetic references an unapproved variable."
+      return resolution ?? (config.classifyCssVariable?.(variable) === "known-non-token" ? undefined : "CSS token arithmetic references an unapproved variable.")
     }
     if (new RegExp(`^calc\\(\\s*var\\(\\s*${variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\)\\s*\\/\\s*[+-]?(?:0+(?:\\.0*)?|\\.0+)\\s*\\)$`).test(text)) return "CSS token arithmetic divides by zero."
-    if (!config.resolveCssVariable(variable, 1)) return "CSS token arithmetic references an unapproved variable."
+    if (!config.resolveCssVariable(variable, 1)) return config.classifyCssVariable?.(variable) === "known-non-token" ? undefined : "CSS token arithmetic references an unapproved variable."
     if (/^calc\(\s*var\(\s*--[A-Za-z0-9_-]+\s*\)\s*\*\s*(?:[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)[eE][+-]?\d+|Infinity)|NaN)\s*\)$/.test(text)) return "CSS token arithmetic operand is not a finite decimal."
     if (/^calc\(\s*var\(\s*--[A-Za-z0-9_-]+\s*\)\s*\*\s*[^)]+\)$/.test(text)) return "CSS token arithmetic operand is not numeric."
     if (/^calc\(.*\)\s*(?:\+|-|\/)\s*.*\)$/.test(text)) return "Unsupported CSS token arithmetic operator."
@@ -317,6 +329,15 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     const source = sourceIdentity(expression, sourcePath, file)
     const staticText = staticCssText(expression, scope)
     if ("reason" in staticText) {
+      if (staticText.reason === "dynamic" && ts.isTemplateExpression(expression) && expression.templateSpans.length === 1) {
+        const variable = /^calc\(\s*var\(\s*(--[A-Za-z0-9_-]+)\s*\)\s*\*\s*$/.exec(expression.head.text)?.[1]
+        const isExactDynamicProduct = /^\s*\)$/.test(expression.templateSpans[0].literal.text)
+        const base = variable && isExactDynamicProduct ? config.resolveDynamicCssVariable?.(variable) : undefined
+        if (base) {
+          output.tokenExpressions.push({ ...base, ...(when ? { when } : {}), source })
+          return
+        }
+      }
       recordIdentityUnresolved(source, output, staticText.reason === "ambiguous" ? "Ambiguous CSS token arithmetic interpolation." : "Dynamic CSS token arithmetic operand.")
       return
     }
