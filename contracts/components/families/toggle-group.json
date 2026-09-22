@@ -73,21 +73,6 @@
             "evidenceRefs": [
               "source"
             ]
-          },
-          {
-            "name": "orientation",
-            "required": false,
-            "type": {
-              "kind": "enum",
-              "values": [
-                "horizontal",
-                "vertical"
-              ]
-            },
-            "default": "horizontal",
-            "evidenceRefs": [
-              "source"
-            ]
           }
         ],
         "inherits": [

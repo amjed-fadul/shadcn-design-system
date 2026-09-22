@@ -764,19 +764,36 @@ function independentLocalPropTypeNodes(typeNode: ts.TypeNode | undefined, checke
   return values
 }
 
-function independentIntrinsicPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): Set<string> {
+function independentNonUndefinedTypes(type: ts.Type): ts.Type[] {
+  if (!type.isUnion()) return [type]
+  return type.types.filter((member) => !(member.flags & ts.TypeFlags.Undefined))
+}
+
+function independentEquivalentPropTypes(checker: ts.TypeChecker, left: ts.Type, right: ts.Type): boolean {
+  const normalizedLeft = independentNonUndefinedTypes(left)
+  const normalizedRight = independentNonUndefinedTypes(right)
+  return normalizedLeft.every((leftMember) => normalizedRight.some((rightMember) => checker.isTypeAssignableTo(leftMember, rightMember)))
+    && normalizedRight.every((rightMember) => normalizedLeft.some((leftMember) => checker.isTypeAssignableTo(rightMember, leftMember)))
+}
+
+function independentInheritedPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): Set<string> {
   const names = new Set<string>()
   if (!typeNode || visited.has(typeNode)) return names
   visited.add(typeNode)
-  if (ts.isParenthesizedTypeNode(typeNode)) return independentIntrinsicPropNames(typeNode.type, checker, visited)
+  if (ts.isParenthesizedTypeNode(typeNode)) return independentInheritedPropNames(typeNode.type, checker, visited)
   if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
-    for (const member of typeNode.types) for (const name of independentIntrinsicPropNames(member, checker, new Set(visited))) names.add(name)
+    for (const member of typeNode.types) for (const name of independentInheritedPropNames(member, checker, new Set(visited))) names.add(name)
     return names
   }
   if (!ts.isTypeReferenceNode(typeNode)) return names
   const utility = independentTypeName(typeNode.typeName)
   const target = typeNode.typeArguments?.[0]
-  if ((utility === "ComponentProps" || utility === "ComponentPropsWithoutRef") && target && ts.isLiteralTypeNode(target) && ts.isStringLiteral(target.literal)) {
+  if (utility === "ComponentProps" || utility === "ComponentPropsWithoutRef") {
+    if (!target) return names
+    if (ts.isTypeQueryNode(target)) {
+      const declaration = functionForSymbol(resolvedSymbol(checker, target.exprName))
+      if (declaration && !declaration.getSourceFile().fileName.includes("node_modules")) return names
+    } else if (!ts.isLiteralTypeNode(target) || !ts.isStringLiteral(target.literal)) return names
     for (const property of checker.getPropertiesOfType(checker.getTypeAtLocation(typeNode))) names.add(property.name)
   }
   return names
@@ -832,8 +849,14 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     if (checker) {
       const propsType = checker.getTypeAtLocation(parameter)
       const typeNode = independentPropsTypeNode(functionLike)
-      const intrinsicProps = independentIntrinsicPropNames(typeNode, checker)
-      const localTypes = new Map([...independentLocalPropTypeNodes(typeNode, checker)].filter(([name]) => !intrinsicProps.has(name)))
+      const inheritedProps = independentInheritedPropNames(typeNode, checker)
+      const localTypeNodes = independentLocalPropTypeNodes(typeNode, checker)
+      const localTypes = new Map([...localTypeNodes].filter(([name, node]) => {
+        if (!inheritedProps.has(name) || !node) return true
+        const inheritedSymbol = checker.getPropertyOfType(propsType, name)
+        if (!inheritedSymbol) return true
+        return !independentEquivalentPropTypes(checker, checker.getTypeAtLocation(node), checker.getTypeOfSymbolAtLocation(inheritedSymbol, parameter))
+      }))
       if (propsType.flags & ts.TypeFlags.Any) propSurfaceError = "component props type is any"
       else if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) propSurfaceError = "component props type cannot be resolved"
       else if (independentUnsafeAuthority(typeNode, checker)) propSurfaceError = "component props type contains unsafe any or unknown authority"
@@ -2250,8 +2273,20 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       if (source.propSurfaceError) errors.push(`${family.id}.${exported.name}: ${source.propSurfaceError}`)
       const variants = cvaFacts(sourceFile, source.sourceText, source.declaration)
       const sourceProps = new Set([...source.bindings].filter((name) => !source.restBindings.has(name)).concat([...source.typeFacts.keys(), ...variants.variants.keys()]))
+      const inheritedDefaults = new Set((exported.component.inheritedPropDefaults ?? []).map((defaultFact: AnyRecord) => defaultFact.propName))
+      const inheritedProps = new Set<string>()
+      for (const interfaceId of exported.component.inherits ?? []) {
+        const inherited = interfaceById.get(interfaceId)
+        const context = inherited && sourceDeclarationContext(inherited)
+        if (!context) {
+          errors.push(`${family.id}.${exported.name}: inherited prop surface ${interfaceId} cannot be resolved independently`)
+          continue
+        }
+        for (const prop of context.checker.getPropertiesOfType(context.propsType)) inheritedProps.add(prop.name)
+      }
       const contractedLocalProps = new Map<string, AnyRecord>((exported.component.localProps ?? []).map((prop: AnyRecord) => [prop.name, prop]))
       for (const [name, sourceFact] of source.localPropFacts) {
+        if (inheritedDefaults.has(name)) continue
         const localProp = contractedLocalProps.get(name)
         if (!localProp) {
           errors.push(`${family.id}.${exported.name}: source local prop ${name} is omitted from the contract`)
@@ -2269,19 +2304,10 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         else if (contractHasDefault && localProp.default !== sourceFact.default) errors.push(`${family.id}.${exported.name}: default for ${name} differs from source`)
       }
       for (const name of contractedLocalProps.keys()) {
-        if (!source.localPropFacts.has(name)) errors.push(`${family.id}.${exported.name}: contract local prop ${name} is absent from the source-local signature`)
+        if (inheritedProps.has(name)) errors.push(`${family.id}.${exported.name}: contract local prop ${name} duplicates an inherited prop`)
+        else if (!source.localPropFacts.has(name)) errors.push(`${family.id}.${exported.name}: contract local prop ${name} is absent from the source-local signature`)
       }
 
-      const inheritedProps = new Set<string>()
-      for (const interfaceId of exported.component.inherits ?? []) {
-        const inherited = interfaceById.get(interfaceId)
-        const context = inherited && sourceDeclarationContext(inherited)
-        if (!context) {
-          errors.push(`${family.id}.${exported.name}: inherited prop surface ${interfaceId} cannot be resolved independently`)
-          continue
-        }
-        for (const prop of context.checker.getPropertiesOfType(context.propsType)) inheritedProps.add(prop.name)
-      }
       const hasAsChild = inheritedProps.has("asChild") || sourceProps.has("asChild")
       const slots = exported.component.slots ?? []
       if (source.directUsesSlot && !slots.some((slot: AnyRecord) => slot.propName === "asChild")) {
@@ -2617,7 +2643,7 @@ describe("Phase 3 Task 10 independent review", () => {
     ["deleted default", (component: AnyRecord) => { delete component.localProps.find((prop: AnyRecord) => prop.name === "size").default }, "pagination.PaginationPrevious: default presence for size differs from source"],
     ["inherited DOM prop labeled local", (component: AnyRecord, artifacts: { interfaces: AnyRecord[] }) => {
       component.localProps.push(clone(interfaceById({ interfaces: artifacts.interfaces }, "html.a").props.find((prop: AnyRecord) => prop.name === "href")))
-    }, "pagination.PaginationPrevious: contract local prop href is absent from the source-local signature"],
+    }, "pagination.PaginationPrevious: contract local prop href duplicates an inherited prop"],
   ])("independent exact local oracle rejects %s", (_name, mutate, expected) => {
     const artifacts = clone(loadArtifacts())
     const previous = exportByName(familyById(artifacts, "pagination"), "PaginationPrevious").component
@@ -2815,6 +2841,23 @@ describe("Phase 3 Task 10 independent review", () => {
 
     expect(directSourceErrors(mutated.families, mutated.interfaces)).toContain(
       "toggle-group.ToggleGroupItem: derived data-spacing property access target is omitted",
+    )
+  })
+
+  test("independent local-prop oracle rejects a ToggleGroup provider prop redeclared as local", () => {
+    const baseline = loadArtifacts()
+    const mutated = clone(baseline)
+    const toggle = exportByName(familyById(mutated, "toggle-group"), "ToggleGroup").component
+    toggle.localProps.push({
+      name: "orientation",
+      required: false,
+      type: { kind: "enum", values: ["horizontal", "vertical"] },
+      default: "horizontal",
+      evidenceRefs: ["source"],
+    })
+
+    expect(directSourceErrors(mutated.families, mutated.interfaces)).toContain(
+      "toggle-group.ToggleGroup: contract local prop orientation duplicates an inherited prop",
     )
   })
 

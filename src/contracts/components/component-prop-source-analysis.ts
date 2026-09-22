@@ -282,8 +282,20 @@ function unsafeAuthorityNode(typeNode: ts.TypeNode | undefined, checker: ts.Type
   return undefined
 }
 
+function nonUndefinedTypes(type: ts.Type): ts.Type[] {
+  if (!type.isUnion()) return [type]
+  return type.types.filter((member) => !(member.flags & ts.TypeFlags.Undefined))
+}
+
+function equivalentPropTypes(checker: ts.TypeChecker, left: ts.Type, right: ts.Type): boolean {
+  const normalizedLeft = nonUndefinedTypes(left)
+  const normalizedRight = nonUndefinedTypes(right)
+  return normalizedLeft.every((leftMember) => normalizedRight.some((rightMember) => checker.isTypeAssignableTo(leftMember, rightMember)))
+    && normalizedRight.every((rightMember) => normalizedLeft.some((leftMember) => checker.isTypeAssignableTo(rightMember, leftMember)))
+}
+
 function sourceLocalPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, seen = new Set<ts.Node>()): Set<string> {
-  const inherited = new Set<string>()
+  const inherited = new Map<string, ts.Type>()
   const visitInherited = (node: ts.TypeNode | undefined, visited = new Set<ts.Node>()) => {
     if (!node || visited.has(node)) return
     visited.add(node)
@@ -296,11 +308,26 @@ function sourceLocalPropNames(typeNode: ts.TypeNode | undefined, checker: ts.Typ
     const utility = rightmostTypeName(node.typeName)
     if (utility !== "ComponentProps" && utility !== "ComponentPropsWithoutRef") return
     const target = node.typeArguments?.[0]
-    if (!target || !ts.isLiteralTypeNode(target) || !ts.isStringLiteral(target.literal)) return
-    for (const property of checker.getPropertiesOfType(checker.getTypeAtLocation(node))) inherited.add(property.name)
+    if (!target) return
+    // A local wrapper's props are intentionally flattened into this component's
+    // public surface (for example PaginationPrevious -> PaginationLink). Only
+    // subtract external component/provider targets here; their inherited
+    // interface is represented by the contract's `inherits` field.
+    if (ts.isTypeQueryNode(target)) {
+      const declaration = declarationFunction(aliasedSymbol(checker, checker.getSymbolAtLocation(target.exprName)))
+      if (declaration && !declaration.getSourceFile().fileName.includes("node_modules")) return
+    } else if (!ts.isLiteralTypeNode(target) || !ts.isStringLiteral(target.literal)) return
+    for (const property of checker.getPropertiesOfType(checker.getTypeAtLocation(node))) {
+      inherited.set(property.name, checker.getTypeOfSymbolAtLocation(property, node))
+    }
   }
   visitInherited(typeNode)
-  return new Set([...sourceLocalPropTypeNodes(typeNode, checker, seen).keys()].filter((name) => !inherited.has(name)))
+  const authored = sourceLocalPropTypeNodes(typeNode, checker, seen)
+  return new Set([...authored.keys()].filter((name) => {
+    const inheritedType = inherited.get(name)
+    const authoredType = authored.get(name)
+    return !inheritedType || !authoredType || !equivalentPropTypes(checker, checker.getTypeAtLocation(authoredType), inheritedType)
+  }))
 }
 
 function delegatedDefaults(functionLike: SourceFunction, checker: ts.TypeChecker, visited: Set<SourceFunction>): Map<string, Literal> {
@@ -429,11 +456,11 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
 
   return {
     analyzeComponentPropSource,
-    compareComponentLocalProps(contracted: LocalPropContract[], analysis: ComponentPropSourceAnalysis): string[] {
+    compareComponentLocalProps(contracted: LocalPropContract[], analysis: ComponentPropSourceAnalysis, inheritedPropNames: ReadonlySet<string> = new Set()): string[] {
       const errors = analysis.unresolved.map((finding) => `Unresolved component prop source: ${finding.reason}`)
       if (analysis.unresolved.length) return errors
       const localNames = new Set(analysis.localPropNames)
-      const source = new Map(analysis.props.filter((prop) => localNames.has(prop.name)).map((prop) => [prop.name, prop]))
+      const source = new Map(analysis.props.filter((prop) => localNames.has(prop.name) && !inheritedPropNames.has(prop.name)).map((prop) => [prop.name, prop]))
       const expected = new Map(contracted.map((prop) => [prop.name, prop]))
       for (const [name, fact] of source) {
         const contract = expected.get(name)

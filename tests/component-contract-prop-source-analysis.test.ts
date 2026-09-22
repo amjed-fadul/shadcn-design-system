@@ -89,6 +89,8 @@ describe("general composed component prop source analysis", () => {
     const dialog = analyzer.analyzeComponentPropSource(sourcePath("dialog"), "DialogContent")
     const field = analyzer.analyzeComponentPropSource(sourcePath("field"), "FieldError")
     const separator = analyzer.analyzeComponentPropSource(sourcePath("field"), "FieldSeparator")
+    const toggleGroup = analyzer.analyzeComponentPropSource(sourcePath("toggle-group"), "ToggleGroup")
+    const toggleContracted = localProps("toggle-group", "ToggleGroup").contracted
 
     expect(selected(alert.props, ["variant"])).toEqual([
       { name: "variant", required: false, type: { kind: "enum", values: ["default", "destructive"] }, default: "default" },
@@ -102,6 +104,10 @@ describe("general composed component prop source analysis", () => {
     ])
     expect(separator.localPropNames).not.toContain("children")
     expect(analyzer.compareComponentLocalProps([], separator)).toEqual([])
+    expect(toggleGroup.localPropNames).not.toContain("orientation")
+    expect(toggleContracted).not.toContainEqual(expect.objectContaining({ name: "orientation" }))
+    expect(family("toggle-group").exports.find((entry) => entry.name === "ToggleGroup")?.component?.inheritedPropDefaults).toContainEqual(expect.objectContaining({ propName: "orientation", value: "horizontal" }))
+    expect(analyzer.compareComponentLocalProps(toggleContracted, toggleGroup, new Set(["orientation"]))).toEqual([])
   })
 
   test("preserves authored local TypeScript expressions instead of checker aliases", () => {

@@ -215,6 +215,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       const propErrors = propAnalyzer.compareComponentLocalProps(
         entry.component.localProps,
         propAnalyzer.analyzeComponentPropSource(path, entry.name),
+        new Set((entry.component.inheritedPropDefaults ?? []).map((defaultFact) => defaultFact.propName)),
       )
       if (propErrors.some((error) => error.includes(" default "))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)
       if (propErrors.some((error) => !error.includes(" default "))) errors.push(`Component ${entry.name} local prop surface does not match source evidence.`)
