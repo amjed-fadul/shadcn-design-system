@@ -115,4 +115,44 @@ function UnsupportedReturnConditionFixture({ condition, mode, ...rest }: { condi
   return <Primitive.Fallback {...rest} />
 }
 
-export { ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+function ConditionalHostAliasFixture({ asChild, ...rest }: { asChild: boolean }) {
+  const Comp = asChild ? Primitive.Slot : "a"
+  return <Comp data-slot="conditional-host" {...rest} />
+}
+
+function ConditionalJsxAliasFixture({ expanded, ...rest }: { expanded: boolean }) {
+  const content = expanded
+    ? <Primitive.Expanded data-slot="expanded" {...rest} />
+    : <Primitive.Collapsed data-slot="collapsed" {...rest} />
+  return content
+}
+
+function NullishChildFixture({ children, ...rest }: { children?: string }) {
+  return (
+    <Primitive.Root data-slot="nullish-root" {...rest}>
+      {children ?? <Primitive.Fallback data-slot="nullish-fallback" />}
+    </Primitive.Root>
+  )
+}
+
+function MappedChildrenFixture({ items, showLabels, ...rest }: { items: string[]; showLabels: boolean }) {
+  return (
+    <Primitive.Root data-slot="mapped-root" {...rest}>
+      {items.map((item) => (
+        <Primitive.Item data-slot="mapped-item" key={item}>
+          {showLabels && <Primitive.Label data-slot="mapped-label" />}
+        </Primitive.Item>
+      ))}
+    </Primitive.Root>
+  )
+}
+
+function NonMapCallbackFixture({ items, ...rest }: { items: string[] }) {
+  return (
+    <Primitive.Root {...rest}>
+      {items.filter((item) => <Primitive.NotRendered key={item} />)}
+    </Primitive.Root>
+  )
+}
+
+export { ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

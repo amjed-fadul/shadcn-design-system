@@ -23,6 +23,7 @@ export const canonicalRenderSourceAnalysisConventions: RenderSourceAnalysisConve
     return canonicalModuleSpecifier !== undefined && extensionless(moduleSpecifier) === canonicalModuleSpecifier
   },
   matchesInheritedInterface(sourceTag, interfaceId, normalizeRenderName) {
+    if (interfaceId.startsWith("html.")) return sourceTag === interfaceId.slice("html.".length)
     const sourceName = normalizeRenderName(sourceTag)
     const interfaceName = normalizeRenderName(interfaceId)
     return sourceName.endsWith(interfaceName) || (sourceTag.startsWith("SheetPrimitive.") && sourceName.replace(/^sheet/, "dialog") === interfaceName)

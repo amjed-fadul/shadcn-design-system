@@ -40,6 +40,8 @@ type SourceFacts = {
   directUsesSlot: boolean
   returnCount: number
   conditionalSource: boolean
+  renderAlternativePredicates: AnyRecord[]
+  mappedRenderEvidence: Array<{ tag: string; parentTag?: string; collection: string; slot?: string; parentSlot?: string }>
   propSurfaceError?: string
   localPropFacts: Map<string, IndependentLocalPropFact>
 }
@@ -218,11 +220,122 @@ function jsxNodes(functionLike: ts.FunctionLikeDeclaration): Array<ts.JsxElement
   const nodes: Array<ts.JsxElement | ts.JsxSelfClosingElement> = []
   const body = functionLike.body
   if (!body) return nodes
-  walkComponent(body, (node) => {
+  const isMapCallback = (node: ts.Node): boolean => (ts.isArrowFunction(node) || ts.isFunctionExpression(node))
+    && ts.isCallExpression(node.parent)
+    && node.parent.arguments.includes(node as ts.Expression)
+    && ts.isPropertyAccessExpression(node.parent.expression)
+    && node.parent.expression.name.text === "map"
+  const visit = (node: ts.Node): void => {
+    if (node !== body && ts.isFunctionLike(node)) {
+      if ((ts.isArrowFunction(node) || ts.isFunctionExpression(node)) && isMapCallback(node)) node.body.forEachChild(visit)
+      return
+    }
     if (ts.isJsxElement(node)) nodes.push(node)
     if (ts.isJsxSelfClosingElement(node)) nodes.push(node)
-  })
+    node.forEachChild(visit)
+  }
+  visit(body)
   return nodes
+}
+
+function literalSlot(node: ts.JsxElement | ts.JsxSelfClosingElement): string | undefined {
+  const attribute = jsxAttributes(node).properties.find((item): item is ts.JsxAttribute => ts.isJsxAttribute(item) && item.name.getText() === "data-slot")
+  return attribute?.initializer && ts.isStringLiteral(attribute.initializer) ? attribute.initializer.text : undefined
+}
+
+function mappedRenderEvidence(functionLike: ts.FunctionLikeDeclaration): SourceFacts["mappedRenderEvidence"] {
+  return jsxNodes(functionLike).flatMap((node) => {
+    let current: ts.Node | undefined = node
+    let call: ts.CallExpression | undefined
+    while (current && current !== functionLike) {
+      if (ts.isCallExpression(current) && ts.isPropertyAccessExpression(current.expression) && current.expression.name.text === "map") {
+        const callback = current.arguments[0]
+        if (callback && (ts.isArrowFunction(callback) || ts.isFunctionExpression(callback))) call = current
+      }
+      current = current.parent
+    }
+    if (!call || !ts.isPropertyAccessExpression(call.expression) || !ts.isIdentifier(call.expression.expression)) return []
+    current = call.parent
+    let parent: ts.JsxElement | undefined
+    while (current && current !== functionLike) {
+      if (ts.isJsxElement(current)) { parent = current; break }
+      current = current.parent
+    }
+    return [{
+      tag: jsxTag(node),
+      ...(parent ? { parentTag: jsxTag(parent) } : {}),
+      collection: call.expression.expression.text,
+      ...(literalSlot(node) ? { slot: literalSlot(node) } : {}),
+      ...(parent && literalSlot(parent) ? { parentSlot: literalSlot(parent) } : {}),
+    }]
+  })
+}
+
+function independentRenderCondition(expression: ts.Expression, bindings: Set<string>, booleanBranch = false): AnyRecord | undefined {
+  const reference = (name: string, value: AnyRecord) => bindings.has(name) ? { propName: name, ...value } : { source: "state", name, ...value }
+  if (ts.isIdentifier(expression)) return reference(expression.text, booleanBranch ? { equals: true } : { truthiness: "truthy" })
+  if (ts.isPrefixUnaryExpression(expression) && expression.operator === ts.SyntaxKind.ExclamationToken && ts.isIdentifier(expression.operand)) {
+    return reference(expression.operand.text, booleanBranch ? { equals: false } : { truthiness: "falsy" })
+  }
+  if (ts.isBinaryExpression(expression) && [ts.SyntaxKind.EqualsEqualsEqualsToken, ts.SyntaxKind.EqualsEqualsToken].includes(expression.operatorToken.kind)) {
+    const left = ts.isIdentifier(expression.left) ? expression.left.text : undefined
+    const right = literalValue(expression.right)
+    if (left && right !== undefined && right !== null) return reference(left, { equals: right })
+  }
+  return undefined
+}
+
+function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): AnyRecord[] {
+  if (!functionLike.body || !ts.isBlock(functionLike.body)) return []
+  const bindings = new Set<string>()
+  const parameter = functionLike.parameters[0]
+  if (parameter && ts.isObjectBindingPattern(parameter.name)) for (const element of parameter.name.elements) if (ts.isIdentifier(element.name)) bindings.add(element.name.text)
+  const topLevel: AnyRecord[] = []
+  for (const statement of functionLike.body.statements) {
+    if (ts.isIfStatement(statement)) {
+      const returns = ts.isReturnStatement(statement.thenStatement)
+        || ts.isBlock(statement.thenStatement) && statement.thenStatement.statements.some(ts.isReturnStatement)
+      const condition = returns ? independentRenderCondition(statement.expression, bindings) : undefined
+      if (condition) topLevel.push(condition)
+    } else if (ts.isReturnStatement(statement) && statement.expression && topLevel.length) topLevel.push({ otherwise: true })
+  }
+  if (topLevel.length > 1) {
+    if (topLevel.length === 2 && "truthiness" in topLevel[0] && topLevel[1].otherwise) {
+      const first = topLevel[0]
+      topLevel[1] = { ...first, truthiness: first.truthiness === "truthy" ? "falsy" : "truthy" }
+    }
+    return topLevel
+  }
+
+  const declarations = new Map<string, ts.Expression>()
+  walkComponent(functionLike.body, (node) => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) declarations.set(node.name.text, node.initializer)
+  })
+  for (const expression of returnExpressions(functionLike)) {
+    const root = unwrapReturnedExpression(expression)
+    if (ts.isIdentifier(root)) {
+      const initializer = declarations.get(root.text)
+      if (initializer && ts.isConditionalExpression(initializer)) {
+        const condition = independentRenderCondition(initializer.condition, bindings, true)
+        if (condition) return [condition, { otherwise: true }]
+      }
+    }
+    const opening = returnedRootOpening(root)
+    if (opening && ts.isIdentifier(opening.tagName)) {
+      const initializer = declarations.get(opening.tagName.text)
+      if (initializer && ts.isConditionalExpression(initializer)) {
+        const condition = independentRenderCondition(initializer.condition, bindings, true)
+        if (condition) return [condition, { otherwise: true }]
+      }
+    }
+    let found: AnyRecord | undefined
+    walkComponent(root, (node) => {
+      if (found || !ts.isBinaryExpression(node) || node.operatorToken.kind !== ts.SyntaxKind.QuestionQuestionToken) return
+      found = independentRenderCondition(node.left, bindings)
+    })
+    if (found) return [found, { otherwise: true }]
+  }
+  return []
 }
 
 function returnExpressions(functionLike: ts.FunctionLikeDeclaration): ts.Expression[] {
@@ -537,6 +650,8 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     directUsesSlot,
     returnCount: functionLike ? returnExpressions(functionLike).length : 0,
     conditionalSource: /\bif\s*\(|\?|&&/.test(bodyText),
+    renderAlternativePredicates: functionLike ? renderAlternativePredicates(functionLike) : [],
+    mappedRenderEvidence: functionLike ? mappedRenderEvidence(functionLike) : [],
     ...(propSurfaceError ? { propSurfaceError } : {}),
     localPropFacts,
   }
@@ -610,6 +725,27 @@ function collectChildIds(node: AnyRecord, ids: string[]): void {
   for (const child of node.children ?? []) {
     if (typeof child.nodeId === "string") ids.push(child.nodeId)
   }
+}
+
+function normalizedPredicate(predicate: AnyRecord): AnyRecord {
+  if (predicate.otherwise) return { otherwise: true }
+  if (predicate.truthiness === "truthy") return { ...predicate, equals: true, truthiness: undefined }
+  if (predicate.truthiness === "falsy") return { ...predicate, equals: false, truthiness: undefined }
+  return predicate
+}
+
+function normalizedHostName(value: string): string {
+  return value.split(".").at(-1)!.replace(/[^a-z0-9]/gi, "").toLowerCase()
+}
+
+function independentHostMatches(tag: string, host: AnyRecord): boolean {
+  if (host?.kind === "unresolved") return true
+  const expected = host?.kind === "inherited-interface"
+    ? host.interfaceId
+    : host?.kind === "component-export" || host?.kind === "cross-family-export"
+      ? host.exportName
+      : host?.tag
+  return typeof expected === "string" && normalizedHostName(tag) === normalizedHostName(expected)
 }
 
 function directTokenEvidence(text: string, tokenIds: Set<string>): Set<string> {
@@ -902,7 +1038,11 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
 
       const variantsToCheck = renderings(exported.component)
       if (!variantsToCheck.length) errors.push(`${family.id}.${exported.name}: render tree is missing`)
-      if (variantsToCheck.length > 1 && (source.returnCount < 2 || !source.conditionalSource)) errors.push(`${family.id}.${exported.name}: render alternatives lack source branching`)
+      if (variantsToCheck.length > 1) {
+        const contractPredicates = exported.component.rendering.alternatives.map((alternative: AnyRecord) => normalizedPredicate(alternative.when ?? { otherwise: true }))
+        const sourcePredicates = source.renderAlternativePredicates.map(normalizedPredicate)
+        if (JSON.stringify(contractPredicates) !== JSON.stringify(sourcePredicates)) errors.push(`${family.id}.${exported.name}: render alternative predicates differ from the canonical AST`)
+      }
       const expectedPortalCount = source.portalCount
       const actualPortalCount = variantsToCheck.reduce((count, rendering) => count + (rendering.portalBoundaries ?? []).length, 0)
       if (expectedPortalCount !== actualPortalCount) errors.push(`${family.id}.${exported.name}: portal count differs from canonical JSX`)
@@ -927,6 +1067,26 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
           if (!source.jsx.some((node) => jsxTag(node) === tag) && !source.sourceText.includes(`: "${tag}"`) && !source.sourceText.includes(`: \"${tag}\"`)) {
             errors.push(`${family.id}.${exported.name}: intrinsic host ${tag} is absent from source`)
           }
+        }
+      }
+      for (const repeated of source.mappedRenderEvidence) {
+        const trees = renderings(exported.component)
+        const repeatedNodes = trees.flatMap((rendering) => rendering.nodes ?? []).filter((node: AnyRecord) => {
+          const slot = (node.dataAttributes ?? []).find((attribute: AnyRecord) => attribute.name === "data-slot" && attribute.source === "literal")?.value
+          return repeated.slot ? slot === repeated.slot : independentHostMatches(repeated.tag, node.host)
+        })
+        if (!repeatedNodes.some((node: AnyRecord) => independentHostMatches(repeated.tag, node.host))) {
+          errors.push(`${family.id}.${exported.name}: repeated JSX host ${repeated.tag} differs from the contract`)
+          continue
+        }
+        if (repeated.parentSlot && repeated.slot) {
+          const linked = trees.some((rendering) => {
+            const nodes = rendering.nodes ?? []
+            const parent = nodes.find((node: AnyRecord) => (node.dataAttributes ?? []).some((attribute: AnyRecord) => attribute.name === "data-slot" && attribute.source === "literal" && attribute.value === repeated.parentSlot))
+            const children = new Set((parent?.children ?? []).map((child: AnyRecord) => child.nodeId))
+            return repeatedNodes.some((node: AnyRecord) => children.has(node.id))
+          })
+          if (!linked) errors.push(`${family.id}.${exported.name}: repeated JSX child ${repeated.slot} is omitted from the contract render edges`)
         }
       }
       if (source.propSpreadCount === 0) errors.push(`${family.id}.${exported.name}: public props spread is absent from source`)
@@ -1172,6 +1332,55 @@ describe("Phase 3 Task 10 independent review", () => {
       componentProgramCache = previousProgram
       sourceCache.delete(fixturePath)
     }
+  })
+
+  test("independently traverses mapped Slider JSX with host, slot, parent, and repetition evidence", () => {
+    const { sourceFile } = sourceFacts(join(root, "src/components/ui/slider.tsx"))
+    const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "Slider")!)
+    const tags = facts.jsx.map(jsxTag)
+    const slots = facts.dataAttributes
+      .filter((attribute) => attribute.name === "data-slot")
+      .map((attribute) => attribute.value)
+
+    expect(tags).toContain("SliderPrimitive.Thumb")
+    expect(slots).toEqual(expect.arrayContaining(["slider", "slider-track", "slider-range", "slider-thumb"]))
+
+    const thumb = facts.jsx.find((node) => jsxTag(node) === "SliderPrimitive.Thumb")!
+    let current: ts.Node | undefined = thumb
+    let mapCall: ts.CallExpression | undefined
+    let parentHost: ts.JsxElement | undefined
+    while (current) {
+      if (ts.isCallExpression(current) && ts.isPropertyAccessExpression(current.expression) && current.expression.name.text === "map") mapCall = current
+      if (mapCall && ts.isJsxElement(current) && jsxTag(current) === "SliderPrimitive.Root") parentHost = current
+      current = current.parent
+    }
+    expect(mapCall?.expression.getText(sourceFile)).toBe("values.map")
+    expect(parentHost && jsxTag(parentHost)).toBe("SliderPrimitive.Root")
+  })
+
+  test.each([
+    ["child edge", (component: AnyRecord) => {
+      const root = component.rendering.nodes.find((node: AnyRecord) => node.id === "root")
+      root.children = root.children.filter((child: AnyRecord) => child.nodeId !== "thumb")
+    }, "slider.Slider: repeated JSX child slider-thumb is omitted from the contract render edges"],
+    ["host", (component: AnyRecord) => {
+      component.rendering.nodes.find((node: AnyRecord) => node.id === "thumb").host.interfaceId = "radix.slider.track"
+    }, "slider.Slider: repeated JSX host SliderPrimitive.Thumb differs from the contract"],
+  ])("independent mapped-render oracle rejects a mutated %s", (_name, mutate, expected) => {
+    const artifacts = clone(loadArtifacts())
+    mutate(exportByName(familyById(artifacts, "slider"), "Slider").component)
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(expected)
+  })
+
+  test("independent conditional-render oracle rejects a mutated branch predicate", () => {
+    const artifacts = clone(loadArtifacts())
+    const link = exportByName(familyById(artifacts, "breadcrumb"), "BreadcrumbLink").component
+    link.rendering.alternatives[0].when = { propName: "asChild", equals: false }
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(
+      "breadcrumb.BreadcrumbLink: render alternative predicates differ from the canonical AST",
+    )
   })
 
   test("has no unreferenced evidence records", () => {

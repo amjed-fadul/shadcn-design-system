@@ -127,15 +127,21 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
 
   test("tracks parameter-derived rest spreads and unresolved dynamic render evidence without losing static nodes", () => {
     const tree = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "RenderCompletenessFixture")
-    expect(tree).toMatchObject({ root: { tag: "Primitive.Root", receivesPublicProps: true, dataAttributes: [expect.objectContaining({ name: "data-slot", value: "static" }), expect.objectContaining({ name: "data-x" })], children: [expect.objectContaining({ tag: "StaticChild" })] } })
+    expect(tree.alternatives).toEqual([
+      { when: { propName: "className", equals: true }, root: expect.objectContaining({ tag: "Primitive.Root", receivesPublicProps: true, dataAttributes: [expect.objectContaining({ name: "data-slot", value: "static" }), expect.objectContaining({ name: "data-x" })], children: [expect.objectContaining({ tag: "StaticChild" })] }) },
+      { otherwise: true, root: expect.objectContaining({ tag: "Primitive.Root", receivesPublicProps: true, children: [] }) },
+    ])
     expect(tree.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("data-x"), expect.stringContaining("dynamicChild")]))
     const unsupportedSpread = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "UnsupportedSpreadFixture")
     expect(unsupportedSpread.root).toMatchObject({ receivesPublicProps: true })
     expect(unsupportedSpread.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("Unsupported spread"), expect.stringContaining("data-state")]))
     expect(sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "UnrelatedSpreadFixture")).toMatchObject({ root: { receivesPublicProps: false }, unresolved: [expect.stringContaining("Unsupported spread")] })
     const conditional = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "ConditionalRenderFixture")
-    expect(conditional.root).toMatchObject({ children: expect.arrayContaining([expect.objectContaining({ tag: "StaticChild" })]) })
-    expect(conditional.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("Conditional JSX child")]))
+    expect(conditional.alternatives).toEqual([
+      { when: { propName: "condition", equals: true }, root: expect.objectContaining({ children: [expect.objectContaining({ tag: "StaticChild", when: { propName: "condition", equals: true } }), expect.objectContaining({ tag: "StaticChild" })] }) },
+      { otherwise: true, root: expect.objectContaining({ children: [expect.objectContaining({ tag: "StaticChild", when: { propName: "condition", equals: true } }), expect.objectContaining({ tag: "Primitive.Root" })] }) },
+    ])
+    expect(conditional.unresolved).toEqual([])
     const multipleReturns = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "MultipleReturnFixture")
     expect(multipleReturns.alternatives).toEqual([
       { when: { propName: "condition", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Primitive.Root" }) },
@@ -165,8 +171,11 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const analyzeJsxRenderTree = (sourceAnalysis as { analyzeJsxRenderTree?: (sourcePath: string, exportName: string) => unknown }).analyzeJsxRenderTree
     expect(analyzeJsxRenderTree).toBeTypeOf("function")
     expect(analyzeJsxRenderTree!(analysisFixture, "RenderFixture")).toMatchObject({
-      root: { tag: "Primitive.Root", receivesPublicProps: true, children: [expect.objectContaining({ tag: "Primitive.Portal", portal: true })] },
-      unresolved: [expect.stringContaining("Conditional JSX child")],
+      alternatives: [
+        { when: { propName: "visible", equals: true }, root: { tag: "Primitive.Root", receivesPublicProps: true, children: [expect.objectContaining({ tag: "Primitive.Portal", portal: true })] } },
+        { otherwise: true, root: { tag: "Primitive.Root", receivesPublicProps: true, children: [expect.objectContaining({ tag: "Primitive.Portal", portal: true })] } },
+      ],
+      unresolved: [],
     })
   })
 
