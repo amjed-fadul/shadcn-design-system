@@ -5,6 +5,7 @@ function CrossFileChild({
   ...props
 }: React.ComponentProps<"div"> & {
   payload?: Promise<string>
+  unsafePayload?: any
 }) {
   return <div data-payload={String(payload)} {...props} />
 }

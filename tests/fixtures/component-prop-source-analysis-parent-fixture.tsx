@@ -7,8 +7,17 @@ type CrossFileWrapperProps = Pick<
   "payload"
 >
 
+type CrossFileUnsafeWrapperProps = Pick<
+  React.ComponentProps<typeof CrossFileChild>,
+  "unsafePayload"
+>
+
 function CrossFileWrapper(props: CrossFileWrapperProps) {
   return <CrossFileChild {...props} />
 }
 
-export { CrossFileWrapper }
+function CrossFileUnsafeWrapper(props: CrossFileUnsafeWrapperProps) {
+  return <CrossFileChild {...props} />
+}
+
+export { CrossFileUnsafeWrapper, CrossFileWrapper }

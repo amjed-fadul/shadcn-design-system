@@ -85,9 +85,10 @@ function sourceFunction(source: ts.SourceFile, exportName: string): SourceFuncti
   return undefined
 }
 
-function sourceIdentity(node: ts.Node, source: ts.SourceFile, reason: string): ComponentPropSourceUnresolved {
+function sourceIdentity(node: ts.Node, reason: string): ComponentPropSourceUnresolved {
+  const source = node.getSourceFile()
   return {
-    sourcePath: source.fileName,
+    sourcePath: normalizedPath(source.fileName),
     start: node.getStart(source),
     end: node.getEnd(),
     expressionKind: ts.SyntaxKind[node.kind],
@@ -366,12 +367,12 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
     const source = program.getSourceFile(sourcePath)
     if (!source) return { props: [], localPropNames: [], unresolved: [{ sourcePath, start: 0, end: 0, expressionKind: "SourceFile", sourceText: exportName, reason: "Component source file is not in the TypeScript program." }] }
     const functionLike = sourceFunction(source, exportName)
-    if (!functionLike) return { props: [], localPropNames: [], unresolved: [sourceIdentity(source, source, `Component function ${exportName} was not found.`)] }
+    if (!functionLike) return { props: [], localPropNames: [], unresolved: [sourceIdentity(source, `Component function ${exportName} was not found.`)] }
     const parameter = functionLike.parameters[0]
-    if (!parameter) return { props: [], localPropNames: [], unresolved: [sourceIdentity(functionLike, source, "Component has no props parameter.")] }
+    if (!parameter) return { props: [], localPropNames: [], unresolved: [sourceIdentity(functionLike, "Component has no props parameter.")] }
     const propsType = checker.getTypeAtLocation(parameter)
-    if (propsType.flags & ts.TypeFlags.Any) return { props: [], localPropNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, source, "Component props type is any.")] }
-    if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) return { props: [], localPropNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, source, "Component props type cannot be resolved.")] }
+    if (propsType.flags & ts.TypeFlags.Any) return { props: [], localPropNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, "Component props type is any.")] }
+    if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) return { props: [], localPropNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, "Component props type cannot be resolved.")] }
 
     const typeNode = propsTypeNode(functionLike)
     const authoredTypes = sourceLocalPropTypeNodes(typeNode, checker)
@@ -386,7 +387,7 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
         }
       }
     }
-    if (unsafeNode) return { props: [], localPropNames: [], unresolved: [sourceIdentity(unsafeNode, source, "Component props type contains unsafe any or unknown authority.")] }
+    if (unsafeNode) return { props: [], localPropNames: [], unresolved: [sourceIdentity(unsafeNode, "Component props type contains unsafe any or unknown authority.")] }
     const defaults = delegatedDefaults(functionLike, checker, new Set())
     for (const [name, value] of cvaDefaults(functionLike, source)) defaults.set(name, value)
     for (const [name, value] of directDefaults(functionLike)) defaults.set(name, value)

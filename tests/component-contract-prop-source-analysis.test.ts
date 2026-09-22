@@ -118,6 +118,22 @@ describe("general composed component prop source analysis", () => {
     ])
   })
 
+  test("reports an exact child-file identity for a cross-file unsafe property", () => {
+    const parent = join(root, "tests/fixtures/component-prop-source-analysis-parent-fixture.tsx")
+    const child = join(root, "tests/fixtures/component-prop-source-analysis-child-fixture.tsx")
+    const analysis = analyzer.analyzeComponentPropSource(parent, "CrossFileUnsafeWrapper")
+
+    expect(analysis.props).toEqual([])
+    expect(analysis.unresolved).toEqual([{
+      sourcePath: child,
+      start: 161,
+      end: 164,
+      expressionKind: "AnyKeyword",
+      sourceText: "any",
+      reason: "Component props type contains unsafe any or unknown authority.",
+    }])
+  })
+
   test("follows a local ComponentProps<PaginationLink> alias and wrapper defaults", () => {
     const link = analyzer.analyzeComponentPropSource(sourcePath("pagination"), "PaginationLink")
     const previous = analyzer.analyzeComponentPropSource(sourcePath("pagination"), "PaginationPrevious")
