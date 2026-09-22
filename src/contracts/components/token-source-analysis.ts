@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import ts from "typescript"
 
-import type { SourceExpressionIdentity, TokenDependency } from "./types"
+import type { SourceExpressionIdentity, TokenCondition, TokenConditionAtom, TokenDependency } from "./types"
 
 export type ClassSource = { classNames: string; propName?: string; equals?: string; source: SourceExpressionIdentity }
 export type UnresolvedClassSource = SourceExpressionIdentity & { reason: string }
@@ -47,6 +47,83 @@ function bindingNames(name: ts.BindingName): string[] {
 }
 function publicPropBindings(functionLike: Pick<ts.SignatureDeclarationBase, "parameters">) {
   return new Set(functionLike.parameters[0] ? bindingNames(functionLike.parameters[0].name) : [])
+}
+
+const operationalVariant = /^(?:\*|\*\*|dark|rtl|ltr|portrait|landscape|print|motion-safe|motion-reduce|contrast-more|contrast-less|forced-colors|sm|md|lg|xl|2xl|first|last|only|odd|even|first-of-type|last-of-type|only-of-type|empty|hover|focus|focus-within|focus-visible|active|visited|target|disabled|enabled|checked|indeterminate|default|required|valid|invalid|in-range|out-of-range|placeholder-shown|autofill|read-only|open|before|after|first-letter|first-line|marker|selection|file|backdrop|(?:group|peer)-(?:hover|focus|focus-within|focus-visible|active|visited|disabled|enabled|checked|open)(?:\/[A-Za-z0-9_-]+)?|@[a-z][A-Za-z0-9_-]*(?:\/[A-Za-z0-9_-]+)?)$/
+const dataVariant = /^(?:((?:group|peer|in)-))?(?:has-)?data-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))(?:\/([A-Za-z0-9_-]+))?$/
+const ariaVariant = /^aria-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))$/
+
+function conditionValue(value: string | undefined): string | number | boolean | undefined {
+  if (value === undefined) return true
+  if (!value || /[\s\[\]{}$`'"\\:]/.test(value)) return undefined
+  if (value === "true") return true
+  if (value === "false") return false
+  if (/^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(value)) return Number(value)
+  return value
+}
+
+function conditionAtoms(condition: TokenCondition | undefined): TokenConditionAtom[] {
+  if (!condition) return []
+  return condition.all ?? [condition as TokenConditionAtom]
+}
+
+function combineConditions(...conditions: Array<TokenCondition | undefined>): TokenCondition | undefined | false {
+  const atoms: TokenConditionAtom[] = []
+  for (const atom of conditions.flatMap(conditionAtoms)) {
+    const existing = atoms.find((candidate) => candidate.propName === atom.propName)
+    if (existing && existing.equals !== atom.equals) return false
+    if (!existing) atoms.push(atom)
+  }
+  if (atoms.length === 0) return undefined
+  return atoms.length === 1 ? atoms[0] : { all: atoms }
+}
+
+function variantSegments(rawUtility: string): string[] | undefined {
+  const segments: string[] = []
+  let start = 0
+  let squareDepth = 0
+  let parenthesisDepth = 0
+  let escaped = false
+  for (let index = 0; index < rawUtility.length; index += 1) {
+    const character = rawUtility[index]
+    if (escaped) { escaped = false; continue }
+    if (character === "\\") { escaped = true; continue }
+    if (character === "[") squareDepth += 1
+    else if (character === "]") { squareDepth -= 1; if (squareDepth < 0) return undefined }
+    else if (character === "(") parenthesisDepth += 1
+    else if (character === ")") { parenthesisDepth -= 1; if (parenthesisDepth < 0) return undefined }
+    else if (character === ":" && squareDepth === 0 && parenthesisDepth === 0) { segments.push(rawUtility.slice(start, index)); start = index + 1 }
+  }
+  if (escaped || squareDepth !== 0 || parenthesisDepth !== 0) return undefined
+  segments.push(rawUtility.slice(start))
+  return segments.every(Boolean) ? segments : undefined
+}
+
+export function parseTailwindTokenUtility(rawUtility: string): { utility: string; when?: TokenCondition } | undefined {
+  const segments = variantSegments(rawUtility)
+  if (!segments) return undefined
+  const utility = segments.at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
+  const conditions: TokenCondition[] = []
+  for (const prefix of segments.slice(0, -1)) {
+    const dataMatch = prefix.match(dataVariant)
+    if (dataMatch) {
+      if (dataMatch[5] && !dataMatch[1]) return undefined
+      const equals = conditionValue(dataMatch[3])
+      if (equals === undefined) return undefined
+      conditions.push({ propName: dataMatch[2] ?? dataMatch[4], equals })
+      continue
+    }
+    const ariaMatch = prefix.match(ariaVariant)
+    if (ariaMatch) {
+      const equals = conditionValue(ariaMatch[2])
+      if (equals === undefined) return undefined
+      conditions.push({ propName: `aria-${ariaMatch[1] ?? ariaMatch[3]}`, equals })
+      continue
+    }
+    if (prefix.includes("data-") || prefix.includes("${") || prefix.startsWith("[") || !operationalVariant.test(prefix)) return undefined
+  }
+  const when = combineConditions(...conditions)
+  return when === false ? undefined : { utility, ...(when ? { when } : {}) }
 }
 
 /** Builds a source analyzer from caller-owned syntax and utility-token rules. */
@@ -360,11 +437,16 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     return { resolved: unique(output.resolved), unresolved: unique(output.unresolved) }
   }
   const analyzeTailwindTokenDependencies = (classNames: string, evidenceRefs: string[] = ["source"]): TokenDependency[] => unique(classNames.split(/\s+/).filter(Boolean).flatMap((rawUtility) => {
-    const utility = rawUtility.split(":").at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
-    const resolution = config.resolveUtility(utility)
-    return resolution ? [{ ...resolution, evidenceRefs }] : []
+    const parsed = parseTailwindTokenUtility(rawUtility)
+    if (!parsed) return []
+    const resolution = config.resolveUtility(parsed.utility)
+    return resolution ? [{ ...resolution, ...(parsed.when ? { when: parsed.when } : {}), evidenceRefs }] : []
   }))
-  const dependencies = (sourcePath: string, exportName?: string) => unique(analyze(sourcePath, exportName).resolved.flatMap((recipe) => analyzeTailwindTokenDependencies(recipe.classNames).map((dependency) => recipe.propName && recipe.equals ? { ...dependency, when: { propName: recipe.propName, equals: recipe.equals } } : dependency)))
+  const dependencies = (sourcePath: string, exportName?: string) => unique(analyze(sourcePath, exportName).resolved.flatMap((recipe) => analyzeTailwindTokenDependencies(recipe.classNames).flatMap((dependency) => {
+    const recipeCondition = recipe.propName && recipe.equals ? { propName: recipe.propName, equals: recipe.equals } satisfies TokenConditionAtom : undefined
+    const when = combineConditions(recipeCondition, dependency.when)
+    return when === false ? [] : [{ ...dependency, ...(when ? { when } : {}) }]
+  })))
   const key = ({ tokenId, when, viaDerivedRule }: Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">) => JSON.stringify({ tokenId, ...(when ? { when } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) })
   const compare = (sourcePath: string, dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>, exportName?: string, includeUnresolved = true, analysis = analyze(sourcePath, exportName)) => {
     const expected = new Set((exportName ? dependenciesForExport(sourcePath, exportName) : dependenciesForSource(sourcePath)).map(key)); const actual = new Set(dependencies.map(key)); const suffix = exportName ? ` for ${exportName}` : ""

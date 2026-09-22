@@ -1502,19 +1502,103 @@ function directTokenEvidence(text: string, tokenIds: Set<string>): Set<string> {
   return result
 }
 
+const independentOperationalPrefixes = new Set([
+  "*", "**", "dark", "rtl", "ltr", "portrait", "landscape", "print", "motion-safe", "motion-reduce", "contrast-more", "contrast-less", "forced-colors",
+  "sm", "md", "lg", "xl", "2xl", "first", "last", "only", "odd", "even", "first-of-type", "last-of-type", "only-of-type", "empty",
+  "hover", "focus", "focus-within", "focus-visible", "active", "visited", "target", "disabled", "enabled", "checked", "indeterminate", "default",
+  "required", "valid", "invalid", "in-range", "out-of-range", "placeholder-shown", "autofill", "read-only", "open", "before", "after", "first-letter",
+  "first-line", "marker", "selection", "file", "backdrop",
+])
+
+function independentUtilitySegments(raw: string): string[] | undefined {
+  const result: string[] = []
+  let square = 0
+  let round = 0
+  let boundary = 0
+  for (let index = 0; index < raw.length; index += 1) {
+    const character = raw[index]
+    if (character === "\\") { index += 1; continue }
+    if (character === "[") square += 1
+    if (character === "]") square -= 1
+    if (character === "(") round += 1
+    if (character === ")") round -= 1
+    if (square < 0 || round < 0) return undefined
+    if (character === ":" && square === 0 && round === 0) {
+      result.push(raw.slice(boundary, index))
+      boundary = index + 1
+    }
+  }
+  if (square !== 0 || round !== 0) return undefined
+  result.push(raw.slice(boundary))
+  return result.every((segment) => segment.length > 0) ? result : undefined
+}
+
+function independentScalar(value: string | undefined): string | number | boolean | undefined {
+  if (value === undefined) return true
+  if (value.length === 0 || [...value].some((character) => " []{}$`'\"\\:".includes(character))) return undefined
+  if (value === "true" || value === "false") return value === "true"
+  if (/^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(value)) return Number(value)
+  return value
+}
+
+function independentUtilityCondition(raw: string): { utility: string; atoms: AnyRecord[] } | undefined {
+  const segments = independentUtilitySegments(raw)
+  if (!segments) return undefined
+  const atoms: AnyRecord[] = []
+  for (const prefix of segments.slice(0, -1)) {
+    const data = /^(?:((?:group|peer|in)-))?(?:has-)?data-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))(?:\/([A-Za-z0-9_-]+))?$/.exec(prefix)
+    const aria = /^aria-(?:\[([A-Za-z_][A-Za-z0-9_-]*)(?:=([^\]]+))?\]|([A-Za-z_][A-Za-z0-9_-]*))$/.exec(prefix)
+    if (data) {
+      if (data[5] && !data[1]) return undefined
+      const equals = independentScalar(data[3])
+      if (equals === undefined) return undefined
+      const propName = data[2] ?? data[4]
+      const prior = atoms.find((atom) => atom.propName === propName)
+      if (prior && prior.equals !== equals) return undefined
+      if (!prior) atoms.push({ propName, equals })
+      continue
+    }
+    if (aria) {
+      const equals = independentScalar(aria[2])
+      if (equals === undefined) return undefined
+      const propName = `aria-${aria[1] ?? aria[3]}`
+      const prior = atoms.find((atom) => atom.propName === propName)
+      if (prior && prior.equals !== equals) return undefined
+      if (!prior) atoms.push({ propName, equals })
+      continue
+    }
+    const namedState = /^(?:group|peer)-(?:hover|focus|focus-within|focus-visible|active|visited|disabled|enabled|checked|open)(?:\/[A-Za-z0-9_-]+)?$/.test(prefix)
+    const container = /^@[a-z][A-Za-z0-9_-]*(?:\/[A-Za-z0-9_-]+)?$/.test(prefix)
+    if (prefix.includes("data-") || prefix.startsWith("aria-") || prefix.includes("${") || prefix.startsWith("[") || (!independentOperationalPrefixes.has(prefix) && !namedState && !container)) return undefined
+  }
+  return { utility: segments.at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, ""), atoms }
+}
+
+function independentMergedCondition(source: IndependentCvaClassSource, utilityAtoms: AnyRecord[]): AnyRecord | undefined {
+  const atoms = [...(source.propName && source.equals ? [{ propName: source.propName, equals: source.equals }] : []), ...utilityAtoms]
+  const unique: AnyRecord[] = []
+  for (const atom of atoms) {
+    const prior = unique.find((candidate) => candidate.propName === atom.propName)
+    if (prior && prior.equals !== atom.equals) return undefined
+    if (!prior) unique.push(atom)
+  }
+  if (unique.length === 0) return {}
+  return { when: unique.length === 1 ? unique[0] : { all: unique } }
+}
+
 function independentImportedTokenDependencies(classSources: IndependentCvaClassSource[]): AnyRecord[] {
   const dependencies: AnyRecord[] = []
   const spacing = /^(?:size|h|w|min-h|min-w|max-h|max-w|p|px|py|pt|pr|pb|pl|ps|pe|gap|gap-x|gap-y|m|mx|my|mt|mr|mb|ml|ms|me|space-x|space-y|inset|inset-x|inset-y|inset-s|inset-e|top|right|bottom|left|start|end)-([0-9]+(?:\.[0-9]+)?)$/
-  for (const source of classSources) {
-    const condition = source.propName && source.equals ? { when: { propName: source.propName, equals: source.equals } } : {}
-    for (const tokenId of directTokenEvidence(source.classNames, approvedTokenIds)) {
+  for (const source of classSources) for (const rawUtility of source.classNames.split(/\s+/).filter(Boolean)) {
+    const parsed = independentUtilityCondition(rawUtility)
+    if (!parsed) continue
+    const condition = independentMergedCondition(source, parsed.atoms)
+    if (!condition) continue
+    for (const tokenId of directTokenEvidence(parsed.utility, approvedTokenIds)) {
       if (tokenId !== "spacing.unit") dependencies.push({ tokenId, ...condition })
     }
-    for (const rawUtility of source.classNames.split(/\s+/).filter(Boolean)) {
-      const utility = rawUtility.split(":").at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
-      const match = utility.match(spacing)
-      if (match) dependencies.push({ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: Number(match[1]) }, ...condition })
-    }
+    const match = parsed.utility.match(spacing)
+    if (match) dependencies.push({ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: Number(match[1]) }, ...condition })
   }
   return [...new Map(dependencies.map((dependency) => [independentStableKey(dependency), dependency])).values()]
 }
@@ -1538,6 +1622,36 @@ function independentImportedFactErrors(label: string, contractTokenFacts: AnyRec
   return [
     ...[...sourceExactFacts].filter(([key]) => !contractExactFacts.has(key)).map(([, fact]) => `${label}: imported recipe token fact differs (missing ${independentStableKey(fact)})`),
     ...[...contractExactFacts].filter(([key]) => !sourceExactFacts.has(key)).map(([, fact]) => `${label}: imported recipe token fact differs (invented ${independentStableKey(fact)})`),
+  ]
+}
+
+function independentConditionalUtilityFactErrors(label: string, contractTokenFacts: AnyRecord[], sourceFile: ts.SourceFile, variants: ReturnType<typeof cvaFacts>): string[] {
+  const importedTokenIds = new Set(
+    independentImportedTokenDependencies(variants.classSources.filter((fact) => fact.sourcePath !== sourceFile.fileName))
+      .map((fact) => fact.tokenId),
+  )
+  const localTokenFacts = independentImportedTokenDependencies([
+    ...variants.localClassSources,
+    ...variants.classSources.filter((fact) => fact.sourcePath === sourceFile.fileName),
+  ])
+  const conditionalTokenIds = new Set(
+    localTokenFacts
+      .filter((fact) => fact.when && !importedTokenIds.has(fact.tokenId))
+      .map((fact) => fact.tokenId),
+  )
+  const sourceExactFacts = new Map<string, AnyRecord>(
+    localTokenFacts
+      .filter((fact) => conditionalTokenIds.has(fact.tokenId))
+      .map((fact) => [independentStableKey(fact), fact]),
+  )
+  const contractExactFacts = new Map<string, AnyRecord>(
+    contractTokenFacts
+      .filter((fact) => conditionalTokenIds.has(fact.tokenId))
+      .map((fact) => [independentStableKey(fact), fact]),
+  )
+  return [
+    ...[...sourceExactFacts].filter(([key]) => !contractExactFacts.has(key)).map(([, fact]) => `${label}: conditional utility token fact differs (missing ${independentStableKey(fact)})`),
+    ...[...contractExactFacts].filter(([key]) => !sourceExactFacts.has(key)).map(([, fact]) => `${label}: conditional utility token fact differs (invented ${independentStableKey(fact)})`),
   ]
 }
 
@@ -1764,6 +1878,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         ...(dependency.viaDerivedRule ? { viaDerivedRule: dependency.viaDerivedRule } : {}),
       }))
       errors.push(...independentImportedFactErrors(`${family.id}.${exported.name}`, comparableContractTokens, sourceFile, variants))
+      errors.push(...independentConditionalUtilityFactErrors(`${family.id}.${exported.name}`, comparableContractTokens, sourceFile, variants))
       for (const tokenId of contractTokenIds) {
         if (!sourceTokenIds.has(tokenId)) errors.push(`${family.id}.${exported.name}: token ${tokenId} has no direct source expression`)
       }
@@ -2291,6 +2406,47 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
   })
 
+  test("independent utility parser preserves exact data conditions and stacked conjunctions", () => {
+    const facts = independentImportedTokenDependencies([
+      { classNames: "data-[size=sm]:rounded-md", sourcePath: "fixture.tsx" },
+      { classNames: "group-data-[orientation=vertical]/root:data-[spacing=0]:gap-2", sourcePath: "fixture.tsx" },
+      { classNames: "data-[state=open]:bg-background", propName: "tone", equals: "default", sourcePath: "fixture.tsx" },
+      { classNames: "aria-invalid:bg-destructive", sourcePath: "fixture.tsx" },
+    ])
+
+    expect(facts).toEqual(expect.arrayContaining([
+      { tokenId: "radius.md", when: { propName: "size", equals: "sm" } },
+      {
+        tokenId: "spacing.unit",
+        when: { all: [{ propName: "orientation", equals: "vertical" }, { propName: "spacing", equals: 0 }] },
+        viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
+      },
+      {
+        tokenId: "color.background",
+        when: { all: [{ propName: "tone", equals: "default" }, { propName: "state", equals: "open" }] },
+      },
+      { tokenId: "color.destructive", when: { propName: "aria-invalid", equals: true } },
+    ]))
+  })
+
+  test("independent utility parser fails closed for malformed, dynamic, unsupported, ambiguous, and contradictory prefixes", () => {
+    expect(independentImportedTokenDependencies([{
+      classNames: "data-[size=sm:rounded-md data-[${dimension}=sm]:rounded-lg mystery-data-[size=sm]:bg-background [&:has([data-size=sm])]:bg-destructive data-[size=sm]:data-[size=lg]:rounded-md data-[size=sm]/named-self:rounded-md",
+      sourcePath: "fixture.tsx",
+    }])).toEqual([])
+  })
+
+  test("independent family audit compares local utility conditions exactly", () => {
+    const artifacts = clone(loadArtifacts())
+    const checkbox = exportByName(familyById(artifacts, "checkbox"), "Checkbox").component
+    checkbox.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.primary").when = { propName: "state", equals: "unchecked" }
+
+    const errors = directSourceErrors(artifacts.families, artifacts.interfaces)
+      .filter((error) => error.includes("checkbox.Checkbox: conditional utility token fact differs"))
+    expect(errors).toContainEqual(expect.stringContaining('missing {"tokenId":"color.primary","when":{"equals":"checked","propName":"state"}}'))
+    expect(errors).toContainEqual(expect.stringContaining('invented {"tokenId":"color.primary","when":{"equals":"unchecked","propName":"state"}}'))
+  })
+
   test("independent imported-recipe parsing fails closed for invalid authority, selectors, invocation values, and lexical shadowing", () => {
     const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
     const wrongConsumerPath = join(root, "tests/fixtures/imported-cva-wrong-consumer.tsx")
@@ -2461,8 +2617,9 @@ describe("Phase 3 Task 10 independent review", () => {
       .filter((error) => error.includes("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
     const baselineArtifacts = loadArtifacts()
     const baselineErrors = importedErrors(baselineArtifacts)
-    expect(baselineErrors).not.toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2}}'))
-    expect(baselineErrors).not.toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5}}'))
+    expect(baselineErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"when":{"equals":0,"propName":"spacing"}}'))
+    expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2}}'))
+    expect(baselineErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":1.5}}'))
 
     const reordered = clone(baselineArtifacts)
     const reorderedComponent = exportByName(familyById(reordered, "toggle-group"), "ToggleGroupItem").component

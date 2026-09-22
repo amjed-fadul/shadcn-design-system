@@ -4,7 +4,7 @@ import { dirname, join, normalize } from "node:path"
 
 import tokenContract from "../../../contracts/tokens/token-contract.json"
 import seedComponents from "../../../provenance/seed-components.json"
-import { createTokenSourceAnalyzer, type TokenCoverageFinding } from "./token-source-analysis"
+import { createTokenSourceAnalyzer, parseTailwindTokenUtility, type TokenCoverageFinding } from "./token-source-analysis"
 
 const direct = new Map<string, string>()
 for (const [utility, token] of [
@@ -90,7 +90,6 @@ export type { TokenCoverageFinding }
 
 const implementationUtilities = new Set(["align-middle", "animate-pulse", "bg-clip-padding", "flex", "flex-col", "flex-row", "grid", "group/card", "group/badge", "group/button", "inline-flex", "items-center", "justify-center", "justify-self-end", "overflow-auto", "overflow-hidden", "outline-none", "pointer-events-none", "relative", "select-none", "self-start", "shrink-0", "table", "transition-all", "transition-colors", "underline", "underline-offset-4", "whitespace-nowrap", "w-fit", "w-full", "h-full", "text-left", "text-center", "text-right", "text-justify", "text-start", "text-end", "border-transparent", "bg-transparent"])
 const notContractedUtilities = new Set(["border", "border-t", "border-r", "border-b", "border-l", "border-s", "border-e", "border-x", "border-y", "border-0", "border-t-0", "border-r-0", "border-b-0", "border-l-0", "border-s-0", "border-e-0", "border-2", "border-4", "border-8", "ring-3", "ring-0", "ring-2"])
-const normalizedUtility = (utility: string) => utility.split(":").at(-1)!.replace(/!$/, "").replace(/\/(?:\d+|\d+\.\d+)$/, "")
 function contractedNamespaceFor(utility: string): string | undefined {
   if (/^text-(?:xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)$/.test(utility)) return "font-size"
   if (/^(?:bg|text|border|ring|outline|decoration|fill|stroke)-/.test(utility)) return "color"
@@ -105,7 +104,9 @@ const recognizedNoToken = (utility: string, namespace: string | undefined) => /-
 export function auditComponentTokenCoverage(sourcePath: string): TokenCoverageFinding[] {
   const findings: TokenCoverageFinding[] = []
   for (const source of analyzeComponentTokenSource(sourcePath).resolved) for (const rawUtility of source.classNames.split(/\s+/).filter(Boolean)) {
-    const utility = normalizedUtility(rawUtility); const tokenId = direct.get(utility); const namespace = contractedNamespaceFor(utility)
+    const parsed = parseTailwindTokenUtility(rawUtility)
+    if (!parsed) continue
+    const utility = parsed.utility; const tokenId = direct.get(utility); const namespace = contractedNamespaceFor(utility)
     if (tokenId && approvedTokenIds.has(tokenId)) findings.push({ utility, classification: "resolved-approved-token", tokenId, namespace: tokenCategory.get(tokenId) })
     else if (spacingUtility.test(utility) && approvedTokenIds.has("spacing.unit")) findings.push({ utility, classification: "resolved-approved-token", tokenId: "spacing.unit", namespace: "spacing" })
     else if (rawColor(utility) || notContractedUtilities.has(utility) || /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility)) findings.push({ utility, classification: "known-not-contracted-namespace", namespace: rawColor(utility) || /^(?:border|bg)(?:-[a-z]+)?-transparent$/.test(utility) ? "primitive-color" : "border-width" })

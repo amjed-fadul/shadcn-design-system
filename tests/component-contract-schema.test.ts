@@ -86,6 +86,21 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, family)).toBe(true)
   })
 
+  test("accepts an exact conjunction for a stacked conditional token utility", () => {
+    const family = validFamily()
+    family.exports[0].component.tokenDependencies.push({
+      tokenId: "spacing.unit",
+      when: { all: [{ propName: "orientation", equals: "vertical" }, { propName: "spacing", equals: 0 }] },
+      viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
+      evidenceRefs: ["source"],
+    })
+    expect(validate(familySchema, family)).toBe(true)
+
+    const malformed = structuredClone(family)
+    malformed.exports[0].component.tokenDependencies[0].when.all = [{ propName: "spacing", equals: 0 }]
+    expect(validate(familySchema, malformed)).toBe(false)
+  })
+
   test("accepts an evidence-backed cross-family component host", () => {
     const family = validFamily()
     family.exports[0].component.rendering.nodes[0].host = {

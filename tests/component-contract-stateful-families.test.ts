@@ -151,7 +151,7 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
   })
 
   test("discovers direct, conditional, and CVA compound class-bearing expressions without harvesting unrelated strings", () => {
-    const normalize = (dependencies: Array<{ tokenId: string; viaDerivedRule?: { id: string; multiplier: number }; when?: { propName: string; equals: string | number | boolean } }>) => dependencies.map(({ tokenId, viaDerivedRule, when }) => ({ tokenId, ...(viaDerivedRule ? { viaDerivedRule } : {}), ...(when ? { when } : {}) })).sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)))
+    const normalize = (dependencies: Array<{ tokenId: string; viaDerivedRule?: { id: string; multiplier: number }; when?: unknown }>) => dependencies.map(({ tokenId, viaDerivedRule, when }) => ({ tokenId, ...(viaDerivedRule ? { viaDerivedRule } : {}), ...(when ? { when } : {}) })).sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)))
     expect(normalize(analyzeComponentTokenDependencies(analysisFixture))).toEqual(normalize([
       { tokenId: "radius.md" },
       { tokenId: "font-size.sm" },

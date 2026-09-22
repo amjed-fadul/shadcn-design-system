@@ -71,6 +71,12 @@
       "type": "object", "additionalProperties": false, "required": ["propName", "equals"],
       "properties": { "propName": { "type": "string" }, "equals": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] } }
     },
+    "tokenCondition": {
+      "oneOf": [
+        { "$ref": "#/$defs/apiCondition" },
+        { "type": "object", "additionalProperties": false, "required": ["all"], "properties": { "all": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/apiCondition" } } } }
+      ]
+    },
     "conditional": {
       "type": "object", "additionalProperties": false,
       "required": ["when", "propRefinements", "eventRefinements", "stateChannels", "evidenceRefs"],
@@ -92,7 +98,7 @@
     },
     "token": {
       "type": "object", "additionalProperties": false, "required": ["tokenId", "evidenceRefs"],
-      "properties": { "tokenId": { "type": "string" }, "when": { "$ref": "#/$defs/apiCondition" }, "viaDerivedRule": { "type": "object", "additionalProperties": false, "required": ["id", "multiplier"], "properties": { "id": { "type": "string" }, "multiplier": { "type": "number" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
+      "properties": { "tokenId": { "type": "string" }, "when": { "$ref": "#/$defs/tokenCondition" }, "viaDerivedRule": { "type": "object", "additionalProperties": false, "required": ["id", "multiplier"], "properties": { "id": { "type": "string" }, "multiplier": { "type": "number" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     },
     "inheritedPropDefault": {
       "type": "object", "additionalProperties": false, "required": ["propName", "value", "evidenceRefs"],
