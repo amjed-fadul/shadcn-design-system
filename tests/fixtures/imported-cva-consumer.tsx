@@ -1,12 +1,23 @@
+import * as React from "react"
+
 import {
   computedRecipe,
   dynamicRecipe,
   importedRecipe as aliasedRecipe,
 } from "./imported-cva-recipe"
+// @ts-expect-error Deliberately absent default export for authority testing.
+import defaultRecipe from "./imported-cva-recipe"
+import * as recipeNamespace from "./imported-cva-recipe"
+import { importedRecipe as reexportedRecipe } from "./imported-cva-reexport"
+import { unrelatedBodyCall } from "./imported-cva-unrelated"
 
-declare const context: { tone?: "default" | "danger" }
+declare const RecipeContext: React.Context<{ tone?: "default" | "danger" }>
 declare const recipeName: "importedRecipe"
 declare function computeTone(): "default" | "danger"
+declare function computeContext(): { tone?: "default" | "danger" }
+declare function computeKey(): "tone"
+
+const context = React.useContext(RecipeContext)
 
 function ImportedDynamicFixture({
   tone = "default",
@@ -44,18 +55,88 @@ function AmbiguousDataFlowFixture() {
   return <div className={aliasedRecipe({ tone: computedTone }) as string} />
 }
 
+function UnknownKeyFixture() {
+  return <div className={aliasedRecipe({ missing: "default" }) as string} />
+}
+
+function UnknownValueFixture() {
+  return <div className={aliasedRecipe({ tone: "unknown" }) as string} />
+}
+
+function UnsupportedInvocationFixture() {
+  return <div className={aliasedRecipe(context) as string} />
+}
+
+function ComputedElementSelectorFixture() {
+  return <div className={aliasedRecipe({ tone: context[computeKey()] }) as string} />
+}
+
+function ArbitraryCallPropertyFixture() {
+  return <div className={aliasedRecipe({ tone: computeContext().tone }) as string} />
+}
+
+function ParameterShadowFixture(aliasedRecipe: (...arguments_: unknown[]) => string) {
+  return <div className={aliasedRecipe({ tone: "default" })} />
+}
+
+function LocalShadowFixture() {
+  const aliasedRecipe = () => "shadow-sm"
+  return <div className={aliasedRecipe()} />
+}
+
+function FunctionShadowFixture() {
+  function aliasedRecipe() { return "shadow-sm" }
+  return <div className={aliasedRecipe()} />
+}
+
+function NamespaceImportFixture() {
+  return <div className={recipeNamespace.importedRecipe() as string} />
+}
+
+function DefaultImportFixture() {
+  return <div className={defaultRecipe() as string} />
+}
+
+function ReexportFixture() {
+  return <div className={reexportedRecipe() as string} />
+}
+
+function AliasChainFixture({ tone = "default" }: { tone?: "default" | "danger" }) {
+  const first = tone
+  const second = first
+  return <div className={aliasedRecipe({ tone: second }) as string} />
+}
+
+function UnrelatedBodyCallFixture() {
+  const visible = unrelatedBodyCall()
+  return <div className={aliasedRecipe() as string}>{visible ? "visible" : "hidden"}</div>
+}
+
 async function DynamicImportFixture() {
   const recipes = await import("./imported-cva-recipe")
   return <div className={recipes[recipeName]({}) as string} />
 }
 
 export {
+  AliasChainFixture,
   AmbiguousInvocationFixture,
   AmbiguousDataFlowFixture,
+  ArbitraryCallPropertyFixture,
+  ComputedElementSelectorFixture,
+  DefaultImportFixture,
   DynamicImportFixture,
+  FunctionShadowFixture,
   ImportedComputedConfigFixture,
   ImportedDefaultsFixture,
   ImportedDynamicConfigFixture,
   ImportedDynamicFixture,
   ImportedStaticFixture,
+  LocalShadowFixture,
+  NamespaceImportFixture,
+  ParameterShadowFixture,
+  ReexportFixture,
+  UnknownKeyFixture,
+  UnknownValueFixture,
+  UnrelatedBodyCallFixture,
+  UnsupportedInvocationFixture,
 }

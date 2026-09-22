@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
 import { existsSync, readFileSync, readdirSync } from "node:fs"
-import { join, resolve } from "node:path"
+import { dirname, join, resolve } from "node:path"
 
 import * as ts from "typescript"
 import { describe, expect, test } from "vitest"
@@ -876,7 +876,7 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     }
   }
   const bodyText = functionLike?.getText(sourceFile) ?? declaration.getText(sourceFile)
-  const variantDefaults = cvaFacts(sourceFile, bodyText).defaults
+  const variantDefaults = cvaFacts(sourceFile, bodyText, declaration).defaults
   for (const [name, fact] of localPropFacts) {
     const hasDefault = bindingDefaults.has(name) || variantDefaults.has(name)
     const value = bindingDefaults.has(name) ? bindingDefaults.get(name) : variantDefaults.get(name)
@@ -922,6 +922,24 @@ function independentRecipeSource(moduleSpecifier: string): string | undefined {
   return independentGitBlobSha(source) === entry.canonicalBlobSha ? path : undefined
 }
 
+function independentLocalModuleSource(importerPath: string, moduleSpecifier: string): string | undefined {
+  const base = moduleSpecifier.startsWith("./") || moduleSpecifier.startsWith("../")
+    ? resolve(dirname(importerPath), moduleSpecifier)
+    : moduleSpecifier.startsWith("@/")
+      ? join(root, "src", moduleSpecifier.slice(2))
+      : undefined
+  if (!base) return undefined
+  return [base, `${base}.ts`, `${base}.tsx`, join(base, "index.ts"), join(base, "index.tsx")].find(existsSync)
+}
+
+function independentReexportsName(sourceFile: ts.SourceFile, exportName: string): boolean {
+  return sourceFile.statements.some((statement) => ts.isExportDeclaration(statement)
+    && !!statement.moduleSpecifier
+    && !!statement.exportClause
+    && ts.isNamedExports(statement.exportClause)
+    && statement.exportClause.elements.some((element) => element.name.text === exportName))
+}
+
 function independentExportedRecipe(sourceFile: ts.SourceFile, exportName: string): ts.CallExpression | undefined {
   const localNames: string[] = []
   for (const statement of sourceFile.statements) {
@@ -938,63 +956,165 @@ function independentExportedRecipe(sourceFile: ts.SourceFile, exportName: string
   return calls.length === 1 ? calls[0] : undefined
 }
 
-function cvaFacts(sourceFile: ts.SourceFile, bodyText: string): { variants: Map<string, string[]>; defaults: Map<string, unknown>; texts: string[]; classSources: IndependentCvaClassSource[]; unresolved: string[] } {
+function independentBindingNames(name: ts.BindingName): string[] {
+  if (ts.isIdentifier(name)) return [name.text]
+  return name.elements.flatMap((element) => ts.isOmittedExpression(element) ? [] : independentBindingNames(element.name))
+}
+
+function independentLexicallyShadowed(node: ts.Node, name: string): boolean {
+  for (let current = node.parent; current && !ts.isSourceFile(current); current = current.parent) {
+    if (ts.isFunctionLike(current) && current.parameters.some((parameter) => independentBindingNames(parameter.name).includes(name))) return true
+    if (!ts.isBlock(current)) continue
+    for (const statement of current.statements) {
+      if (ts.isVariableStatement(statement) && statement.declarationList.declarations.some((declaration) => independentBindingNames(declaration.name).includes(name))) return true
+      if ((ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) && statement.name?.text === name) return true
+    }
+  }
+  return false
+}
+
+function independentSafeRecipeSelector(expression: ts.Expression, invocation: ts.CallExpression, sourceFile: ts.SourceFile, visited = new Set<string>()): boolean {
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return independentSafeRecipeSelector(expression.expression, invocation, sourceFile, visited)
+  if (ts.isPropertyAccessExpression(expression)) return independentSafeRecipeSelector(expression.expression, invocation, sourceFile, new Set(visited))
+  if (ts.isElementAccessExpression(expression)) {
+    return !!expression.argumentExpression
+      && (ts.isStringLiteral(expression.argumentExpression) || ts.isNumericLiteral(expression.argumentExpression))
+      && independentSafeRecipeSelector(expression.expression, invocation, sourceFile, new Set(visited))
+  }
+  if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) {
+    return independentSafeRecipeSelector(expression.left, invocation, sourceFile, new Set(visited))
+      && independentSafeRecipeSelector(expression.right, invocation, sourceFile, new Set(visited))
+  }
+  if (ts.isCallExpression(expression) && expression.arguments.length === 1) {
+    if (ts.isPropertyAccessExpression(expression.expression) && ts.isIdentifier(expression.expression.expression)) {
+      const namespace = expression.expression.expression.text
+      const approved = sourceFile.statements.some((statement) => ts.isImportDeclaration(statement)
+        && ts.isStringLiteral(statement.moduleSpecifier)
+        && statement.moduleSpecifier.text === "react"
+        && !!statement.importClause?.namedBindings
+        && ts.isNamespaceImport(statement.importClause.namedBindings)
+        && statement.importClause.namedBindings.name.text === namespace)
+      return approved && expression.expression.name.text === "useContext" && !independentLexicallyShadowed(expression, namespace)
+    }
+    if (ts.isIdentifier(expression.expression)) {
+      const name = expression.expression.text
+      return sourceFile.statements.some((statement) => ts.isImportDeclaration(statement)
+        && ts.isStringLiteral(statement.moduleSpecifier)
+        && statement.moduleSpecifier.text === "react"
+        && !!statement.importClause?.namedBindings
+        && ts.isNamedImports(statement.importClause.namedBindings)
+        && statement.importClause.namedBindings.elements.some((element) => element.name.text === name && (element.propertyName?.text ?? element.name.text) === "useContext"))
+        && !independentLexicallyShadowed(expression, name)
+    }
+  }
+  if (!ts.isIdentifier(expression)) return false
+  if (visited.has(expression.text)) return false
+  type FunctionWithBody = ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction | ts.MethodDeclaration
+  let owner: FunctionWithBody | undefined
+  for (let current: ts.Node | undefined = invocation; current; current = current.parent) {
+    if (ts.isFunctionLike(current)) {
+      if (!owner && (ts.isFunctionDeclaration(current) || ts.isFunctionExpression(current) || ts.isArrowFunction(current) || ts.isMethodDeclaration(current))) owner = current
+      if (current.parameters.some((parameter) => independentBindingNames(parameter.name).includes(expression.text))) return true
+    }
+  }
+  const initializers = new Map<string, ts.Expression>()
+  const collect = (node: ts.Node): void => {
+    if (ts.isFunctionLike(node) && node !== owner) return
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && node.getStart(sourceFile) < invocation.getStart(sourceFile)) initializers.set(node.name.text, node.initializer)
+    node.forEachChild(collect)
+  }
+  for (const statement of sourceFile.statements) if (ts.isVariableStatement(statement)) statement.forEachChild(collect)
+  if (owner?.body) collect(owner.body)
+  const initializer = initializers.get(expression.text)
+  if (!initializer) return false
+  visited.add(expression.text)
+  return independentSafeRecipeSelector(initializer, invocation, sourceFile, visited)
+}
+
+function cvaFacts(sourceFile: ts.SourceFile, bodyText: string, declaration?: ts.Node, resolveRecipeSource = independentRecipeSource): { variants: Map<string, string[]>; defaults: Map<string, unknown>; texts: string[]; classSources: IndependentCvaClassSource[]; unresolved: string[] } {
   const variants = new Map<string, string[]>()
   const defaults = new Map<string, unknown>()
   const texts: string[] = []
   const classSources: IndependentCvaClassSource[] = []
   const unresolved: string[] = []
   const parseRecipe = (call: ts.CallExpression, recipeFile: ts.SourceFile, sourcePath: string, invocation?: ts.CallExpression): void => {
-    texts.push(call.getText(recipeFile))
-    const base = call.arguments[0]
-    if (base && (ts.isStringLiteral(base) || ts.isNoSubstitutionTemplateLiteral(base))) classSources.push({ classNames: base.text, sourcePath })
-    else if (base) unresolved.push(`${sourcePath}:${base.getStart(recipeFile)}:dynamic recipe base`)
-    const options = call.arguments[1]
-    if (!options) return
-    if (!ts.isObjectLiteralExpression(options)) { unresolved.push(`${sourcePath}:${options.getStart(recipeFile)}:dynamic recipe configuration`); return }
-    const assignment = (name: string) => options.properties.find((property): property is ts.PropertyAssignment => ts.isPropertyAssignment(property) && propertyName(property.name) === name)?.initializer
-    const defaultOptions = assignment("defaultVariants")
-    if (defaultOptions && !ts.isObjectLiteralExpression(defaultOptions)) unresolved.push(`${sourcePath}:${defaultOptions.getStart(recipeFile)}:dynamic recipe defaults`)
-    if (defaultOptions && ts.isObjectLiteralExpression(defaultOptions)) for (const property of defaultOptions.properties) {
-      if (!ts.isPropertyAssignment(property) || ts.isComputedPropertyName(property.name)) { unresolved.push(`${sourcePath}:${property.getStart(recipeFile)}:computed recipe default`); continue }
-      const name = propertyName(property.name)
-      const value = literalValue(property.initializer)
-      if (!name || value === undefined || value === null) unresolved.push(`${sourcePath}:${property.getStart(recipeFile)}:dynamic recipe default`)
-      else defaults.set(name, value)
-    }
-    const selections = new Map<string, unknown>()
-    let dynamicSelection = new Set<string>()
-    if (invocation?.arguments[0]) {
-      const argument = invocation.arguments[0]
-      if (!ts.isObjectLiteralExpression(argument)) unresolved.push(`${invocation.getSourceFile().fileName}:${argument.getStart()}:dynamic recipe invocation`)
-      else for (const property of argument.properties) {
-        if ((!ts.isPropertyAssignment(property) && !ts.isShorthandPropertyAssignment(property)) || ts.isComputedPropertyName(property.name)) { unresolved.push(`${invocation.getSourceFile().fileName}:${property.getStart()}:computed recipe invocation`); continue }
+    const textStart = texts.length
+    const classStart = classSources.length
+    const unresolvedStart = unresolved.length
+    const variantsBefore = new Map([...variants].map(([name, values]) => [name, [...values]]))
+    const defaultsBefore = new Map(defaults)
+    const parse = (): void => {
+      texts.push(call.getText(recipeFile))
+      const base = call.arguments[0]
+      if (base && (ts.isStringLiteral(base) || ts.isNoSubstitutionTemplateLiteral(base))) classSources.push({ classNames: base.text, sourcePath })
+      else if (base) unresolved.push(`${sourcePath}:${base.getStart(recipeFile)}:dynamic recipe base`)
+      const options = call.arguments[1]
+      if (!options) return
+      if (!ts.isObjectLiteralExpression(options)) { unresolved.push(`${sourcePath}:${options.getStart(recipeFile)}:dynamic recipe configuration`); return }
+      if (options.properties.some((property) => !ts.isPropertyAssignment(property) || ts.isComputedPropertyName(property.name))) unresolved.push(`${sourcePath}:${options.getStart(recipeFile)}:computed recipe configuration`)
+      const assignment = (name: string) => options.properties.find((property): property is ts.PropertyAssignment => ts.isPropertyAssignment(property) && !ts.isComputedPropertyName(property.name) && propertyName(property.name) === name)?.initializer
+      const defaultOptions = assignment("defaultVariants")
+      if (defaultOptions && !ts.isObjectLiteralExpression(defaultOptions)) unresolved.push(`${sourcePath}:${defaultOptions.getStart(recipeFile)}:dynamic recipe defaults`)
+      if (defaultOptions && ts.isObjectLiteralExpression(defaultOptions)) for (const property of defaultOptions.properties) {
+        if (!ts.isPropertyAssignment(property) || ts.isComputedPropertyName(property.name)) { unresolved.push(`${sourcePath}:${property.getStart(recipeFile)}:computed recipe default`); continue }
         const name = propertyName(property.name)
-        if (!name || ["class", "className"].includes(name)) continue
-        const initializer = ts.isPropertyAssignment(property) ? property.initializer : property.name
-        const value = literalValue(initializer)
-        if (value === undefined || value === null) dynamicSelection.add(name)
-        else selections.set(name, value)
+        const value = literalValue(property.initializer)
+        if (!name || value === undefined || value === null) unresolved.push(`${sourcePath}:${property.getStart(recipeFile)}:dynamic recipe default`)
+        else defaults.set(name, value)
+      }
+      const selections = new Map<string, unknown>()
+      const dynamicSelections = new Set<string>()
+      if (invocation) {
+        const argument = invocation.arguments[0]
+        if (invocation.arguments.length > 1 || (argument && !ts.isObjectLiteralExpression(argument))) unresolved.push(`${invocation.getSourceFile().fileName}:${(argument ?? invocation).getStart()}:dynamic recipe invocation`)
+        else if (argument && ts.isObjectLiteralExpression(argument)) for (const property of argument.properties) {
+          if ((!ts.isPropertyAssignment(property) && !ts.isShorthandPropertyAssignment(property)) || ts.isComputedPropertyName(property.name)) { unresolved.push(`${invocation.getSourceFile().fileName}:${property.getStart()}:computed recipe invocation`); continue }
+          const name = propertyName(property.name)
+          if (!name || ["class", "className"].includes(name)) continue
+          const initializer = ts.isPropertyAssignment(property) ? property.initializer : property.name
+          const value = literalValue(initializer)
+          if (value === undefined || value === null) {
+            if (independentSafeRecipeSelector(initializer, invocation, sourceFile)) dynamicSelections.add(name)
+            else unresolved.push(`${invocation.getSourceFile().fileName}:${initializer.getStart()}:ambiguous recipe selector`)
+          } else selections.set(name, value)
+        }
+      }
+      const variantOptions = assignment("variants")
+      if (variantOptions && !ts.isObjectLiteralExpression(variantOptions)) { unresolved.push(`${sourcePath}:${variantOptions.getStart(recipeFile)}:dynamic recipe variants`); return }
+      if (!variantOptions || !ts.isObjectLiteralExpression(variantOptions)) return
+      const variantValues = new Map<string, Set<string>>()
+      for (const variant of variantOptions.properties) {
+        if (!ts.isPropertyAssignment(variant) || ts.isComputedPropertyName(variant.name) || !ts.isObjectLiteralExpression(variant.initializer)) { unresolved.push(`${sourcePath}:${variant.getStart(recipeFile)}:computed or dynamic recipe variant`); continue }
+        const variantName = propertyName(variant.name)
+        if (!variantName) continue
+        const values: string[] = []
+        for (const item of variant.initializer.properties) {
+          if (!ts.isPropertyAssignment(item) || ts.isComputedPropertyName(item.name)) { unresolved.push(`${sourcePath}:${item.getStart(recipeFile)}:computed recipe value`); continue }
+          const valueName = propertyName(item.name)
+          if (!valueName || (!ts.isStringLiteral(item.initializer) && !ts.isNoSubstitutionTemplateLiteral(item.initializer))) { unresolved.push(`${sourcePath}:${item.getStart(recipeFile)}:dynamic recipe value`); continue }
+          values.push(valueName)
+          if (!invocation || dynamicSelections.has(variantName)) classSources.push({ classNames: item.initializer.text, propName: variantName, equals: valueName, sourcePath })
+          else if (String(selections.get(variantName) ?? defaults.get(variantName)) === valueName) classSources.push({ classNames: item.initializer.text, sourcePath })
+        }
+        variants.set(variantName, values)
+        variantValues.set(variantName, new Set(values))
+      }
+      for (const [name, value] of defaults) {
+        if (!variantValues.get(name)?.has(String(value))) unresolved.push(`${sourcePath}:${defaultOptions?.getStart(recipeFile) ?? call.getStart(recipeFile)}:unknown recipe default`)
+      }
+      for (const name of [...selections.keys(), ...dynamicSelections]) {
+        if (!variantValues.has(name)) unresolved.push(`${invocation?.getSourceFile().fileName}:${invocation?.getStart()}:unknown recipe variant`)
+      }
+      for (const [name, value] of selections) {
+        if (variantValues.has(name) && !variantValues.get(name)!.has(String(value))) unresolved.push(`${invocation?.getSourceFile().fileName}:${invocation?.getStart()}:unknown recipe value`)
       }
     }
-    const variantOptions = assignment("variants")
-    if (variantOptions && !ts.isObjectLiteralExpression(variantOptions)) { unresolved.push(`${sourcePath}:${variantOptions.getStart(recipeFile)}:dynamic recipe variants`); return }
-    if (!variantOptions || !ts.isObjectLiteralExpression(variantOptions)) return
-    for (const variant of variantOptions.properties) {
-      if (!ts.isPropertyAssignment(variant) || ts.isComputedPropertyName(variant.name) || !ts.isObjectLiteralExpression(variant.initializer)) { unresolved.push(`${sourcePath}:${variant.getStart(recipeFile)}:computed or dynamic recipe variant`); continue }
-      const variantName = propertyName(variant.name)
-      if (!variantName) continue
-      const values: string[] = []
-      for (const item of variant.initializer.properties) {
-        if (!ts.isPropertyAssignment(item) || ts.isComputedPropertyName(item.name)) { unresolved.push(`${sourcePath}:${item.getStart(recipeFile)}:computed recipe value`); continue }
-        const valueName = propertyName(item.name)
-        if (!valueName || (!ts.isStringLiteral(item.initializer) && !ts.isNoSubstitutionTemplateLiteral(item.initializer))) { unresolved.push(`${sourcePath}:${item.getStart(recipeFile)}:dynamic recipe value`); continue }
-        values.push(valueName)
-        if (!invocation || dynamicSelection.has(variantName)) classSources.push({ classNames: item.initializer.text, propName: variantName, equals: valueName, sourcePath })
-        else if (String(selections.get(variantName) ?? defaults.get(variantName)) === valueName) classSources.push({ classNames: item.initializer.text, sourcePath })
-      }
-      variants.set(variantName, values)
-    }
+    parse()
+    if (unresolved.length === unresolvedStart) return
+    texts.splice(textStart)
+    classSources.splice(classStart)
+    variants.clear(); for (const [name, values] of variantsBefore) variants.set(name, values)
+    defaults.clear(); for (const [name, value] of defaultsBefore) defaults.set(name, value)
   }
   for (const statement of sourceFile.statements) {
     if (!ts.isVariableStatement(statement)) continue
@@ -1016,14 +1136,24 @@ function cvaFacts(sourceFile: ts.SourceFile, bodyText: string): { variants: Map<
         if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === localName && bodyText.includes(node.getText(sourceFile))) invocations.push(node)
         node.forEachChild(visit)
       }
-      sourceFile.forEachChild(visit)
+      ;(declaration ?? sourceFile).forEachChild(visit)
       if (!invocations.length) continue
-      const sourcePath = independentRecipeSource(statement.moduleSpecifier.text)
-      if (!sourcePath) continue
+      const sourcePath = resolveRecipeSource(statement.moduleSpecifier.text)
+      if (!sourcePath) {
+        const localPath = independentLocalModuleSource(sourceFile.fileName, statement.moduleSpecifier.text)
+        if (!localPath) continue
+        const candidateFile = sourceFacts(localPath).sourceFile
+        if (!independentExportedRecipe(candidateFile, importedName) && !independentReexportsName(candidateFile, importedName)) continue
+        for (const invocation of invocations) unresolved.push(`${sourceFile.fileName}:${invocation.getStart(sourceFile)}:unapproved or stale recipe module`)
+        continue
+      }
       const importedFile = sourceFacts(sourcePath).sourceFile
       const recipe = independentExportedRecipe(importedFile, importedName)
       if (!recipe) { unresolved.push(`${sourceFile.fileName}:${binding.getStart(sourceFile)}:missing recipe export`); continue }
-      for (const invocation of invocations) parseRecipe(recipe, importedFile, sourcePath, invocation)
+      for (const invocation of invocations) {
+        if (independentLexicallyShadowed(invocation, localName)) { unresolved.push(`${sourceFile.fileName}:${invocation.getStart(sourceFile)}:shadowed imported recipe`); continue }
+        parseRecipe(recipe, importedFile, sourcePath, invocation)
+      }
     }
   }
   return { variants, defaults, texts, classSources, unresolved }
@@ -1179,7 +1309,16 @@ function independentImportedTokenDependencies(classSources: IndependentCvaClassS
       if (match) dependencies.push({ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", multiplier: Number(match[1]) }, ...condition })
     }
   }
-  return dependencies.filter((dependency, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(dependency)) === index)
+  return [...new Map(dependencies.map((dependency) => [independentStableKey(dependency), dependency])).values()]
+}
+
+function independentStableKey(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(independentStableKey).join(",")}]`
+  if (value && typeof value === "object") {
+    const record = value as AnyRecord
+    return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${independentStableKey(record[key])}`).join(",")}}`
+  }
+  return JSON.stringify(value)
 }
 
 function sourceDeclarationContext(artifact: AnyRecord): DeclarationContext | undefined {
@@ -1348,7 +1487,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       if (!exported.component) continue
       const source = componentSourceFacts(sourceFile, declaration)
       if (source.propSurfaceError) errors.push(`${family.id}.${exported.name}: ${source.propSurfaceError}`)
-      const variants = cvaFacts(sourceFile, source.sourceText)
+      const variants = cvaFacts(sourceFile, source.sourceText, source.declaration)
       const sourceProps = new Set([...source.bindings].filter((name) => !source.restBindings.has(name)).concat([...source.typeFacts.keys(), ...variants.variants.keys()]))
       const contractedLocalProps = new Map<string, AnyRecord>((exported.component.localProps ?? []).map((prop: AnyRecord) => [prop.name, prop]))
       for (const [name, sourceFact] of source.localPropFacts) {
@@ -1405,11 +1544,11 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         ...(dependency.viaDerivedRule ? { viaDerivedRule: dependency.viaDerivedRule } : {}),
       }))
       const importedTokenFacts = independentImportedTokenDependencies(variants.classSources.filter((fact) => fact.sourcePath !== sourceFile.fileName))
-      for (const fact of importedTokenFacts) {
-        if (!comparableContractTokens.some((dependency: AnyRecord) => JSON.stringify(dependency) === JSON.stringify(fact))) {
-          errors.push(`${family.id}.${exported.name}: imported recipe token fact differs (${JSON.stringify(fact)})`)
-        }
-      }
+      const importedTokenIds = new Set(importedTokenFacts.map((fact) => fact.tokenId))
+      const sourceImportedFacts = new Map<string, AnyRecord>(importedTokenFacts.map((fact) => [independentStableKey(fact), fact]))
+      const contractImportedFacts = new Map<string, AnyRecord>(comparableContractTokens.filter((fact: AnyRecord) => importedTokenIds.has(fact.tokenId)).map((fact: AnyRecord) => [independentStableKey(fact), fact]))
+      for (const [key, fact] of sourceImportedFacts) if (!contractImportedFacts.has(key)) errors.push(`${family.id}.${exported.name}: imported recipe token fact differs (missing ${independentStableKey(fact)})`)
+      for (const [key, fact] of contractImportedFacts) if (!sourceImportedFacts.has(key)) errors.push(`${family.id}.${exported.name}: imported recipe token fact differs (invented ${independentStableKey(fact)})`)
       for (const tokenId of contractTokenIds) {
         if (!sourceTokenIds.has(tokenId)) errors.push(`${family.id}.${exported.name}: token ${tokenId} has no direct source expression`)
       }
@@ -1916,7 +2055,7 @@ describe("Phase 3 Task 10 independent review", () => {
     const togglePath = join(root, "src/components/ui/toggle.tsx")
     const { sourceFile } = sourceFacts(toggleGroupPath)
     const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, "ToggleGroupItem")!)
-    const facts = cvaFacts(sourceFile, source.sourceText) as ReturnType<typeof cvaFacts> & {
+    const facts = cvaFacts(sourceFile, source.sourceText, source.declaration) as ReturnType<typeof cvaFacts> & {
       classSources?: Array<{ classNames: string; propName?: string; equals?: string; sourcePath: string }>
       unresolved?: string[]
     }
@@ -1935,6 +2074,108 @@ describe("Phase 3 Task 10 independent review", () => {
     component.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.input").when.equals = "default"
 
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
+  })
+
+  test("independent imported-recipe parsing fails closed for invalid authority, selectors, invocation values, and lexical shadowing", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const wrongConsumerPath = join(root, "tests/fixtures/imported-cva-wrong-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const fixtureAuthority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)
+    const analyze = (sourcePath: string, exportName: string) => {
+      const { sourceFile } = sourceFacts(sourcePath)
+      const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, exportName)!)
+      return cvaFacts(sourceFile, source.sourceText, source.declaration, fixtureAuthority)
+    }
+
+    for (const exportName of [
+      "UnknownKeyFixture",
+      "UnknownValueFixture",
+      "AmbiguousInvocationFixture",
+      "UnsupportedInvocationFixture",
+      "ComputedElementSelectorFixture",
+      "ArbitraryCallPropertyFixture",
+      "ParameterShadowFixture",
+      "LocalShadowFixture",
+      "FunctionShadowFixture",
+      "ReexportFixture",
+    ]) {
+      const facts = analyze(consumerPath, exportName)
+      expect(facts.unresolved.length, exportName).toBeGreaterThan(0)
+      expect(facts.classSources, exportName).toEqual([])
+    }
+
+    const wrongModule = analyze(wrongConsumerPath, "WrongSourceFixture")
+    expect(wrongModule.unresolved).not.toEqual([])
+    expect(wrongModule.classSources).toEqual([])
+
+    const toggleSeed = independentSeedComponents.find((component) => component.canonicalPath === "src/components/ui/toggle.tsx")!
+    const originalBlob = toggleSeed.canonicalBlobSha
+    try {
+      toggleSeed.canonicalBlobSha = "0000000000000000000000000000000000000000"
+      const stale = analyze(join(root, "src/components/ui/toggle-group.tsx"), "ToggleGroupItem")
+      expect(stale.unresolved).not.toEqual([])
+      expect(stale.classSources).toEqual([])
+    } finally {
+      toggleSeed.canonicalBlobSha = originalBlob
+    }
+  })
+
+  test("independent recipe discovery audits class-producing calls without treating unrelated body calls as token inputs", () => {
+    const consumerPath = join(root, "tests/fixtures/imported-cva-consumer.tsx")
+    const fixtureProviderPath = join(root, "tests/fixtures/imported-cva-recipe.ts")
+    const fixtureAuthority = (moduleSpecifier: string) => moduleSpecifier === "./imported-cva-recipe" ? fixtureProviderPath : independentRecipeSource(moduleSpecifier)
+    const { sourceFile } = sourceFacts(consumerPath)
+    const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, "UnrelatedBodyCallFixture")!)
+    const facts = cvaFacts(sourceFile, source.sourceText, source.declaration, fixtureAuthority)
+
+    expect(facts.unresolved).toEqual([])
+    expect(facts.classSources).not.toEqual([])
+
+    const wrongPath = join(root, "tests/fixtures/imported-cva-wrong-consumer.tsx")
+    const wrongFile = sourceFacts(wrongPath).sourceFile
+    const wrongSource = componentSourceFacts(wrongFile, declarationFor(wrongFile, "WrongSourceFixture")!)
+    const wrongFacts = cvaFacts(wrongFile, wrongSource.sourceText, wrongSource.declaration)
+    expect(wrongFacts.unresolved).not.toEqual([])
+    expect(wrongFacts.classSources).toEqual([])
+  })
+
+  test("independent imported-recipe comparison is exact, deduplicated, and key-order insensitive", () => {
+    const importedErrors = (artifacts: ReturnType<typeof loadArtifacts>) => directSourceErrors(artifacts.families, artifacts.interfaces)
+      .filter((error) => error.includes("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
+    const baselineArtifacts = loadArtifacts()
+    const baselineCount = importedErrors(baselineArtifacts).length
+
+    const reordered = clone(baselineArtifacts)
+    const reorderedComponent = exportByName(familyById(reordered, "toggle-group"), "ToggleGroupItem").component
+    reorderedComponent.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.input").when = { equals: "outline", propName: "variant" }
+    expect(importedErrors(reordered)).toHaveLength(baselineCount)
+
+    const inserted = clone(baselineArtifacts)
+    exportByName(familyById(inserted, "toggle-group"), "ToggleGroupItem").component.tokenDependencies.push({
+      tokenId: "color.input",
+      when: { propName: "variant", equals: "default" },
+      evidenceRefs: ["source", "tokens"],
+    })
+    expect(importedErrors(inserted)).toHaveLength(baselineCount + 1)
+
+    const omitted = clone(baselineArtifacts)
+    const omittedComponent = exportByName(familyById(omitted, "toggle-group"), "ToggleGroupItem").component
+    omittedComponent.tokenDependencies = omittedComponent.tokenDependencies.filter((dependency: AnyRecord) => dependency.tokenId !== "color.input")
+    expect(importedErrors(omitted)).toHaveLength(baselineCount + 1)
+
+    const validSpacing = clone(baselineArtifacts)
+    exportByName(familyById(validSpacing, "toggle-group"), "ToggleGroupItem").component.tokenDependencies.push({
+      tokenId: "spacing.unit",
+      when: { equals: "sm", propName: "size" },
+      viaDerivedRule: { multiplier: 7, id: "spacing.multiplier" },
+      evidenceRefs: ["source", "tokens"],
+    })
+    expect(importedErrors(validSpacing)).toHaveLength(baselineCount - 1)
+
+    const derivationDrift = clone(validSpacing)
+    const driftComponent = exportByName(familyById(derivationDrift, "toggle-group"), "ToggleGroupItem").component
+    driftComponent.tokenDependencies.at(-1).viaDerivedRule.multiplier = 8
+    expect(importedErrors(derivationDrift)).toHaveLength(baselineCount + 1)
   })
 
   test("has no unreferenced evidence records", () => {

@@ -53,6 +53,7 @@ const analyzer = createTokenSourceAnalyzer({
     dynamicInvocation: "Unsupported dynamic CVA invocation.",
     invocationProperty: "Unsupported CVA invocation property.",
     unknownVariant: "CVA invocation references an unknown variant.",
+    unknownVariantValue: "CVA invocation references an unknown variant value.",
     importAuthority: "Imported CVA source is not approved.",
     importedExport: "Imported CVA export is not a static recipe.",
   },

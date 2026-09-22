@@ -134,3 +134,58 @@ The increase from 42 to 55 is expected strictness: imported Toggle recipe facts 
 - Defaults and literal arguments select only the active branch. Safe prop/context selectors retain exact variant conditions. Computed keys, spreads, unsupported calls, unknown variants, and ambiguous aliases fail closed.
 - The independent audit is structurally separate and mutation-tested. It reads the same external authority inputs but does not reuse production resolution, parsing, or comparison functions.
 - No family/path exception, suppression, ignore list, contract-derived fact, weakened equality, manual fact cleanup, or 4C2C2 parsing was introduced.
+
+## Fix Round 1 — fail-closed invocation, lexical authority, and exact independent comparison
+
+### Confirmed root causes and corrections
+
+1. Recipe base/default facts were appended before invocation validation completed. Unknown keys were detected only after facts were emitted, unknown literal values were not validated, and malformed/spread invocations could retain base facts. Production and independent paths now buffer every recipe result and publish facts only when the complete configuration, defaults, keys, values, selector provenance, and call shape validate. Invalid recipes retain unresolved evidence and publish zero recipe facts.
+2. Imported bindings were copied into nested scopes without lexical invalidation. Parameters, local variables, and local function declarations can no longer resolve through a shadowed import. Selector validation now recursively proves roots and aliases from public props or an import-bound React `useContext` flow; computed element keys and arbitrary call properties fail closed.
+3. The independent audit compared source imported facts only in one direction with insertion-order-sensitive `JSON.stringify`. It now recursively canonicalizes object keys, deduplicates facts, limits contract candidates to token IDs established by the imported source, and reports both missing source facts and invented contract facts.
+4. The independent parser previously treated every nonliteral selector as safe and silently skipped wrong/stale modules. It now performs its own lexical/provenance validation, validates variant keys and values, independently checks canonical blob authority, recognizes direct unapproved local CVA exports and re-exports, and rolls back all buffered facts on any error.
+
+The controller authorized semantic discovery from actual class-producing AST roots so unrelated render/state calls are not mistaken for token recipes. The implemented audit is conservatively broader: it scopes discovery to the exact component declaration, examines every named imported call in that declaration, and independently parses local exports to distinguish direct/re-exported CVA candidates from proven non-recipe helpers. Thus wrong/unapproved CVA calls still fail closed, while unrelated calls such as `React.isValidElement`, `useIsMobile`, and the focused helper fixture are not token inputs. No family/path/finding exception was added.
+
+### RED / GREEN evidence
+
+The initial focused command produced **4/4 expected failures**:
+
+- invalid invocation keys leaked provider base/default facts;
+- a parameter shadow still resolved the imported recipe;
+- the independent parser accepted an unknown key and retained facts;
+- the independent comparator rejected semantic key reordering and did not detect extra contract facts.
+
+A separate discovery RED proved that an unrelated imported body call was misclassified as an unapproved recipe input while a wrong class-producing import also needed to remain unresolved.
+
+Final focused results:
+
+- Production imported-recipe suite: **6/6 passed**.
+- Combined production/independent imported-recipe set: **10/10 passed, 39 skipped**.
+- Independent authority/parser/exact-comparison/discovery set after the controller ruling: **4/4 passed, 40 skipped**.
+- Production compatibility — imported recipes, stateful families, unresolved reconciliation: **3 files passed, 70/70 tests passed**.
+
+Mutation coverage now includes unknown key, unknown literal value, spread, non-object call, parameter/local/function shadowing, computed element key, arbitrary call property, namespace/default/re-export, source-backed alias chains, wrong module, stale blob, unrelated body calls, semantic key reordering, exact omission, fabricated same-token condition, valid conditional spacing, condition drift, and derivation drift.
+
+### Bounded gates and residuals
+
+- Independent review: **42 passed / 2 expected residual failures**. Exact residuals are now **57 source findings plus `collapsible.json:tokens`**. The prior 55 findings remain, and exact bidirectional comparison adds two true invented facts for `toggle-group.ToggleGroupItem`: unconditional spacing multipliers `2` and `1.5`. No unrelated-call false finding remains.
+- Token dependency suite: **1 passed / 3 expected failures**. Closure remains exactly `missing: 45`, `invented: 15`, `unresolved: 0`, `suspiciousContractedNamespace: 7`, with **60** per-export mismatches.
+- `npm run typecheck`: **exit 0**.
+- `git diff --check`: **exit 0** before the fix commit.
+- Release-001 base/current blobs: `75b59166086e9de0c67656fe64712a8cc70aa6e3` / `75b59166086e9de0c67656fe64712a8cc70aa6e3`; scoped family/release diff is empty.
+- `components:verify` and the full suite were not rerun because the controller requested bounded verification unless semantic diagnostics changed beyond this slice. The token counts are unchanged; the independent finding count changes only by the two intentionally exposed invented imported facts.
+
+### Fix-round changed files
+
+- `src/contracts/components/token-source-analysis.ts`
+- `src/contracts/components/canonical-token-source-analysis.ts`
+- `tests/component-contract-imported-token-source-analysis.test.ts`
+- `tests/component-contract-independent-review.test.ts`
+- `tests/fixtures/imported-cva-consumer.tsx`
+- `tests/fixtures/imported-cva-wrong-consumer.tsx`
+- `tests/fixtures/imported-cva-reexport.ts`
+- `tests/fixtures/imported-cva-unrelated.ts`
+- `tests/fixtures/not-the-pinned-recipe.ts`
+- `.superpowers/sdd/2026-09-21-release-5-hardening/task-4c2c1-report.md`
+
+No component-family JSON, token contract, source component, release artifact, render/prop/interface authority, 4C2C2 parser, suppression, weakened comparison, or manual fact cleanup changed.

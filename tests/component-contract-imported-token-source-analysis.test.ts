@@ -86,6 +86,37 @@ describe("imported CVA token source analysis", () => {
     }
   })
 
+  test("publishes no recipe facts for invalid invocation keys, values, spreads, or call shapes", () => {
+    const analyzer = fixtureAnalyzer()
+    for (const exportName of ["UnknownKeyFixture", "UnknownValueFixture", "AmbiguousInvocationFixture", "UnsupportedInvocationFixture"] as const) {
+      const analysis = analyzer.analyzeComponentTokenSourceForExport(consumerPath, exportName)
+      expect(analysis.unresolved.length, exportName).toBeGreaterThan(0)
+      expect(analysis.resolved, exportName).toEqual([])
+    }
+  })
+
+  test("binds imported recipes and selectors lexically and fails closed for unsafe provenance", () => {
+    const analyzer = fixtureAnalyzer()
+    for (const exportName of [
+      "ParameterShadowFixture",
+      "LocalShadowFixture",
+      "FunctionShadowFixture",
+      "ComputedElementSelectorFixture",
+      "ArbitraryCallPropertyFixture",
+      "NamespaceImportFixture",
+      "DefaultImportFixture",
+      "ReexportFixture",
+    ] as const) {
+      const analysis = analyzer.analyzeComponentTokenSourceForExport(consumerPath, exportName)
+      expect(analysis.unresolved.length, exportName).toBeGreaterThan(0)
+      expect(analysis.resolved, exportName).toEqual([])
+    }
+
+    const aliasChain = analyzer.analyzeComponentTokenSourceForExport(consumerPath, "AliasChainFixture")
+    expect(aliasChain.unresolved).toEqual([])
+    expect(aliasChain.resolved).toContainEqual(expect.objectContaining({ propName: "tone", equals: "danger" }))
+  })
+
   test("resolves the canonical toggle recipe only through its pinned module and export identity", () => {
     const analysis = analyzeComponentTokenSourceForExport(toggleGroupPath, "ToggleGroupItem")
     const dependencies = analyzeComponentTokenDependenciesForExport(toggleGroupPath, "ToggleGroupItem")
