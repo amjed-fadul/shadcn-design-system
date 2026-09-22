@@ -56,28 +56,6 @@ function schemaValid(schema: object, value: unknown) {
   return new Ajv2020({ allErrors: true, strict: true }).compile(schema)(value)
 }
 
-const drawerRenderConventions = {
-  ...canonicalRenderSourceAnalysisConventions,
-  matchesInheritedInterface(
-    sourceTag: string,
-    interfaceId: string,
-    normalizeRenderName: (name: string) => string
-  ) {
-    if (sourceTag.startsWith("DrawerPrimitive.")) {
-      const member = sourceTag.split(".").at(-1)?.toLowerCase()
-      if (member && (
-        interfaceId === `vaul.drawer.${member}` ||
-        interfaceId === `radix.dialog.${member}`
-      )) return true
-    }
-    return canonicalRenderSourceAnalysisConventions.matchesInheritedInterface!(
-      sourceTag,
-      interfaceId,
-      normalizeRenderName
-    )
-  },
-}
-
 function expectedVaulInterface(contract: any) {
   if (contract.source.symbol !== "Root") {
     return analyzePackageComponentInterface({
@@ -197,7 +175,7 @@ describe("release.5 Drawer", () => {
         compareJsxRenderTree(
           entry.component.rendering as any,
           analyzeJsxRenderTree(sourcePath, entry.name) as any,
-          drawerRenderConventions
+          canonicalRenderSourceAnalysisConventions
         ),
         entry.name
       ).toEqual([])

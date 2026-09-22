@@ -53,28 +53,6 @@ const eventNames = new Map<string, string[]>([
   ["Command.Item", ["onSelect"]],
 ])
 
-const commandRenderConventions = {
-  ...canonicalRenderSourceAnalysisConventions,
-  matchesInheritedInterface(
-    sourceTag: string,
-    interfaceId: string,
-    normalizeRenderName: (name: string) => string
-  ) {
-    if (sourceTag === "CommandPrimitive" && interfaceId === "cmdk.command.root") {
-      return true
-    }
-    if (sourceTag.startsWith("CommandPrimitive.")) {
-      const member = sourceTag.split(".").at(-1)?.toLowerCase()
-      if (member && interfaceId === `cmdk.command.${member}`) return true
-    }
-    return canonicalRenderSourceAnalysisConventions.matchesInheritedInterface!(
-      sourceTag,
-      interfaceId,
-      normalizeRenderName
-    )
-  },
-}
-
 function schemaValid(schema: object, value: unknown) {
   return new Ajv2020({ allErrors: true, strict: true }).compile(schema)(value)
 }
@@ -175,7 +153,7 @@ describe("release.5 Command", () => {
         compareJsxRenderTree(
           entry.component.rendering as any,
           analyzeJsxRenderTree(sourcePath, entry.name) as any,
-          commandRenderConventions
+          canonicalRenderSourceAnalysisConventions
         ),
         entry.name
       ).toEqual([])
