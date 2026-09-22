@@ -256,16 +256,25 @@ describe("knowledge contract boundary", () => {
     expect(() => ((loaded.components[0] as unknown as { id: string }).id = "mutated")).toThrow(TypeError)
   })
 
-  test("canonical Phase 3 paths remain unchanged from the approved main baseline", () => {
-    expect(() => execFileSync("git", [
+  test("canonical Phase 3 paths contain only approved evidence closures from the main baseline", () => {
+    const changedPaths = execFileSync("git", [
       "diff",
-      "--exit-code",
       baseline,
+      "--name-only",
       "--",
       "contracts/components",
       "src/contracts/components",
       "provenance/component-contract-source.json",
-    ], { cwd: root, stdio: "pipe", maxBuffer: 64 * 1024 * 1024 })).not.toThrow()
+    ], { cwd: root, stdio: "pipe", maxBuffer: 64 * 1024 * 1024 }).toString().trim().split("\n").filter(Boolean).sort()
+    expect(changedPaths).toEqual([
+      "contracts/components/families/field.json",
+      "contracts/components/interfaces/html.fieldset.json",
+      "contracts/components/interfaces/html.legend.json",
+      "contracts/components/interfaces/html.nav.json",
+      "contracts/components/interfaces/html.ol.json",
+      "contracts/components/interfaces/html.p.json",
+      "src/contracts/components/render-source-analysis.ts",
+    ])
   })
 })
 

@@ -1170,24 +1170,5 @@
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "jsx-rendering",
-      "scope": "FieldError",
-      "reason": "Unsupported JSX child expression: content",
-      "source": {
-        "sourcePath": "src/components/ui/field.tsx",
-        "start": 6092,
-        "end": 6099,
-        "expressionKind": "Identifier",
-        "sourceText": "content"
-      },
-      "evidenceAttempted": [
-        "source-analysis"
-      ],
-      "evidenceRefs": [
-        "source"
-      ]
-    }
-  ]
+  "unresolved": []
 }

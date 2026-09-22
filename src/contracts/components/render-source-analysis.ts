@@ -89,7 +89,7 @@ export type JsxSourceUnresolvedFinding = SourceExpressionIdentity & { reason: st
 export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; unresolved: string[]; unresolvedFindings: JsxSourceUnresolvedFinding[] }
 type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment">; importBinding?: JsxImportBinding }
 type JsxBranch<T> = { value: T; when?: JsxRenderCondition; otherwise?: true; otherwiseFor?: JsxRenderCondition }
-type JsxScope = { aliases: Map<string, JsxBranch<JsxRenderNode[]>[]>; hostAliases: Map<string, JsxBranch<JsxHost>[]>; derivedSpreads: Map<string, JsxDerivedSpread>; importBindings: Map<string, JsxImportBinding> }
+type JsxScope = { aliases: Map<string, JsxBranch<JsxRenderNode[]>[]>; dynamicChildren: Set<string>; hostAliases: Map<string, JsxBranch<JsxHost>[]>; derivedSpreads: Map<string, JsxDerivedSpread>; importBindings: Map<string, JsxImportBinding> }
 type JsxUnresolved = { messages: string[]; findings: JsxSourceUnresolvedFinding[] }
 
 function recordUnresolved(unresolved: JsxUnresolved, node: ts.Node, file: ts.SourceFile, reason: string) {
@@ -373,6 +373,9 @@ function jsxExpressionBranches(expression: ts.Expression | undefined, file: ts.S
   if (!expression || expression.kind === ts.SyntaxKind.NullKeyword) return [branch([])]
   if (ts.isIdentifier(expression) && expression.text === "children") return [branch([])]
   if (ts.isIdentifier(expression) && scope.aliases.has(expression.text)) return structuredClone(scope.aliases.get(expression.text)!)
+  // A useMemo-derived child is runtime data; its callback may return text, JSX, or null.
+  // Keep the opaque branch structurally valid without inventing a false unsupported-expression finding.
+  if (ts.isIdentifier(expression) && scope.dynamicChildren.has(expression.text)) return [branch([])]
   if (ts.isIdentifier(expression) && publicBindings.has(expression.text)) return [branch([])]
   if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return jsxExpressionBranches(expression.expression, file, unresolved, publicBindings, scope)
   if (ts.isConditionalExpression(expression)) {
@@ -530,7 +533,7 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
     if (bindings && ts.isNamespaceImport(bindings)) importBindings.set(bindings.name.text, { importedName: "*", localName: bindings.name.text, moduleSpecifier })
     if (bindings && ts.isNamedImports(bindings)) for (const element of bindings.elements) importBindings.set(element.name.text, { importedName: element.propertyName?.text ?? element.name.text, localName: element.name.text, moduleSpecifier })
   }
-  const scope: JsxScope = { aliases: new Map(), hostAliases: new Map(), derivedSpreads: new Map(), importBindings }
+  const scope: JsxScope = { aliases: new Map(), dynamicChildren: new Set(), hostAliases: new Map(), derivedSpreads: new Map(), importBindings }
   const jsxHostAliases = new Set<string>()
   const collectHostAliases = (node: ts.Node) => {
     if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && ts.isIdentifier(node.tagName)) jsxHostAliases.add(node.tagName.text)
@@ -550,6 +553,7 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
   const visit = (node: ts.Node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
       if (containsJsx(node.initializer)) scope.aliases.set(node.name.text, jsxExpressionBranches(node.initializer, file, unresolved, publicBindings, scope))
+      else if (ts.isCallExpression(node.initializer) && ts.isIdentifier(node.initializer.expression) && importBindings.get(node.initializer.expression.text)?.importedName === "useMemo") scope.dynamicChildren.add(node.name.text)
       else if (jsxHostAliases.has(node.name.text) && canBeHost(node.initializer)) {
         const hosts = aliasHostBranches(node.initializer, file, unresolved, publicBindings, scope)
         if (hosts) scope.hostAliases.set(node.name.text, hosts)

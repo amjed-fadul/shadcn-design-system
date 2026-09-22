@@ -133,6 +133,17 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
+const approvedUnresolvedFacts = new Map<string, string[]>([
+  ["drawer.Drawer", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+  ["drawer.DrawerClose", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+  ["drawer.DrawerContent", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+  ["drawer.DrawerDescription", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+  ["drawer.DrawerOverlay", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+  ["drawer.DrawerPortal", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+  ["drawer.DrawerTitle", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+  ["drawer.DrawerTrigger", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
+])
+
 describe("Phase 5 executable validator coverage across all 38 canonical families", () => {
   test("projects and resolves every authorable canonical export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
@@ -144,10 +155,26 @@ describe("Phase 5 executable validator coverage across all 38 canonical families
     expect(authorable).toHaveLength(199)
     expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
+    const failures: Array<{ exportId: string; errors: ReadonlyArray<ValidationError> }> = []
     for (const entry of authorable) {
+      const exportId = `${entry.familyId}.${entry.name}`
       const result = validateAuthoredUi({ root: nodeFor(entry.familyId, entry.name) }, contract)
-      expect(result.errors.every((error) => error.code === "UNRESOLVED_FACT"), `${entry.familyId}.${entry.name}`).toBe(true)
+      const actual = result.errors.map((error) => `${error.code}:${error.message}`)
+      const approved = approvedUnresolvedFacts.get(exportId) ?? []
+      if (!approved.length) {
+        expect(result.errors, exportId).toEqual([])
+      } else if (actual.join("\u0000") !== approved.join("\u0000")) {
+        failures.push({ exportId, errors: result.errors })
+      }
     }
+    expect(failures).toEqual([])
+  })
+
+  test("models FieldError useMemo children as a source-backed dynamic expression", async () => {
+    const { analyzeJsxRenderTree } = await import("../src/contracts/components/render-source-analysis")
+    const result = analyzeJsxRenderTree("src/components/ui/field.tsx", "FieldError")
+    expect(result.unresolved).toEqual([])
+    expect(result.root?.kind).toBe("intrinsic")
   })
 
   test.each([
