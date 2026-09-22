@@ -121,4 +121,48 @@ describe("CSS-variable token arithmetic source analysis", () => {
       viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
     }))
   })
+
+  test.each([
+    "ReassignedBindingFixture",
+    "UpdatedBindingFixture",
+    "StaleBindingFixture",
+  ])("rejects mutable or written interpolation binding in %s", (exportName) => {
+    const { tokenExpressions, unresolved } = arithmeticSources(exportName)
+    expect(tokenExpressions).toEqual([])
+    expect(unresolved).toEqual([
+      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
+    ])
+  })
+
+  test("resolves the nearest immutable shadow without using a stale outer binding", () => {
+    const { tokenExpressions, unresolved } = arithmeticSources("ShadowedBindingFixture")
+    expect(unresolved).toEqual([])
+    expect(tokenExpressions).toEqual([
+      expect.objectContaining({
+        viaDerivedRule: { id: "spacing.multiplier", multiplier: 3 },
+        source: expect.objectContaining({ sourceText: "`calc(var(--spacing) * ${SHADOW_MULTIPLIER})`" }),
+      }),
+    ])
+  })
+
+  test.each([
+    "OverflowNumericFixture",
+    "ScientificNumericFixture",
+    "NaNNumericFixture",
+    "InfinityNumericFixture",
+  ])("rejects non-finite or non-decimal numeric spelling in %s", (exportName) => {
+    const { tokenExpressions, unresolved } = arithmeticSources(exportName)
+    expect(tokenExpressions).toEqual([])
+    expect(unresolved).toEqual([
+      expect.objectContaining({ reason: "CSS token arithmetic operand is not a finite decimal." }),
+    ])
+  })
+
+  test("canonicalizes negative zero to positive zero", () => {
+    const { tokenExpressions, unresolved } = arithmeticSources("NegativeZeroFixture")
+    expect(unresolved).toEqual([])
+    expect(tokenExpressions).toHaveLength(1)
+    expect(tokenExpressions[0].viaDerivedRule.multiplier).toBe(0)
+    expect(Object.is(tokenExpressions[0].viaDerivedRule.multiplier, -0)).toBe(false)
+  })
 })

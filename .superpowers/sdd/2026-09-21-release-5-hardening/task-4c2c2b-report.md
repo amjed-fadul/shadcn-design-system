@@ -89,3 +89,30 @@ The four unresolved arithmetic records are the same ToggleGroup plus three Sideb
 - Production and independent implementations remain structurally separate and are mutation-tested against multiplier, operator, variable, and provenance drift.
 - Dynamic ToggleGroup arithmetic is unresolved rather than converted to its default prop value; static source analysis does not pretend that a runtime selector is constant.
 - No Task 4C3 cleanup was started.
+
+## Fix Round 1 — immutable scope, finite numbers, and exact independent comparison
+
+### Confirmed findings and fixes
+
+1. Static interpolation could follow a `let`/`var` initializer and ignore a later assignment. Production bindings now carry declaration identity, immutability, and write state. Only an initialized, lexically visible, unwritten `const` may resolve. A scope-aware write prepass rejects assignment, compound assignment, and update expressions, including writes after the style expression; shadowed bindings do not invalidate each other.
+2. Decimal overflow could reach the resolver as `Infinity` and serialize incorrectly. Exact decimal operands must now be finite before authority resolution. Scientific notation, `NaN`, and signed `Infinity` are rejected with `CSS token arithmetic operand is not a finite decimal.` The explicit negative-zero policy is canonicalization to positive `0`.
+3. The independent initializer oracle searched the whole source file by name. It now maintains its own lexical scope stack, including source/block declarations and parameter/catch shadowing, and follows only the nearest visible `const` initializer.
+4. Independent comparison checked only source facts missing from the contract. It now performs stable-key comparison in both directions and reports missing and invented facts. Tests cover extra and wrong multipliers, condition drift, facts invented from unsupported operators, and provenance-sensitive evidence comparison.
+
+### Strict TDD evidence
+
+The focused RED selection produced **10 failed / 1 passed / 78 skipped**. It demonstrated all four defects: reassignment/update/stale bindings leaked multiplier `2`, decimal overflow produced `Infinity`, the special numeric forms lacked the finite-decimal policy, negative zero remained `-0`, the independent oracle resolved an out-of-scope same-name binding, and one-way comparison accepted an invented contract fact. The existing nearest-shadow production case passed as a regression guard.
+
+After implementation, the focused GREEN selection passed **18/18**. A fresh post-fixture/typecheck correction selection passed **16/16** with **79 skipped**. Production arithmetic plus utility/imported-CVA compatibility passed **37/37**. The bounded analyzer/schema/invariant/unresolved-reconciliation compatibility selection passed **138/138** across six files.
+
+The independent review produced **72 passed / 2 expected residual failures**, **268** direct findings, and the unchanged `collapsible.json:tokens` evidence orphan. The additional direct finding is the now-explicit invented unconditional `spacing.unit` contract fact for the dynamic ToggleGroup expression; no multiplier is fabricated from runtime source.
+
+The token dependency suite produced **1 passed / 3 expected residual failures**. Canonical production facts are unchanged, so exact closure remains `missing: 145`, `invented: 126`, `unresolved: 4`, and `suspiciousContractedNamespace: 7`. `npm run typecheck` exited **0**. Per the fix-round instruction, `components:verify` and the full suite were not rerun.
+
+### Preservation and self-review
+
+- Release-001 remained byte-identical at blob `75b59166086e9de0c67656fe64712a8cc70aa6e3` before and after the fix.
+- The diff under `contracts/components`, `contracts/tokens`, and `provenance/releases` is empty.
+- Fix-round changes are limited to the production analyzer, arithmetic fixtures/tests, the independent audit/tests, and this report.
+- Production and independent implementations remain separate. Neither consumes contract facts as source truth, weakens equality, filters findings, or introduces component/family exceptions, allowlists, or manual token facts.
+- Every rejected operand/operator/scope case emits unresolved evidence with exact source provenance and zero partial arithmetic facts. Conditions and derived rules remain part of exact bidirectional equality.

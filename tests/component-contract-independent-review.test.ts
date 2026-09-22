@@ -1690,38 +1690,28 @@ type IndependentArithmeticEvidence = {
   source: { sourcePath: string; start: number; end: number; expressionKind: string; sourceText: string }
 }
 
-function independentConstInitializer(sourceFile: ts.SourceFile, name: string): ts.Expression | undefined {
-  const candidates: ts.Expression[] = []
-  const visit = (node: ts.Node): void => {
-    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name && node.initializer) {
-      const list = node.parent
-      if (ts.isVariableDeclarationList(list) && (list.flags & ts.NodeFlags.Const) !== 0) candidates.push(node.initializer)
-    }
-    ts.forEachChild(node, visit)
-  }
-  visit(sourceFile)
-  return candidates.length === 1 ? candidates[0] : undefined
-}
+type IndependentStaticScope = Map<string, ts.VariableDeclaration | undefined>
 
-function independentStaticCssPrimitive(expression: ts.Expression, sourceFile: ts.SourceFile, seen = new Set<string>()): string | undefined {
+function independentStaticCssPrimitive(expression: ts.Expression, sourceFile: ts.SourceFile, scope: IndependentStaticScope, seen = new Set<string>()): string | undefined {
   if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression) || ts.isNumericLiteral(expression)) return expression.text
   if (ts.isPrefixUnaryExpression(expression) && (expression.operator === ts.SyntaxKind.PlusToken || expression.operator === ts.SyntaxKind.MinusToken) && ts.isNumericLiteral(expression.operand)) {
     return `${expression.operator === ts.SyntaxKind.MinusToken ? "-" : "+"}${expression.operand.text}`
   }
-  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return independentStaticCssPrimitive(expression.expression, sourceFile, seen)
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return independentStaticCssPrimitive(expression.expression, sourceFile, scope, seen)
   if (!ts.isIdentifier(expression) || seen.has(expression.text)) return undefined
-  const initializer = independentConstInitializer(sourceFile, expression.text)
-  if (!initializer) return undefined
+  const declaration = scope.get(expression.text)
+  const list = declaration?.parent
+  if (!declaration?.initializer || !list || !ts.isVariableDeclarationList(list) || (list.flags & ts.NodeFlags.Const) === 0) return undefined
   seen.add(expression.text)
-  return independentStaticCssPrimitive(initializer, sourceFile, seen)
+  return independentStaticCssPrimitive(declaration.initializer, sourceFile, scope, seen)
 }
 
-function independentStaticCssText(expression: ts.Expression, sourceFile: ts.SourceFile): { text?: string; error?: string } {
+function independentStaticCssText(expression: ts.Expression, sourceFile: ts.SourceFile, scope: IndependentStaticScope): { text?: string; error?: string } {
   if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression)) return { text: expression.text }
   if (!ts.isTemplateExpression(expression)) return { error: "Dynamic CSS token arithmetic operand." }
   let text = expression.head.text
   for (const span of expression.templateSpans) {
-    const value = independentStaticCssPrimitive(span.expression, sourceFile)
+    const value = independentStaticCssPrimitive(span.expression, sourceFile, scope)
     if (value === undefined) return { error: "Dynamic CSS token arithmetic operand." }
     const preceding = text[text.length - 1]
     const following = span.literal.text[0]
@@ -1736,8 +1726,13 @@ function independentlyParseSpacingArithmetic(text: string): { multiplier?: numbe
   if (references.length !== 1) return { error: references.length > 1 ? "CSS token arithmetic must reference exactly one variable." : "CSS token arithmetic expression shape is not equivalent." }
   if (references[0] !== "--spacing") return { error: "CSS token arithmetic references an unapproved variable." }
   const exact = /^calc\s*\(\s*var\s*\(\s*--spacing\s*\)\s*\*\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\)$/.exec(text)
-  if (exact) return { multiplier: Number(exact[1]) }
+  if (exact) {
+    const parsed = Number(exact[1])
+    if (!Number.isFinite(parsed)) return { error: "CSS token arithmetic operand is not a finite decimal." }
+    return { multiplier: Object.is(parsed, -0) ? 0 : parsed }
+  }
   if (/^calc\s*\(\s*var\s*\(\s*--spacing\s*\)\s*\/\s*[+-]?(?:0+(?:\.0*)?|\.0+)\s*\)$/.test(text)) return { error: "CSS token arithmetic divides by zero." }
+  if (/^calc\s*\(\s*var\s*\(\s*--spacing\s*\)\s*\*\s*(?:[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)[eE][+-]?\d+|Infinity)|NaN)\s*\)$/.test(text)) return { error: "CSS token arithmetic operand is not a finite decimal." }
   if (/^calc\s*\(\s*var\s*\(\s*--spacing\s*\)\s*\*\s*[^)]+\)$/.test(text)) return { error: "CSS token arithmetic operand is not numeric." }
   if (/^calc\s*\(.*\)\s*(?:\+|-|\/)\s*.*\)$/.test(text)) return { error: "Unsupported CSS token arithmetic operator." }
   return { error: "CSS token arithmetic expression shape is not equivalent." }
@@ -1753,10 +1748,10 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
     expressionKind: ts.SyntaxKind[expression.kind],
     sourceText: expression.getText(sourceFile),
   })
-  const inspect = (expression: ts.Expression, when?: AnyRecord): void => {
+  const inspect = (expression: ts.Expression, scope: IndependentStaticScope, when?: AnyRecord): void => {
     if (!expression.getText(sourceFile).includes("calc(") || !expression.getText(sourceFile).includes("var(")) return
     const source = identity(expression)
-    const staticValue = independentStaticCssText(expression, sourceFile)
+    const staticValue = independentStaticCssText(expression, sourceFile, scope)
     if (staticValue.error) { unresolved.push({ ...source, reason: staticValue.error }); return }
     const parsed = independentlyParseSpacingArithmetic(staticValue.text!)
     if (parsed.error) { unresolved.push({ ...source, reason: parsed.error }); return }
@@ -1780,11 +1775,35 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
     if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) { inspectClassExpression(expression.right); return }
     if (ts.isCallExpression(expression)) for (const argument of expression.arguments) inspectClassExpression(argument)
   }
-  const visit = (node: ts.Node): void => {
+  const scopeWithStatements = (parent: IndependentStaticScope, statements: ts.NodeArray<ts.Statement>): IndependentStaticScope => {
+    const scope = new Map(parent)
+    for (const statement of statements) if (ts.isVariableStatement(statement)) {
+      for (const item of statement.declarationList.declarations) if (ts.isIdentifier(item.name)) scope.set(item.name.text, item)
+    }
+    return scope
+  }
+  const visit = (node: ts.Node, scope: IndependentStaticScope): void => {
+    if (ts.isSourceFile(node) || ts.isBlock(node)) {
+      const nested = scopeWithStatements(scope, node.statements)
+      for (const statement of node.statements) visit(statement, nested)
+      return
+    }
+    if (ts.isFunctionLike(node)) {
+      const nested = new Map(scope)
+      for (const parameter of node.parameters) for (const name of independentBindingNames(parameter.name)) nested.set(name, undefined)
+      if ("body" in node && node.body) visit(node.body, nested)
+      return
+    }
+    if (ts.isCatchClause(node)) {
+      const nested = new Map(scope)
+      if (node.variableDeclaration) for (const name of independentBindingNames(node.variableDeclaration.name)) nested.set(name, undefined)
+      visit(node.block, nested)
+      return
+    }
     if (ts.isJsxAttribute(node) && node.name.getText(sourceFile) === "style" && node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
       let expression = node.initializer.expression
       while (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) expression = expression.expression
-      if (ts.isObjectLiteralExpression(expression)) for (const property of expression.properties) if (ts.isPropertyAssignment(property)) inspect(property.initializer)
+      if (ts.isObjectLiteralExpression(expression)) for (const property of expression.properties) if (ts.isPropertyAssignment(property)) inspect(property.initializer, scope)
       return
     }
     if (ts.isJsxAttribute(node) && node.name.getText(sourceFile) === "className" && node.initializer) {
@@ -1792,13 +1811,45 @@ function independentSpacingArithmetic(sourceFile: ts.SourceFile, declaration: ts
       if (expression) inspectClassExpression(expression)
       return
     }
-    ts.forEachChild(node, visit)
+    ts.forEachChild(node, (child) => visit(child, scope))
   }
-  visit(declaration)
+  const topLevelScope = scopeWithStatements(new Map(), sourceFile.statements)
+  visit(declaration, topLevelScope)
   return {
     facts: [...new Map(facts.map((fact) => [independentStableKey(fact), fact])).values()],
     unresolved: [...new Map(unresolved.map((fact) => [independentStableKey(fact), fact])).values()],
   }
+}
+
+function independentArithmeticEvidenceErrors(expected: IndependentArithmeticEvidence[], actual: IndependentArithmeticEvidence[]): string[] {
+  const expectedFacts = new Map(expected.map((fact) => [independentStableKey(fact), fact]))
+  const actualFacts = new Map(actual.map((fact) => [independentStableKey(fact), fact]))
+  return [
+    ...[...expectedFacts].filter(([key]) => !actualFacts.has(key)).map(([, fact]) => `missing ${independentStableKey(fact)}`),
+    ...[...actualFacts].filter(([key]) => !expectedFacts.has(key)).map(([, fact]) => `invented ${independentStableKey(fact)}`),
+  ]
+}
+
+function independentArithmeticFactErrors(
+  label: string,
+  contractTokenFacts: AnyRecord[],
+  arithmetic: ReturnType<typeof independentSpacingArithmetic>,
+  sourceUtilityFacts: AnyRecord[],
+): string[] {
+  const arithmeticTokenIds = new Set(arithmetic.facts.map((fact) => fact.tokenId))
+  if (arithmetic.unresolved.some((fact) => fact.sourceText.includes("var(--spacing)"))) arithmeticTokenIds.add("spacing.unit")
+  if (arithmeticTokenIds.size === 0) return []
+  const sourceFacts = new Map<string, AnyRecord>([
+    ...arithmetic.facts.map(({ source: _source, ...fact }) => fact),
+    ...sourceUtilityFacts.filter((fact) => arithmeticTokenIds.has(fact.tokenId)),
+  ].map((fact) => [independentStableKey(fact), fact]))
+  const contractFacts = new Map<string, AnyRecord>(contractTokenFacts
+    .filter((fact) => arithmeticTokenIds.has(fact.tokenId))
+    .map((fact) => [independentStableKey(fact), fact]))
+  return [
+    ...[...sourceFacts].filter(([key]) => !contractFacts.has(key)).map(([, fact]) => `${label}: CSS token arithmetic fact differs (missing ${independentStableKey(fact)})`),
+    ...[...contractFacts].filter(([key]) => !sourceFacts.has(key)).map(([, fact]) => `${label}: CSS token arithmetic fact differs (invented ${independentStableKey(fact)})`),
+  ]
 }
 
 function independentImportedFactErrors(label: string, contractTokenFacts: AnyRecord[], sourceFile: ts.SourceFile, variants: ReturnType<typeof cvaFacts>): string[] {
@@ -2069,12 +2120,11 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         ...(dependency.when ? { when: dependency.when } : {}),
         ...(dependency.viaDerivedRule ? { viaDerivedRule: dependency.viaDerivedRule } : {}),
       }))
-      for (const fact of arithmetic.facts) {
-        const { source: _source, ...expected } = fact
-        if (!comparableContractTokens.some((candidate: AnyRecord) => independentStableKey(candidate) === independentStableKey(expected))) {
-          errors.push(`${family.id}.${exported.name}: CSS token arithmetic fact differs (missing ${independentStableKey(expected)})`)
-        }
-      }
+      const sourceUtilityFacts = independentImportedTokenDependencies([
+        ...variants.localClassSources,
+        ...variants.classSources,
+      ])
+      errors.push(...independentArithmeticFactErrors(`${family.id}.${exported.name}`, comparableContractTokens, arithmetic, sourceUtilityFacts))
       errors.push(...independentImportedFactErrors(`${family.id}.${exported.name}`, comparableContractTokens, sourceFile, variants))
       errors.push(...independentConditionalUtilityFactErrors(`${family.id}.${exported.name}`, comparableContractTokens, sourceFile, variants))
       for (const tokenId of contractTokenIds) {
@@ -2723,6 +2773,29 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(facts.unresolved[0]).toEqual(expect.objectContaining({ reason, sourceText: expect.stringContaining("calc(") }))
   })
 
+  test.each([
+    "OverflowNumericFixture",
+    "ScientificNumericFixture",
+    "NaNNumericFixture",
+    "InfinityNumericFixture",
+  ])("independent arithmetic parser rejects non-finite decimal form in %s", (exportName) => {
+    const sourceFile = sourceFacts(join(root, "tests/fixtures/token-arithmetic-fixture.tsx")).sourceFile
+    const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, exportName)!)
+    expect(facts.facts).toEqual([])
+    expect(facts.unresolved).toEqual([
+      expect.objectContaining({ reason: "CSS token arithmetic operand is not a finite decimal." }),
+    ])
+  })
+
+  test("independent arithmetic parser canonicalizes negative zero", () => {
+    const sourceFile = sourceFacts(join(root, "tests/fixtures/token-arithmetic-fixture.tsx")).sourceFile
+    const facts = independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "NegativeZeroFixture")!)
+    expect(facts.unresolved).toEqual([])
+    expect(facts.facts).toHaveLength(1)
+    expect(facts.facts[0].viaDerivedRule.multiplier).toBe(0)
+    expect(Object.is(facts.facts[0].viaDerivedRule.multiplier, -0)).toBe(false)
+  })
+
   test("independent arithmetic mutations expose multiplier, operator, variable, and provenance drift", () => {
     const inspect = (sourceText: string) => {
       const sourceFile = ts.createSourceFile("/virtual/arithmetic-mutation.tsx", sourceText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
@@ -2737,7 +2810,66 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(inspect('function MutationFixture() { return <div style={{ gap: "calc(var(--space) * 3)" }} /> }').unresolved[0]?.reason).toBe("CSS token arithmetic references an unapproved variable.")
     const shiftedProvenance = inspect('\nfunction MutationFixture() { return <div style={{ gap: "calc(var(--spacing) * 3)" }} /> }')
     expect(shiftedProvenance.facts[0]?.source.start).toBe(multiplier.facts[0]!.source.start + 1)
-    expect(independentStableKey(shiftedProvenance.facts[0])).not.toBe(independentStableKey(multiplier.facts[0]))
+    expect(independentArithmeticEvidenceErrors(multiplier.facts, shiftedProvenance.facts)).toEqual([
+      expect.stringContaining("missing"),
+      expect.stringContaining("invented"),
+    ])
+  })
+
+  test("independent arithmetic comparison rejects extra, multiplier, condition, and operator-derived facts", () => {
+    const inspect = (sourceText: string) => {
+      const sourceFile = ts.createSourceFile("/virtual/arithmetic-comparison.tsx", sourceText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+      return independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, "ComparisonFixture")!)
+    }
+    const exact = inspect('function ComparisonFixture() { return <div style={{ gap: "calc(var(--spacing) * 3)" }} /> }')
+    const fact = (multiplier: number, when?: AnyRecord) => ({
+      tokenId: "spacing.unit",
+      viaDerivedRule: { id: "spacing.multiplier", multiplier },
+      ...(when ? { when } : {}),
+    })
+    expect(independentArithmeticFactErrors("fixture", [fact(3)], exact, [])).toEqual([])
+    expect(independentArithmeticFactErrors("fixture", [fact(3), fact(4)], exact, [])).toContainEqual(expect.stringContaining("invented"))
+    expect(independentArithmeticFactErrors("fixture", [fact(4)], exact, [])).toEqual(expect.arrayContaining([
+      expect.stringContaining("missing"),
+      expect.stringContaining("invented"),
+    ]))
+    expect(independentArithmeticFactErrors("fixture", [fact(3, { propName: "size", equals: "sm" })], exact, [])).toEqual(expect.arrayContaining([
+      expect.stringContaining("missing"),
+      expect.stringContaining("invented"),
+    ]))
+    const unsupported = inspect('function ComparisonFixture() { return <div style={{ gap: "calc(var(--spacing) + 3)" }} /> }')
+    expect(independentArithmeticFactErrors("fixture", [fact(3)], unsupported, [])).toEqual([
+      expect.stringContaining("invented"),
+    ])
+  })
+
+  test("independent arithmetic lookup uses the nearest lexical binding only", () => {
+    const fixturePath = join(root, "tests/fixtures/token-arithmetic-fixture.tsx")
+    const sourceFile = sourceFacts(fixturePath).sourceFile
+    const inspect = (exportName: string) => independentSpacingArithmetic(sourceFile, declarationFor(sourceFile, exportName)!)
+
+    expect(inspect("OutOfScopeBindingFixture").facts).toEqual([])
+    expect(inspect("OutOfScopeBindingFixture").unresolved).toEqual([
+      expect.objectContaining({ reason: "Dynamic CSS token arithmetic operand." }),
+    ])
+    expect(inspect("NestedShadowBindingFixture").facts).toEqual([
+      expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier: 6 } }),
+    ])
+    expect(inspect("SameNameOwnerTwo").facts).toEqual([
+      expect.objectContaining({ viaDerivedRule: { id: "spacing.multiplier", multiplier: 9 } }),
+    ])
+  })
+
+  test("independent arithmetic audit rejects invented exact spacing facts bidirectionally", () => {
+    const artifacts = clone(loadArtifacts())
+    const toggleGroup = exportByName(familyById(artifacts, "toggle-group"), "ToggleGroup").component
+    const spacing = toggleGroup.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "spacing.unit")
+    spacing.viaDerivedRule = { id: "spacing.multiplier", multiplier: 999 }
+    spacing.when = { propName: "spacing", equals: 999 }
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining(
+      'toggle-group.ToggleGroup: CSS token arithmetic fact differs (invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":999},"when":{"equals":999,"propName":"spacing"}})',
+    ))
   })
 
   test("independent family audit surfaces canonical dynamic arithmetic as unresolved", () => {

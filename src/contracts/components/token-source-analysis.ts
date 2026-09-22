@@ -27,7 +27,8 @@ export type TokenSourceAnalyzerConfig = Readonly<{
 
 type RecipeDefinition = { call: ts.CallExpression; sourcePath: string; sourceFile: ts.SourceFile }
 type ImportedBinding = { importedName: string; moduleSpecifier: string }
-type Scope = { recipes: Map<string, RecipeDefinition>; importedBindings: Map<string, ImportedBinding>; namespaceBindings: Map<string, string>; values: Map<string, ts.Expression>; publicPropBindings: Set<string>; publicClassBindings: Set<string> }
+type ValueBinding = { declaration: ts.VariableDeclaration; initializer?: ts.Expression; immutable: boolean; written: boolean }
+type Scope = { recipes: Map<string, RecipeDefinition>; importedBindings: Map<string, ImportedBinding>; namespaceBindings: Map<string, string>; values: Map<string, ValueBinding>; publicPropBindings: Set<string>; publicClassBindings: Set<string> }
 type SourceFunction = ts.FunctionDeclaration | ts.ArrowFunction
 
 function unique<T>(items: T[]) { return items.filter((item, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(item)) === index) }
@@ -70,10 +71,10 @@ function staticCssPrimitive(expression: ts.Expression, scope: Scope, visited = n
   }
   if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return staticCssPrimitive(expression.expression, scope, visited)
   if (!ts.isIdentifier(expression) || scope.publicPropBindings.has(expression.text) || visited.has(expression.text)) return undefined
-  const initializer = scope.values.get(expression.text)
-  if (!initializer) return undefined
+  const binding = scope.values.get(expression.text)
+  if (!binding?.initializer || !binding.immutable || binding.written) return undefined
   visited.add(expression.text)
-  return staticCssPrimitive(initializer, scope, visited)
+  return staticCssPrimitive(binding.initializer, scope, visited)
 }
 
 function staticCssText(expression: ts.Expression, scope: Scope): StaticCssText {
@@ -268,6 +269,20 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     ...config.recipeUnresolvedReasons,
   }
   const readSource = config.readSource ?? ((sourcePath: string) => readFileSync(sourcePath, "utf8"))
+  const valueBindings = new WeakMap<ts.VariableDeclaration, ValueBinding>()
+  const valueBinding = (declaration: ts.VariableDeclaration): ValueBinding => {
+    const existing = valueBindings.get(declaration)
+    if (existing) return existing
+    const list = declaration.parent
+    const binding = {
+      declaration,
+      initializer: declaration.initializer,
+      immutable: ts.isVariableDeclarationList(list) && (list.flags & ts.NodeFlags.Const) !== 0,
+      written: false,
+    }
+    valueBindings.set(declaration, binding)
+    return binding
+  }
   const sourceFile = (sourcePath: string) => ts.createSourceFile(sourcePath, readSource(sourcePath), ts.ScriptTarget.Latest, true, sourcePath.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS)
   const isNamedCall = (expression: ts.Expression, names: ReadonlySet<string>): expression is ts.CallExpression => ts.isCallExpression(expression) && ts.isIdentifier(expression.expression) && names.has(expression.expression.text)
   const sourceIdentity = (node: ts.Node, sourcePath: string, file: ts.SourceFile): SourceExpressionIdentity => ({ sourcePath, start: node.getStart(file), end: node.getEnd(), expressionKind: ts.SyntaxKind[node.kind], sourceText: node.getText(file) })
@@ -283,12 +298,15 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     const variable = variables[0][1]
     const exact = /^calc\(\s*var\(\s*(--[A-Za-z0-9_-]+)\s*\)\s*\*\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\)$/.exec(text)
     if (exact) {
-      const multiplier = Number(exact[2])
+      const parsedMultiplier = Number(exact[2])
+      if (!Number.isFinite(parsedMultiplier)) return "CSS token arithmetic operand is not a finite decimal."
+      const multiplier = Object.is(parsedMultiplier, -0) ? 0 : parsedMultiplier
       const resolution = config.resolveCssVariable(exact[1], multiplier)
       return resolution ?? "CSS token arithmetic references an unapproved variable."
     }
     if (new RegExp(`^calc\\(\\s*var\\(\\s*${variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\)\\s*\\/\\s*[+-]?(?:0+(?:\\.0*)?|\\.0+)\\s*\\)$`).test(text)) return "CSS token arithmetic divides by zero."
     if (!config.resolveCssVariable(variable, 1)) return "CSS token arithmetic references an unapproved variable."
+    if (/^calc\(\s*var\(\s*--[A-Za-z0-9_-]+\s*\)\s*\*\s*(?:[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)[eE][+-]?\d+|Infinity)|NaN)\s*\)$/.test(text)) return "CSS token arithmetic operand is not a finite decimal."
     if (/^calc\(\s*var\(\s*--[A-Za-z0-9_-]+\s*\)\s*\*\s*[^)]+\)$/.test(text)) return "CSS token arithmetic operand is not numeric."
     if (/^calc\(.*\)\s*(?:\+|-|\/)\s*.*\)$/.test(text)) return "Unsupported CSS token arithmetic operator."
     return "CSS token arithmetic expression shape is not equivalent."
@@ -370,10 +388,10 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     if (!ts.isIdentifier(expression)) return false
     if (scope.publicPropBindings.has(expression.text)) return true
     if (visited.has(expression.text)) return false
-    const initializer = scope.values.get(expression.text)
-    if (!initializer) return false
+    const binding = scope.values.get(expression.text)
+    if (!binding?.initializer) return false
     visited.add(expression.text)
-    return isSafeSelectorExpression(initializer, scope, visited)
+    return isSafeSelectorExpression(binding.initializer, scope, visited)
   }
 
   const classSourcesFromExpression = (expression: ts.Expression | undefined, output: ComponentTokenSourceAnalysis, sourcePath: string, file: ts.SourceFile, scope: Scope, context: Pick<ClassSource, "propName" | "equals"> = {}, resolving = new Set<ts.CallExpression>()): void => {
@@ -505,10 +523,10 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
     const recipes = new Map<string, RecipeDefinition>()
     const importedBindings = new Map<string, ImportedBinding>()
     const namespaceBindings = new Map<string, string>()
-    const values = new Map<string, ts.Expression>()
+    const values = new Map<string, ValueBinding>()
     for (const statement of source.statements) {
       if (ts.isVariableStatement(statement)) for (const declaration of statement.declarationList.declarations) if (ts.isIdentifier(declaration.name) && declaration.initializer) {
-        values.set(declaration.name.text, declaration.initializer)
+        values.set(declaration.name.text, valueBinding(declaration))
         if (isNamedCall(declaration.initializer, recipeNames)) recipes.set(declaration.name.text, { call: declaration.initializer, sourcePath, sourceFile: source })
       }
       if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || !statement.importClause?.namedBindings) continue
@@ -555,6 +573,59 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
       if ((ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) && statement.name) return [statement.name.text]
       return []
     })
+    const bindStatementValues = (scope: Scope, statements: ts.NodeArray<ts.Statement>) => {
+      for (const statement of statements) if (ts.isVariableStatement(statement)) {
+        for (const item of statement.declarationList.declarations) if (ts.isIdentifier(item.name)) scope.values.set(item.name.text, valueBinding(item))
+      }
+    }
+    const markWritten = (expression: ts.Expression, scope: Scope) => {
+      if (ts.isIdentifier(expression)) {
+        const binding = scope.values.get(expression.text)
+        if (binding) binding.written = true
+      }
+    }
+    const scanWrites = (node: ts.Node, scope: Scope): void => {
+      if (ts.isSourceFile(node) || ts.isBlock(node)) {
+        const nested = nestedScope(scope)
+        if (ts.isBlock(node)) invalidateBindings(nested, statementBindings(node.statements))
+        bindStatementValues(nested, node.statements)
+        for (const statement of node.statements) scanWrites(statement, nested)
+        return
+      }
+      if (ts.isCatchClause(node)) {
+        const nested = nestedScope(scope)
+        if (node.variableDeclaration) invalidateBindings(nested, bindingNames(node.variableDeclaration.name))
+        scanWrites(node.block, nested)
+        return
+      }
+      if (ts.isForStatement(node) || ts.isForOfStatement(node) || ts.isForInStatement(node)) {
+        const nested = nestedScope(scope)
+        const initializer = node.initializer
+        if (initializer && ts.isVariableDeclarationList(initializer)) {
+          invalidateBindings(nested, initializer.declarations.flatMap((item) => bindingNames(item.name)))
+          for (const item of initializer.declarations) if (ts.isIdentifier(item.name)) nested.values.set(item.name.text, valueBinding(item))
+        }
+        ts.forEachChild(node, (child) => scanWrites(child, nested))
+        return
+      }
+      if (ts.isSwitchStatement(node)) {
+        const nested = nestedScope(scope)
+        invalidateBindings(nested, node.caseBlock.clauses.flatMap((clause) => statementBindings(clause.statements)))
+        for (const clause of node.caseBlock.clauses) bindStatementValues(nested, clause.statements)
+        scanWrites(node.expression, nested)
+        for (const clause of node.caseBlock.clauses) for (const statement of clause.statements) scanWrites(statement, nested)
+        return
+      }
+      if (ts.isFunctionLike(node) && node !== declaration) {
+        const nested = nestedScope(scope)
+        invalidateBindings(nested, node.parameters.flatMap((parameter) => bindingNames(parameter.name)))
+        if ("body" in node && node.body) scanWrites(node.body, nested)
+        return
+      }
+      if (ts.isBinaryExpression(node) && node.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && node.operatorToken.kind <= ts.SyntaxKind.LastAssignment) markWritten(node.left, scope)
+      if ((ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) && [ts.SyntaxKind.PlusPlusToken, ts.SyntaxKind.MinusMinusToken].includes(node.operator)) markWritten(node.operand, scope)
+      ts.forEachChild(node, (child) => scanWrites(child, scope))
+    }
     const visit = (node: ts.Node, scope: Scope): void => {
       if (ts.isSourceFile(node) || ts.isBlock(node)) { const nested = nestedScope(scope); if (ts.isBlock(node)) invalidateBindings(nested, statementBindings(node.statements)); for (const statement of node.statements) visit(statement, nested); return }
       if (ts.isCatchClause(node)) {
@@ -578,7 +649,7 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
         return
       }
       if (ts.isFunctionLike(node) && node !== declaration) { const nested = nestedScope(scope); invalidateBindings(nested, node.parameters.flatMap((parameter) => bindingNames(parameter.name))); for (const binding of publicPropBindings(node)) { nested.publicPropBindings.add(binding); if (binding === "className") nested.publicClassBindings.add(binding) } if ("body" in node && node.body) visit(node.body, nested); return }
-      if (ts.isVariableStatement(node)) { for (const child of node.declarationList.declarations) if (ts.isIdentifier(child.name) && child.initializer) { scope.values.set(child.name.text, child.initializer); if (isNamedCall(child.initializer, recipeNames)) scope.recipes.set(child.name.text, { call: child.initializer, sourcePath, sourceFile: source }) } ts.forEachChild(node, (child) => visit(child, scope)); return }
+      if (ts.isVariableStatement(node)) { for (const child of node.declarationList.declarations) if (ts.isIdentifier(child.name)) { scope.values.set(child.name.text, valueBinding(child)); if (child.initializer && isNamedCall(child.initializer, recipeNames)) scope.recipes.set(child.name.text, { call: child.initializer, sourcePath, sourceFile: source }) } ts.forEachChild(node, (child) => visit(child, scope)); return }
       if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && node.name.text === "style" && node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
         let styleExpression = node.initializer.expression
         while (ts.isParenthesizedExpression(styleExpression) || ts.isAsExpression(styleExpression) || ts.isTypeAssertionExpression(styleExpression) || ts.isNonNullExpression(styleExpression)) styleExpression = styleExpression.expression
@@ -592,7 +663,7 @@ export function createTokenSourceAnalyzer(config: TokenSourceAnalyzerConfig) {
       ts.forEachChild(node, (child) => visit(child, scope))
     }
     const scope = topLevelScope(source, sourcePath)
-    if (declaration) { invalidateBindings(scope, declaration.parameters.flatMap((parameter) => bindingNames(parameter.name))); for (const binding of publicPropBindings(declaration)) { scope.publicPropBindings.add(binding); if (binding === "className") scope.publicClassBindings.add(binding) } visit(declaration.body!, scope) } else visit(source, scope)
+    if (declaration) { invalidateBindings(scope, declaration.parameters.flatMap((parameter) => bindingNames(parameter.name))); for (const binding of publicPropBindings(declaration)) { scope.publicPropBindings.add(binding); if (binding === "className") scope.publicClassBindings.add(binding) } scanWrites(declaration.body!, scope); visit(declaration.body!, scope) } else { scanWrites(source, scope); visit(source, scope) }
     for (const classSource of output.resolved) for (const rawUtility of classSource.classNames.split(/\s+/).filter(Boolean)) {
       const parsed = parseTailwindTokenUtility(rawUtility)
       const expression = parsed && arbitraryUtilityExpression(parsed.utility)
