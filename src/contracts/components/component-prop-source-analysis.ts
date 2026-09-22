@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto"
+import { existsSync, readFileSync, realpathSync } from "node:fs"
+import { resolve } from "node:path"
+
 import ts from "typescript"
 
 import type { LocalPropContract, SourceExpressionIdentity, StructuredPropType } from "./types"
@@ -18,6 +22,31 @@ export type ComponentPropSourceAnalyzerConfig = Readonly<{
 
 type SourceFunction = ts.FunctionDeclaration | ts.FunctionExpression | ts.ArrowFunction
 type Literal = string | number | boolean | null
+type ProgramEntry = { program: ts.Program; fingerprint: string }
+
+function normalizedPath(path: string): string {
+  const absolute = resolve(path)
+  return existsSync(absolute) ? realpathSync.native(absolute) : absolute
+}
+
+function programFingerprint(program: ts.Program): string {
+  const hash = createHash("sha256")
+  for (const source of program.getSourceFiles().filter((candidate) => !candidate.isDeclarationFile).sort((left, right) => left.fileName.localeCompare(right.fileName))) {
+    const path = normalizedPath(source.fileName)
+    hash.update(path)
+    try { hash.update(readFileSync(path)) } catch (error) { hash.update(`unreadable:${String(error)}`) }
+  }
+  return hash.digest("hex")
+}
+
+function createProgramEntry(rootNames: readonly string[], compilerOptions: ts.CompilerOptions): ProgramEntry {
+  const program = ts.createProgram([...rootNames], compilerOptions)
+  return { program, fingerprint: programFingerprint(program) }
+}
+
+function isProgramCurrent(entry: ProgramEntry): boolean {
+  return entry.fingerprint === programFingerprint(entry.program)
+}
 
 function literal(expression: ts.Expression | undefined): Literal | undefined {
   if (!expression) return undefined
@@ -215,6 +244,43 @@ function sourceLocalPropTypeNodes(typeNode: ts.TypeNode | undefined, checker: ts
   return values
 }
 
+function unsafeAuthorityNode(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, seen = new Set<ts.Node>()): ts.Node | undefined {
+  if (!typeNode || seen.has(typeNode)) return undefined
+  seen.add(typeNode)
+  const type = checker.getTypeAtLocation(typeNode)
+  if (type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return typeNode
+  if (ts.isParenthesizedTypeNode(typeNode)) return unsafeAuthorityNode(typeNode.type, checker, seen)
+  if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
+    for (const member of typeNode.types) {
+      const unsafe = unsafeAuthorityNode(member, checker, new Set(seen))
+      if (unsafe) return unsafe
+    }
+    return undefined
+  }
+  if (ts.isTypeLiteralNode(typeNode)) {
+    for (const member of typeNode.members) {
+      if (!ts.isPropertySignature(member)) continue
+      const unsafe = unsafeAuthorityNode(member.type, checker, new Set(seen))
+      if (unsafe) return unsafe
+    }
+    return undefined
+  }
+  if (!ts.isTypeReferenceNode(typeNode)) return undefined
+  const utility = rightmostTypeName(typeNode.typeName)
+  if (utility === "Pick" || utility === "Omit" || utility === "VariantProps") {
+    const unsafe = unsafeAuthorityNode(typeNode.typeArguments?.[0], checker, new Set(seen))
+    if (unsafe) return unsafe
+  }
+  if (utility === "ComponentProps" || utility === "ComponentPropsWithoutRef") return undefined
+  const symbol = aliasedSymbol(checker, checker.getSymbolAtLocation(typeNode.typeName))
+  for (const declaration of symbol?.declarations ?? []) {
+    if (!ts.isTypeAliasDeclaration(declaration)) continue
+    const unsafe = unsafeAuthorityNode(declaration.type, checker, new Set(seen))
+    if (unsafe) return unsafe
+  }
+  return undefined
+}
+
 function sourceLocalPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, seen = new Set<ts.Node>()): Set<string> {
   return new Set(sourceLocalPropTypeNodes(typeNode, checker, seen).keys())
 }
@@ -275,18 +341,26 @@ function comparableType(type: StructuredPropType): StructuredPropType {
 }
 
 export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAnalyzerConfig) {
-  const sharedProgram = config.rootNames ? ts.createProgram([...config.rootNames], config.compilerOptions) : undefined
-  const programs = new Map<string, ts.Program>()
+  const sharedRootNames = config.rootNames?.map(normalizedPath).sort()
+  const sharedRootSet = new Set(sharedRootNames)
+  let sharedProgram = sharedRootNames ? createProgramEntry(sharedRootNames, config.compilerOptions) : undefined
+  const programs = new Map<string, ProgramEntry>()
   const programFor = (sourcePath: string) => {
-    if (sharedProgram?.getSourceFile(sourcePath)) return sharedProgram
+    if (sharedProgram && sharedRootSet.has(sourcePath)) {
+      if (!isProgramCurrent(sharedProgram)) sharedProgram = createProgramEntry(sharedRootNames!, config.compilerOptions)
+      return sharedProgram.program
+    }
     let program = programs.get(sourcePath)
-    if (!program) {
-      program = ts.createProgram([sourcePath], config.compilerOptions)
+    if (!program || !isProgramCurrent(program)) {
+      program = createProgramEntry([sourcePath], config.compilerOptions)
+      programs.delete(sourcePath)
       programs.set(sourcePath, program)
     }
-    return program
+    while (programs.size > 4) programs.delete(programs.keys().next().value!)
+    return program.program
   }
   const analyzeComponentPropSource = (sourcePath: string, exportName: string): ComponentPropSourceAnalysis => {
+    sourcePath = normalizedPath(sourcePath)
     const program = programFor(sourcePath)
     const checker = program.getTypeChecker()
     const source = program.getSourceFile(sourcePath)
@@ -301,6 +375,18 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
 
     const typeNode = propsTypeNode(functionLike)
     const authoredTypes = sourceLocalPropTypeNodes(typeNode, checker)
+    let unsafeNode = unsafeAuthorityNode(typeNode, checker)
+    if (!unsafeNode) {
+      for (const [name, node] of authoredTypes) {
+        const symbol = checker.getPropertyOfType(propsType, name)
+        const type = symbol && checker.getTypeOfSymbolAtLocation(symbol, parameter)
+        if (type && type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) {
+          unsafeNode = node ?? typeNode ?? parameter
+          break
+        }
+      }
+    }
+    if (unsafeNode) return { props: [], localPropNames: [], unresolved: [sourceIdentity(unsafeNode, source, "Component props type contains unsafe any or unknown authority.")] }
     const defaults = delegatedDefaults(functionLike, checker, new Set())
     for (const [name, value] of cvaDefaults(functionLike, source)) defaults.set(name, value)
     for (const [name, value] of directDefaults(functionLike)) defaults.set(name, value)
@@ -314,7 +400,7 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
           const structured = structuredType(checker, type)
           const authored = authoredTypes.get(symbol.name)
           return structured.kind === "typescript" && authored
-            ? { kind: "typescript", typeText: authored.getText(source).replaceAll("React.", "") } as const
+            ? { kind: "typescript", typeText: authored.getText(authored.getSourceFile()).replaceAll("React.", "") } as const
             : structured
         })(),
         ...(value !== undefined ? { default: value } : {}),
@@ -325,10 +411,10 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
 
   return {
     analyzeComponentPropSource,
-    compareComponentLocalProps(contracted: LocalPropContract[], inheritedPropNames: ReadonlySet<string>, analysis: ComponentPropSourceAnalysis): string[] {
+    compareComponentLocalProps(contracted: LocalPropContract[], analysis: ComponentPropSourceAnalysis): string[] {
       const errors = analysis.unresolved.map((finding) => `Unresolved component prop source: ${finding.reason}`)
       if (analysis.unresolved.length) return errors
-      const localNames = new Set(analysis.localPropNames.filter((name) => !inheritedPropNames.has(name)))
+      const localNames = new Set(analysis.localPropNames)
       const source = new Map(analysis.props.filter((prop) => localNames.has(prop.name)).map((prop) => [prop.name, prop]))
       const expected = new Map(contracted.map((prop) => [prop.name, prop]))
       for (const [name, fact] of source) {

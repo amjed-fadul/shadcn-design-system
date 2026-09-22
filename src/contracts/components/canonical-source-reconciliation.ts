@@ -169,7 +169,6 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
   if (cached) return [...cached]
   const errors: string[] = []
   const propAnalyzer = canonicalComponentPropSourceAnalyzer(repositoryRoot)
-  const interfacesById = new Map(context.interfaces.map((contract) => [contract.id, contract]))
   const sourceConditionalWhens = new Map<string, Array<{ propName: string; equals: string | number | boolean }>>()
   for (const family of context.families) {
     const path = join(repositoryRoot, family.source.canonicalPath)
@@ -211,13 +210,8 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
         if (renderErrors.some((error) => error.startsWith("Data attributes mismatch"))) errors.push(`Family ${family.id} render data-slot facts do not match source evidence.`)
         errors.push(`Component ${entry.name} rendering does not match source evidence.`)
       }
-      const inheritedPropNames = new Set(entry.component.inherits.flatMap((interfaceId) => {
-        const contract = interfacesById.get(interfaceId)
-        return contract ? analyzeCanonicalInterfaceFacts(contract, undefined).props.map((prop) => prop.name) : []
-      }))
       const propErrors = propAnalyzer.compareComponentLocalProps(
         entry.component.localProps,
-        inheritedPropNames,
         propAnalyzer.analyzeComponentPropSource(path, entry.name),
       )
       if (propErrors.some((error) => error.includes(" default "))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)

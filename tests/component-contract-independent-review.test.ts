@@ -14,6 +14,16 @@ const approvedTokenIds = new Set<string>(readJson(join(root, "contracts/tokens/t
 const expectedFamilies = [...canonicalFamilyIds].sort()
 
 type AnyRecord = Record<string, any>
+type IndependentStructuredType =
+  | { kind: "boolean" | "string" | "number" }
+  | { kind: "enum"; values: string[] }
+  | { kind: "typescript"; typeText: string }
+type IndependentLocalPropFact = {
+  required: boolean
+  type: IndependentStructuredType
+  hasDefault: boolean
+  default?: unknown
+}
 type SourceFacts = {
   sourceFile: ts.SourceFile
   sourceText: string
@@ -31,7 +41,7 @@ type SourceFacts = {
   returnCount: number
   conditionalSource: boolean
   propSurfaceError?: string
-  sourceLocalPropNames: Set<string>
+  localPropFacts: Map<string, IndependentLocalPropFact>
 }
 
 type DeclarationContext = {
@@ -318,39 +328,89 @@ function independentStringKeys(node: ts.TypeNode | undefined): string[] {
   return ts.isLiteralTypeNode(node) && ts.isStringLiteral(node.literal) ? [node.literal.text] : []
 }
 
-function independentLocalPropNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): Set<string> {
-  const names = new Set<string>()
-  if (!typeNode || visited.has(typeNode)) return names
+function independentPropsTypeNode(functionLike: ts.FunctionLikeDeclaration): ts.TypeNode | undefined {
+  const direct = functionLike.parameters[0]?.type
+  if (direct) return direct
+  return ts.isCallExpression(functionLike.parent) ? functionLike.parent.typeArguments?.[1] : undefined
+}
+
+function independentLocalPropTypeNodes(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): Map<string, ts.TypeNode | undefined> {
+  const values = new Map<string, ts.TypeNode | undefined>()
+  if (!typeNode || visited.has(typeNode)) return values
   visited.add(typeNode)
-  if (ts.isParenthesizedTypeNode(typeNode)) return independentLocalPropNames(typeNode.type, checker, visited)
+  if (ts.isParenthesizedTypeNode(typeNode)) return independentLocalPropTypeNodes(typeNode.type, checker, visited)
   if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
-    for (const member of typeNode.types) for (const name of independentLocalPropNames(member, checker, new Set(visited))) names.add(name)
-    return names
+    for (const member of typeNode.types) for (const [name, node] of independentLocalPropTypeNodes(member, checker, new Set(visited))) values.set(name, node)
+    return values
   }
   if (ts.isTypeLiteralNode(typeNode)) {
-    for (const member of typeNode.members) if (ts.isPropertySignature(member) && member.name && (ts.isIdentifier(member.name) || ts.isStringLiteral(member.name))) names.add(member.name.text)
-    return names
+    for (const member of typeNode.members) {
+      if (ts.isPropertySignature(member) && member.name && (ts.isIdentifier(member.name) || ts.isStringLiteral(member.name))) values.set(member.name.text, member.type)
+    }
+    return values
   }
-  if (!ts.isTypeReferenceNode(typeNode)) return names
+  if (!ts.isTypeReferenceNode(typeNode)) return values
   const utility = independentTypeName(typeNode.typeName)
-  if (utility === "Pick") return new Set(independentStringKeys(typeNode.typeArguments?.[1]))
+  if (utility === "Pick") {
+    const selected = independentLocalPropTypeNodes(typeNode.typeArguments?.[0], checker, new Set(visited))
+    for (const name of independentStringKeys(typeNode.typeArguments?.[1])) values.set(name, selected.get(name))
+    return values
+  }
   if (utility === "Omit") {
-    const selected = independentLocalPropNames(typeNode.typeArguments?.[0], checker, new Set(visited))
+    const selected = independentLocalPropTypeNodes(typeNode.typeArguments?.[0], checker, new Set(visited))
     for (const name of independentStringKeys(typeNode.typeArguments?.[1])) selected.delete(name)
     return selected
   }
-  if (utility === "VariantProps") return new Set(checker.getPropertiesOfType(checker.getTypeAtLocation(typeNode)).map((property) => property.name))
-  if (utility === "ComponentProps") {
+  if (utility === "VariantProps") {
+    for (const property of checker.getPropertiesOfType(checker.getTypeAtLocation(typeNode))) values.set(property.name, undefined)
+    return values
+  }
+  if (utility === "ComponentProps" || utility === "ComponentPropsWithoutRef") {
     const target = typeNode.typeArguments?.[0]
-    if (!target || !ts.isTypeQueryNode(target)) return names
+    if (!target || !ts.isTypeQueryNode(target)) return values
     const child = functionForSymbol(resolvedSymbol(checker, target.exprName))
-    return child ? independentLocalPropNames(child.parameters[0]?.type, checker, new Set(visited)) : names
+    return child ? independentLocalPropTypeNodes(independentPropsTypeNode(child), checker, new Set(visited)) : values
   }
   const symbol = resolvedSymbol(checker, typeNode.typeName)
   for (const declaration of symbol?.declarations ?? []) if (ts.isTypeAliasDeclaration(declaration)) {
-    for (const name of independentLocalPropNames(declaration.type, checker, new Set(visited))) names.add(name)
+    for (const [name, node] of independentLocalPropTypeNodes(declaration.type, checker, new Set(visited))) values.set(name, node)
   }
-  return names
+  return values
+}
+
+function independentUnsafeAuthority(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, visited = new Set<ts.Node>()): boolean {
+  if (!typeNode || visited.has(typeNode)) return false
+  visited.add(typeNode)
+  if (checker.getTypeAtLocation(typeNode).flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) return true
+  if (ts.isParenthesizedTypeNode(typeNode)) return independentUnsafeAuthority(typeNode.type, checker, visited)
+  if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
+    return typeNode.types.some((member) => independentUnsafeAuthority(member, checker, new Set(visited)))
+  }
+  if (ts.isTypeLiteralNode(typeNode)) {
+    return typeNode.members.some((member) => ts.isPropertySignature(member) && independentUnsafeAuthority(member.type, checker, new Set(visited)))
+  }
+  if (!ts.isTypeReferenceNode(typeNode)) return false
+  const utility = independentTypeName(typeNode.typeName)
+  if (["Pick", "Omit", "VariantProps"].includes(utility) && independentUnsafeAuthority(typeNode.typeArguments?.[0], checker, new Set(visited))) return true
+  if (utility === "ComponentProps" || utility === "ComponentPropsWithoutRef") return false
+  const symbol = resolvedSymbol(checker, typeNode.typeName)
+  return (symbol?.declarations ?? []).some((declaration) => ts.isTypeAliasDeclaration(declaration)
+    && independentUnsafeAuthority(declaration.type, checker, new Set(visited)))
+}
+
+function independentStructuredType(checker: ts.TypeChecker, type: ts.Type, authored: ts.TypeNode | undefined): IndependentStructuredType {
+  const members = (type.isUnion() ? type.types : [type]).filter((member) => !(member.flags & (ts.TypeFlags.Undefined | ts.TypeFlags.Null | ts.TypeFlags.Void)))
+  const values = members.filter((member) => member.isStringLiteral()).map((member) => member.value)
+  if (members.length > 0 && values.length === members.length) return { kind: "enum", values: [...new Set(values)].sort() }
+  if (members.length > 0 && members.every((member) => Boolean(member.flags & (ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLiteral)))) return { kind: "boolean" }
+  if (members.length > 0 && members.every((member) => Boolean(member.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLiteral)))) return { kind: "string" }
+  if (members.length > 0 && members.every((member) => Boolean(member.flags & (ts.TypeFlags.Number | ts.TypeFlags.NumberLiteral)))) return { kind: "number" }
+  return {
+    kind: "typescript",
+    typeText: authored
+      ? authored.getText(authored.getSourceFile()).replaceAll("React.", "")
+      : checker.typeToString(type, undefined, ts.TypeFormatFlags.NoTruncation),
+  }
 }
 
 function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): SourceFacts {
@@ -360,25 +420,40 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
   const bindingDefaults = new Map<string, unknown>()
   const typeFacts = new Map<string, { typeText: string; values: string[] }>()
   let propSurfaceError: string | undefined
-  let sourceLocalPropNames = new Set<string>()
+  const localPropFacts = new Map<string, IndependentLocalPropFact>()
   if (functionLike?.parameters[0]) {
     const parameter = functionLike.parameters[0]
     collectTypeFacts(parameter.type, sourceFile, typeFacts)
     const checker = componentProgramCache?.checker
     if (checker) {
       const propsType = checker.getTypeAtLocation(parameter)
+      const typeNode = independentPropsTypeNode(functionLike)
+      const localTypes = independentLocalPropTypeNodes(typeNode, checker)
       if (propsType.flags & ts.TypeFlags.Any) propSurfaceError = "component props type is any"
       else if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) propSurfaceError = "component props type cannot be resolved"
+      else if (independentUnsafeAuthority(typeNode, checker)) propSurfaceError = "component props type contains unsafe any or unknown authority"
       else {
         for (const symbol of checker.getPropertiesOfType(propsType)) {
           const type = checker.getTypeOfSymbolAtLocation(symbol, parameter)
+          if (localTypes.has(symbol.name) && type.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) {
+            propSurfaceError = "component props type contains unsafe any or unknown authority"
+            typeFacts.clear()
+            localPropFacts.clear()
+            break
+          }
           typeFacts.set(symbol.name, {
             typeText: checker.typeToString(type, parameter, ts.TypeFormatFlags.NoTruncation),
             values: [...new Set(stringLiteralValues(type))].sort(),
           })
+          if (localTypes.has(symbol.name)) {
+            localPropFacts.set(symbol.name, {
+              required: !Boolean(symbol.flags & ts.SymbolFlags.Optional),
+              type: independentStructuredType(checker, type, localTypes.get(symbol.name)),
+              hasDefault: false,
+            })
+          }
         }
       }
-      sourceLocalPropNames = independentLocalPropNames(parameter.type, checker)
       for (const [name, value] of inheritedWrapperDefaults(functionLike, checker)) bindingDefaults.set(name, value)
     }
     if (ts.isObjectBindingPattern(parameter.name)) {
@@ -439,6 +514,12 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     }
   }
   const bodyText = functionLike?.getText(sourceFile) ?? declaration.getText(sourceFile)
+  const variantDefaults = cvaFacts(sourceFile, bodyText).defaults
+  for (const [name, fact] of localPropFacts) {
+    const hasDefault = bindingDefaults.has(name) || variantDefaults.has(name)
+    const value = bindingDefaults.has(name) ? bindingDefaults.get(name) : variantDefaults.get(name)
+    localPropFacts.set(name, { ...fact, hasDefault, ...(hasDefault ? { default: value } : {}) })
+  }
   directUsesSlot ||= bodyText.includes("Slot.Root")
   return {
     sourceFile,
@@ -457,7 +538,7 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     returnCount: functionLike ? returnExpressions(functionLike).length : 0,
     conditionalSource: /\bif\s*\(|\?|&&/.test(bodyText),
     ...(propSurfaceError ? { propSurfaceError } : {}),
-    sourceLocalPropNames,
+    localPropFacts,
   }
 }
 
@@ -609,8 +690,10 @@ function sourceDeclarationContext(artifact: AnyRecord): DeclarationContext | und
   return result
 }
 
-function normalizeTypeText(value: string): string {
-  return value.replace(/\s+/g, "").split("|").filter((member) => member !== "undefined" && member !== "null").join("|")
+function comparableIndependentType(type: IndependentStructuredType): IndependentStructuredType {
+  if (type.kind === "enum") return { kind: "enum", values: [...type.values].sort() }
+  if (type.kind === "typescript") return { kind: "typescript", typeText: type.typeText.replaceAll("React.", "").replace(/\s+/g, "") }
+  return type
 }
 
 function propertySymbols(checker: ts.TypeChecker, type: ts.Type, name: string): ts.Symbol[] {
@@ -732,21 +815,26 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       if (source.propSurfaceError) errors.push(`${family.id}.${exported.name}: ${source.propSurfaceError}`)
       const variants = cvaFacts(sourceFile, source.sourceText)
       const sourceProps = new Set([...source.bindings].filter((name) => !source.restBindings.has(name)).concat([...source.typeFacts.keys(), ...variants.variants.keys()]))
-      const contractedLocalNames = new Set((exported.component.localProps ?? []).map((prop: AnyRecord) => prop.name))
-      for (const localProp of exported.component.localProps ?? []) {
-        if (!sourceProps.has(localProp.name)) errors.push(`${family.id}.${exported.name}: local prop ${localProp.name} is not in the source signature`)
-        const sourceType = source.typeFacts.get(localProp.name)
-        const sourceValues = variants.variants.get(localProp.name) ?? sourceType?.values ?? []
-        if (localProp.type?.kind === "enum" && JSON.stringify([...localProp.type.values].sort()) !== JSON.stringify([...sourceValues].sort())) {
-          errors.push(`${family.id}.${exported.name}: enum values for ${localProp.name} differ from source literals`)
+      const contractedLocalProps = new Map<string, AnyRecord>((exported.component.localProps ?? []).map((prop: AnyRecord) => [prop.name, prop]))
+      for (const [name, sourceFact] of source.localPropFacts) {
+        const localProp = contractedLocalProps.get(name)
+        if (!localProp) {
+          errors.push(`${family.id}.${exported.name}: source local prop ${name} is omitted from the contract`)
+          continue
         }
-        if (localProp.default !== undefined) {
-          const sourceDefault = source.bindingDefaults.get(localProp.name) ?? variants.defaults.get(localProp.name)
-          if (sourceDefault !== localProp.default) errors.push(`${family.id}.${exported.name}: default for ${localProp.name} differs from source`)
+        if (localProp.required !== sourceFact.required) errors.push(`${family.id}.${exported.name}: requiredness for ${name} differs from source`)
+        if (JSON.stringify(comparableIndependentType(localProp.type)) !== JSON.stringify(comparableIndependentType(sourceFact.type))) {
+          const message = localProp.type?.kind === "enum"
+            ? `enum values for ${name} differ from source literals`
+            : `type for ${name} differs from source`
+          errors.push(`${family.id}.${exported.name}: ${message}`)
         }
-        if (localProp.type?.kind === "boolean" && sourceType && normalizeTypeText(sourceType.typeText) !== "boolean") {
-          errors.push(`${family.id}.${exported.name}: boolean prop ${localProp.name} differs from source type`)
-        }
+        const contractHasDefault = Object.hasOwn(localProp, "default")
+        if (contractHasDefault !== sourceFact.hasDefault) errors.push(`${family.id}.${exported.name}: default presence for ${name} differs from source`)
+        else if (contractHasDefault && localProp.default !== sourceFact.default) errors.push(`${family.id}.${exported.name}: default for ${name} differs from source`)
+      }
+      for (const name of contractedLocalProps.keys()) {
+        if (!source.localPropFacts.has(name)) errors.push(`${family.id}.${exported.name}: contract local prop ${name} is absent from the source-local signature`)
       }
 
       const inheritedProps = new Set<string>()
@@ -758,9 +846,6 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
           continue
         }
         for (const prop of context.checker.getPropertiesOfType(context.propsType)) inheritedProps.add(prop.name)
-      }
-      for (const propName of source.sourceLocalPropNames) {
-        if (!inheritedProps.has(propName) && !contractedLocalNames.has(propName)) errors.push(`${family.id}.${exported.name}: source local prop ${propName} is omitted from the contract`)
       }
       const hasAsChild = inheritedProps.has("asChild") || sourceProps.has("asChild")
       const slots = exported.component.slots ?? []
@@ -988,6 +1073,55 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(findings).toContain("pagination.PaginationPrevious: default for size differs from source")
   })
 
+  test("independent local-prop comparison rejects forged inheritance over an omitted local", () => {
+    const artifacts = clone(loadArtifacts())
+    const previous = exportByName(familyById(artifacts, "pagination"), "PaginationPrevious").component
+    previous.localProps = previous.localProps.filter((prop: AnyRecord) => prop.name !== "size")
+    previous.inherits.push("html.input")
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(
+      "pagination.PaginationPrevious: source local prop size is omitted from the contract",
+    )
+  })
+
+  test("independently preserves cross-file authored type provenance", () => {
+    const fixturePath = join(root, "tests/fixtures/component-prop-source-analysis-parent-fixture.tsx")
+    const fixtureProgram = ts.createProgram([fixturePath], {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      jsx: ts.JsxEmit.ReactJSX,
+      strict: true,
+      skipLibCheck: true,
+    })
+    const previousProgram = componentProgramCache
+    componentProgramCache = { program: fixtureProgram, checker: fixtureProgram.getTypeChecker() }
+    sourceCache.delete(fixturePath)
+    try {
+      const { sourceFile } = sourceFacts(fixturePath)
+      const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "CrossFileWrapper")!)
+      expect(facts.localPropFacts.get("payload")?.type).toEqual({ kind: "typescript", typeText: "Promise<string>" })
+    } finally {
+      componentProgramCache = previousProgram
+      sourceCache.delete(fixturePath)
+    }
+  })
+
+  test.each([
+    ["wrong string type", (component: AnyRecord) => { component.localProps.find((prop: AnyRecord) => prop.name === "text").type = { kind: "number" } }, "pagination.PaginationPrevious: type for text differs from source"],
+    ["requiredness flip", (component: AnyRecord) => { component.localProps.find((prop: AnyRecord) => prop.name === "isActive").required = true }, "pagination.PaginationPrevious: requiredness for isActive differs from source"],
+    ["deleted default", (component: AnyRecord) => { delete component.localProps.find((prop: AnyRecord) => prop.name === "size").default }, "pagination.PaginationPrevious: default presence for size differs from source"],
+    ["inherited DOM prop labeled local", (component: AnyRecord, artifacts: { interfaces: AnyRecord[] }) => {
+      component.localProps.push(clone(interfaceById({ interfaces: artifacts.interfaces }, "html.a").props.find((prop: AnyRecord) => prop.name === "href")))
+    }, "pagination.PaginationPrevious: contract local prop href is absent from the source-local signature"],
+  ])("independent exact local oracle rejects %s", (_name, mutate, expected) => {
+    const artifacts = clone(loadArtifacts())
+    const previous = exportByName(familyById(artifacts, "pagination"), "PaginationPrevious").component
+    mutate(previous, artifacts)
+
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContain(expected)
+  })
+
   test("independent prop analysis fails closed for an any-typed surface", () => {
     const fixturePath = join(root, "tests/fixtures/component-prop-source-analysis-fixture.tsx")
     const fixtureProgram = ts.createProgram([fixturePath], {
@@ -1006,6 +1140,34 @@ describe("Phase 3 Task 10 independent review", () => {
       const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "AnyPropsFixture")!)
       expect(facts.typeFacts.size).toBe(0)
       expect(facts.propSurfaceError).toBe("component props type is any")
+    } finally {
+      componentProgramCache = previousProgram
+      sourceCache.delete(fixturePath)
+    }
+  })
+
+  test.each([
+    ["UnknownPropsFixture", "component props type cannot be resolved"],
+    ["PickAnyPropsFixture", "component props type contains unsafe any or unknown authority"],
+    ["VariantAnyPropsFixture", "component props type contains unsafe any or unknown authority"],
+  ])("independent prop analysis fails closed for %s", (exportName, reason) => {
+    const fixturePath = join(root, "tests/fixtures/component-prop-source-analysis-fixture.tsx")
+    const fixtureProgram = ts.createProgram([fixturePath], {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      jsx: ts.JsxEmit.ReactJSX,
+      strict: true,
+      skipLibCheck: true,
+    })
+    const previousProgram = componentProgramCache
+    componentProgramCache = { program: fixtureProgram, checker: fixtureProgram.getTypeChecker() }
+    sourceCache.delete(fixturePath)
+    try {
+      const { sourceFile } = sourceFacts(fixturePath)
+      const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, exportName)!)
+      expect(facts.typeFacts.size).toBe(0)
+      expect(facts.propSurfaceError).toBe(reason)
     } finally {
       componentProgramCache = previousProgram
       sourceCache.delete(fixturePath)
@@ -1061,5 +1223,5 @@ describe("Phase 3 Task 10 independent review", () => {
       mutate(artifacts)
       expect(independentAudit(artifacts), label).not.toEqual([])
     }
-  })
+  }, 60_000)
 })
