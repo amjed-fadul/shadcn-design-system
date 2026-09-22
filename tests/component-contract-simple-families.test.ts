@@ -8,14 +8,13 @@ import contractSet from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
 import { validateComponentFamilyInvariants, validateInheritedInterfaceInvariants } from "../src/contracts/components/invariants"
 import { isRenderingTree, type ComponentFamilyContract, type InheritedInterfaceContract, type RenderingFact, type RenderingTree } from "../src/contracts/components/types"
-import { extractCvaVariantLiterals, extractDataSlotLiterals, extractFunctionPropDefaults, listModuleExports, readCanonicalSourceBlobSha } from "./helpers/component-source-analysis"
+import { analyzeJsxRenderTree, compareJsxRenderTree, extractCvaVariantLiterals, extractDataSlotLiterals, extractFunctionPropDefaults, listModuleExports, readCanonicalSourceBlobSha } from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependencies, analyzeTailwindTokenDependencies, auditComponentTokenCoverage } from "./helpers/component-token-analysis"
 import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
 import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
-function tree(rendering: RenderingFact): RenderingTree {
-  if (!isRenderingTree(rendering)) throw new Error("Expected an unconditional rendering tree in a pre-Task 6A family.")
-  return rendering
+function renderingTrees(rendering: RenderingFact): RenderingTree[] {
+  return isRenderingTree(rendering) ? [rendering] : rendering.alternatives.map((alternative) => alternative.rendering)
 }
 
 const root = fileURLToPath(new URL("../", import.meta.url))
@@ -83,9 +82,9 @@ describe("simple/native-oriented component contracts", () => {
       if (entry.kind === "component") {
         expect(entry.authorableJsx).toBe(true)
         expect(entry.component).toBeDefined()
-        expect(tree(entry.component!.rendering).nodes.length).toBeGreaterThan(0)
-        expect(tree(entry.component!.rendering).nodes.flatMap((node) => node.dataAttributes).every(({ name, value, prop }) => name.startsWith("data-") && (prop || (value && extractDataSlotLiterals(source).includes(value))))).toBe(true)
-        expect(tree(entry.component!.rendering).nodes.filter((node) => node.receivesPublicProps)).toHaveLength(1)
+        expect(renderingTrees(entry.component!.rendering).every((rendering) => rendering.nodes.length > 0)).toBe(true)
+        expect(renderingTrees(entry.component!.rendering).flatMap((rendering) => rendering.nodes).flatMap((node) => node.dataAttributes).every(({ name, value, prop }) => name.startsWith("data-") && (prop || (value && extractDataSlotLiterals(source).includes(value))))).toBe(true)
+        expect(renderingTrees(entry.component!.rendering).every((rendering) => rendering.nodes.filter((node) => node.receivesPublicProps).length === 1)).toBe(true)
       } else {
         expect(entry.authorableJsx).toBe(false)
         expect(entry.component).toBeUndefined()
@@ -111,6 +110,16 @@ describe("simple/native-oriented component contracts", () => {
     expect(badge.localProps[1].default).toBe(defaults.get("asChild"))
     expect(badge.slots).toHaveLength(1)
     expect(badge.slots[0]).toMatchObject({ propName: "asChild", default: false, replacesHost: true, childCardinality: { min: 0, max: 1 }, forwardsProps: true, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" })
+    const sourceRendering = analyzeJsxRenderTree(source, "Badge")
+    expect(compareJsxRenderTree(badge.rendering, sourceRendering)).toEqual([])
+    const predicateMutation = structuredClone(badge.rendering)
+    if (isRenderingTree(predicateMutation)) throw new Error("Badge must preserve its conditional host alternatives.")
+    predicateMutation.alternatives[0].when = { propName: "asChild", equals: false }
+    expect(compareJsxRenderTree(predicateMutation, sourceRendering)).toContain("Render alternative condition mismatch at 0.")
+    const omittedBranch = structuredClone(badge.rendering)
+    if (isRenderingTree(omittedBranch)) throw new Error("Badge must preserve its conditional host alternatives.")
+    omittedBranch.alternatives.pop()
+    expect(compareJsxRenderTree(omittedBranch, sourceRendering)).toContain("Render alternative count mismatch.")
   })
 
   test("reconciles CVA and local defaults for Card", () => {

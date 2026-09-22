@@ -30,7 +30,7 @@ export type ExpectedFact =
   | Readonly<{ kind: "type"; type: StructuredPropType }>
   | Readonly<{ kind: "enum"; values: readonly string[] }>
   | Readonly<{ kind: "unavailable-prop" }>
-  | Readonly<{ kind: "conditional-branch"; propName: string; values: readonly (string | number | boolean)[] }>
+  | Readonly<{ kind: "conditional-branch"; propName: string; values: readonly (string | number | boolean | "present" | "absent")[] }>
   | Readonly<{ kind: "slot-child"; min: number; max: number }>
   | Readonly<{ kind: "capability"; capability: string }>
   | Readonly<{ kind: "unsupported-hard-constraint"; constraint: string }>

@@ -406,19 +406,73 @@
       ]
     }
   ],
-  "conditionalApi": [],
-  "unresolved": [
+  "conditionalApi": [
     {
-      "topic": "snap-point fade conditional API",
-      "scope": "vaul.drawer.root",
-      "reason": "Vaul DialogProps is a union where fadeFromIndex is only meaningful with snapPoints. The current component conditional schema models literal discriminators but cannot represent presence-based array branches without flattening the union.",
-      "evidenceAttempted": [
-        "pinned vaul 1.1.2 declaration",
-        "canonical inherited-interface analyzer"
+      "when": {
+        "propName": "fadeFromIndex",
+        "presence": "present"
+      },
+      "propRefinements": [
+        {
+          "propName": "fadeFromIndex",
+          "availability": "available",
+          "required": true,
+          "type": {
+            "kind": "number"
+          },
+          "evidenceRefs": [
+            "declaration"
+          ]
+        },
+        {
+          "propName": "snapPoints",
+          "availability": "available",
+          "required": true,
+          "type": {
+            "kind": "array",
+            "item": {
+              "kind": "union",
+              "members": [
+                {
+                  "kind": "string"
+                },
+                {
+                  "kind": "number"
+                }
+              ]
+            }
+          },
+          "evidenceRefs": [
+            "declaration"
+          ]
+        }
       ],
+      "eventRefinements": [],
+      "stateChannels": [],
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "when": {
+        "propName": "fadeFromIndex",
+        "presence": "absent"
+      },
+      "propRefinements": [
+        {
+          "propName": "fadeFromIndex",
+          "availability": "unavailable",
+          "evidenceRefs": [
+            "declaration"
+          ]
+        }
+      ],
+      "eventRefinements": [],
+      "stateChannels": [],
       "evidenceRefs": [
         "declaration"
       ]
     }
-  ]
+  ],
+  "unresolved": []
 }

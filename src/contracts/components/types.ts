@@ -21,7 +21,8 @@ export type CompositionContract = { requires: string[]; provides: string[]; hard
 export type StateChannel = EvidenceRef & { name: string; controlledProp?: string; defaultProp?: string; changeEventProp?: string } & ({ controlledProp: string } | { defaultProp: string } | { changeEventProp: string })
 export type ConditionalPropRefinement = EvidenceRef & ({ propName: string; availability: "available"; required: boolean; type: StructuredPropType } | { propName: string; availability: "unavailable" })
 export type ConditionalEventRefinement = EvidenceRef & { eventPropName: string; payload: StructuredPropType }
-export type ConditionalApiCase = EvidenceRef & { when: { propName: string; equals: string | number | boolean }; propRefinements: ConditionalPropRefinement[]; eventRefinements: ConditionalEventRefinement[]; stateChannels: StateChannel[] }
+export type ConditionalApiCondition = { propName: string; equals: string | number | boolean } | { propName: string; presence: "present" | "absent" }
+export type ConditionalApiCase = EvidenceRef & { when: ConditionalApiCondition; propRefinements: ConditionalPropRefinement[]; eventRefinements: ConditionalEventRefinement[]; stateChannels: StateChannel[] }
 export type EventContract = EvidenceRef & { propName: string; payload?: StructuredPropType }
 export type TokenConditionRelationshipSegment =
   | { kind: "has" | "in"; name?: never }

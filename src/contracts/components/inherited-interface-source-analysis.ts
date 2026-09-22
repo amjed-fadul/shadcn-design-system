@@ -49,6 +49,12 @@ function mergedTypeText(checker: ts.TypeChecker, types: ts.Type[], location: ts.
   return unique.map((type) => declarationTypeText(checker, type, location)).join(" | ")
 }
 
+function presenceState(symbol: ts.Symbol | undefined, type: ts.Type | undefined): "present" | "absent" | undefined {
+  if (!symbol || !type) return "absent"
+  if (symbol.getFlags() & ts.SymbolFlags.Optional) return type.flags & ts.TypeFlags.Never ? "absent" : undefined
+  return type.flags & ts.TypeFlags.Never ? undefined : "present"
+}
+
 function intrinsicPropsType(checker: ts.TypeChecker, file: ts.SourceFile, symbol: string): ts.Type | undefined {
   const match = symbol.match(/^React\.JSX\.IntrinsicElements\["([a-z][a-z0-9-]*)"\]$/)
   if (!match) return undefined
@@ -121,7 +127,7 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
     })
     return { propName, required: symbols.length === branches.length && symbols.every((symbol) => !(symbol.getFlags() & ts.SymbolFlags.Optional)), payload: mergeStructuredTypes(payloadTypes.map((type) => structuredType(checker, type, declaration))), payloadTypeText: mergedTypeText(checker, payloadTypes, declaration), evidenceRefs }
   })
-  const discriminator = branches.length > 1 ? propFacts.find((prop) => {
+  const literalDiscriminator = branches.length > 1 ? propFacts.find((prop) => {
     const branchTypes = branches.map((branch) => {
       const symbol = checker.getPropertyOfType(branch, prop.name)
       return symbol ? checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration ?? declaration) : undefined
@@ -130,14 +136,26 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
       && branchTypes.every((type): type is ts.StringLiteralType => Boolean(type?.isStringLiteral()))
       && new Set(branchTypes.map((type) => type.value)).size > 1
   }) : undefined
+  const presenceDiscriminator = literalDiscriminator ? undefined : branches.length > 1 ? propFacts.find((prop) => {
+    const states = branches.map((branch) => {
+      const symbol = checker.getPropertyOfType(branch, prop.name)
+      const type = symbol && checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration ?? declaration)
+      return presenceState(symbol, type)
+    })
+    return states.every((state): state is "present" | "absent" => Boolean(state)) && new Set(states).size === 2
+  }) : undefined
+  const discriminator = literalDiscriminator ?? presenceDiscriminator
   const conditionalApi = discriminator ? branches.map((branch) => {
     const typeSymbol = checker.getPropertyOfType(branch, discriminator.name)
     const type = typeSymbol && checker.getTypeOfSymbolAtLocation(typeSymbol, typeSymbol.valueDeclaration ?? declaration)
-    if (!type?.isStringLiteral()) throw new Error(`Package export ${source.symbol} has a non-literal discriminator branch.`)
-    const propRefinements = propFacts.filter((prop) => prop.name !== discriminator.name).map((prop) => {
+    const presence = presenceDiscriminator ? presenceState(typeSymbol, type) : undefined
+    if (literalDiscriminator && !type?.isStringLiteral()) throw new Error(`Package export ${source.symbol} has a non-literal discriminator branch.`)
+    if (presenceDiscriminator && !presence) throw new Error(`Package export ${source.symbol} has an indeterminate presence discriminator branch.`)
+    const propRefinements = propFacts.filter((prop) => presenceDiscriminator || prop.name !== discriminator.name).map((prop) => {
       const symbol = checker.getPropertyOfType(branch, prop.name)
       if (!symbol) return { propName: prop.name, availability: "unavailable" as const, evidenceRefs }
       const valueType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration ?? declaration)
+      if (symbol.getFlags() & ts.SymbolFlags.Optional && valueType.flags & ts.TypeFlags.Never) return { propName: prop.name, availability: "unavailable" as const, evidenceRefs }
       const required = !(symbol.getFlags() & ts.SymbolFlags.Optional); const type = structuredType(checker, valueType, declaration)
       return JSON.stringify(type) === JSON.stringify(prop.type) && required === prop.required ? undefined : { propName: prop.name, availability: "available" as const, required, type, evidenceRefs }
     }).filter((refinement): refinement is NonNullable<typeof refinement> => Boolean(refinement))
@@ -147,9 +165,13 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
       const eventType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration ?? declaration)
       const payload = eventType.getCallSignatures()[0]?.parameters[0]
       if (!payload) throw new Error(`Package event ${event.propName} does not expose a payload.`)
-      return { eventPropName: event.propName, payload: structuredType(checker, checker.getTypeOfSymbolAtLocation(payload, declaration), declaration), evidenceRefs }
-    })
-    return { when: { propName: discriminator.name, equals: type.value }, propRefinements, eventRefinements, stateChannels: [], evidenceRefs }
+      const branchPayload = structuredType(checker, checker.getTypeOfSymbolAtLocation(payload, declaration), declaration)
+      return JSON.stringify(branchPayload) === JSON.stringify(event.payload) ? undefined : { eventPropName: event.propName, payload: branchPayload, evidenceRefs }
+    }).filter((refinement): refinement is NonNullable<typeof refinement> => Boolean(refinement))
+    const when = literalDiscriminator
+      ? { propName: discriminator.name, equals: (type as ts.StringLiteralType).value }
+      : { propName: discriminator.name, presence: presence! }
+    return { when, propRefinements, eventRefinements, stateChannels: [], evidenceRefs }
   }) : []
   return { props: propFacts, events: eventFacts, conditionalApi }
 }

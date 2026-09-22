@@ -71,6 +71,12 @@
       "type": "object", "additionalProperties": false, "required": ["propName", "equals"],
       "properties": { "propName": { "type": "string" }, "equals": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }] } }
     },
+    "conditionalApiCondition": {
+      "oneOf": [
+        { "$ref": "#/$defs/apiCondition" },
+        { "type": "object", "additionalProperties": false, "required": ["propName", "presence"], "properties": { "propName": { "type": "string" }, "presence": { "enum": ["present", "absent"] } } }
+      ]
+    },
     "tokenCondition": {
       "oneOf": [
         { "$ref": "#/$defs/tokenConditionAtom" },
@@ -105,7 +111,7 @@
     "conditional": {
       "type": "object", "additionalProperties": false,
       "required": ["when", "propRefinements", "eventRefinements", "stateChannels", "evidenceRefs"],
-      "properties": { "when": { "$ref": "#/$defs/apiCondition" }, "propRefinements": { "type": "array", "items": { "$ref": "#/$defs/propRefinement" } }, "eventRefinements": { "type": "array", "items": { "$ref": "#/$defs/eventRefinement" } }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
+      "properties": { "when": { "$ref": "#/$defs/conditionalApiCondition" }, "propRefinements": { "type": "array", "items": { "$ref": "#/$defs/propRefinement" } }, "eventRefinements": { "type": "array", "items": { "$ref": "#/$defs/eventRefinement" } }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     },
     "propRefinement": {
       "oneOf": [

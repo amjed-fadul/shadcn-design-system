@@ -81,11 +81,11 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Data attributes mismatch at ToggleGroupPrimitive.Item.")
   })
 
-  test("normalizes a single surviving branch after a source null return", () => {
+  test("normalizes a useMemo-derived child after a source null return", () => {
     const tree = sourceAnalysis.analyzeJsxRenderTree(field, "FieldError")
 
-    expect(tree.unresolved).toEqual(["Unsupported JSX child expression: content"])
-    expect(tree.unresolvedFindings).toEqual([expect.objectContaining({ expressionKind: "Identifier", sourceText: "content" })])
+    expect(tree.unresolved).toEqual([])
+    expect(tree.unresolvedFindings).toEqual([])
     expect(tree).toMatchObject({
       root: expect.objectContaining({
         tag: "div",

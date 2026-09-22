@@ -4,6 +4,7 @@ import type {
   ComponentDefinition,
   ComponentFamilyContract,
   CompositionContract,
+  ConditionalApiCondition,
   ConditionalApiCase,
   EventContract,
   RenderCondition,
@@ -101,7 +102,7 @@ export type ExecutableApiShape = Readonly<{
 }>
 
 export type ExecutableConditionalApi = Readonly<{
-  when: Readonly<{ propName: string; equals: string | number | boolean }>
+  when: Readonly<ConditionalApiCondition>
   shape: ExecutableApiShape
 }>
 

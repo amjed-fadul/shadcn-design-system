@@ -12,7 +12,7 @@ import type { ComponentContractSourceReconciliationContext } from "./loader"
 import { compareJsxRenderTree, analyzeJsxRenderTree, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
 import { reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
 import { analyzeComponentTokenSourceForExport, compareComponentTokenDependenciesForExport } from "./canonical-token-source-analysis"
-import type { ComponentFamilyContract, ConditionalApiCase, InheritedInterfaceContract } from "./types"
+import type { ComponentFamilyContract, ConditionalApiCase, ConditionalApiCondition, InheritedInterfaceContract } from "./types"
 
 const analyzedInterfaceFacts = new Map<string, ReturnType<typeof analyzePackageComponentInterface>>()
 const canonicalReconciliationCache = new Map<string, readonly string[]>()
@@ -217,7 +217,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
   if (cached) return [...cached]
   const errors: string[] = []
   const propAnalyzer = canonicalComponentPropSourceAnalyzer(repositoryRoot)
-  const sourceConditionalWhens = new Map<string, Array<{ propName: string; equals: string | number | boolean }>>()
+  const sourceConditionalWhens = new Map<string, ConditionalApiCondition[]>()
   for (const family of context.families) {
     const path = join(repositoryRoot, family.source.canonicalPath)
     let source: string
@@ -298,7 +298,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       ...component.inherits.flatMap((interfaceId) => sourceConditionalWhens.get(interfaceId) ?? []),
     ]
     for (const conditional of expectedConditionalApi) {
-      if (!supported.some((candidate) => candidate.propName === conditional.when.propName && candidate.equals === conditional.when.equals)) {
+      if (!supported.some((candidate) => candidate.propName === conditional.when.propName && ("equals" in candidate && "equals" in conditional.when ? candidate.equals === conditional.when.equals : "presence" in candidate && "presence" in conditional.when && candidate.presence === conditional.when.presence))) {
         errors.push(`Component ${entry.name} conditional API lacks source evidence for ${conditional.when.propName}.`)
       }
     }

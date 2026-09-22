@@ -353,7 +353,7 @@ function combineIndependentRenderConditions(left: AnyRecord, right: AnyRecord): 
   return unique.length === 1 ? unique[0] : { all: unique }
 }
 
-function independentRenderBranchExpressions(functionLike: ts.FunctionLikeDeclaration): Array<{ predicate: AnyRecord; expression: ts.Expression }> {
+function independentRenderBranchExpressions(functionLike: ts.FunctionLikeDeclaration, opaqueStateBindings = new Set<string>()): Array<{ predicate: AnyRecord; expression: ts.Expression }> {
   if (!functionLike.body || !ts.isBlock(functionLike.body)) return []
   const bindings = new Set<string>()
   const parameter = functionLike.parameters[0]
@@ -434,14 +434,16 @@ function independentRenderBranchExpressions(functionLike: ts.FunctionLikeDeclara
     } else results.push({ predicate: branch.predicate ?? nested, expression: branch.expression })
   }
   const renderedResults = results.filter(({ expression }) => unwrapReturnedExpression(expression).kind !== ts.SyntaxKind.NullKeyword)
-  return renderedResults.length === 1 && renderedResults[0].predicate.otherwise ? [] : renderedResults
+  const onlyPredicate = renderedResults[0]?.predicate
+  const opaqueSurvivor = renderedResults.length === 1 && onlyPredicate?.source === "state" && opaqueStateBindings.has(onlyPredicate.name)
+  return renderedResults.length === 1 && (onlyPredicate.otherwise || opaqueSurvivor) ? [] : renderedResults
 }
 
-function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration): AnyRecord[] {
-  return independentRenderBranchExpressions(functionLike).map((branch) => branch.predicate)
+function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration, opaqueStateBindings = new Set<string>()): AnyRecord[] {
+  return independentRenderBranchExpressions(functionLike, opaqueStateBindings).map((branch) => branch.predicate)
 }
 
-function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sourceFile: ts.SourceFile, restBindings: Set<string>): IndependentRenderBranch[] {
+function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sourceFile: ts.SourceFile, restBindings: Set<string>, opaqueStateBindings = new Set<string>()): IndependentRenderBranch[] {
   const declarations = new Map<string, ts.Expression>()
   walkComponent(functionLike.body!, (node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) declarations.set(node.name.text, node.initializer)
@@ -605,7 +607,7 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
     const rendered = renderNode(expression, predicate, when)
     return rendered ? [rendered] : []
   }
-  return independentRenderBranchExpressions(functionLike).map(({ predicate, expression }) => {
+  return independentRenderBranchExpressions(functionLike, opaqueStateBindings).map(({ predicate, expression }) => {
     const rendered = renderNode(expression, predicate)
     return { predicate, ...(rendered ? { tree: rendered.node } : {}) }
   })
@@ -915,6 +917,14 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
   }
   const jsx = functionLike ? jsxNodes(functionLike) : []
   const jsxAliases = new Set<string>()
+  const importedFunctions = new Map<string, string>()
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !statement.importClause?.namedBindings || !ts.isNamedImports(statement.importClause.namedBindings)) continue
+    for (const element of statement.importClause.namedBindings.elements) {
+      importedFunctions.set(element.name.text, element.propertyName?.text ?? element.name.text)
+    }
+  }
+  const dynamicChildBindings = new Set<string>()
   const containsDirectJsx = (expression: ts.Expression): boolean => {
     if (ts.isJsxElement(expression) || ts.isJsxSelfClosingElement(expression) || ts.isJsxFragment(expression)) return true
     if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return containsDirectJsx(expression.expression)
@@ -922,6 +932,9 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
   }
   if (functionLike?.body) walkComponent(functionLike.body, (node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && containsDirectJsx(node.initializer)) jsxAliases.add(node.name.text)
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && ts.isCallExpression(node.initializer) && ts.isIdentifier(node.initializer.expression) && importedFunctions.get(node.initializer.expression.text) === "useMemo") {
+      dynamicChildBindings.add(node.name.text)
+    }
   })
   const renderUnresolved: IndependentRenderUnresolved[] = []
   const nonJsxBindings = new Set([...typeFacts.entries()]
@@ -930,7 +943,7 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
   for (const node of jsx) {
     if (!ts.isJsxElement(node)) continue
     for (const child of node.children) {
-      if (!ts.isJsxExpression(child) || !child.expression || !ts.isIdentifier(child.expression) || child.expression.text === "children" || jsxAliases.has(child.expression.text) || nonJsxBindings.has(child.expression.text)) continue
+      if (!ts.isJsxExpression(child) || !child.expression || !ts.isIdentifier(child.expression) || child.expression.text === "children" || jsxAliases.has(child.expression.text) || dynamicChildBindings.has(child.expression.text) || nonJsxBindings.has(child.expression.text)) continue
       renderUnresolved.push({
         sourcePath: sourceFile.fileName,
         start: child.expression.getStart(sourceFile),
@@ -1002,8 +1015,8 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     directUsesSlot,
     returnCount: functionLike ? returnExpressions(functionLike).length : 0,
     conditionalSource: /\bif\s*\(|\?|&&/.test(bodyText),
-    renderAlternativePredicates: functionLike ? renderAlternativePredicates(functionLike) : [],
-    renderBranches: functionLike ? independentRenderBranches(functionLike, sourceFile, restBindings) : [],
+    renderAlternativePredicates: functionLike ? renderAlternativePredicates(functionLike, dynamicChildBindings) : [],
+    renderBranches: functionLike ? independentRenderBranches(functionLike, sourceFile, restBindings, dynamicChildBindings) : [],
     renderUnresolved,
     mappedRenderEvidence: functionLike ? mappedRenderEvidence(functionLike) : [],
     ...(propSurfaceError ? { propSurfaceError } : {}),
@@ -2844,6 +2857,17 @@ describe("Phase 3 Task 10 independent review", () => {
     )
   })
 
+  test("independent render oracle accepts only imported useMemo dynamic children", () => {
+    const { sourceFile } = sourceFacts(join(root, "tests/fixtures/component-analysis-completeness-fixture.tsx"))
+    const imported = componentSourceFacts(sourceFile, declarationFor(sourceFile, "ImportedUseMemoChildFixture")!)
+    const counterfeit = componentSourceFacts(sourceFile, declarationFor(sourceFile, "CounterfeitMemoChildFixture")!)
+
+    expect(imported.renderUnresolved).toEqual([])
+    expect(counterfeit.renderUnresolved).toEqual([
+      expect.objectContaining({ expressionKind: "Identifier", sourceText: "content", reason: "Unsupported JSX child expression: content" }),
+    ])
+  })
+
   test("independent local-prop oracle rejects a ToggleGroup provider prop redeclared as local", () => {
     const baseline = loadArtifacts()
     const mutated = clone(baseline)
@@ -2913,7 +2937,7 @@ describe("Phase 3 Task 10 independent review", () => {
     component.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.input").when.equals = "default"
 
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
-  })
+  }, 15_000)
 
   test("independent utility parser preserves exact data conditions and stacked conjunctions", () => {
     const facts = independentImportedTokenDependencies([

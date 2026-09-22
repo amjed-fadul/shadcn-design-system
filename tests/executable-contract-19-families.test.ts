@@ -90,7 +90,7 @@ function bareNode(entry: ExecutableExport, childrenOverride?: AuthoredNode[], pr
   }
   const selected = new Map<string, string | number | boolean>()
   for (const conditional of componentContract.conditionalApi) {
-    if (!selected.has(conditional.when.propName)) selected.set(conditional.when.propName, conditional.when.equals)
+    if ("equals" in conditional.when && !selected.has(conditional.when.propName)) selected.set(conditional.when.propName, conditional.when.equals)
   }
   for (const [propName, value] of selected) props[propName] ??= literal(value)
   Object.assign(props, propsOverride)
@@ -133,17 +133,6 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
-const approvedUnresolvedFacts = new Map<string, string[]>([
-  ["drawer.Drawer", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-  ["drawer.DrawerClose", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-  ["drawer.DrawerContent", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-  ["drawer.DrawerDescription", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-  ["drawer.DrawerOverlay", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-  ["drawer.DrawerPortal", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-  ["drawer.DrawerTitle", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-  ["drawer.DrawerTrigger", ["UNRESOLVED_FACT:Factual contract for drawer.Drawer is unresolved: snap-point fade conditional API."]],
-])
-
 describe("Phase 5 executable validator coverage across all 38 canonical families", () => {
   test("projects and resolves every authorable canonical export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
@@ -155,19 +144,21 @@ describe("Phase 5 executable validator coverage across all 38 canonical families
     expect(authorable).toHaveLength(199)
     expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
-    const failures: Array<{ exportId: string; errors: ReadonlyArray<ValidationError> }> = []
     for (const entry of authorable) {
       const exportId = `${entry.familyId}.${entry.name}`
       const result = validateAuthoredUi({ root: nodeFor(entry.familyId, entry.name) }, contract)
-      const actual = result.errors.map((error) => `${error.code}:${error.message}`)
-      const approved = approvedUnresolvedFacts.get(exportId) ?? []
-      if (!approved.length) {
-        expect(result.errors, exportId).toEqual([])
-      } else if (actual.join("\u0000") !== approved.join("\u0000")) {
-        failures.push({ exportId, errors: result.errors })
-      }
+      expect(result.errors, exportId).toEqual([])
     }
-    expect(failures).toEqual([])
+  })
+
+  test("selects Drawer fadeFromIndex presence branches and enforces required snapPoints", () => {
+    const absent = validateAuthoredUi({ root: component("drawer", "Drawer"), tokenUses: [] }, contract)
+    const incomplete = validateAuthoredUi({ root: component("drawer", "Drawer", { fadeFromIndex: literal(0) }), tokenUses: [] }, contract)
+    const complete = validateAuthoredUi({ root: component("drawer", "Drawer", { fadeFromIndex: literal(0), snapPoints: literal([0.25, "320px"]) }), tokenUses: [] }, contract)
+
+    expect(absent).toEqual({ ok: true, errors: [] })
+    expect(incomplete.errors).toContainEqual(expect.objectContaining({ code: "INVALID_PROP", message: "Required prop Drawer.snapPoints is missing." }))
+    expect(complete).toEqual({ ok: true, errors: [] })
   })
 
   test("models FieldError useMemo children as a source-backed dynamic expression", async () => {

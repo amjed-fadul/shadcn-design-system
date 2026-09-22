@@ -26,7 +26,7 @@ import knowledge from "../contracts/knowledge/components/drawer.json"
 import references from "../contracts/knowledge/references.json"
 import packageJson from "../package.json"
 import { analyzePackageComponentInterface } from "./helpers/typescript-interface-analysis"
-import { validateComponentFamilyInvariants } from "../src/contracts/components/invariants"
+import { validateComponentFamilyInvariants, validateInheritedInterfaceInvariants } from "../src/contracts/components/invariants"
 import {
   analyzeJsxRenderTree,
   compareJsxRenderTree,
@@ -109,12 +109,7 @@ describe("release.5 Drawer", () => {
         }).toEqual(analyzed)
       }
 
-      expect(vaulRoot.unresolved).toEqual([
-        expect.objectContaining({
-          topic: "snap-point fade conditional API",
-          scope: "vaul.drawer.root",
-        }),
-      ])
+      expect(vaulRoot.unresolved).toEqual([])
       expect(vaulOverlay.unresolved).toEqual([])
       expect(vaulContent.unresolved).toEqual([])
       expect(vaulPortal.unresolved).toEqual([])
@@ -122,8 +117,28 @@ describe("release.5 Drawer", () => {
     60_000
   )
 
-  test("keeps the analyzer from inventing direction as a union discriminator", () => {
-    expect(vaulRoot.conditionalApi).toEqual([])
+  test("models the declaration's fadeFromIndex presence union without inventing direction as a discriminator", () => {
+    expect(vaulRoot.conditionalApi).toEqual([
+      {
+        when: { propName: "fadeFromIndex", presence: "present" },
+        propRefinements: [
+          { propName: "fadeFromIndex", availability: "available", required: true, type: { kind: "number" }, evidenceRefs: ["declaration"] },
+          { propName: "snapPoints", availability: "available", required: true, type: { kind: "array", item: { kind: "union", members: [{ kind: "string" }, { kind: "number" }] } }, evidenceRefs: ["declaration"] },
+        ],
+        eventRefinements: [],
+        stateChannels: [],
+        evidenceRefs: ["declaration"],
+      },
+      {
+        when: { propName: "fadeFromIndex", presence: "absent" },
+        propRefinements: [
+          { propName: "fadeFromIndex", availability: "unavailable", evidenceRefs: ["declaration"] },
+        ],
+        eventRefinements: [],
+        stateChannels: [],
+        evidenceRefs: ["declaration"],
+      },
+    ])
     expect(vaulRoot.props.find((prop) => prop.name === "direction")?.type).toEqual({
       kind: "enum",
       values: ["top", "bottom", "left", "right"],
@@ -135,6 +150,16 @@ describe("release.5 Drawer", () => {
         members: [{ kind: "string" }, { kind: "number" }],
       },
     })
+
+    const missingBranch = structuredClone(vaulRoot) as any
+    missingBranch.conditionalApi.pop()
+    expect(validateInheritedInterfaceInvariants(missingBranch)).toContain(
+      "Inherited interface vaul.drawer.root presence discriminator fadeFromIndex must define exactly one present and one absent case.",
+    )
+
+    const forgedBranch = structuredClone(vaulRoot) as any
+    forgedBranch.conditionalApi[0].propRefinements.find((prop: any) => prop.propName === "snapPoints").required = false
+    expect({ props: forgedBranch.props, events: forgedBranch.events ?? [], conditionalApi: forgedBranch.conditionalApi }).not.toEqual(expectedVaulInterface(vaulRoot))
   })
 
   test("keeps source and current shadcn upstream identity exact", () => {
@@ -280,7 +305,7 @@ describe("release.5 Drawer", () => {
     expect(validateComponentFamilyInvariants(family as any, authority as any)).toEqual([])
   })
 
-  test("keeps official Drawer knowledge and the unresolved snap-point boundary explicit", () => {
+  test("keeps official Drawer knowledge with no unresolved snap-point boundary", () => {
     expect(knowledge.guidanceStatus).toMatchObject({
       whatItIs: "available",
       whenToUse: "available",
@@ -289,11 +314,6 @@ describe("release.5 Drawer", () => {
     })
     expect(references.references.some((reference) => reference.id === "shadcn.drawer.docs"))
       .toBe(true)
-    expect(family.unresolved).toEqual([
-      expect.objectContaining({
-        topic: "Vaul snap-point presence union",
-        scope: "Drawer Root API",
-      }),
-    ])
+    expect(family.unresolved).toEqual([])
   })
 })

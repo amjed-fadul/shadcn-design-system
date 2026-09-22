@@ -1,5 +1,5 @@
 import { isRenderingTree } from "./types"
-import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType, TokenConditionAtom } from "./types"
+import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, ConditionalApiCondition, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType, TokenConditionAtom } from "./types"
 
 type PublicPropFact = { name: string; availability: "available" | "unavailable"; required?: boolean; type?: StructuredPropType }
 
@@ -103,15 +103,27 @@ function basePublicProps(component: ComponentDefinition, authority: ComponentInv
   return props
 }
 
-function resolveConditionalApiShapeAtStage(component: ComponentDefinition, selection: { propName: string; equals: string | number | boolean }, authority: ComponentInvariantAuthority, includeWrapperRefinements: boolean): EffectiveComponentApiShape {
+function sameConditionalApiCondition(left: ConditionalApiCondition, right: ConditionalApiCondition): boolean {
+  return left.propName === right.propName && ("equals" in left && "equals" in right ? left.equals === right.equals : "presence" in left && "presence" in right && left.presence === right.presence)
+}
+
+function conditionalApiConditionKey(condition: ConditionalApiCondition): string {
+  return `${condition.propName}:${"equals" in condition ? `equals=${JSON.stringify(condition.equals)}` : `presence=${condition.presence}`}`
+}
+
+function conditionalApiConditionLabel(condition: ConditionalApiCondition): string {
+  return "equals" in condition ? `${condition.propName}=${String(condition.equals)}` : `${condition.propName} ${condition.presence}`
+}
+
+function resolveConditionalApiShapeAtStage(component: ComponentDefinition, selection: ConditionalApiCondition, authority: ComponentInvariantAuthority, includeWrapperRefinements: boolean): EffectiveComponentApiShape {
   const interfaceCases = inheritedContracts(component, authority).flatMap((contract) => {
-    const cases = (contract.conditionalApi ?? []).filter((candidate) => candidate.when.propName === selection.propName && candidate.when.equals === selection.equals)
-    if (cases.length > 1) throw new Error(`Expected at most one inherited conditional API case for ${selection.propName}=${String(selection.equals)}.`)
+    const cases = (contract.conditionalApi ?? []).filter((candidate) => sameConditionalApiCondition(candidate.when, selection))
+    if (cases.length > 1) throw new Error(`Expected at most one inherited conditional API case for ${conditionalApiConditionLabel(selection)}.`)
     return cases
   })
-  const componentCases = component.conditionalApi.filter((candidate) => candidate.when.propName === selection.propName && candidate.when.equals === selection.equals)
-  if (componentCases.length > 1) throw new Error(`Expected at most one component conditional API case for ${selection.propName}=${String(selection.equals)}.`)
-  if (interfaceCases.length + componentCases.length === 0) throw new Error(`Expected a conditional API case for ${selection.propName}=${String(selection.equals)}.`)
+  const componentCases = component.conditionalApi.filter((candidate) => sameConditionalApiCondition(candidate.when, selection))
+  if (componentCases.length > 1) throw new Error(`Expected at most one component conditional API case for ${conditionalApiConditionLabel(selection)}.`)
+  if (interfaceCases.length + componentCases.length === 0) throw new Error(`Expected a conditional API case for ${conditionalApiConditionLabel(selection)}.`)
   const baseCases = interfaceCases.length > 0 ? interfaceCases : componentCases
   const wrapperCases = includeWrapperRefinements && interfaceCases.length > 0 ? componentCases : []
   const props = new Map<string, EffectivePublicProp>()
@@ -132,7 +144,7 @@ function resolveConditionalApiShapeAtStage(component: ComponentDefinition, selec
 }
 
 /** Resolves only factual branch shape; it does not validate authored runtime props. */
-export function resolveConditionalApiShape(component: ComponentDefinition, selection: { propName: string; equals: string | number | boolean }, authority: ComponentInvariantAuthority): EffectiveComponentApiShape {
+export function resolveConditionalApiShape(component: ComponentDefinition, selection: ConditionalApiCondition, authority: ComponentInvariantAuthority): EffectiveComponentApiShape {
   return resolveConditionalApiShapeAtStage(component, selection, authority, true)
 }
 
@@ -304,12 +316,13 @@ function validateConditionalApi(errors: string[], family: ComponentFamilyContrac
     hasEvidence(errors, conditional.evidenceRefs, family.evidence, `Conditional API ${componentName}.${conditional.when.propName}`)
     const discriminator = baseProps.get(conditional.when.propName)
     if (!discriminator) errors.push(`Conditional API ${componentName} references unknown discriminant prop: ${conditional.when.propName}.`)
-    else if (!discriminator.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type)) errors.push(`Conditional API ${componentName}.${conditional.when.propName} has enum prop without value: ${String(conditional.when.equals)}.`)
-    const caseKey = `${conditional.when.propName}:${JSON.stringify(conditional.when.equals)}`
-    if (cases.has(caseKey)) errors.push(`Component ${componentName} has conflicting conditional API case for ${conditional.when.propName}=${String(conditional.when.equals)}.`)
+    else if ("equals" in conditional.when && (!discriminator.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type))) errors.push(`Conditional API ${componentName}.${conditional.when.propName} has enum prop without value: ${String(conditional.when.equals)}.`)
+    else if ("presence" in conditional.when && discriminator.required) errors.push(`Conditional API ${componentName}.${conditional.when.propName} cannot use presence discrimination on a required prop.`)
+    const caseKey = conditionalApiConditionKey(conditional.when)
+    if (cases.has(caseKey)) errors.push(`Component ${componentName} has conflicting conditional API case for ${conditionalApiConditionLabel(conditional.when)}.`)
     cases.add(caseKey)
 
-    const inheritedBranchExists = inheritedContracts(component, authority).some((contract) => (contract.conditionalApi ?? []).some((candidate) => candidate.when.propName === conditional.when.propName && candidate.when.equals === conditional.when.equals))
+    const inheritedBranchExists = inheritedContracts(component, authority).some((contract) => (contract.conditionalApi ?? []).some((candidate) => sameConditionalApiCondition(candidate.when, conditional.when)))
     const inheritedBranch = inheritedBranchExists ? resolveConditionalApiShapeAtStage(component, conditional.when, authority, false) : undefined
     const effectiveBaseProps: Map<string, EffectivePublicProp> = inheritedBranch
       ? new Map(inheritedBranch.props.map((prop) => [prop.name, prop]))
@@ -344,9 +357,15 @@ function validateConditionalApi(errors: string[], family: ComponentFamilyContrac
       else if (!base.payload || !strictlyNarrowsStructuredPropType(refinement.payload, base.payload)) errors.push(`Conditional API ${componentName}.${conditional.when.propName} refines event ${refinement.eventPropName} with a payload that does not narrow its ${inheritedBranch ? "selected branch" : "base payload"}.`)
     }
 
-    if (component.conditionalApi.filter((candidate) => candidate.when.propName === conditional.when.propName && candidate.when.equals === conditional.when.equals).length === 1) {
+    if (component.conditionalApi.filter((candidate) => sameConditionalApiCondition(candidate.when, conditional.when)).length === 1) {
       const effective = resolveConditionalApiShape(component, conditional.when, authority)
       validateStateChannels(errors, family, componentName, conditional.stateChannels, new Map(effective.props.map((prop) => [prop.name, prop])), new Map(effective.events.map((event) => [event.propName, event])))
+    }
+  }
+  for (const propName of new Set(component.conditionalApi.filter((conditional) => "presence" in conditional.when).map((conditional) => conditional.when.propName))) {
+    const presenceCases = component.conditionalApi.filter((conditional) => conditional.when.propName === propName && "presence" in conditional.when)
+    if (presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "present").length !== 1 || presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "absent").length !== 1) {
+      errors.push(`Component ${componentName} presence discriminator ${propName} must define exactly one present and one absent case.`)
     }
   }
 }
@@ -469,9 +488,10 @@ export function validateInheritedInterfaceInvariants(contract: InheritedInterfac
   for (const conditional of contract.conditionalApi ?? []) {
     hasEvidence(errors, conditional.evidenceRefs, contract.evidence, `Inherited interface ${contract.id}.${conditional.when.propName}`)
     const discriminator = props.get(conditional.when.propName)
-    if (!discriminator?.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type)) errors.push(`Inherited interface ${contract.id} has invalid discriminator ${conditional.when.propName}=${String(conditional.when.equals)}.`)
-    const caseKey = `${conditional.when.propName}:${JSON.stringify(conditional.when.equals)}`
-    if (cases.has(caseKey)) errors.push(`Inherited interface ${contract.id} has conflicting conditional API case for ${conditional.when.propName}=${String(conditional.when.equals)}.`)
+    if ("equals" in conditional.when && (!discriminator?.type || !isStructuredPropTypeAssignable({ kind: "literal", value: conditional.when.equals }, discriminator.type))) errors.push(`Inherited interface ${contract.id} has invalid discriminator ${conditional.when.propName}=${String(conditional.when.equals)}.`)
+    else if ("presence" in conditional.when && discriminator?.required) errors.push(`Inherited interface ${contract.id} cannot use presence discrimination on required prop ${conditional.when.propName}.`)
+    const caseKey = conditionalApiConditionKey(conditional.when)
+    if (cases.has(caseKey)) errors.push(`Inherited interface ${contract.id} has conflicting conditional API case for ${conditionalApiConditionLabel(conditional.when)}.`)
     cases.add(caseKey)
     for (const refinement of conditional.propRefinements) {
       const base = props.get(refinement.propName); hasEvidence(errors, refinement.evidenceRefs, contract.evidence, `Inherited interface prop refinement ${contract.id}.${refinement.propName}`)
@@ -483,6 +503,12 @@ export function validateInheritedInterfaceInvariants(contract: InheritedInterfac
       const base = events.get(refinement.eventPropName); hasEvidence(errors, refinement.evidenceRefs, contract.evidence, `Inherited interface event refinement ${contract.id}.${refinement.eventPropName}`)
       if (!base) errors.push(`Inherited interface ${contract.id}.${conditional.when.propName} refines unknown event: ${refinement.eventPropName}.`)
       else if (!base.payload || !strictlyNarrowsStructuredPropType(refinement.payload, base.payload)) errors.push(`Inherited interface ${contract.id}.${conditional.when.propName} refines event ${refinement.eventPropName} with a payload that does not narrow its base payload.`)
+    }
+  }
+  for (const propName of new Set((contract.conditionalApi ?? []).filter((conditional) => "presence" in conditional.when).map((conditional) => conditional.when.propName))) {
+    const presenceCases = (contract.conditionalApi ?? []).filter((conditional) => conditional.when.propName === propName && "presence" in conditional.when)
+    if (presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "present").length !== 1 || presenceCases.filter((conditional) => "presence" in conditional.when && conditional.when.presence === "absent").length !== 1) {
+      errors.push(`Inherited interface ${contract.id} presence discriminator ${propName} must define exactly one present and one absent case.`)
     }
   }
   return errors

@@ -34,8 +34,8 @@ describe("executable contract projection", () => {
 
   test("projects Accordion's single and multiple conditional API shapes", () => {
     const accordion = contract.exports["accordion\u0000Accordion"].component!
-    const single = accordion.conditionalApi.find((entry) => entry.when.equals === "single")!
-    const multiple = accordion.conditionalApi.find((entry) => entry.when.equals === "multiple")!
+    const single = accordion.conditionalApi.find((entry) => "equals" in entry.when && entry.when.equals === "single")!
+    const multiple = accordion.conditionalApi.find((entry) => "equals" in entry.when && entry.when.equals === "multiple")!
 
     expect(single.shape.props).toEqual(expect.arrayContaining([
       expect.objectContaining({ name: "value", availability: "available", type: { kind: "string" } }),

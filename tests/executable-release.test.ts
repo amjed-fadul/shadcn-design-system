@@ -86,11 +86,13 @@ describe("immutable executable release", () => {
     expect(exportIds).toEqual(expectedExportIds)
   })
 
-  test("preserves release 001 byte-for-byte while activating release 002", () => {
+  test("preserves release 001 byte-for-byte and pins regenerated release 002 exactly", () => {
     const release001 = readFileSync(fileURLToPath(new URL("../provenance/releases/shadcn-radix-release-001.json", import.meta.url)))
-    const digest = createHash("sha256").update(release001).digest("hex")
+    const release002 = readFileSync(fileURLToPath(new URL("../provenance/releases/shadcn-radix-release-002.json", import.meta.url)))
 
-    expect(digest).toBe("1f9274c16ba625cf02096a6b8bb6da570762a16296da8624daa7475db3a89370")
+    expect(createHash("sha256").update(release001).digest("hex")).toBe("1f9274c16ba625cf02096a6b8bb6da570762a16296da8624daa7475db3a89370")
+    expect(createHash("sha256").update(release002).digest("hex")).toBe("cfb63e9dfdda341b49a649b247f3e13813c071784fe7cadbb5ee4af0c9efb5fa")
+    expect(getExecutableRelease().sha256).toBe("fa1e7031b4f6de1bc8d77f9f1e188c8811edb3c94f788c9b7ce0eab5b82dca05")
     expect(EXECUTABLE_RELEASE_ID).toBe("shadcn-radix-release-002")
   })
 

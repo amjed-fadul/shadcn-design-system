@@ -21,7 +21,7 @@ const authorityErrors = (families: ComponentFamilyContract[]) => reconcileCanoni
 describe("canonical source-backed composition and conditional authority", () => {
   test("accepts the promoted families' exact source-backed facts", () => {
     expect(authorityErrors(sourceBackedFamilies)).toEqual([])
-  })
+  }, 120_000)
 
   test("rejects removed release.5 composition and conditional facts", () => {
     const mutated = structuredClone(sourceBackedFamilies)

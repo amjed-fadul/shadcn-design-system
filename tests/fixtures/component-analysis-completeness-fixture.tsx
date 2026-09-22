@@ -1,3 +1,5 @@
+import { useMemo as importedUseMemo } from "react"
+
 declare const cva: (...arguments_: unknown[]) => unknown
 declare const cn: (...arguments_: unknown[]) => string
 declare const styles: { root: string }
@@ -14,6 +16,10 @@ declare const unrelated: Record<string, unknown>
 declare const Tooltip: any
 declare const TooltipTrigger: any
 declare const TooltipContent: any
+
+function localMemo(callback: () => unknown) {
+  return callback()
+}
 
 function DynamicTokenFixture() {
   return (
@@ -207,4 +213,14 @@ function CoercedTruthinessFixture({ children, ...rest }: { children?: string }) 
   )
 }
 
-export { AndTernaryChildFixture, CoercedTruthinessFixture, ConditionalDataBranchFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonHostConditionalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, SamePredicateSiblingTernaryFixture, ScalarPropChildFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+function ImportedUseMemoChildFixture({ children, ...rest }: { children?: string }) {
+  const content = importedUseMemo(() => children ?? <StaticChild />, [children])
+  return <Primitive.Root {...rest}>{content}</Primitive.Root>
+}
+
+function CounterfeitMemoChildFixture({ children, ...rest }: { children?: string }) {
+  const content = localMemo(() => children ?? <StaticChild />)
+  return <Primitive.Root {...rest}>{content}</Primitive.Root>
+}
+
+export { AndTernaryChildFixture, CoercedTruthinessFixture, ConditionalDataBranchFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, CounterfeitMemoChildFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, ImportedUseMemoChildFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonHostConditionalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, SamePredicateSiblingTernaryFixture, ScalarPropChildFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

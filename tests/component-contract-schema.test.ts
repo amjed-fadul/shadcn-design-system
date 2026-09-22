@@ -59,6 +59,23 @@ describe("component contract JSON Schemas", () => {
     }
   })
 
+  test("accepts exact presence conditions and rejects mixed or unknown presence predicates", () => {
+    const family = validFamily()
+    family.exports[0].component.conditionalApi = [{ when: { propName: "optional", presence: "present" }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] }]
+    const inherited = validInterface() as any
+    inherited.conditionalApi = [{ when: { propName: "title", presence: "absent" }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["declaration"] }]
+
+    expect(validate(familySchema, family)).toBe(true)
+    expect(validate(interfaceSchema, inherited)).toBe(true)
+
+    const mixed = structuredClone(inherited)
+    mixed.conditionalApi[0].when.equals = true
+    expect(validate(interfaceSchema, mixed)).toBe(false)
+    const unknown = structuredClone(inherited)
+    unknown.conditionalApi[0].when.presence = "maybe"
+    expect(validate(interfaceSchema, unknown)).toBe(false)
+  })
+
   test("accepts an evidence-backed node-targeted portal boundary", () => {
     const family = validFamily()
     family.exports[0].component.rendering = {

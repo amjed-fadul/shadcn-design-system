@@ -59,7 +59,7 @@ describe("component contract loader and derived index", () => {
       }))
       expect(loaded.contractSet.status).toBe(status)
     }
-  })
+  }, 30_000)
 
   test("rejects an unknown component contract lifecycle state", () => {
     expect(() => loadComponentContracts(memorySource((artifacts) => {

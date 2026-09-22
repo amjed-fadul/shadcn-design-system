@@ -170411,7 +170411,668 @@
               ]
             }
           ],
-          "conditionalApi": [],
+          "conditionalApi": [
+            {
+              "when": {
+                "propName": "fadeFromIndex",
+                "presence": "absent"
+              },
+              "shape": {
+                "props": [
+                  {
+                    "name": "activeSnapPoint",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "union",
+                      "members": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        }
+                      ]
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "autoFocus",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "children",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "union",
+                      "members": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "literal",
+                          "value": false
+                        },
+                        {
+                          "kind": "literal",
+                          "value": true
+                        },
+                        {
+                          "kind": "typescript",
+                          "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+                        },
+                        {
+                          "kind": "typescript",
+                          "typeText": "Iterable<React.ReactNode>"
+                        },
+                        {
+                          "kind": "typescript",
+                          "typeText": "React.ReactPortal"
+                        }
+                      ]
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "closeThreshold",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "number"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "container",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "HTMLElement"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "defaultOpen",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "direction",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "enum",
+                      "values": [
+                        "top",
+                        "bottom",
+                        "left",
+                        "right"
+                      ]
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "disablePreventScroll",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "dismissible",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "fadeFromIndex",
+                    "availability": "unavailable",
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "fixed",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "handleOnly",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "modal",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "nested",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "noBodyStyles",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onAnimationEnd",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(open: boolean) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onClose",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "() => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onDrag",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(event: React.PointerEvent<HTMLDivElement>, percentageDragged: number) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onRelease",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(event: React.PointerEvent<HTMLDivElement>, open: boolean) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "open",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "preventScrollRestoration",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "repositionInputs",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "scrollLockTimeout",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "number"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "setActiveSnapPoint",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(snapPoint: number | string | null) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "setBackgroundColorOnScale",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "shouldScaleBackground",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "snapPoints",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "array",
+                      "item": {
+                        "kind": "union",
+                        "members": [
+                          {
+                            "kind": "string"
+                          },
+                          {
+                            "kind": "number"
+                          }
+                        ]
+                      }
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "snapToSequentialPoint",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  }
+                ],
+                "events": [
+                  {
+                    "propName": "onOpenChange",
+                    "required": false,
+                    "payload": {
+                      "kind": "boolean"
+                    },
+                    "origin": "inherited"
+                  }
+                ],
+                "stateChannels": []
+              }
+            },
+            {
+              "when": {
+                "propName": "fadeFromIndex",
+                "presence": "present"
+              },
+              "shape": {
+                "props": [
+                  {
+                    "name": "activeSnapPoint",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "union",
+                      "members": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        }
+                      ]
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "autoFocus",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "children",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "union",
+                      "members": [
+                        {
+                          "kind": "string"
+                        },
+                        {
+                          "kind": "number"
+                        },
+                        {
+                          "kind": "literal",
+                          "value": false
+                        },
+                        {
+                          "kind": "literal",
+                          "value": true
+                        },
+                        {
+                          "kind": "typescript",
+                          "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+                        },
+                        {
+                          "kind": "typescript",
+                          "typeText": "Iterable<React.ReactNode>"
+                        },
+                        {
+                          "kind": "typescript",
+                          "typeText": "React.ReactPortal"
+                        }
+                      ]
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "closeThreshold",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "number"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "container",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "HTMLElement"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "defaultOpen",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "direction",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "enum",
+                      "values": [
+                        "top",
+                        "bottom",
+                        "left",
+                        "right"
+                      ]
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "disablePreventScroll",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "dismissible",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "fadeFromIndex",
+                    "availability": "available",
+                    "required": true,
+                    "type": {
+                      "kind": "number"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "fixed",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "handleOnly",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "modal",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "nested",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "noBodyStyles",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onAnimationEnd",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(open: boolean) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onClose",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "() => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onDrag",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(event: React.PointerEvent<HTMLDivElement>, percentageDragged: number) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "onRelease",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(event: React.PointerEvent<HTMLDivElement>, open: boolean) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "open",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "preventScrollRestoration",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "repositionInputs",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "scrollLockTimeout",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "number"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "setActiveSnapPoint",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "typescript",
+                      "typeText": "(snapPoint: number | string | null) => void"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "setBackgroundColorOnScale",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "shouldScaleBackground",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "snapPoints",
+                    "availability": "available",
+                    "required": true,
+                    "type": {
+                      "kind": "array",
+                      "item": {
+                        "kind": "union",
+                        "members": [
+                          {
+                            "kind": "string"
+                          },
+                          {
+                            "kind": "number"
+                          }
+                        ]
+                      }
+                    },
+                    "origin": "conditional"
+                  },
+                  {
+                    "name": "snapToSequentialPoint",
+                    "availability": "available",
+                    "required": false,
+                    "type": {
+                      "kind": "boolean"
+                    },
+                    "origin": "conditional"
+                  }
+                ],
+                "events": [
+                  {
+                    "propName": "onOpenChange",
+                    "required": false,
+                    "payload": {
+                      "kind": "boolean"
+                    },
+                    "origin": "inherited"
+                  }
+                ],
+                "stateChannels": []
+              }
+            }
+          ],
           "slots": [],
           "composition": {
             "requires": [],
@@ -170421,35 +171082,9 @@
             "hardConstraints": []
           },
           "tokenDependencies": [],
-          "unresolved": [
-            {
-              "topic": "snap-point fade conditional API",
-              "scope": "vaul.drawer.root",
-              "reason": "Vaul DialogProps is a union where fadeFromIndex is only meaningful with snapPoints. The current component conditional schema models literal discriminators but cannot represent presence-based array branches without flattening the union.",
-              "evidenceAttempted": [
-                "pinned vaul 1.1.2 declaration",
-                "canonical inherited-interface analyzer"
-              ],
-              "evidenceRefs": [
-                "declaration"
-              ]
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "snap-point fade conditional API",
-            "scope": "vaul.drawer.root",
-            "reason": "Vaul DialogProps is a union where fadeFromIndex is only meaningful with snapPoints. The current component conditional schema models literal discriminators but cannot represent presence-based array branches without flattening the union.",
-            "evidenceAttempted": [
-              "pinned vaul 1.1.2 declaration",
-              "canonical inherited-interface analyzer"
-            ],
-            "evidenceRefs": [
-              "declaration"
-            ]
-          }
-        ]
+        "unresolved": []
       },
       "drawer\u0000DrawerClose": {
         "familyId": "drawer",
@@ -484423,5 +485058,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "e77d544e37edc2c41dd703c3b140bd694f93443dac8d2c1e860771b895cf3e8f"
+  "sha256": "fa1e7031b4f6de1bc8d77f9f1e188c8811edb3c94f788c9b7ce0eab5b82dca05"
 }
