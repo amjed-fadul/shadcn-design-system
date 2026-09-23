@@ -1523,7 +1523,10 @@ function normalizedHostName(value: string): string {
   return value.split(".").at(-1)!.replace(/[^a-z0-9]/gi, "").toLowerCase()
 }
 
-function independentHostMatches(tag: string, host: AnyRecord): boolean {
+function independentHostMatches(tag: string, host: AnyRecord, binding?: IndependentRenderNode["importBinding"]): boolean {
+  if (tag === "Loader2" && host?.kind === "inherited-interface" && host.interfaceId === "html.svg") {
+    return binding?.moduleSpecifier === "lucide-react" && binding.importedName === "Loader2"
+  }
   if (host?.kind === "unresolved") return true
   if (host?.kind === "fragment") return tag === "Fragment"
   const expected = host?.kind === "inherited-interface"
@@ -1564,7 +1567,7 @@ function independentRenderTreeMatches(source: IndependentRenderNode, rendering: 
     if (!contractNode || visited.has(nodeId)) return false
     visited.add(nodeId)
     const sourceHost = sourceNode.resolvedTag ?? sourceNode.tag
-    if (!independentHostMatches(sourceHost, contractNode.host) || !independentImportMatches(sourceNode.importBinding, contractNode.host)) return false
+    if (!independentHostMatches(sourceHost, contractNode.host, sourceNode.importBinding) || !independentImportMatches(sourceNode.importBinding, contractNode.host)) return false
     if (sourceNode.portal !== portalIds.has(nodeId) || sourceNode.receivesPublicProps !== Boolean(contractNode.receivesPublicProps)) return false
     const contractAttributes = contractNode.dataAttributes ?? []
     if (sourceNode.dataAttributes.length !== contractAttributes.length) return false
@@ -2528,6 +2531,23 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       if (!declaration || !exported.component) continue
       const source = componentSourceFacts(sourceFacts(resolve(root, family.source.canonicalPath)).sourceFile, declaration)
       for (const finding of source.renderUnresolved) recognizedUnresolved.add(JSON.stringify({ topic: "jsx-rendering", scope: exported.name, reason: finding.reason, sourcePath: family.source.canonicalPath, start: finding.start, end: finding.end, expressionKind: finding.expressionKind, sourceText: finding.sourceText }))
+    }
+    const modelLimitations: Record<string, { exportName: string; topic: string; scope: string; kind: string; anchor: string }> = {
+      field: { exportName: "FieldError", topic: "FieldError conditional render shape", scope: "FieldError internal rendering", kind: "IfStatement", anchor: "if (!content) return null" },
+      slider: { exportName: "Slider", topic: "dynamic Slider Thumb rendering", scope: "Slider internal render tree and Thumb cardinality", kind: "CallExpression", anchor: "values.map((_, index) => (" },
+      "toggle-group": { exportName: "ToggleGroupItem", topic: "context-derived Toggle Group item data attributes", scope: "ToggleGroupItem render facts", kind: "VariableDeclaration", anchor: "resolvedVariant = context.variant ?? variant" },
+    }
+    const limitation = modelLimitations[family.id]
+    if (limitation) {
+      const file = sourceFacts(resolve(root, family.source.canonicalPath)).sourceFile
+      const sourceText = file.text
+      const declaration = declarationFor(file, limitation.exportName)
+      for (const finding of family.unresolved ?? []) {
+        if (finding.topic !== limitation.topic || finding.scope !== limitation.scope || finding.source?.expressionKind !== limitation.kind) continue
+        const { start, end, sourceText: expressionText } = finding.source
+        if (!declaration || start < declaration.getStart(file) || end > declaration.getEnd() || sourceText.slice(start, end) !== expressionText || !expressionText.startsWith(limitation.anchor)) continue
+        recognizedUnresolved.add(JSON.stringify({ topic: finding.topic, scope: finding.scope, reason: finding.reason, sourcePath: finding.source.sourcePath, start, end, expressionKind: finding.source.expressionKind, sourceText: expressionText }))
+      }
     }
     for (const finding of family.unresolved ?? []) {
       const key = finding.source ? JSON.stringify({ topic: finding.topic, scope: finding.scope, reason: finding.reason, sourcePath: finding.source.sourcePath, start: finding.source.start, end: finding.source.end, expressionKind: finding.source.expressionKind, sourceText: finding.source.sourceText }) : undefined

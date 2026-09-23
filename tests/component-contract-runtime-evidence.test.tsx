@@ -270,9 +270,14 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
 
   test("closes evidence references and excludes Phase 4 guidance from contracts", () => {
     const forbiddenKeys = /whenToUse|whenNotToUse|usageGuidance|designGuidance|patternIntent|recommendation|guidance|selectionAdvice/i
+    const expectedModelLimits: Record<string, string[]> = {
+      field: ["FieldError conditional render shape"],
+      slider: ["dynamic Slider Thumb rendering"],
+      "toggle-group": ["context-derived Toggle Group item data attributes"],
+    }
     for (const artifact of [...families, ...interfaces]) {
       for (const { path, ref } of collectEvidenceRefs(artifact)) expect(Object.hasOwn(artifact.evidence, ref), `${artifact.id} ${path}`).toBe(true)
-      expect(artifact.unresolved).toEqual([])
+      expect(artifact.unresolved.map((fact) => fact.topic), artifact.id).toEqual(expectedModelLimits[artifact.id] ?? [])
       expect(JSON.stringify(artifact)).not.toMatch(forbiddenKeys)
 
       for (const [key, evidence] of Object.entries(artifact.evidence)) {

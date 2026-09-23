@@ -149,7 +149,10 @@ describe("Phase 5 executable validator coverage across all 38 canonical families
     for (const entry of authorable) {
       const exportId = `${entry.familyId}.${entry.name}`
       const result = validateAuthoredUi({ root: nodeFor(entry.familyId, entry.name) }, contract)
-      expect(result.errors, exportId).toEqual([])
+      if (entry.unresolved.length) {
+        expect(result.errors.length, exportId).toBeGreaterThan(0)
+        expect([...new Set(result.errors.map((error) => error.code))], exportId).toEqual(["UNRESOLVED_FACT"])
+      } else expect(result.errors, exportId).toEqual([])
     }
   })
 
@@ -163,11 +166,12 @@ describe("Phase 5 executable validator coverage across all 38 canonical families
     expect(complete).toEqual({ ok: true, errors: [] })
   })
 
-  test("models FieldError useMemo children as a source-backed dynamic expression", async () => {
+  test("keeps FieldError's normalized JSX separate from its contract-model limit", async () => {
     const { analyzeJsxRenderTree } = await import("../src/contracts/components/render-source-analysis")
     const result = analyzeJsxRenderTree("src/components/ui/field.tsx", "FieldError")
     expect(result.unresolved).toEqual([])
     expect(result.root?.kind).toBe("intrinsic")
+    expect(contract.exports["field\u0000FieldError"].unresolved.map((fact) => fact.topic)).toEqual(["FieldError conditional render shape"])
   })
 
   test.each([

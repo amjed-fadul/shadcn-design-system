@@ -67,6 +67,7 @@
     "contracts/components/interfaces/html.ol.json",
     "contracts/components/interfaces/html.p.json",
     "contracts/components/interfaces/html.span.json",
+    "contracts/components/interfaces/html.svg.json",
     "contracts/components/interfaces/html.table.json",
     "contracts/components/interfaces/html.tbody.json",
     "contracts/components/interfaces/html.td.json",

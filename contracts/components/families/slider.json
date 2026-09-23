@@ -320,5 +320,25 @@
       }
     }
   ],
-  "unresolved": []
+  "unresolved": [
+    {
+      "topic": "dynamic Slider Thumb rendering",
+      "scope": "Slider internal render tree and Thumb cardinality",
+      "reason": "The render-contract model has no repeated-child or dynamic-cardinality field. Slider maps values derived from value, otherwise defaultValue, otherwise [min] to Thumb JSX; the single thumb edge records a template only and does not assert one rendered Thumb.",
+      "evidenceAttempted": [
+        "canonical src/components/ui/slider.tsx Slider implementation",
+        "component rendering schema and repeated-child source analysis"
+      ],
+      "evidenceRefs": [
+        "source"
+      ],
+      "source": {
+        "sourcePath": "src/components/ui/slider.tsx",
+        "start": 1351,
+        "end": 1793,
+        "expressionKind": "CallExpression",
+        "sourceText": "values.map((_, index) => (\n        <SliderPrimitive.Thumb\n          data-slot=\"slider-thumb\"\n          key={index}\n          className=\"relative block size-3 shrink-0 select-none rounded-full border border-ring bg-background ring-ring/50 transition-[color,box-shadow] after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-none active:ring-3 disabled:pointer-events-none disabled:opacity-50\"\n        />\n      ))"
+      }
+    }
+  ]
 }

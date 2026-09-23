@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
 import { canonicalInterfaceMemberAuthority } from "./canonical-interface-member-authority"
+import { analyzeCanonicalModelLimitations } from "./canonical-model-limitations"
 import { canonicalComponentPropSourceAnalyzer } from "./canonical-component-prop-source-analysis"
 import { canonicalRenderSourceAnalysisConventions } from "./canonical-render-source-conventions"
 import { analyzeCanonicalDelegatedHostFacts, canonicalDelegatedHostEvidencePaths, canonicalSourceOwnedSlotPropNames } from "./canonical-slot-source-analysis"
@@ -269,7 +270,9 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       if (propErrors.some((error) => !error.includes(" default "))) errors.push(`Component ${entry.name} local prop surface does not match source evidence.`)
       errors.push(...propErrors.map((error) => `Component ${entry.name}: ${error}`))
     }
-    errors.push(...reconcileSourceEvidenceCompleteness(family, unresolved))
+    const modelLimitations = analyzeCanonicalModelLimitations(path, family.source.canonicalPath, family.id)
+    errors.push(...modelLimitations.errors)
+    errors.push(...reconcileSourceEvidenceCompleteness(family, [...unresolved, ...modelLimitations.analyses]))
   }
 
   for (const contract of context.interfaces) {

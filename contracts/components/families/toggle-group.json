@@ -972,5 +972,25 @@
       }
     }
   ],
-  "unresolved": []
+  "unresolved": [
+    {
+      "topic": "context-derived Toggle Group item data attributes",
+      "scope": "ToggleGroupItem render facts",
+      "reason": "The render-contract model cannot express data-variant, data-size, and data-spacing as parent ToggleGroupContext-derived values with local variant/size fallbacks and later forwarded-prop overrides. The primitive-state labels record local expression targets only; they do not establish the final attribute values or make item-local variant/size authoritative.",
+      "evidenceAttempted": [
+        "canonical src/components/ui/toggle-group.tsx provider and item implementations",
+        "component rendering data-attribute schema"
+      ],
+      "evidenceRefs": [
+        "source"
+      ],
+      "source": {
+        "sourcePath": "src/components/ui/toggle-group.tsx",
+        "start": 1871,
+        "end": 1915,
+        "expressionKind": "VariableDeclaration",
+        "sourceText": "resolvedVariant = context.variant ?? variant"
+      }
+    }
+  ]
 }

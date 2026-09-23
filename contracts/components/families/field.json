@@ -1181,5 +1181,25 @@
       }
     }
   ],
-  "unresolved": []
+  "unresolved": [
+    {
+      "topic": "FieldError conditional render shape",
+      "scope": "FieldError internal rendering",
+      "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
+      "evidenceAttempted": [
+        "canonical src/components/ui/field.tsx FieldError implementation",
+        "component rendering schema and source reconciliation"
+      ],
+      "evidenceRefs": [
+        "source"
+      ],
+      "source": {
+        "sourcePath": "src/components/ui/field.tsx",
+        "start": 5894,
+        "end": 5919,
+        "expressionKind": "IfStatement",
+        "sourceText": "if (!content) return null"
+      }
+    }
+  ]
 }

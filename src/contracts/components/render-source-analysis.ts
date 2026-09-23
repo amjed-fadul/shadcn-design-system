@@ -668,7 +668,7 @@ type ContractRendering = ContractRenderingTree | { alternatives: Array<({ when: 
 export type RenderSourceAnalysisConventions = Readonly<{
   isStateBinding?: (initializer: ts.Expression) => boolean
   normalizeRenderName?: (name: string) => string
-  matchesInheritedInterface?: (sourceTag: string, interfaceId: string, normalizeRenderName: (name: string) => string) => boolean
+  matchesInheritedInterface?: (sourceTag: string, interfaceId: string, normalizeRenderName: (name: string) => string, importBinding?: JsxRenderNode["importBinding"]) => boolean
   matchesCrossFamilySource?: (moduleSpecifier: string, familyId: string) => boolean
   includeUnresolved?: boolean
 }>
@@ -689,7 +689,7 @@ function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNo
   }
   if (host.kind === "inherited-interface") {
     const interfaceId = host.interfaceId ?? ""
-    return conventions.matchesInheritedInterface?.(resolved.tag, interfaceId, normalizeRenderName) ?? normalizeRenderName(resolved.tag).endsWith(normalizeRenderName(interfaceId))
+    return conventions.matchesInheritedInterface?.(resolved.tag, interfaceId, normalizeRenderName, resolved.importBinding ?? source.importBinding) ?? normalizeRenderName(resolved.tag).endsWith(normalizeRenderName(interfaceId))
   }
   return host.kind === "unresolved" && (source.kind === "component" || source.kind === "member" || source.kind === "unresolved" || Boolean(source.resolvedHost))
 }

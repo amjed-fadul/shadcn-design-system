@@ -54,7 +54,10 @@ export const canonicalRenderSourceAnalysisConventions: RenderSourceAnalysisConve
     const canonicalModuleSpecifier = canonicalModuleSpecifiers.get(familyId)
     return canonicalModuleSpecifier !== undefined && extensionless(moduleSpecifier) === canonicalModuleSpecifier
   },
-  matchesInheritedInterface(sourceTag, interfaceId, normalizeRenderName) {
+  matchesInheritedInterface(sourceTag, interfaceId, normalizeRenderName, importBinding) {
+    if (sourceTag === "Loader2" && interfaceId === "html.svg") {
+      return importBinding?.moduleSpecifier === "lucide-react" && importBinding.importedName === "Loader2"
+    }
     if (interfaceId.startsWith("html.")) return sourceTag === interfaceId.slice("html.".length)
     const primitiveInterfaceMatch = matchesCanonicalPrimitiveInterface(sourceTag, interfaceId)
     if (primitiveInterfaceMatch !== undefined) return primitiveInterfaceMatch

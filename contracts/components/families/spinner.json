@@ -16,6 +16,10 @@
     "tokens": {
       "kind": "token-contract",
       "source": "shadcn-radix-token-contract-001"
+    },
+    "runtime": {
+      "kind": "runtime-test",
+      "source": "tests/release-005-spinner-runtime.test.tsx"
     }
   },
   "exports": [
@@ -28,7 +32,9 @@
       ],
       "component": {
         "localProps": [],
-        "inherits": [],
+        "inherits": [
+          "html.svg"
+        ],
         "slots": [],
         "composition": {
           "requires": [],
@@ -58,7 +64,8 @@
             {
               "id": "host",
               "host": {
-                "kind": "unresolved"
+                "kind": "inherited-interface",
+                "interfaceId": "html.svg"
               },
               "receivesPublicProps": true,
               "dataAttributes": [
@@ -73,7 +80,8 @@
               ],
               "children": [],
               "evidenceRefs": [
-                "source"
+                "source",
+                "runtime"
               ]
             }
           ],
@@ -85,7 +93,8 @@
             "owner": "component",
             "mechanism": "rendered icon receives role=\"status\"",
             "evidenceRefs": [
-              "source"
+              "source",
+              "runtime"
             ]
           },
           {
@@ -93,11 +102,29 @@
             "owner": "component",
             "mechanism": "rendered icon receives aria-label=\"Loading\" unless overridden by forwarded props",
             "evidenceRefs": [
-              "source"
+              "source",
+              "runtime"
             ]
           }
         ],
-        "inheritedPropDefaults": []
+        "inheritedPropDefaults": [
+          {
+            "propName": "role",
+            "value": "status",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "propName": "aria-label",
+            "value": "Loading",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          }
+        ]
       }
     }
   ],

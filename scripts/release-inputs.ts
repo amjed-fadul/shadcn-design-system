@@ -65,6 +65,9 @@ export function discoverImplementationInputs(root: string, options: ReleaseInput
   for (const file of readdirSync(root)) if (/^(README|LICEN[CS]E|COPYING)(\.|$)/i.test(file) || [".npmignore", ".gitignore", ".npmrc"].includes(file) || /^\.env(?:\.|$)/.test(file)) add(file)
   walk("scripts")
   for (const directory of ["contracts/components", "contracts/tokens"]) walk(directory)
+  // The canonical Button evidence extractor is an independently reviewed
+  // source authority even though it is not imported by the package runtime.
+  if (existsSync(path.join(root, "src/contracts/components/canonical-render-source-evidence.ts"))) add("src/contracts/components/canonical-render-source-evidence.ts")
   // Tailwind's library CSS pass observes UI source, including story files;
   // bind every observed byte even when stories are excluded from declarations.
   walk("src/components/ui")

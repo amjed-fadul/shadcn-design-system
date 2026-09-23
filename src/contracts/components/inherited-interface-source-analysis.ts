@@ -1,8 +1,10 @@
 import ts from "typescript"
+import { resolve } from "node:path"
 
 import type { ConditionalApiCase, InheritedInterfaceEvent, InheritedInterfaceProp, StructuredPropType } from "./types"
 
 const packagePrograms = new Map<string, { checker: ts.TypeChecker; file: ts.SourceFile }>()
+const intrinsicFacts = new Map<string, ReturnType<typeof analyzePackageComponentInterface>>()
 
 export type InterfacePropEvidence = { name: string; required: boolean; typeText: string }
 export type InterfaceMemberSelection = { props?: readonly string[]; events: readonly string[] }
@@ -72,13 +74,27 @@ function intrinsicPropsType(checker: ts.TypeChecker, file: ts.SourceFile, symbol
 }
 
 export function analyzePackageComponentInterface(source: { declarationPath: string; symbol: string }, factNames?: InterfaceMemberSelection): Pick<{ props: InheritedInterfaceProp[]; events: InheritedInterfaceEvent[]; conditionalApi: ConditionalApiCase[] }, "props" | "events" | "conditionalApi"> {
-  let program = packagePrograms.get(source.declarationPath)
+  // TypeScript can print equivalent intrinsic unions in a different order
+  // after unrelated queries against the same Program. Reuse the first exact
+  // source analysis so repeated authority checks are byte-stable.
+  const intrinsicKey = source.symbol.startsWith("React.JSX.IntrinsicElements[")
+    ? JSON.stringify({ declarationPath: resolve(source.declarationPath), symbol: source.symbol, factNames })
+    : undefined
+  const previous = intrinsicKey && intrinsicFacts.get(intrinsicKey)
+  if (previous) return structuredClone(previous)
+  // SVG's large union surface changes lazy type printing for HTML interfaces
+  // when all intrinsic tags share one checker. Give it a separate pinned
+  // declaration Program so both SVG and established HTML facts stay stable.
+  const programKey = source.symbol === 'React.JSX.IntrinsicElements["svg"]'
+    ? `${resolve(source.declarationPath)}#svg`
+    : source.declarationPath
+  let program = packagePrograms.get(programKey)
   if (!program) {
     const created = ts.createProgram([source.declarationPath], { target: ts.ScriptTarget.ESNext, moduleResolution: ts.ModuleResolutionKind.Node10, skipLibCheck: true, esModuleInterop: true })
     const file = created.getSourceFile(source.declarationPath)
     if (!file) throw new Error(`Unable to read declaration: ${source.declarationPath}.`)
     program = { checker: created.getTypeChecker(), file }
-    packagePrograms.set(source.declarationPath, program)
+    packagePrograms.set(programKey, program)
   }
   const { checker, file } = program
   const intrinsic = intrinsicPropsType(checker, file, source.symbol)
@@ -173,5 +189,8 @@ export function analyzePackageComponentInterface(source: { declarationPath: stri
       : { propName: discriminator.name, presence: presence! }
     return { when, propRefinements, eventRefinements, stateChannels: [], evidenceRefs }
   }) : []
-  return { props: propFacts, events: eventFacts, conditionalApi }
+  const facts = { props: propFacts, events: eventFacts, conditionalApi }
+  if (intrinsicKey) intrinsicFacts.set(intrinsicKey, structuredClone(facts))
+  if (source.symbol === 'React.JSX.IntrinsicElements["svg"]') packagePrograms.delete(programKey)
+  return facts
 }

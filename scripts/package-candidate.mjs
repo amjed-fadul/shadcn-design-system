@@ -35,7 +35,9 @@ function toolchain() {
 function packBuild() {
   const stage = mkdtempSync(path.join(tmpdir(), "release-005-build-"))
   try {
-    execFileSync(process.execPath, [path.join(root, "scripts/build-library.mjs"), "--out-dir", path.join(stage, "dist-library")], { cwd: root, stdio: "pipe", timeout: 180_000, maxBuffer: 16 * 1024 * 1024 })
+    // The full pinned declaration and contract graph exceeds Node's default
+    // 4 GB heap during a fresh package build; keep the verifier reproducible.
+    execFileSync(process.execPath, ["--max-old-space-size=6144", path.join(root, "scripts/build-library.mjs"), "--out-dir", path.join(stage, "dist-library")], { cwd: root, stdio: "pipe", timeout: 180_000, maxBuffer: 16 * 1024 * 1024 })
     for (const file of readdirSync(root)) if (file === "package.json" || /^(README|LICEN[CS]E|COPYING)(\.|$)/i.test(file)) cpSync(path.join(root, file), path.join(stage, file))
     const result = JSON.parse(execFileSync("npm", ["pack", "--ignore-scripts", "--json"], { cwd: stage, encoding: "utf8", timeout: 60_000, maxBuffer: 16 * 1024 * 1024 }))[0]
     const bytes = readFileSync(path.join(stage, result.filename))
