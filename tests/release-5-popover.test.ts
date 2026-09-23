@@ -106,7 +106,7 @@ describe("release.5 Popover", () => {
 
       expect(popover.source.canonicalBlobSha).toBe(blobSha)
       expect(popover.source.canonicalBlobSha).toBe(
-        "f9742bc6d2168cf02ddf3318856fcb327436620a"
+        "1131a8154243aecccf705c4140596b32e3f2ac41"
       )
       expect(popover.source.upstreamPath).toBe(
         "apps/v4/registry/bases/radix/ui/popover.tsx"

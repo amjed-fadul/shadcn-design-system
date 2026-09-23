@@ -53,8 +53,8 @@
     },
     {
       "path": "contracts/components/families/alert-dialog.json",
-      "gitBlob": "2699bf2eeca181a43cb407b19dc6e8afd65b02ab",
-      "sha256": "d0c087b92e68978ded7e831ca866136b5f6b4a9282b866d356908433109304ab"
+      "gitBlob": "3f1fd0b793c917e5015010627bed091e17244a3c",
+      "sha256": "db3ffc96e13f5fd4dc3475fba14e6e35bb1f5178a4dad9d398165120e7844f11"
     },
     {
       "path": "contracts/components/families/alert.json",
@@ -148,8 +148,8 @@
     },
     {
       "path": "contracts/components/families/popover.json",
-      "gitBlob": "73d7239038e1210a04d3d8e45a74c0ffa4b9728d",
-      "sha256": "d4d9b3daadb14a35f98d48b59faadd349c6688bfed6d20df73b0340214c7f481"
+      "gitBlob": "9dd303d559b19dedb4f85913f69df90de35b6675",
+      "sha256": "ac5ac69ef27022d2bf31453da98f9ce63ab14c9d10441106622a02dd45f362ba"
     },
     {
       "path": "contracts/components/families/progress.json",
@@ -1123,13 +1123,13 @@
     },
     {
       "path": "provenance/component-contract-source.json",
-      "gitBlob": "da7b3cb6a2a77c898950e22bb14635f2503c4d12",
-      "sha256": "7700da9985ff95b99d448b11bb858ee4ac672e3de230df9750c3bcec01c5324b"
+      "gitBlob": "3e1b6d5a61fab3c005a000540b1ff2db9b1b42a2",
+      "sha256": "8b3bd2dc04617433062fab40c74764e70a7bbf15fc84e666ca1a5d659fb479e8"
     },
     {
       "path": "provenance/seed-components.json",
-      "gitBlob": "caa7a86b9ac3bb22005ebf50dd178df351b0ffbb",
-      "sha256": "aa6562e578495911c73a485def31558e1ba86b18e1d074847c99c842d7c9aeae"
+      "gitBlob": "b6292cf149980d65194671264bb94e5e78a5850b",
+      "sha256": "806befa86a6d1a0ee17c75df215b1180576259f18cb1b5459da16612fa66f606"
     },
     {
       "path": "provenance/token-contract-source.json",
@@ -1218,8 +1218,8 @@
     },
     {
       "path": "src/components/ui/alert-dialog.tsx",
-      "gitBlob": "8f52a23d78dcba8c5226d4e375c03335399520b2",
-      "sha256": "b399c170263b115702e293937b3adb1ed100d7552050db7292f24f8399b96842"
+      "gitBlob": "8d837f749cf5ff7ca696184834255ce089037a83",
+      "sha256": "7427e60d28db43ba277035c9deb1caa3c740ddf33d6a3d59c27ea85c1f33ff67"
     },
     {
       "path": "src/components/ui/alert.stories.tsx",
@@ -1408,8 +1408,8 @@
     },
     {
       "path": "src/components/ui/popover.tsx",
-      "gitBlob": "f9742bc6d2168cf02ddf3318856fcb327436620a",
-      "sha256": "1e4fe4177dfef55b4bde2e09c114a8f0d1ae1fa93a3fda079180f9ecfc5f9321"
+      "gitBlob": "1131a8154243aecccf705c4140596b32e3f2ac41",
+      "sha256": "1f624e115e6bb7cd034197ca5203b26de185cafb0bba563e0941477a3b5c3618"
     },
     {
       "path": "src/components/ui/progress.stories.tsx",
@@ -23243,6 +23243,16 @@
         "authorableJsx": true,
         "component": {
           "props": [
+            {
+              "name": "portalContainer",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "typescript",
+                "typeText": "ComponentProps<typeof AlertDialogPrimitive.Portal>[\"container\"]"
+              },
+              "origin": "local"
+            },
             {
               "name": "size",
               "availability": "available",
@@ -308268,6 +308278,16 @@
         "component": {
           "props": [
             {
+              "name": "portalContainer",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "typescript",
+                "typeText": "ComponentProps<typeof PopoverPrimitive.Portal>[\"container\"]"
+              },
+              "origin": "local"
+            },
+            {
               "name": "about",
               "availability": "available",
               "required": false,
@@ -494870,5 +494890,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "5913ccae4330cb1284fc0017c8cc9f4fcc9810d9d0b468e8b074e6c33094eba5"
+  "sha256": "3dd233fa0245c0a3713836902b8f18c3ff1565b85cdb86d686320d90a368400e"
 }

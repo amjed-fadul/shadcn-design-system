@@ -101,7 +101,7 @@ describe("release.5 Alert Dialog", () => {
 
       expect(family.source.canonicalBlobSha).toBe(blobSha)
       expect(family.source.canonicalBlobSha).toBe(
-        "8f52a23d78dcba8c5226d4e375c03335399520b2"
+        "8d837f749cf5ff7ca696184834255ce089037a83"
       )
       expect(family.source.upstreamPath).toBe(
         "apps/v4/registry/bases/radix/ui/alert-dialog.tsx"
@@ -204,6 +204,12 @@ describe("release.5 Alert Dialog", () => {
     const content = family.exports.find((entry) => entry.name === "AlertDialogContent")!.component!
 
     expect(content.localProps).toEqual([
+      {
+        name: "portalContainer",
+        required: false,
+        type: { kind: "typescript", typeText: 'ComponentProps<typeof AlertDialogPrimitive.Portal>["container"]' },
+        evidenceRefs: ["source"],
+      },
       {
         name: "size",
         required: false,

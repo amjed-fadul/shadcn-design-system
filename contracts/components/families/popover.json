@@ -3,7 +3,7 @@
   "id": "popover",
   "source": {
     "canonicalPath": "src/components/ui/popover.tsx",
-    "canonicalBlobSha": "f9742bc6d2168cf02ddf3318856fcb327436620a",
+    "canonicalBlobSha": "1131a8154243aecccf705c4140596b32e3f2ac41",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/popover.tsx",
     "upstreamBlobSha": "d8e539566cfafc43bb8b6441679b88e64e9387a2"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/popover.tsx@f9742bc6d2168cf02ddf3318856fcb327436620a"
+      "source": "src/components/ui/popover.tsx@1131a8154243aecccf705c4140596b32e3f2ac41"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -174,7 +174,17 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof PopoverPrimitive.Portal>[\"container\"]"
+            },
+            "evidenceRefs": ["source"]
+          }
+        ],
         "inherits": [
           "radix.popover.content"
         ],

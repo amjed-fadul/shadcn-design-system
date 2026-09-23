@@ -3,7 +3,7 @@
   "id": "alert-dialog",
   "source": {
     "canonicalPath": "src/components/ui/alert-dialog.tsx",
-    "canonicalBlobSha": "8f52a23d78dcba8c5226d4e375c03335399520b2",
+    "canonicalBlobSha": "8d837f749cf5ff7ca696184834255ce089037a83",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/alert-dialog.tsx",
     "upstreamBlobSha": "9726776cda43f26e624e88a3dc54ec22eaefdcb3"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/alert-dialog.tsx@8f52a23d78dcba8c5226d4e375c03335399520b2"
+      "source": "src/components/ui/alert-dialog.tsx@8d837f749cf5ff7ca696184834255ce089037a83"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -327,6 +327,15 @@
       ],
       "component": {
         "localProps": [
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof AlertDialogPrimitive.Portal>[\"container\"]"
+            },
+            "evidenceRefs": ["source"]
+          },
           {
             "name": "size",
             "required": false,
