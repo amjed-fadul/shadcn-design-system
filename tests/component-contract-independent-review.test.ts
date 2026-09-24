@@ -2533,8 +2533,6 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       for (const finding of source.renderUnresolved) recognizedUnresolved.add(JSON.stringify({ topic: "jsx-rendering", scope: exported.name, reason: finding.reason, sourcePath: family.source.canonicalPath, start: finding.start, end: finding.end, expressionKind: finding.expressionKind, sourceText: finding.sourceText }))
     }
     const modelLimitations: Record<string, { exportName: string; topic: string; scope: string; kind: string; anchor: string }> = {
-      field: { exportName: "FieldError", topic: "FieldError conditional render shape", scope: "FieldError internal rendering", kind: "IfStatement", anchor: "if (!content) return null" },
-      slider: { exportName: "Slider", topic: "dynamic Slider Thumb rendering", scope: "Slider internal render tree and Thumb cardinality", kind: "CallExpression", anchor: "values.map((_, index) => (" },
       "toggle-group": { exportName: "ToggleGroupItem", topic: "context-derived Toggle Group item data attributes", scope: "ToggleGroupItem render facts", kind: "VariableDeclaration", anchor: "resolvedVariant = context.variant ?? variant" },
     }
     const limitation = modelLimitations[family.id]

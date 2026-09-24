@@ -271,8 +271,6 @@ describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
   test("closes evidence references and excludes Phase 4 guidance from contracts", () => {
     const forbiddenKeys = /whenToUse|whenNotToUse|usageGuidance|designGuidance|patternIntent|recommendation|guidance|selectionAdvice/i
     const expectedModelLimits: Record<string, string[]> = {
-      field: ["FieldError conditional render shape"],
-      slider: ["dynamic Slider Thumb rendering"],
       "toggle-group": ["context-derived Toggle Group item data attributes"],
     }
     for (const artifact of [...families, ...interfaces]) {

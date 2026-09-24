@@ -4,6 +4,8 @@ import { readFileSync } from "node:fs"
 import { describe, expect, test } from "vitest"
 
 import * as sourceAnalysis from "./helpers/component-source-analysis"
+import { canonicalRenderSourceAnalysisConventions } from "../src/contracts/components/canonical-render-source-conventions"
+import { analyzeRenderFlowSource, compareRenderFlowSource } from "../src/contracts/components/render-flow-source-analysis"
 
 const fixture = fileURLToPath(new URL("./fixtures/component-analysis-completeness-fixture.tsx", import.meta.url))
 const sidebar = fileURLToPath(new URL("../src/components/ui/sidebar.tsx", import.meta.url))
@@ -82,8 +84,10 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Data attributes mismatch at ToggleGroupPrimitive.Item.")
   })
 
-  test("normalizes a useMemo-derived child after a source null return", () => {
+  test("retains the FieldError null branch and derived content alongside its JSX root", () => {
     const tree = sourceAnalysis.analyzeJsxRenderTree(field, "FieldError")
+    const flow = analyzeRenderFlowSource(field, "FieldError", canonicalRenderSourceAnalysisConventions)
+    const contract = fieldContract.exports.find((entry: any) => entry.name === "FieldError").component.renderingFlow
 
     expect(tree.unresolved).toEqual([])
     expect(tree.unresolvedFindings).toEqual([])
@@ -94,6 +98,9 @@ describe("generic render-model alternatives and factual aliases", () => {
       }),
     })
     expect(tree.alternatives).toBeUndefined()
+    expect(flow.errors).toEqual([])
+    expect(flow.flow?.branches.some((branch) => branch.outcome.kind === "absent")).toBe(true)
+    expect(compareRenderFlowSource(contract, flow, canonicalRenderSourceAnalysisConventions)).toEqual([])
   })
 
   test("records direct local property access as primitive-state provenance", () => {
@@ -562,6 +569,7 @@ describe("generic render-model alternatives and factual aliases", () => {
 
   test("reconciles the real Slider Thumb mapped callback as a repeated child template", () => {
     const source = sourceAnalysis.analyzeJsxRenderTree(slider, "Slider")
+    const flow = analyzeRenderFlowSource(slider, "Slider", canonicalRenderSourceAnalysisConventions)
     const thumb = source.root?.children.find((child) => child.tag === "SliderPrimitive.Thumb")
     const component = sliderContract.exports.find((entry: any) => entry.name === "Slider").component
 
@@ -570,6 +578,8 @@ describe("generic render-model alternatives and factual aliases", () => {
       dataAttributes: [{ name: "data-slot", source: "literal", value: "slider-thumb" }],
       repetition: { kind: "map", source: "state", name: "values" },
     })
-    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([])
+    expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source, { ...canonicalRenderSourceAnalysisConventions, compareRepetition: true })).toEqual([])
+    expect(flow.errors).toEqual([])
+    expect(compareRenderFlowSource(component.renderingFlow, flow, canonicalRenderSourceAnalysisConventions)).toEqual([])
   })
 })

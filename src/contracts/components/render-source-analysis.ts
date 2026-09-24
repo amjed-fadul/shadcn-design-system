@@ -86,7 +86,7 @@ export type JsxRenderRepetition = { kind: "map"; source: "prop" | "state"; name:
 export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; importBinding?: JsxImportBinding; resolvedHost?: { tag: string; kind: "intrinsic" | "component" | "member" | "unresolved"; importBinding?: JsxImportBinding }; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition; repetition?: JsxRenderRepetition }
 export type JsxRenderAlternative = ({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { root: JsxRenderNode }
 export type JsxSourceUnresolvedFinding = SourceExpressionIdentity & { reason: string }
-export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; unresolved: string[]; unresolvedFindings: JsxSourceUnresolvedFinding[] }
+export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; absent?: true; unresolved: string[]; unresolvedFindings: JsxSourceUnresolvedFinding[] }
 type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment">; importBinding?: JsxImportBinding }
 type JsxBranch<T> = { value: T; when?: JsxRenderCondition; otherwise?: true; otherwiseFor?: JsxRenderCondition }
 type JsxScope = { aliases: Map<string, JsxBranch<JsxRenderNode[]>[]>; dynamicChildren: Set<string>; hostAliases: Map<string, JsxBranch<JsxHost>[]>; derivedSpreads: Map<string, JsxDerivedSpread>; importBindings: Map<string, JsxImportBinding>; stateBindings: Set<string> }
@@ -657,11 +657,23 @@ export function analyzeJsxRenderTree(sourcePath: string, exportName: string, con
   if (!roots.length) recordUnresolved(unresolved, declaration, file, `No JSX root found for ${exportName}`)
   const hasNullReturn = returned.some((item) => item.absent || item.expression?.kind === ts.SyntaxKind.NullKeyword)
   const nullReturnIsOptionalMemoContent = hasNullReturn && expressions.every(({ when }) => when && "source" in when && scope.dynamicChildren.has(when.name))
-  if (roots.length === 1 && (!roots[0].when && !roots[0].otherwise || nullReturnIsOptionalMemoContent)) return { root: roots[0].root, unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
-  return { alternatives: roots.map(({ when, otherwise, root }) => when ? { when, root } : { otherwise: otherwise ?? true, root }), unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
+  const absence = conventions.retainAbsence && hasNullReturn ? { absent: true as const } : {}
+  if (roots.length === 1 && (!roots[0].when && !roots[0].otherwise || nullReturnIsOptionalMemoContent)) return { root: roots[0].root, ...absence, unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
+  return { alternatives: roots.map(({ when, otherwise, root }) => when ? { when, root } : { otherwise: otherwise ?? true, root }), ...absence, unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
 }
 
-type ContractRenderNode = { id: string; host: { kind: string; tag?: string; interfaceId?: string; familyId?: string; exportName?: string }; receivesPublicProps: boolean; dataAttributes: Array<{ name: string; source: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: unknown; whenFalse?: unknown }>; derivedSpreads?: Array<{ source: string; name: string }>; children: Array<{ nodeId: string; when?: JsxRenderCondition }> }
+type ContractRenderNode = {
+  id: string
+  host: { kind: string; tag?: string; interfaceId?: string; familyId?: string; exportName?: string }
+  receivesPublicProps: boolean
+  dataAttributes: Array<{ name: string; source: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: unknown; whenFalse?: unknown }>
+  derivedSpreads?: Array<{ source: string; name: string }>
+  children: Array<{
+    nodeId: string
+    when?: JsxRenderCondition
+    repeat?: { collectionId: string; count: "collection-length" | "matching-items"; itemWhen?: { op: "truthy"; itemProperty: string } }
+  }>
+}
 type ContractRenderingTree = { rootNodeId: string; publicPropsTargetNodeId: string; nodes: ContractRenderNode[]; portalBoundaries: Array<{ nodeId: string }> }
 type ContractRendering = ContractRenderingTree | { alternatives: Array<({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { rendering: ContractRenderingTree }> }
 
@@ -671,6 +683,8 @@ export type RenderSourceAnalysisConventions = Readonly<{
   matchesInheritedInterface?: (sourceTag: string, interfaceId: string, normalizeRenderName: (name: string) => string, importBinding?: JsxRenderNode["importBinding"]) => boolean
   matchesCrossFamilySource?: (moduleSpecifier: string, familyId: string) => boolean
   includeUnresolved?: boolean
+  compareRepetition?: boolean
+  retainAbsence?: boolean
 }>
 
 function normalizedRenderName(name: string) { return name.replace(/[^a-z0-9]/gi, "").toLowerCase() }
@@ -727,6 +741,8 @@ export function compareJsxRenderTree(rendering: ContractRendering, source: JsxRe
       const expectedChild = expected.children[index]
       const actualChild = actual.children[index]
       if (JSON.stringify(expectedChild.when ?? null) !== JSON.stringify(actualChild.when ?? null)) errors.push(`Conditional render edge mismatch at ${path}>${actualChild.tag}.`)
+      if (expectedChild.repeat && expectedChild.repeat.collectionId !== actualChild.repetition?.name) errors.push(`Repeated render edge provenance mismatch at ${path}>${actualChild.tag}.`)
+      if (conventions.compareRepetition && Boolean(expectedChild.repeat) !== Boolean(actualChild.repetition)) errors.push(`Repeated render edge mismatch at ${path}>${actualChild.tag}.`)
       compare(expectedChild.nodeId, actualChild, `${path}>${actualChild.tag}`)
     }
   }

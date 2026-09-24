@@ -11,6 +11,7 @@ import { analyzeCanonicalDelegatedHostFacts, canonicalDelegatedHostEvidencePaths
 import { analyzePackageComponentInterface, type InterfaceMemberSelection } from "./inherited-interface-source-analysis"
 import type { ComponentContractSourceReconciliationContext } from "./loader"
 import { compareJsxRenderTree, analyzeJsxRenderTree, listModuleExports, type JsxRenderCondition, type JsxRenderNode, type JsxRenderTree } from "./render-source-analysis"
+import { analyzeRenderFlowSource, compareRenderFlowSource } from "./render-flow-source-analysis"
 import { reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
 import { analyzeComponentTokenSourceForExport, compareComponentTokenDependenciesForExport } from "./canonical-token-source-analysis"
 import type { ComponentFamilyContract, ConditionalApiCase, ConditionalApiCondition, InheritedInterfaceContract } from "./types"
@@ -240,7 +241,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
         errors.push(...tokenErrors.map((error) => `Component ${entry.name}: ${error}`))
       }
 
-      const sourceRendering = analyzeJsxRenderTree(path, entry.name, canonicalRenderSourceAnalysisConventions)
+      const sourceRendering = analyzeJsxRenderTree(path, entry.name, { ...canonicalRenderSourceAnalysisConventions, retainAbsence: Boolean(entry.component.renderingFlow) })
       unresolved.push({
         topic: "jsx-rendering",
         scope: entry.name,
@@ -255,7 +256,15 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       const delegatedHostAnalysis = analyzeCanonicalDelegatedHostFacts(path, entry.name)
       errors.push(...delegatedHostAnalysis.errors)
       errors.push(...reconcileSourceOwnedSlotCardinality(family, entry.name, delegatedHostAnalysis.facts, canonicalSourceOwnedSlotPropNames(path, entry.name)))
-      const renderErrors = compareJsxRenderTree(entry.component.rendering, sourceRendering, canonicalRenderSourceAnalysisConventions)
+      // A renderingFlow owns the complete ordered outcome set. The legacy tree
+      // remains a source-backed wrapper template and is reconciled as well.
+      const flow = entry.component.renderingFlow
+      const renderErrors = flow
+        ? [
+            ...compareRenderFlowSource(flow, analyzeRenderFlowSource(path, entry.name, canonicalRenderSourceAnalysisConventions), canonicalRenderSourceAnalysisConventions),
+            ...compareJsxRenderTree(entry.component.rendering, sourceRendering, { ...canonicalRenderSourceAnalysisConventions, compareRepetition: true }),
+          ]
+        : compareJsxRenderTree(entry.component.rendering, sourceRendering, canonicalRenderSourceAnalysisConventions)
       if (renderErrors.length > 0) {
         if (renderErrors.some((error) => error.startsWith("Data attributes mismatch"))) errors.push(`Family ${family.id} render data-slot facts do not match source evidence.`)
         errors.push(`Component ${entry.name} rendering does not match source evidence.`)

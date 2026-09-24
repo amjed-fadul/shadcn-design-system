@@ -1,5 +1,5 @@
 import { isRenderingTree } from "./types"
-import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, ConditionalApiCondition, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, StructuredPropType, TokenConditionAtom } from "./types"
+import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, ConditionalApiCondition, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, RenderFlowGuard, RenderFlowGuardSource, StructuredPropType, TokenConditionAtom } from "./types"
 
 type PublicPropFact = { name: string; availability: "available" | "unavailable"; required?: boolean; type?: StructuredPropType }
 
@@ -198,7 +198,7 @@ function validateRenderCondition(errors: string[], componentName: string, scope:
   }
 }
 
-function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: RenderingTree, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]) {
+function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: RenderingTree, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"], flowCollectionIds: Set<string> = new Set()) {
   const ids = new Set<string>()
   for (const node of rendering.nodes) {
     if (ids.has(node.id)) errors.push(`Component ${componentName} has duplicate render-node ID: ${node.id}.`)
@@ -238,6 +238,13 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
   for (const node of rendering.nodes) for (const child of node.children) {
     hasEvidence(errors, child.evidenceRefs, family.evidence, `Render child ${componentName}.${node.id}->${child.nodeId}`)
     if (!ids.has(child.nodeId)) errors.push(`Component ${componentName} render node ${node.id} references unknown child: ${child.nodeId}.`)
+    if (child.repeat) {
+      hasEvidence(errors, child.repeat.evidenceRefs, family.evidence, `Render repetition ${componentName}.${node.id}->${child.nodeId}`)
+      if (!flowCollectionIds.has(child.repeat.collectionId)) errors.push(`Component ${componentName} render repetition references unknown collection: ${child.repeat.collectionId}.`)
+      if (child.repeat.count === "matching-items" && !child.repeat.itemWhen) errors.push(`Component ${componentName} render repetition ${node.id}->${child.nodeId} requires an item filter for matching-items.`)
+      if (child.repeat.count === "collection-length" && child.repeat.itemWhen) errors.push(`Component ${componentName} render repetition ${node.id}->${child.nodeId} cannot filter collection-length.`)
+      if (child.repeat.itemWhen && (child.repeat.itemWhen.op !== "truthy" || !child.repeat.itemWhen.itemProperty || typeof child.repeat.itemWhen.optionalItem !== "boolean")) errors.push(`Component ${componentName} render repetition ${node.id}->${child.nodeId} has an unsupported item filter.`)
+    }
     if (child.when) {
       validateRenderCondition(errors, componentName, `render child ${node.id}->${child.nodeId}`, child.when, props)
       for (const condition of atomicRenderConditions(child.when)) {
@@ -264,9 +271,148 @@ function validateRenderingTree(errors: string[], family: ComponentFamilyContract
   }
 }
 
-function validateRendering(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]) {
+function validateRenderFlowGuardSource(errors: string[], componentName: string, scope: string, source: RenderFlowGuardSource, props: Map<string, PublicPropFact>, collectionIds: Set<string>): void {
+  if (source.kind === "prop") {
+    if (!props.has(source.propName) || props.get(source.propName)?.availability !== "available") errors.push(`Component ${componentName} ${scope} references unknown prop: ${source.propName}.`)
+    return
+  }
+  if (!collectionIds.has(source.collectionId)) errors.push(`Component ${componentName} ${scope} references unknown collection: ${source.collectionId}.`)
+  if (source.kind === "collection-item-property" && (!source.itemProperty || source.index !== 0 || typeof source.optionalItem !== "boolean")) errors.push(`Component ${componentName} ${scope} has an unsupported collection item-property reference.`)
+}
+
+type RenderFlowGuardAtom = Exclude<RenderFlowGuard, { all: unknown }>
+
+function renderFlowGuardAtoms(guard: RenderFlowGuard): RenderFlowGuardAtom[] {
+  return "all" in guard ? guard.all.flatMap(renderFlowGuardAtoms) : [guard]
+}
+
+function renderFlowGuardAtomKey(atom: RenderFlowGuardAtom): string {
+  return stableSerialize(atom)
+}
+
+function renderFlowGuardSubject(atom: RenderFlowGuardAtom): string {
+  return stableSerialize(atom.source)
+}
+
+function validateRenderFlowGuardLogic(errors: string[], componentName: string, scope: string, guard: RenderFlowGuard): boolean {
+  const atoms = renderFlowGuardAtoms(guard)
+  const seen = new Set<string>()
+  let contradictory = false
+  for (const atom of atoms) {
+    const key = renderFlowGuardAtomKey(atom)
+    if (seen.has(key)) errors.push(`Component ${componentName} ${scope} contains a duplicate predicate.`)
+    seen.add(key)
+  }
+  for (let leftIndex = 0; leftIndex < atoms.length; leftIndex += 1) {
+    const left = atoms[leftIndex]
+    for (const right of atoms.slice(leftIndex + 1)) {
+      if (renderFlowGuardSubject(left) !== renderFlowGuardSubject(right)) continue
+      const oppositeTruthiness = (left.op === "truthy" && right.op === "falsy") || (left.op === "falsy" && right.op === "truthy")
+      const arrayCannotBeFalsy = left.op === "array" && right.op === "falsy" || right.op === "array" && left.op === "falsy"
+      const incompatibleLengths = left.op === "length-eq" && right.op === "length-eq" && left.value !== right.value
+      const equalityExcludesGreater = left.op === "length-eq" && right.op === "length-gt" && left.value <= right.value || right.op === "length-eq" && left.op === "length-gt" && right.value <= left.value
+      const positiveLengthAndEmpty = left.op === "empty" && (right.op === "length-gt" || right.op === "length-eq" && right.value > 0) || right.op === "empty" && (left.op === "length-gt" || left.op === "length-eq" && left.value > 0)
+      if (oppositeTruthiness || arrayCannotBeFalsy || incompatibleLengths || equalityExcludesGreater || positiveLengthAndEmpty) {
+        errors.push(`Component ${componentName} ${scope} contains contradictory predicates.`)
+        contradictory = true
+        break
+      }
+    }
+  }
+  return contradictory
+}
+
+function renderFlowAtomImplies(previous: RenderFlowGuardAtom, current: RenderFlowGuardAtom): boolean {
+  if (renderFlowGuardAtomKey(previous) === renderFlowGuardAtomKey(current)) return true
+  if (renderFlowGuardSubject(previous) !== renderFlowGuardSubject(current)) return false
+  if (previous.op === "array" && current.op === "truthy") return true
+  if (previous.op === "length-gt" && current.op === "length-gt") return previous.value >= current.value
+  if (previous.op === "length-eq" && current.op === "length-gt") return previous.value > current.value
+  if (previous.op === "length-eq" && current.op === "empty" && previous.value === 0 && previous.source.kind === "collection") return true
+  return false
+}
+
+function renderFlowGuardImplies(previous: RenderFlowGuard, current: RenderFlowGuard): boolean {
+  const previousAtoms = renderFlowGuardAtoms(previous)
+  const currentAtoms = renderFlowGuardAtoms(current)
+  return previousAtoms.every((previousAtom) => currentAtoms.some((currentAtom) => renderFlowAtomImplies(currentAtom, previousAtom)))
+}
+
+function validateRenderFlowGuard(errors: string[], componentName: string, scope: string, guard: RenderFlowGuard, props: Map<string, PublicPropFact>, collectionIds: Set<string>): void {
+  if ("all" in guard) {
+    if (guard.all.length < 2) errors.push(`Component ${componentName} ${scope} conjunction must contain at least two conditions.`)
+    for (const member of guard.all) validateRenderFlowGuard(errors, componentName, scope, member, props, collectionIds)
+    return
+  }
+  if (!("source" in guard) || !["truthy", "falsy", "array", "empty", "length-eq", "length-gt"].includes(guard.op)) {
+    errors.push(`Component ${componentName} ${scope} uses an unsupported rendering-flow operator.`)
+    return
+  }
+  const sourceKind = guard.source.kind
+  const sourceCompatible = guard.op === "truthy" || guard.op === "falsy" || guard.op === "array" && sourceKind === "prop" || guard.op === "empty" && (sourceKind === "prop" || sourceKind === "collection") || (guard.op === "length-eq" || guard.op === "length-gt") && (sourceKind === "prop" || sourceKind === "collection")
+  if (!sourceCompatible) errors.push(`Component ${componentName} ${scope} uses an unsupported source for rendering-flow operator ${guard.op}.`)
+  if (guard.op === "empty" && (typeof guard.optionalSource !== "boolean" || (sourceKind !== "prop" && guard.optionalSource))) errors.push(`Component ${componentName} ${scope} has invalid empty-source optionality.`)
+  if ((guard.op === "length-eq" || guard.op === "length-gt") && (!Number.isInteger(guard.value) || guard.value < 0)) errors.push(`Component ${componentName} ${scope} has an invalid rendering-flow length value.`)
+  validateRenderFlowGuardSource(errors, componentName, scope, guard.source, props, collectionIds)
+}
+
+function validateRenderingFlow(errors: string[], family: ComponentFamilyContract, componentName: string, flow: NonNullable<ComponentDefinition["renderingFlow"]>, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]): void {
+  const collectionIds = new Set<string>()
+  for (const collection of flow.collections) {
+    if (collectionIds.has(collection.id)) errors.push(`Component ${componentName} has duplicate rendering-flow collection ID: ${collection.id}.`)
+    if (!collection.id) errors.push(`Component ${componentName} rendering-flow collection has an empty ID.`)
+    hasEvidence(errors, collection.evidenceRefs, family.evidence, `Rendering-flow collection ${componentName}.${collection.id}`)
+    if (collection.choices.length === 0) errors.push(`Component ${componentName} rendering-flow collection ${collection.id} has no choices.`)
+    let fallbackCount = 0
+    const priorChoiceGuards: RenderFlowGuard[] = []
+    for (const [index, choice] of collection.choices.entries()) {
+      hasEvidence(errors, choice.evidenceRefs, family.evidence, `Rendering-flow collection choice ${componentName}.${collection.id}.${index}`)
+      if (!choice.when) {
+        fallbackCount += 1
+        if (index !== collection.choices.length - 1) errors.push(`Component ${componentName} rendering-flow collection ${collection.id} has an unguarded choice before the final choice.`)
+      }
+      if (choice.when) {
+        validateRenderFlowGuard(errors, componentName, `collection ${collection.id} choice ${index} guard`, choice.when, props, collectionIds)
+        const contradictory = validateRenderFlowGuardLogic(errors, componentName, `collection ${collection.id} choice ${index} guard`, choice.when)
+        if (priorChoiceGuards.some((previous) => renderFlowGuardImplies(previous, choice.when))) errors.push(`Component ${componentName} rendering-flow collection ${collection.id} choice ${index} is unreachable because an earlier guard already matches.`)
+        if (!contradictory) priorChoiceGuards.push(choice.when)
+      }
+      if (!props.has(choice.source.propName) || props.get(choice.source.propName)?.availability !== "available") errors.push(`Component ${componentName} rendering-flow collection ${collection.id} references unknown prop: ${choice.source.propName}.`)
+    }
+    if (fallbackCount !== 1) errors.push(`Component ${componentName} rendering-flow collection ${collection.id} must have exactly one unguarded fallback choice.`)
+    if (collection.uniqueBy) {
+      hasEvidence(errors, collection.uniqueBy.evidenceRefs, family.evidence, `Rendering-flow deduplication ${componentName}.${collection.id}`)
+      if (!collection.uniqueBy.itemProperty || typeof collection.uniqueBy.optionalItem !== "boolean" || collection.uniqueBy.retention !== "last-value-first-key-order") errors.push(`Component ${componentName} rendering-flow collection ${collection.id} has unsupported deduplication semantics.`)
+    }
+    collectionIds.add(collection.id)
+  }
+  if (flow.branches.length === 0) errors.push(`Component ${componentName} rendering-flow has no branches.`)
+  const priorGuards: RenderFlowGuard[] = []
+  let otherwiseCount = 0
+  for (const [index, branch] of flow.branches.entries()) {
+    hasEvidence(errors, branch.evidenceRefs, family.evidence, `Rendering-flow branch ${componentName}.${index}`)
+    if ("otherwise" in branch) {
+      otherwiseCount += 1
+      if (index !== flow.branches.length - 1) errors.push(`Component ${componentName} rendering-flow otherwise branch must be last.`)
+    } else {
+      validateRenderFlowGuard(errors, componentName, `rendering-flow branch ${index} guard`, branch.when, props, collectionIds)
+      const contradictory = validateRenderFlowGuardLogic(errors, componentName, `rendering-flow branch ${index} guard`, branch.when)
+      if (priorGuards.some((previous) => renderFlowGuardImplies(previous, branch.when))) errors.push(`Component ${componentName} rendering-flow branch ${index} is unreachable because an earlier guard already matches.`)
+      if (!contradictory) priorGuards.push(branch.when)
+    }
+    if (branch.outcome.kind === "rendered") {
+      validateRenderingTree(errors, family, `${componentName} branch ${index}`, branch.outcome.tree, authority, exportEntries, props, localProps, collectionIds)
+      const content = branch.outcome.content
+      if (content?.source === "prop" && (!props.has(content.propName) || props.get(content.propName)?.availability !== "available")) errors.push(`Component ${componentName} rendering-flow branch ${index} references unknown content prop: ${content.propName}.`)
+      if (content?.source === "collection-item-property" && (!collectionIds.has(content.collectionId) || !content.itemProperty || content.index !== 0 || typeof content.optionalItem !== "boolean")) errors.push(`Component ${componentName} rendering-flow branch ${index} has an invalid collection content reference.`)
+    } else if (branch.outcome.kind !== "absent") errors.push(`Component ${componentName} rendering-flow branch ${index} has an unsupported outcome.`)
+  }
+  if (otherwiseCount > 1) errors.push(`Component ${componentName} rendering-flow has multiple otherwise branches.`)
+}
+
+function validateRendering(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"], flowCollectionIds: Set<string> = new Set()) {
   if (isRenderingTree(rendering)) {
-    validateRenderingTree(errors, family, componentName, rendering, authority, exportEntries, props, localProps)
+    validateRenderingTree(errors, family, componentName, rendering, authority, exportEntries, props, localProps, flowCollectionIds)
     return
   }
   let otherwiseCount = 0
@@ -274,7 +420,7 @@ function validateRendering(errors: string[], family: ComponentFamilyContract, co
     hasEvidence(errors, alternative.evidenceRefs, family.evidence, `Render alternative ${componentName}.${index}`)
     if ("otherwise" in alternative) otherwiseCount += 1
     else validateRenderCondition(errors, componentName, `render alternative ${index}`, alternative.when, props)
-    validateRenderingTree(errors, family, `${componentName} alternative ${index}`, alternative.rendering, authority, exportEntries, props, localProps)
+    validateRenderingTree(errors, family, `${componentName} alternative ${index}`, alternative.rendering, authority, exportEntries, props, localProps, flowCollectionIds)
   }
   if (otherwiseCount > 1) errors.push(`Component ${componentName} has multiple otherwise render alternatives.`)
   if (rendering.alternatives.some((alternative, index) => "otherwise" in alternative && index !== rendering.alternatives!.length - 1)) errors.push(`Component ${componentName} has an otherwise render alternative before the final branch.`)
@@ -460,7 +606,10 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
       if (token.viaDerivedRule && !authority.derivedTokenRuleIds.has(token.viaDerivedRule.id)) errors.push(`Component ${entry.name} references unknown derived token rule: ${token.viaDerivedRule.id}.`)
     }
     validateConditionalApi(errors, family, entry.name, component, props, events, authority)
-    validateRendering(errors, family, entry.name, component.rendering, authority, new Map(family.exports.map(({ name, kind, authorableJsx }) => [name, { kind, authorableJsx }])), props, component.localProps)
+    const renderExports = new Map(family.exports.map(({ name, kind, authorableJsx }) => [name, { kind, authorableJsx }]))
+    const flowCollectionIds = new Set(component.renderingFlow?.collections.map((collection) => collection.id) ?? [])
+    validateRendering(errors, family, entry.name, component.rendering, authority, renderExports, props, component.localProps, flowCollectionIds)
+    if (component.renderingFlow) validateRenderingFlow(errors, family, entry.name, component.renderingFlow, authority, renderExports, props, component.localProps)
     const slotNames = new Set<string>()
     for (const slot of component.slots) {
       if (slotNames.has(slot.propName)) errors.push(`Component ${entry.name} has duplicate Slot fact for prop: ${slot.propName}.`)

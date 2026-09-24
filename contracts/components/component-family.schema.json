@@ -146,6 +146,35 @@
       "type": "object", "additionalProperties": false, "required": ["propName", "value", "evidenceRefs"],
       "properties": { "propName": { "type": "string" }, "value": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }, { "type": "null" }] }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     },
+    "renderFlowGuardSource": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["kind", "propName"], "properties": { "kind": { "const": "prop" }, "propName": { "type": "string" } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "collectionId"], "properties": { "kind": { "const": "collection" }, "collectionId": { "type": "string" } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "collectionId", "itemProperty", "index", "optionalItem"], "properties": { "kind": { "const": "collection-item-property" }, "collectionId": { "type": "string" }, "itemProperty": { "type": "string" }, "index": { "const": 0 }, "optionalItem": { "type": "boolean" } } }
+    ] },
+    "renderFlowGuard": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["op", "source"], "properties": { "op": { "enum": ["truthy", "falsy", "array"] }, "source": { "$ref": "#/$defs/renderFlowGuardSource" } } },
+      { "type": "object", "additionalProperties": false, "required": ["op", "source", "optionalSource"], "properties": { "op": { "const": "empty" }, "source": { "$ref": "#/$defs/renderFlowGuardSource" }, "optionalSource": { "type": "boolean" } } },
+      { "type": "object", "additionalProperties": false, "required": ["op", "source", "value"], "properties": { "op": { "enum": ["length-eq", "length-gt"] }, "source": { "$ref": "#/$defs/renderFlowGuardSource" }, "value": { "type": "integer", "minimum": 0 } } },
+      { "type": "object", "additionalProperties": false, "required": ["all"], "properties": { "all": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/renderFlowGuard" } } } }
+    ] },
+    "collectionChoice": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["when", "source", "evidenceRefs"], "properties": { "when": { "$ref": "#/$defs/renderFlowGuard" }, "source": { "type": "object", "additionalProperties": false, "required": ["kind", "propName"], "properties": { "kind": { "enum": ["prop", "singleton-prop"] }, "propName": { "type": "string" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+      { "type": "object", "additionalProperties": false, "required": ["source", "evidenceRefs"], "properties": { "source": { "type": "object", "additionalProperties": false, "required": ["kind", "propName"], "properties": { "kind": { "enum": ["prop", "singleton-prop"] }, "propName": { "type": "string" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
+    ] },
+    "derivedCollection": { "type": "object", "additionalProperties": false, "required": ["id", "choices", "evidenceRefs"], "properties": { "id": { "type": "string", "minLength": 1 }, "choices": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/collectionChoice" } }, "uniqueBy": { "type": "object", "additionalProperties": false, "required": ["itemProperty", "optionalItem", "retention", "evidenceRefs"], "properties": { "itemProperty": { "type": "string" }, "optionalItem": { "type": "boolean" }, "retention": { "const": "last-value-first-key-order" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+    "renderFlowContent": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["source", "propName"], "properties": { "source": { "const": "prop" }, "propName": { "type": "string" } } },
+      { "type": "object", "additionalProperties": false, "required": ["source", "collectionId", "itemProperty", "index", "optionalItem"], "properties": { "source": { "const": "collection-item-property" }, "collectionId": { "type": "string" }, "itemProperty": { "type": "string" }, "index": { "const": 0 }, "optionalItem": { "type": "boolean" } } }
+    ] },
+    "renderFlowOutcome": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "absent" } } },
+      { "type": "object", "additionalProperties": false, "required": ["kind", "tree"], "properties": { "kind": { "const": "rendered" }, "tree": { "$ref": "#/$defs/renderingTree" }, "content": { "$ref": "#/$defs/renderFlowContent" } } }
+    ] },
+    "renderFlowBranch": { "oneOf": [
+      { "type": "object", "additionalProperties": false, "required": ["when", "outcome", "evidenceRefs"], "properties": { "when": { "$ref": "#/$defs/renderFlowGuard" }, "outcome": { "$ref": "#/$defs/renderFlowOutcome" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+      { "type": "object", "additionalProperties": false, "required": ["otherwise", "outcome", "evidenceRefs"], "properties": { "otherwise": { "const": true }, "outcome": { "$ref": "#/$defs/renderFlowOutcome" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
+    ] },
+    "renderingFlow": { "type": "object", "additionalProperties": false, "required": ["collections", "branches"], "properties": { "collections": { "type": "array", "items": { "$ref": "#/$defs/derivedCollection" } }, "branches": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/renderFlowBranch" } } } },
     "renderHost": {
       "oneOf": [
         { "type": "object", "additionalProperties": false, "required": ["kind", "tag"], "properties": { "kind": { "const": "intrinsic" }, "tag": { "type": "string" } } },
@@ -175,7 +204,7 @@
     },
     "renderChildRef": {
       "type": "object", "additionalProperties": false, "required": ["nodeId", "evidenceRefs"],
-      "properties": { "nodeId": { "type": "string" }, "when": { "$ref": "#/$defs/renderCondition" }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
+      "properties": { "nodeId": { "type": "string" }, "when": { "$ref": "#/$defs/renderCondition" }, "repeat": { "type": "object", "additionalProperties": false, "required": ["collectionId", "count", "evidenceRefs"], "properties": { "collectionId": { "type": "string" }, "count": { "enum": ["collection-length", "matching-items"] }, "itemWhen": { "type": "object", "additionalProperties": false, "required": ["op", "itemProperty", "optionalItem"], "properties": { "op": { "const": "truthy" }, "itemProperty": { "type": "string" }, "optionalItem": { "type": "boolean" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
     },
     "renderDataAttribute": {
       "oneOf": [
@@ -237,7 +266,7 @@
     "component": {
       "type": "object", "additionalProperties": false,
       "required": ["localProps", "inherits", "slots", "composition", "stateChannels", "conditionalApi", "events", "tokenDependencies", "rendering", "accessibility", "inheritedPropDefaults"],
-      "properties": { "localProps": { "type": "array", "items": { "$ref": "#/$defs/localProp" } }, "inherits": { "type": "array", "items": { "type": "string" } }, "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } }, "inheritedPropDefaults": { "type": "array", "items": { "$ref": "#/$defs/inheritedPropDefault" } }, "composition": { "$ref": "#/$defs/composition" }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "conditionalApi": { "type": "array", "items": { "$ref": "#/$defs/conditional" } }, "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }, "tokenDependencies": { "type": "array", "items": { "$ref": "#/$defs/token" } }, "rendering": { "$ref": "#/$defs/rendering" }, "accessibility": { "type": "array", "items": { "$ref": "#/$defs/accessibility" } } }
+      "properties": { "localProps": { "type": "array", "items": { "$ref": "#/$defs/localProp" } }, "inherits": { "type": "array", "items": { "type": "string" } }, "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } }, "inheritedPropDefaults": { "type": "array", "items": { "$ref": "#/$defs/inheritedPropDefault" } }, "composition": { "$ref": "#/$defs/composition" }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "conditionalApi": { "type": "array", "items": { "$ref": "#/$defs/conditional" } }, "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }, "tokenDependencies": { "type": "array", "items": { "$ref": "#/$defs/token" } }, "rendering": { "$ref": "#/$defs/rendering" }, "renderingFlow": { "$ref": "#/$defs/renderingFlow" }, "accessibility": { "type": "array", "items": { "$ref": "#/$defs/accessibility" } } }
     },
     "export": {
       "type": "object", "additionalProperties": false, "required": ["name", "kind", "authorableJsx", "evidenceRefs"],

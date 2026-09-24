@@ -199,7 +199,14 @@
                   "nodeId": "thumb",
                   "evidenceRefs": [
                     "source"
-                  ]
+                  ],
+                  "repeat": {
+                    "collectionId": "values",
+                    "count": "collection-length",
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
                 }
               ],
               "evidenceRefs": [
@@ -316,29 +323,195 @@
               "source"
             ]
           }
-        ]
+        ],
+        "renderingFlow": {
+          "collections": [
+            {
+              "id": "values",
+              "choices": [
+                {
+                  "when": {
+                    "op": "array",
+                    "source": {
+                      "kind": "prop",
+                      "propName": "value"
+                    }
+                  },
+                  "source": {
+                    "kind": "prop",
+                    "propName": "value"
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "when": {
+                    "op": "array",
+                    "source": {
+                      "kind": "prop",
+                      "propName": "defaultValue"
+                    }
+                  },
+                  "source": {
+                    "kind": "prop",
+                    "propName": "defaultValue"
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "source": {
+                    "kind": "singleton-prop",
+                    "propName": "min"
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "branches": [
+            {
+              "otherwise": true,
+              "outcome": {
+                "kind": "rendered",
+                "tree": {
+                  "rootNodeId": "root",
+                  "publicPropsTargetNodeId": "root",
+                  "nodes": [
+                    {
+                      "id": "root",
+                      "host": {
+                        "kind": "inherited-interface",
+                        "interfaceId": "radix.slider.root"
+                      },
+                      "receivesPublicProps": true,
+                      "dataAttributes": [
+                        {
+                          "name": "data-slot",
+                          "source": "literal",
+                          "value": "slider",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "track",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        },
+                        {
+                          "nodeId": "thumb",
+                          "evidenceRefs": [
+                            "source"
+                          ],
+                          "repeat": {
+                            "collectionId": "values",
+                            "count": "collection-length",
+                            "evidenceRefs": [
+                              "source"
+                            ]
+                          }
+                        }
+                      ],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    },
+                    {
+                      "id": "track",
+                      "host": {
+                        "kind": "inherited-interface",
+                        "interfaceId": "radix.slider.track"
+                      },
+                      "receivesPublicProps": false,
+                      "dataAttributes": [
+                        {
+                          "name": "data-slot",
+                          "source": "literal",
+                          "value": "slider-track",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "range",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    },
+                    {
+                      "id": "range",
+                      "host": {
+                        "kind": "inherited-interface",
+                        "interfaceId": "radix.slider.range"
+                      },
+                      "receivesPublicProps": false,
+                      "dataAttributes": [
+                        {
+                          "name": "data-slot",
+                          "source": "literal",
+                          "value": "slider-range",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "children": [],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    },
+                    {
+                      "id": "thumb",
+                      "host": {
+                        "kind": "inherited-interface",
+                        "interfaceId": "radix.slider.thumb"
+                      },
+                      "receivesPublicProps": false,
+                      "dataAttributes": [
+                        {
+                          "name": "data-slot",
+                          "source": "literal",
+                          "value": "slider-thumb",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "children": [],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    }
+                  ],
+                  "portalBoundaries": []
+                }
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        }
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "dynamic Slider Thumb rendering",
-      "scope": "Slider internal render tree and Thumb cardinality",
-      "reason": "The render-contract model has no repeated-child or dynamic-cardinality field. Slider maps values derived from value, otherwise defaultValue, otherwise [min] to Thumb JSX; the single thumb edge records a template only and does not assert one rendered Thumb.",
-      "evidenceAttempted": [
-        "canonical src/components/ui/slider.tsx Slider implementation",
-        "component rendering schema and repeated-child source analysis"
-      ],
-      "evidenceRefs": [
-        "source"
-      ],
-      "source": {
-        "sourcePath": "src/components/ui/slider.tsx",
-        "start": 1351,
-        "end": 1793,
-        "expressionKind": "CallExpression",
-        "sourceText": "values.map((_, index) => (\n        <SliderPrimitive.Thumb\n          data-slot=\"slider-thumb\"\n          key={index}\n          className=\"relative block size-3 shrink-0 select-none rounded-full border border-ring bg-background ring-ring/50 transition-[color,box-shadow] after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-none active:ring-3 disabled:pointer-events-none disabled:opacity-50\"\n        />\n      ))"
-      }
-    }
-  ]
+  "unresolved": []
 }

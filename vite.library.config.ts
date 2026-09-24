@@ -9,11 +9,12 @@ import type * as PackageData from "./scripts/library-data"
 import { libraryLicenseNotices } from "./scripts/library-licenses"
 
 const root = path.dirname(fileURLToPath(import.meta.url))
+const packageBuildIsolation = { server: { fs: { allow: [root] } }, css: { postcss: { plugins: [] } } }
 const isReact = (id: string) => /^(react|react-dom)(\/|$)/.test(id)
 const virtualId = "virtual:shadcn-package-data"
 
 export default defineConfig(async (): Promise<UserConfig> => {
-  const { module: data } = await runnerImport<typeof PackageData>(path.join(root, "scripts/library-data.ts"), { configFile: false })
+  const { module: data } = await runnerImport<typeof PackageData>(path.join(root, "scripts/library-data.ts"), { configFile: false, ...packageBuildIsolation })
   const sourcePaths = data.componentContracts.families.map((family) => family.source.canonicalPath)
   const utilityPrefixes: Record<string, string> = {
     "font-size": "text", "font-weight": "font", "letter-spacing": "tracking",
@@ -80,6 +81,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
 
   return {
     plugins: [packageBoundary, react(), tailwindcss()],
+    ...packageBuildIsolation,
     resolve: { alias: { "@": path.join(root, "src") } },
     build: {
       outDir: "dist-library",

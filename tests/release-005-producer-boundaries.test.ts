@@ -26,10 +26,8 @@ function projected(familyId: string, name: string) {
 }
 
 describe("Release 005 producer boundaries", () => {
-  test("has exactly the three scoped model limitations at family level", () => {
+  test("retains only the Toggle Group model limitation at family level", () => {
     expect(source.families.flatMap((entry) => entry.unresolved.map((fact) => `${entry.id}: ${fact.topic}`)).sort()).toEqual([
-      "field: FieldError conditional render shape",
-      "slider: dynamic Slider Thumb rendering",
       "toggle-group: context-derived Toggle Group item data attributes",
     ])
   })
@@ -44,14 +42,18 @@ describe("Release 005 producer boundaries", () => {
   })
 
   test.each([
-    ["field", "FieldError", "FieldError conditional render shape"],
-    ["slider", "Slider", "dynamic Slider Thumb rendering"],
     ["toggle-group", "ToggleGroupItem", "context-derived Toggle Group item data attributes"],
   ])("keeps %s.%s structural uncertainty visible to the executable consumer", (familyId, exportName, topic) => {
     const finding = family(familyId).unresolved.find((entry) => entry.topic === topic)
     expect(finding).toMatchObject({ scope: expect.stringContaining(exportName), evidenceRefs: ["source"] })
     expect(finding?.reason).toBeTruthy()
     expect(projected(familyId, exportName).unresolved).toContainEqual(finding)
+  })
+
+  test.each([["field", "FieldError"], ["slider", "Slider"]])("projects resolved %s.%s without a structural limitation", (familyId, exportName) => {
+    expect(family(familyId).unresolved).toEqual([])
+    expect(projected(familyId, exportName).unresolved).toEqual([])
+    expect(exported(familyId, exportName).renderingFlow).toBeDefined()
   })
 
   test("projects the pinned SVG public API and wrapper defaults for Spinner", () => {

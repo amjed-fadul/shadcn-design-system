@@ -166,12 +166,13 @@ describe("Phase 5 executable validator coverage across all 38 canonical families
     expect(complete).toEqual({ ok: true, errors: [] })
   })
 
-  test("keeps FieldError's normalized JSX separate from its contract-model limit", async () => {
+  test("keeps FieldError's full rendering flow outside the executable projection", async () => {
     const { analyzeJsxRenderTree } = await import("../src/contracts/components/render-source-analysis")
     const result = analyzeJsxRenderTree("src/components/ui/field.tsx", "FieldError")
     expect(result.unresolved).toEqual([])
     expect(result.root?.kind).toBe("intrinsic")
-    expect(contract.exports["field\u0000FieldError"].unresolved.map((fact) => fact.topic)).toEqual(["FieldError conditional render shape"])
+    expect(contract.exports["field\u0000FieldError"].unresolved).toEqual([])
+    expect("renderingFlow" in contract.exports["field\u0000FieldError"].component!).toBe(false)
   })
 
   test.each([

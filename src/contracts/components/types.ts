@@ -52,7 +52,7 @@ export type RenderAtomicCondition =
   | { source: "state"; name: string; nullishness: "nullish" | "non-nullish" }
 export type RenderCondition = RenderAtomicCondition | { all: AtLeastTwo<RenderCondition> }
 export type RenderValue = { source: "literal"; value: string | number | boolean } | { source: "prop" | "state"; name: string }
-export type RenderChildRef = EvidenceRef & { nodeId: string; when?: RenderCondition }
+export type RenderChildRef = EvidenceRef & { nodeId: string; when?: RenderCondition; repeat?: EvidenceRef & { collectionId: string; count: "collection-length" | "matching-items"; itemWhen?: { op: "truthy"; itemProperty: string; optionalItem: boolean } } }
 export type RenderDataAttribute = EvidenceRef & { name: string; value?: string; prop?: string; condition?: RenderCondition } & (
   | { source: "literal" }
   | { source: "prop"; prop: string }
@@ -67,9 +67,34 @@ export type RenderingTree = { rootNodeId: string; publicPropsTargetNodeId: strin
 export type RenderingAlternative = EvidenceRef & ({ when: RenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { rendering: RenderingTree }
 export type RenderingFact = RenderingTree | { alternatives: RenderingAlternative[] }
 export function isRenderingTree(rendering: RenderingFact): rendering is RenderingTree { return "nodes" in rendering }
+export type RenderFlowGuardSource =
+  | { kind: "prop"; propName: string }
+  | { kind: "collection"; collectionId: string }
+  | { kind: "collection-item-property"; collectionId: string; itemProperty: string; index: 0; optionalItem: boolean }
+export type RenderFlowGuard =
+  | { op: "truthy" | "falsy" | "array"; source: RenderFlowGuardSource }
+  | { op: "empty"; source: RenderFlowGuardSource; optionalSource: boolean }
+  | { op: "length-eq" | "length-gt"; source: RenderFlowGuardSource; value: number }
+  | { all: AtLeastTwo<RenderFlowGuard> }
+export type CollectionChoice = EvidenceRef & (
+  | { when: RenderFlowGuard; source: { kind: "prop" | "singleton-prop"; propName: string } }
+  | { when?: never; source: { kind: "prop" | "singleton-prop"; propName: string } }
+)
+export type DerivedCollection = EvidenceRef & { id: string; choices: AtLeastOne<CollectionChoice>; uniqueBy?: EvidenceRef & { itemProperty: string; optionalItem: boolean; retention: "last-value-first-key-order" } }
+export type RenderFlowContentSource =
+  | { source: "prop"; propName: string }
+  | { source: "collection-item-property"; collectionId: string; itemProperty: string; index: 0; optionalItem: boolean }
+export type RenderFlowOutcome =
+  | { kind: "absent" }
+  | { kind: "rendered"; tree: RenderingTree; content?: RenderFlowContentSource }
+export type RenderFlowBranch = EvidenceRef & (
+  | { when: RenderFlowGuard; otherwise?: never; outcome: RenderFlowOutcome }
+  | { otherwise: true; when?: never; outcome: RenderFlowOutcome }
+)
+export type RenderingFlow = { collections: DerivedCollection[]; branches: RenderFlowBranch[] }
 export type InheritedPropDefault = EvidenceRef & { propName: string; value: string | number | boolean | null }
 export type AccessibilityFact = EvidenceRef & { feature: string; owner: "native" | "author" | "component"; mechanism: string }
-export type ComponentDefinition = { localProps: LocalPropContract[]; inherits: string[]; slots: SlotContract[]; inheritedPropDefaults: InheritedPropDefault[]; composition: CompositionContract; stateChannels: StateChannel[]; conditionalApi: ConditionalApiCase[]; events: EventContract[]; tokenDependencies: TokenDependency[]; rendering: RenderingFact; accessibility: AccessibilityFact[] }
+export type ComponentDefinition = { localProps: LocalPropContract[]; inherits: string[]; slots: SlotContract[]; inheritedPropDefaults: InheritedPropDefault[]; composition: CompositionContract; stateChannels: StateChannel[]; conditionalApi: ConditionalApiCase[]; events: EventContract[]; tokenDependencies: TokenDependency[]; rendering: RenderingFact; renderingFlow?: RenderingFlow; accessibility: AccessibilityFact[] }
 export type EffectivePublicProp = { name: string; availability: "available"; required: boolean; type: StructuredPropType } | { name: string; availability: "unavailable" }
 export type EffectiveComponentApiShape = { props: EffectivePublicProp[]; events: EventContract[] }
 export type PublicExportContract = EvidenceRef & { name: string; kind: ComponentExportKind; authorableJsx: boolean; component?: ComponentDefinition }

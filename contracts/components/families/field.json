@@ -1177,29 +1177,290 @@
               "source"
             ]
           }
-        ]
+        ],
+        "renderingFlow": {
+          "collections": [
+            {
+              "id": "uniqueErrors",
+              "choices": [
+                {
+                  "source": {
+                    "kind": "prop",
+                    "propName": "errors"
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "uniqueBy": {
+                "itemProperty": "message",
+                "retention": "last-value-first-key-order",
+                "evidenceRefs": [
+                  "source"
+                ],
+                "optionalItem": true
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "branches": [
+            {
+              "when": {
+                "op": "truthy",
+                "source": {
+                  "kind": "prop",
+                  "propName": "children"
+                }
+              },
+              "outcome": {
+                "kind": "rendered",
+                "tree": {
+                  "rootNodeId": "host",
+                  "publicPropsTargetNodeId": "host",
+                  "nodes": [
+                    {
+                      "id": "host",
+                      "host": {
+                        "kind": "intrinsic",
+                        "tag": "div"
+                      },
+                      "receivesPublicProps": true,
+                      "dataAttributes": [
+                        {
+                          "name": "data-slot",
+                          "source": "literal",
+                          "value": "field-error",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "children": [],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    }
+                  ],
+                  "portalBoundaries": []
+                },
+                "content": {
+                  "source": "prop",
+                  "propName": "children"
+                }
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "when": {
+                "op": "empty",
+                "source": {
+                  "kind": "prop",
+                  "propName": "errors"
+                },
+                "optionalSource": true
+              },
+              "outcome": {
+                "kind": "absent"
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "op": "length-eq",
+                    "source": {
+                      "kind": "collection",
+                      "collectionId": "uniqueErrors"
+                    },
+                    "value": 1
+                  },
+                  {
+                    "op": "falsy",
+                    "source": {
+                      "kind": "collection-item-property",
+                      "collectionId": "uniqueErrors",
+                      "itemProperty": "message",
+                      "index": 0,
+                      "optionalItem": true
+                    }
+                  }
+                ]
+              },
+              "outcome": {
+                "kind": "absent"
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "op": "length-eq",
+                    "source": {
+                      "kind": "collection",
+                      "collectionId": "uniqueErrors"
+                    },
+                    "value": 1
+                  },
+                  {
+                    "op": "truthy",
+                    "source": {
+                      "kind": "collection-item-property",
+                      "collectionId": "uniqueErrors",
+                      "itemProperty": "message",
+                      "index": 0,
+                      "optionalItem": true
+                    }
+                  }
+                ]
+              },
+              "outcome": {
+                "kind": "rendered",
+                "tree": {
+                  "rootNodeId": "host",
+                  "publicPropsTargetNodeId": "host",
+                  "nodes": [
+                    {
+                      "id": "host",
+                      "host": {
+                        "kind": "intrinsic",
+                        "tag": "div"
+                      },
+                      "receivesPublicProps": true,
+                      "dataAttributes": [
+                        {
+                          "name": "data-slot",
+                          "source": "literal",
+                          "value": "field-error",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "children": [],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    }
+                  ],
+                  "portalBoundaries": []
+                },
+                "content": {
+                  "source": "collection-item-property",
+                  "collectionId": "uniqueErrors",
+                  "itemProperty": "message",
+                  "index": 0,
+                  "optionalItem": true
+                }
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "outcome": {
+                "kind": "rendered",
+                "tree": {
+                  "rootNodeId": "host",
+                  "publicPropsTargetNodeId": "host",
+                  "nodes": [
+                    {
+                      "id": "host",
+                      "host": {
+                        "kind": "intrinsic",
+                        "tag": "div"
+                      },
+                      "receivesPublicProps": true,
+                      "dataAttributes": [
+                        {
+                          "name": "data-slot",
+                          "source": "literal",
+                          "value": "field-error",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "children": [
+                        {
+                          "nodeId": "list",
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    },
+                    {
+                      "id": "list",
+                      "host": {
+                        "kind": "intrinsic",
+                        "tag": "ul"
+                      },
+                      "receivesPublicProps": false,
+                      "dataAttributes": [],
+                      "children": [
+                        {
+                          "nodeId": "item",
+                          "repeat": {
+                            "collectionId": "uniqueErrors",
+                            "count": "matching-items",
+                            "itemWhen": {
+                              "op": "truthy",
+                              "itemProperty": "message",
+                              "optionalItem": true
+                            },
+                            "evidenceRefs": [
+                              "source"
+                            ]
+                          },
+                          "evidenceRefs": [
+                            "source"
+                          ]
+                        }
+                      ],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    },
+                    {
+                      "id": "item",
+                      "host": {
+                        "kind": "intrinsic",
+                        "tag": "li"
+                      },
+                      "receivesPublicProps": false,
+                      "dataAttributes": [],
+                      "children": [],
+                      "evidenceRefs": [
+                        "source"
+                      ]
+                    }
+                  ],
+                  "portalBoundaries": []
+                }
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
+        }
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "FieldError conditional render shape",
-      "scope": "FieldError internal rendering",
-      "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-      "evidenceAttempted": [
-        "canonical src/components/ui/field.tsx FieldError implementation",
-        "component rendering schema and source reconciliation"
-      ],
-      "evidenceRefs": [
-        "source"
-      ],
-      "source": {
-        "sourcePath": "src/components/ui/field.tsx",
-        "start": 5894,
-        "end": 5919,
-        "expressionKind": "IfStatement",
-        "sourceText": "if (!content) return null"
-      }
-    }
-  ]
+  "unresolved": []
 }

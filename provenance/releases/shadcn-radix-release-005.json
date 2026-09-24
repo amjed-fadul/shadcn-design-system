@@ -43,8 +43,8 @@
     },
     {
       "path": "contracts/components/component-family.schema.json",
-      "gitBlob": "5deb83f20deaccb2cacaba725dbe5f247b7e088b",
-      "sha256": "81bb98c32868f095b38311b66634492306f466b268691a4e54c86468ccfbf20c"
+      "gitBlob": "6c37ed52333863a47e339e4f3605b84c80042290",
+      "sha256": "502f1a2957ad7de50a30c58bb23cef31c1bbc0485e84078619720f31446cc514"
     },
     {
       "path": "contracts/components/families/accordion.json",
@@ -123,8 +123,8 @@
     },
     {
       "path": "contracts/components/families/field.json",
-      "gitBlob": "b435ddf44e9981bf75e56ed9979ec339537cdb07",
-      "sha256": "e4fa7a08bfc39bbe10157c1feb381762e7ca447d08fdeed94741d13d3ecf4f0c"
+      "gitBlob": "8effe13e9d134882f025ee56d6182824f32b2c0b",
+      "sha256": "bde97441144f00b99ed5abe8c7b90cd13bdebbd2bfddde4dcb36f9bae38a7c3d"
     },
     {
       "path": "contracts/components/families/input-group.json",
@@ -193,8 +193,8 @@
     },
     {
       "path": "contracts/components/families/slider.json",
-      "gitBlob": "01811f0709dc1ea2cf3e2476d23489fedfe1e207",
-      "sha256": "4cb8a7a7870086e082cb501579a19de648aa379fbec4363584e5544695a0ee2f"
+      "gitBlob": "6ac97bcd0689dceb7ae56a911ff14b1b04d2b708",
+      "sha256": "63bf0c14523108023d58f51310fd63591d4d0a5ad51e8396337c7da89ce5ff87"
     },
     {
       "path": "contracts/components/families/spinner.json",
@@ -1598,8 +1598,8 @@
     },
     {
       "path": "src/contracts/components/canonical-model-limitations.ts",
-      "gitBlob": "55f6b025d205657b8bc3267dda3c42f582d70d9e",
-      "sha256": "b503877a57db1b2cbf4283a2f2f929ebd1e725ed57f5772ce3c02c96ac340dc6"
+      "gitBlob": "de5f718302ff64d8cad9aae211bee677770cf142",
+      "sha256": "9714d45df6910cf39faf41aab3cb1abe421f9fbcb309a01a47fa58a38b662c14"
     },
     {
       "path": "src/contracts/components/canonical-render-source-conventions.ts",
@@ -1618,8 +1618,8 @@
     },
     {
       "path": "src/contracts/components/canonical-source-reconciliation.ts",
-      "gitBlob": "c3e71585825ed4bfc7000d1ec20353f19df6905a",
-      "sha256": "29a887c80bace02fbb5851b40d5e684d9aed0ea83dc846f06d06077408067d73"
+      "gitBlob": "95a2958f49b0674da87944b561d1aee125634612",
+      "sha256": "fe0bdaa9fa273e599dd1cd4f18e2647721f89b9bf3c8eb221e097c79aea896aa"
     },
     {
       "path": "src/contracts/components/canonical-token-source-analysis.ts",
@@ -1643,8 +1643,8 @@
     },
     {
       "path": "src/contracts/components/invariants.ts",
-      "gitBlob": "4fa96f7295bd98f7cd575fe49f3da408e33c7ffb",
-      "sha256": "e90ed4a6e33f67f39686924f9c7ec61c5e62992288981c8ce9f4c29831e0d35e"
+      "gitBlob": "c7a5f148726f9138d4879b3db663a04508841ca2",
+      "sha256": "43bdff4f00883f0a432bbf548ce54ae7c884424f58242ab9bd907c31b7d33f3e"
     },
     {
       "path": "src/contracts/components/loader.ts",
@@ -1652,9 +1652,14 @@
       "sha256": "da3efbc22852d804e88e5d8aa5a73f370687c43f820621674fd4e1dfc020ec7f"
     },
     {
+      "path": "src/contracts/components/render-flow-source-analysis.ts",
+      "gitBlob": "3391515493260d29d1217822231a658957dfc56e",
+      "sha256": "9f82449de9f1ea0d9e99053e05fffd2b4686109868e474ee5d6a9828b2040c9c"
+    },
+    {
       "path": "src/contracts/components/render-source-analysis.ts",
-      "gitBlob": "53322b5ccc6218992cb5c0dec399ab7472296719",
-      "sha256": "6376b89ae128370b09fb1cf805941e69cbc1cff0782aab675c57266bdf9af0a7"
+      "gitBlob": "44339a08e1b9e82222770e07b56c4240c890f2c5",
+      "sha256": "6752a63a6c156eb221d582006c638adbeb5b5b525cc8460c71b2d3ab71ec8d54"
     },
     {
       "path": "src/contracts/components/source-reconciliation.ts",
@@ -1668,8 +1673,8 @@
     },
     {
       "path": "src/contracts/components/types.ts",
-      "gitBlob": "479d83ebdc36f93cf1648c7c107b2822c822613b",
-      "sha256": "be52e18d67a9072c7762db1696695356104ebae88d2ef97c130a37ebc80a1c45"
+      "gitBlob": "24f61384288d0734028f9d692f42ae892c045ea3",
+      "sha256": "b0304d16ec68e98fa04a04c4bb8b3ab043f1d472d644113202d8a86d9932668a"
     },
     {
       "path": "src/contracts/tokens/contract.ts",
@@ -1753,8 +1758,8 @@
     },
     {
       "path": "vite.library.config.ts",
-      "gitBlob": "4b4f643c9364a0f1290f49fa34006544cfeb370e",
-      "sha256": "9f16a3dd7ca0c5cd7f6cb46df30eff33e7561e84e382efbbb5680ed78256c2aa"
+      "gitBlob": "81eda5b3a23ebb028e91fac0c1f3cf623effc569",
+      "sha256": "22d605bb06fed06777942d39b52d8842d90415bba46a12d4bc448a9fa1247f9a"
     }
   ],
   "releaseId": "shadcn-radix-release-005",
@@ -212968,49 +212973,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldContent": {
         "familyId": "field",
@@ -216429,49 +216394,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldDescription": {
         "familyId": "field",
@@ -219918,49 +219843,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldError": {
         "familyId": "field",
@@ -223415,49 +223300,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldGroup": {
         "familyId": "field",
@@ -226890,49 +226735,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldLabel": {
         "familyId": "field",
@@ -230405,49 +230210,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldLegend": {
         "familyId": "field",
@@ -233914,49 +233679,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldSeparator": {
         "familyId": "field",
@@ -237433,49 +237158,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldSet": {
         "familyId": "field",
@@ -240925,49 +240610,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "field\u0000FieldTitle": {
         "familyId": "field",
@@ -244400,49 +244045,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "FieldError conditional render shape",
-              "scope": "FieldError internal rendering",
-              "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/field.tsx FieldError implementation",
-                "component rendering schema and source reconciliation"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/field.tsx",
-                "start": 5894,
-                "end": 5919,
-                "expressionKind": "IfStatement",
-                "sourceText": "if (!content) return null"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "FieldError conditional render shape",
-            "scope": "FieldError internal rendering",
-            "reason": "The render-contract model does not represent FieldError's null/absent render, computed useMemo content, single-message branch, deduplicated list branch, or conditional repeated li children. The recorded div and role=alert describe only the rendered container, not an unconditional render or complete child tree.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/field.tsx FieldError implementation",
-              "component rendering schema and source reconciliation"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/field.tsx",
-              "start": 5894,
-              "end": 5919,
-              "expressionKind": "IfStatement",
-              "sourceText": "if (!content) return null"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "input\u0000Input": {
         "familyId": "input",
@@ -433194,49 +432799,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "dynamic Slider Thumb rendering",
-              "scope": "Slider internal render tree and Thumb cardinality",
-              "reason": "The render-contract model has no repeated-child or dynamic-cardinality field. Slider maps values derived from value, otherwise defaultValue, otherwise [min] to Thumb JSX; the single thumb edge records a template only and does not assert one rendered Thumb.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/slider.tsx Slider implementation",
-                "component rendering schema and repeated-child source analysis"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/slider.tsx",
-                "start": 1351,
-                "end": 1793,
-                "expressionKind": "CallExpression",
-                "sourceText": "values.map((_, index) => (\n        <SliderPrimitive.Thumb\n          data-slot=\"slider-thumb\"\n          key={index}\n          className=\"relative block size-3 shrink-0 select-none rounded-full border border-ring bg-background ring-ring/50 transition-[color,box-shadow] after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-none active:ring-3 disabled:pointer-events-none disabled:opacity-50\"\n        />\n      ))"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "dynamic Slider Thumb rendering",
-            "scope": "Slider internal render tree and Thumb cardinality",
-            "reason": "The render-contract model has no repeated-child or dynamic-cardinality field. Slider maps values derived from value, otherwise defaultValue, otherwise [min] to Thumb JSX; the single thumb edge records a template only and does not assert one rendered Thumb.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/slider.tsx Slider implementation",
-              "component rendering schema and repeated-child source analysis"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/slider.tsx",
-              "start": 1351,
-              "end": 1793,
-              "expressionKind": "CallExpression",
-              "sourceText": "values.map((_, index) => (\n        <SliderPrimitive.Thumb\n          data-slot=\"slider-thumb\"\n          key={index}\n          className=\"relative block size-3 shrink-0 select-none rounded-full border border-ring bg-background ring-ring/50 transition-[color,box-shadow] after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-none active:ring-3 disabled:pointer-events-none disabled:opacity-50\"\n        />\n      ))"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "spinner\u0000Spinner": {
         "familyId": "spinner",
@@ -494900,5 +494465,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "3eb8e00456118c9085f7a9faf246c82d134252d5346afb8c525268001d5e5bf1"
+  "sha256": "38f2b39524e3d988592abd7f77c4d5c576b9ae33078f5267ec361459f82e2e3d"
 }
