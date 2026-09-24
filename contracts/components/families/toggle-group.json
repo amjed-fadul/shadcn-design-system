@@ -181,42 +181,97 @@
               "dataAttributes": [
                 {
                   "name": "data-slot",
-                  "source": "literal",
-                  "value": "toggle-group",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "literal",
+                        "value": "toggle-group"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 },
                 {
                   "name": "data-variant",
-                  "source": "prop",
-                  "prop": "variant",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "variant"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 },
                 {
                   "name": "data-size",
-                  "source": "prop",
-                  "prop": "size",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "size"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 },
                 {
                   "name": "data-spacing",
-                  "source": "prop",
-                  "prop": "spacing",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "spacing"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 },
                 {
                   "name": "data-orientation",
-                  "source": "prop",
-                  "prop": "orientation",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "orientation"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 }
               ],
@@ -262,6 +317,65 @@
           {
             "propName": "orientation",
             "value": "horizontal",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "context": [
+          {
+            "id": "ToggleGroupContext",
+            "defaultFields": [
+              {
+                "name": "size",
+                "value": "default"
+              },
+              {
+                "name": "variant",
+                "value": "default"
+              },
+              {
+                "name": "spacing",
+                "value": 2
+              },
+              {
+                "name": "orientation",
+                "value": "horizontal"
+              }
+            ],
+            "provider": {
+              "nodeId": "context",
+              "fields": [
+                {
+                  "name": "variant",
+                  "value": {
+                    "source": "prop",
+                    "name": "variant"
+                  }
+                },
+                {
+                  "name": "size",
+                  "value": {
+                    "source": "prop",
+                    "name": "size"
+                  }
+                },
+                {
+                  "name": "spacing",
+                  "value": {
+                    "source": "prop",
+                    "name": "spacing"
+                  }
+                },
+                {
+                  "name": "orientation",
+                  "value": {
+                    "source": "prop",
+                    "name": "orientation"
+                  }
+                }
+              ]
+            },
             "evidenceRefs": [
               "source"
             ]
@@ -910,34 +1024,95 @@
               "dataAttributes": [
                 {
                   "name": "data-slot",
-                  "source": "literal",
-                  "value": "toggle-group-item",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "literal",
+                        "value": "toggle-group-item"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 },
                 {
                   "name": "data-variant",
-                  "source": "primitive-state",
-                  "prop": "resolvedVariant",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "nullish-coalesce",
+                        "first": {
+                          "source": "context-field",
+                          "contextId": "ToggleGroupContext",
+                          "field": "variant"
+                        },
+                        "fallback": {
+                          "source": "prop",
+                          "name": "variant"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 },
                 {
                   "name": "data-size",
-                  "source": "primitive-state",
-                  "prop": "resolvedSize",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "nullish-coalesce",
+                        "first": {
+                          "source": "context-field",
+                          "contextId": "ToggleGroupContext",
+                          "field": "size"
+                        },
+                        "fallback": {
+                          "source": "prop",
+                          "name": "size"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 },
                 {
                   "name": "data-spacing",
-                  "source": "primitive-state",
-                  "prop": "context.spacing",
                   "evidenceRefs": [
                     "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "context-field",
+                        "contextId": "ToggleGroupContext",
+                        "field": "spacing"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
                   ]
                 }
               ],
@@ -968,29 +1143,36 @@
             ]
           }
         ],
-        "inheritedPropDefaults": []
+        "inheritedPropDefaults": [],
+        "context": [
+          {
+            "id": "ToggleGroupContext",
+            "defaultFields": [
+              {
+                "name": "size",
+                "value": "default"
+              },
+              {
+                "name": "variant",
+                "value": "default"
+              },
+              {
+                "name": "spacing",
+                "value": 2
+              },
+              {
+                "name": "orientation",
+                "value": "horizontal"
+              }
+            ],
+            "providerExportName": "ToggleGroup",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
       }
     }
   ],
-  "unresolved": [
-    {
-      "topic": "context-derived Toggle Group item data attributes",
-      "scope": "ToggleGroupItem render facts",
-      "reason": "The render-contract model cannot express data-variant, data-size, and data-spacing as parent ToggleGroupContext-derived values with local variant/size fallbacks and later forwarded-prop overrides. The primitive-state labels record local expression targets only; they do not establish the final attribute values or make item-local variant/size authoritative.",
-      "evidenceAttempted": [
-        "canonical src/components/ui/toggle-group.tsx provider and item implementations",
-        "component rendering data-attribute schema"
-      ],
-      "evidenceRefs": [
-        "source"
-      ],
-      "source": {
-        "sourcePath": "src/components/ui/toggle-group.tsx",
-        "start": 1871,
-        "end": 1915,
-        "expressionKind": "VariableDeclaration",
-        "sourceText": "resolvedVariant = context.variant ?? variant"
-      }
-    }
-  ]
+  "unresolved": []
 }

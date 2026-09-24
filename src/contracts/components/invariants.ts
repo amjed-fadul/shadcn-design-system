@@ -1,5 +1,5 @@
 import { isRenderingTree } from "./types"
-import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, ConditionalApiCondition, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderCondition, RenderingTree, RenderFlowGuard, RenderFlowGuardSource, StructuredPropType, TokenConditionAtom } from "./types"
+import type { ComponentContractSet, ComponentDefinition, ComponentFamilyContract, ComponentInvariantAuthority, ConditionalApiCondition, ContextFact, EffectiveComponentApiShape, EffectivePublicProp, EventContract, InheritedInterfaceContract, RenderAttributeValue, RenderCondition, RenderingTree, RenderFlowGuard, RenderFlowGuardSource, StructuredPropType, TokenConditionAtom } from "./types"
 
 type PublicPropFact = { name: string; availability: "available" | "unavailable"; required?: boolean; type?: StructuredPropType }
 
@@ -198,19 +198,105 @@ function validateRenderCondition(errors: string[], componentName: string, scope:
   }
 }
 
-function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: RenderingTree, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"], flowCollectionIds: Set<string> = new Set()) {
+function validateAttributeValue(errors: string[], componentName: string, scope: string, value: RenderAttributeValue, props: Map<string, PublicPropFact>, contexts: Map<string, ContextFact>, depth = 0): void {
+  if (depth > 16) { errors.push(`Component ${componentName} ${scope} has an excessively nested value.`); return }
+  if (value.source === "literal") return
+  if (value.source === "prop") {
+    if (props.get(value.name)?.availability !== "available") errors.push(`Component ${componentName} ${scope} references unknown prop: ${value.name}.`)
+    return
+  }
+  if (value.source === "context-field") {
+    const context = contexts.get(value.contextId)
+    if (!context) errors.push(`Component ${componentName} ${scope} references unknown context: ${value.contextId}.`)
+    else if (!context.defaultFields.some((field) => field.name === value.field)) errors.push(`Component ${componentName} ${scope} references unknown context field: ${value.contextId}.${value.field}.`)
+    return
+  }
+  if (value.source === "nullish-coalesce") {
+    validateAttributeValue(errors, componentName, scope, value.first, props, contexts, depth + 1)
+    validateAttributeValue(errors, componentName, scope, value.fallback, props, contexts, depth + 1)
+    return
+  }
+  errors.push(`Component ${componentName} ${scope} has an unsupported value source.`)
+}
+
+function readsContext(value: RenderAttributeValue, contextId: string): boolean {
+  if (value.source === "context-field") return value.contextId === contextId
+  return value.source === "nullish-coalesce" && (readsContext(value.first, contextId) || readsContext(value.fallback, contextId))
+}
+
+function referencedContexts(value: RenderAttributeValue): string[] {
+  if (value.source === "context-field") return [value.contextId]
+  return value.source === "nullish-coalesce" ? [...referencedContexts(value.first), ...referencedContexts(value.fallback)] : []
+}
+
+function validateContextFacts(errors: string[], family: ComponentFamilyContract, componentName: string, component: ComponentDefinition, props: Map<string, PublicPropFact>): Map<string, ContextFact> {
+  const contexts = new Map<string, ContextFact>()
+  const seen = new Set<string>()
+  for (const context of component.context ?? []) if (!contexts.has(context.id)) contexts.set(context.id, context)
+  for (const context of component.context ?? []) {
+    hasEvidence(errors, context.evidenceRefs, family.evidence, `Context ${componentName}.${context.id}`)
+    if (!context.id || seen.has(context.id)) errors.push(`Component ${componentName} has duplicate or empty context ID: ${context.id}.`)
+    seen.add(context.id)
+    if (Boolean(context.provider) === Boolean(context.providerExportName)) errors.push(`Component ${componentName} context ${context.id} needs exactly one provider or provider export reference.`)
+    const names = new Set<string>()
+    if (!context.defaultFields.length) errors.push(`Component ${componentName} context ${context.id} has no default fields.`)
+    for (const field of context.defaultFields) {
+      if (!field.name || names.has(field.name)) errors.push(`Component ${componentName} context ${context.id} has duplicate or empty default field: ${field.name}.`)
+      names.add(field.name)
+    }
+    if (context.provider) {
+      const providerNames = new Set<string>()
+      if (!context.provider.fields.length) errors.push(`Component ${componentName} context ${context.id} has no provider fields.`)
+      for (const field of context.provider.fields) {
+        if (providerNames.has(field.name)) errors.push(`Component ${componentName} context ${context.id} has duplicate provider field: ${field.name}.`)
+        providerNames.add(field.name)
+        if (!names.has(field.name)) errors.push(`Component ${componentName} context ${context.id} provides unknown field: ${field.name}.`)
+        if (readsContext(field.value, context.id)) errors.push(`Component ${componentName} context ${context.id}.${field.name} reads its own provider value.`)
+        validateAttributeValue(errors, componentName, `context ${context.id}.${field.name}`, field.value, props, contexts)
+      }
+      for (const name of names) if (!providerNames.has(name)) errors.push(`Component ${componentName} context ${context.id} omits provider field: ${name}.`)
+      const trees = isRenderingTree(component.rendering) ? [component.rendering] : component.rendering.alternatives.map((branch) => branch.rendering)
+      if (!trees.every((tree) => tree.nodes.some((node) => node.id === context.provider!.nodeId))) errors.push(`Component ${componentName} context ${context.id} references unknown provider node: ${context.provider.nodeId}.`)
+    }
+  }
+  const visiting = new Set<string>(), visited = new Set<string>()
+  const visit = (id: string) => {
+    if (visiting.has(id)) { errors.push(`Component ${componentName} context values contain a cycle at ${id}.`); return }
+    if (visited.has(id)) return
+    visiting.add(id)
+    for (const field of contexts.get(id)?.provider?.fields ?? []) for (const dependency of referencedContexts(field.value)) if (contexts.has(dependency)) visit(dependency)
+    visiting.delete(id)
+    visited.add(id)
+  }
+  for (const id of contexts.keys()) visit(id)
+  return contexts
+}
+
+function validateRenderingTree(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: RenderingTree, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"], flowCollectionIds: Set<string> = new Set(), contexts: Map<string, ContextFact> = new Map()) {
   const ids = new Set<string>()
   for (const node of rendering.nodes) {
     if (ids.has(node.id)) errors.push(`Component ${componentName} has duplicate render-node ID: ${node.id}.`)
     ids.add(node.id)
     hasEvidence(errors, node.evidenceRefs, family.evidence, `Render node ${componentName}.${node.id}`)
+    const attributeNames = new Set<string>()
     for (const attr of node.dataAttributes) {
       hasEvidence(errors, attr.evidenceRefs, family.evidence, `Render attribute ${componentName}.${node.id}.${attr.name}`)
+      if (!attr.name.startsWith("data-") || attributeNames.has(attr.name)) errors.push(`Component ${componentName} render node ${node.id} has unknown or duplicate data attribute: ${attr.name}.`)
+      attributeNames.add(attr.name)
       if (attr.source === "derived-condition") validateRenderCondition(errors, componentName, `render attribute ${node.id}.${attr.name}`, attr.condition, props)
       if (attr.source === "prop" && !props.has(attr.prop)) errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} references unknown prop: ${attr.prop}.`)
       if (attr.source === "conditional-value") {
         validateRenderCondition(errors, componentName, `render attribute ${node.id}.${attr.name}`, attr.condition, props)
         for (const value of [attr.whenTrue, attr.whenFalse]) if (value.source === "prop" && !props.has(value.name)) errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} references unknown prop value: ${value.name}.`)
+      }
+      if (attr.source === "ordered-writes") {
+        if (!attr.writes.length || !attr.writes.some((write) => write.kind === "value")) errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} needs a value write.`)
+        for (const [index, write] of attr.writes.entries()) {
+          if (write.kind === "value") validateAttributeValue(errors, componentName, `render attribute ${node.id}.${attr.name} write ${index}`, write.value, props, contexts)
+          else if (write.kind === "public-props-spread") {
+            if (!node.receivesPublicProps || rendering.publicPropsTargetNodeId !== node.id) errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} has a public-props write on a non-target node.`)
+          } else errors.push(`Component ${componentName} render attribute ${node.id}.${attr.name} has an unsupported write.`)
+        }
       }
     }
     for (const spread of node.derivedSpreads ?? []) {
@@ -356,7 +442,7 @@ function validateRenderFlowGuard(errors: string[], componentName: string, scope:
   validateRenderFlowGuardSource(errors, componentName, scope, guard.source, props, collectionIds)
 }
 
-function validateRenderingFlow(errors: string[], family: ComponentFamilyContract, componentName: string, flow: NonNullable<ComponentDefinition["renderingFlow"]>, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"]): void {
+function validateRenderingFlow(errors: string[], family: ComponentFamilyContract, componentName: string, flow: NonNullable<ComponentDefinition["renderingFlow"]>, authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"], contexts: Map<string, ContextFact>): void {
   const collectionIds = new Set<string>()
   for (const collection of flow.collections) {
     if (collectionIds.has(collection.id)) errors.push(`Component ${componentName} has duplicate rendering-flow collection ID: ${collection.id}.`)
@@ -401,7 +487,7 @@ function validateRenderingFlow(errors: string[], family: ComponentFamilyContract
       if (!contradictory) priorGuards.push(branch.when)
     }
     if (branch.outcome.kind === "rendered") {
-      validateRenderingTree(errors, family, `${componentName} branch ${index}`, branch.outcome.tree, authority, exportEntries, props, localProps, collectionIds)
+      validateRenderingTree(errors, family, `${componentName} branch ${index}`, branch.outcome.tree, authority, exportEntries, props, localProps, collectionIds, contexts)
       const content = branch.outcome.content
       if (content?.source === "prop" && (!props.has(content.propName) || props.get(content.propName)?.availability !== "available")) errors.push(`Component ${componentName} rendering-flow branch ${index} references unknown content prop: ${content.propName}.`)
       if (content?.source === "collection-item-property" && (!collectionIds.has(content.collectionId) || !content.itemProperty || content.index !== 0 || typeof content.optionalItem !== "boolean")) errors.push(`Component ${componentName} rendering-flow branch ${index} has an invalid collection content reference.`)
@@ -410,9 +496,9 @@ function validateRenderingFlow(errors: string[], family: ComponentFamilyContract
   if (otherwiseCount > 1) errors.push(`Component ${componentName} rendering-flow has multiple otherwise branches.`)
 }
 
-function validateRendering(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"], flowCollectionIds: Set<string> = new Set()) {
+function validateRendering(errors: string[], family: ComponentFamilyContract, componentName: string, rendering: ComponentDefinition["rendering"], authority: ComponentInvariantAuthority, exportEntries: Map<string, { kind: string; authorableJsx: boolean }>, props: Map<string, PublicPropFact>, localProps: ComponentDefinition["localProps"], flowCollectionIds: Set<string> = new Set(), contexts: Map<string, ContextFact> = new Map()) {
   if (isRenderingTree(rendering)) {
-    validateRenderingTree(errors, family, componentName, rendering, authority, exportEntries, props, localProps, flowCollectionIds)
+    validateRenderingTree(errors, family, componentName, rendering, authority, exportEntries, props, localProps, flowCollectionIds, contexts)
     return
   }
   let otherwiseCount = 0
@@ -420,7 +506,7 @@ function validateRendering(errors: string[], family: ComponentFamilyContract, co
     hasEvidence(errors, alternative.evidenceRefs, family.evidence, `Render alternative ${componentName}.${index}`)
     if ("otherwise" in alternative) otherwiseCount += 1
     else validateRenderCondition(errors, componentName, `render alternative ${index}`, alternative.when, props)
-    validateRenderingTree(errors, family, `${componentName} alternative ${index}`, alternative.rendering, authority, exportEntries, props, localProps, flowCollectionIds)
+    validateRenderingTree(errors, family, `${componentName} alternative ${index}`, alternative.rendering, authority, exportEntries, props, localProps, flowCollectionIds, contexts)
   }
   if (otherwiseCount > 1) errors.push(`Component ${componentName} has multiple otherwise render alternatives.`)
   if (rendering.alternatives.some((alternative, index) => "otherwise" in alternative && index !== rendering.alternatives!.length - 1)) errors.push(`Component ${componentName} has an otherwise render alternative before the final branch.`)
@@ -608,8 +694,9 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
     validateConditionalApi(errors, family, entry.name, component, props, events, authority)
     const renderExports = new Map(family.exports.map(({ name, kind, authorableJsx }) => [name, { kind, authorableJsx }]))
     const flowCollectionIds = new Set(component.renderingFlow?.collections.map((collection) => collection.id) ?? [])
-    validateRendering(errors, family, entry.name, component.rendering, authority, renderExports, props, component.localProps, flowCollectionIds)
-    if (component.renderingFlow) validateRenderingFlow(errors, family, entry.name, component.renderingFlow, authority, renderExports, props, component.localProps)
+    const contexts = validateContextFacts(errors, family, entry.name, component, props)
+    validateRendering(errors, family, entry.name, component.rendering, authority, renderExports, props, component.localProps, flowCollectionIds, contexts)
+    if (component.renderingFlow) validateRenderingFlow(errors, family, entry.name, component.renderingFlow, authority, renderExports, props, component.localProps, contexts)
     const slotNames = new Set<string>()
     for (const slot of component.slots) {
       if (slotNames.has(slot.propName)) errors.push(`Component ${entry.name} has duplicate Slot fact for prop: ${slot.propName}.`)
@@ -620,6 +707,13 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
       if (slot.childCardinality.max < slot.childCardinality.min) errors.push(`Slot ${entry.name}.${slot.propName} has max ${slot.childCardinality.max} below min ${slot.childCardinality.min}.`)
     }
     for (const fact of component.accessibility) hasEvidence(errors, fact.evidenceRefs, family.evidence, `Accessibility ${entry.name}.${fact.feature}`)
+  }
+  for (const entry of family.exports) for (const context of entry.component?.context ?? []) {
+    if (!context.providerExportName) continue
+    const providerEntry = family.exports.find((candidate) => candidate.name === context.providerExportName)
+    const provider = providerEntry?.component?.context?.find((candidate) => candidate.id === context.id && candidate.provider)
+    if (!provider) errors.push(`Component ${entry.name} context ${context.id} references unknown provider export: ${context.providerExportName}.`)
+    else if (stableSerialize(context.defaultFields) !== stableSerialize(provider.defaultFields)) errors.push(`Component ${entry.name} context ${context.id} has defaults different from provider ${context.providerExportName}.`)
   }
   for (const unresolved of family.unresolved) hasEvidence(errors, unresolved.evidenceRefs, family.evidence, `Unresolved fact ${unresolved.topic}`)
   if (authority.sourceIdentity && family.source.canonicalPath !== authority.sourceIdentity.canonicalPath) errors.push("Family source canonicalPath does not match approved source identity.")

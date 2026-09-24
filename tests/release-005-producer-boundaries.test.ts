@@ -26,10 +26,8 @@ function projected(familyId: string, name: string) {
 }
 
 describe("Release 005 producer boundaries", () => {
-  test("retains only the Toggle Group model limitation at family level", () => {
-    expect(source.families.flatMap((entry) => entry.unresolved.map((fact) => `${entry.id}: ${fact.topic}`)).sort()).toEqual([
-      "toggle-group: context-derived Toggle Group item data attributes",
-    ])
+  test("has no unresolved family-level model limitation", () => {
+    expect(source.families.flatMap((entry) => entry.unresolved.map((fact) => `${entry.id}: ${fact.topic}`)).sort()).toEqual([])
   })
 
   test("retains Vaul's snap-point presence requirement in executable branches", () => {
@@ -41,13 +39,12 @@ describe("Release 005 producer boundaries", () => {
     expect(absent?.shape.props.find((prop) => prop.name === "snapPoints")).toMatchObject({ availability: "available", required: false })
   })
 
-  test.each([
-    ["toggle-group", "ToggleGroupItem", "context-derived Toggle Group item data attributes"],
-  ])("keeps %s.%s structural uncertainty visible to the executable consumer", (familyId, exportName, topic) => {
-    const finding = family(familyId).unresolved.find((entry) => entry.topic === topic)
-    expect(finding).toMatchObject({ scope: expect.stringContaining(exportName), evidenceRefs: ["source"] })
-    expect(finding?.reason).toBeTruthy()
-    expect(projected(familyId, exportName).unresolved).toContainEqual(finding)
+  test("projects resolved ToggleGroupItem without render internals", () => {
+    expect(family("toggle-group").unresolved).toEqual([])
+    expect(projected("toggle-group", "ToggleGroupItem").unresolved).toEqual([])
+    expect(family("toggle-group").exports.find((entry) => entry.name === "ToggleGroupItem")?.authorableJsx).toBe(true)
+    expect(exported("toggle-group", "ToggleGroupItem").context).toBeDefined()
+    expect("context" in projected("toggle-group", "ToggleGroupItem").component!).toBe(false)
   })
 
   test.each([["field", "FieldError"], ["slider", "Slider"]])("projects resolved %s.%s without a structural limitation", (familyId, exportName) => {

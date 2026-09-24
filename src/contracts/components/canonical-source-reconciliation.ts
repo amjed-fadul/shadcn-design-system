@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
 import { canonicalInterfaceMemberAuthority } from "./canonical-interface-member-authority"
-import { analyzeCanonicalModelLimitations } from "./canonical-model-limitations"
+import { analyzeContextRenderSource } from "./context-render-source-analysis"
 import { canonicalComponentPropSourceAnalyzer } from "./canonical-component-prop-source-analysis"
 import { canonicalRenderSourceAnalysisConventions } from "./canonical-render-source-conventions"
 import { analyzeCanonicalDelegatedHostFacts, canonicalDelegatedHostEvidencePaths, canonicalSourceOwnedSlotPropNames } from "./canonical-slot-source-analysis"
@@ -14,7 +14,7 @@ import { compareJsxRenderTree, analyzeJsxRenderTree, listModuleExports, type Jsx
 import { analyzeRenderFlowSource, compareRenderFlowSource } from "./render-flow-source-analysis"
 import { reconcileSourceEvidenceCompleteness, reconcileSourceOwnedSlotCardinality } from "./source-reconciliation"
 import { analyzeComponentTokenSourceForExport, compareComponentTokenDependenciesForExport } from "./canonical-token-source-analysis"
-import type { ComponentFamilyContract, ConditionalApiCase, ConditionalApiCondition, InheritedInterfaceContract } from "./types"
+import type { ComponentDefinition, ComponentFamilyContract, ConditionalApiCase, ConditionalApiCondition, InheritedInterfaceContract, RenderingTree } from "./types"
 
 const analyzedInterfaceFacts = new Map<string, ReturnType<typeof analyzePackageComponentInterface>>()
 const canonicalReconciliationCache = new Map<string, readonly string[]>()
@@ -170,6 +170,30 @@ function sameValue(left: unknown, right: unknown) {
   return JSON.stringify(left) === JSON.stringify(right)
 }
 
+function sourceTagForContractNode(rendering: ComponentDefinition["rendering"], source: JsxRenderTree, nodeId: string): string | undefined {
+  const pairs: Array<{ expected: RenderingTree; actual: JsxRenderNode }> = "nodes" in rendering
+    ? source.root ? [{ expected: rendering, actual: source.root }] : []
+    : rendering.alternatives.flatMap((alternative, index) => source.alternatives?.[index] ? [{ expected: alternative.rendering, actual: source.alternatives[index].root }] : [])
+  for (const { expected, actual } of pairs) {
+    const nodes = new Map(expected.nodes.map((node) => [node.id, node]))
+    const visit = (id: string, sourceNode: JsxRenderNode): string | undefined => {
+      if (id === nodeId) return sourceNode.tag
+      const expectedNode = nodes.get(id)
+      for (const [index, child] of (expectedNode?.children ?? []).entries()) {
+        const nested = sourceNode.children[index]
+        if (nested) {
+          const found = visit(child.nodeId, nested)
+          if (found) return found
+        }
+      }
+      return undefined
+    }
+    const tag = visit(expected.rootNodeId, actual)
+    if (tag) return tag
+  }
+  return undefined
+}
+
 /**
  * Cache only evidence whose key includes both loaded contract data and every
  * canonical file read during reconciliation. A changed artifact, component
@@ -242,6 +266,13 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       }
 
       const sourceRendering = analyzeJsxRenderTree(path, entry.name, { ...canonicalRenderSourceAnalysisConventions, retainAbsence: Boolean(entry.component.renderingFlow) })
+      const sourceContext = analyzeContextRenderSource(path, entry.name)
+      const contractedContext = (entry.component.context ?? []).map(({ evidenceRefs: _evidenceRefs, provider, ...fact }) => ({
+        ...fact,
+        ...(provider ? { provider: { nodeTag: sourceTagForContractNode(entry.component!.rendering, sourceRendering, provider.nodeId), fields: provider.fields } } : {}),
+      }))
+      if (contractedContext.length && sourceContext.unresolved.length) errors.push(`Component ${entry.name} context provenance has unsupported source expressions: ${sourceContext.unresolved.join("; ")}.`)
+      if ((contractedContext.length || sourceContext.unresolved.length === 0) && !sameValue(contractedContext, sourceContext.context)) errors.push(`Component ${entry.name} context provenance does not match source evidence.`)
       unresolved.push({
         topic: "jsx-rendering",
         scope: entry.name,
@@ -279,9 +310,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
       if (propErrors.some((error) => !error.includes(" default "))) errors.push(`Component ${entry.name} local prop surface does not match source evidence.`)
       errors.push(...propErrors.map((error) => `Component ${entry.name}: ${error}`))
     }
-    const modelLimitations = analyzeCanonicalModelLimitations(path, family.source.canonicalPath, family.id)
-    errors.push(...modelLimitations.errors)
-    errors.push(...reconcileSourceEvidenceCompleteness(family, [...unresolved, ...modelLimitations.analyses]))
+    errors.push(...reconcileSourceEvidenceCompleteness(family, unresolved))
   }
 
   for (const contract of context.interfaces) {

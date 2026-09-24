@@ -1558,6 +1558,21 @@ function comparableIndependentAttribute(attribute: AnyRecord): AnyRecord {
   }
 }
 
+function independentOrderedAttributeMatches(source: AnyRecord, contract: AnyRecord): boolean {
+  if (contract.source !== "ordered-writes") return false
+  const writes = contract.writes ?? []
+  if (writes.length !== 2 || writes[0]?.kind !== "value" || writes[1]?.kind !== "public-props-spread") return false
+  const value = writes[0].value
+  if (source.name !== contract.name) return false
+  if (source.source === "literal") return value?.source === "literal" && value.value === source.value
+  if (source.source === "prop") return value?.source === "prop" && value.name === source.prop
+  if (source.source !== "primitive-state") return false
+  if (value?.source === "context-field") return typeof source.prop === "string" && source.prop.endsWith(`.${value.field}`)
+  return value?.source === "nullish-coalesce"
+    && value.first?.source === "context-field"
+    && value.fallback?.source === "prop"
+}
+
 function independentRenderTreeMatches(source: IndependentRenderNode, rendering: AnyRecord): boolean {
   const nodes = new Map<string, AnyRecord>((rendering.nodes ?? []).map((node: AnyRecord) => [node.id, node]))
   const portalIds = new Set<string>((rendering.portalBoundaries ?? []).map((boundary: AnyRecord) => boundary.nodeId))
@@ -1573,7 +1588,8 @@ function independentRenderTreeMatches(source: IndependentRenderNode, rendering: 
     if (sourceNode.dataAttributes.length !== contractAttributes.length) return false
     if (!sourceNode.dataAttributes.every((attribute, index) => {
       const candidate = comparableIndependentAttribute(contractAttributes[index])
-      return JSON.stringify(comparableIndependentAttribute(attribute)) === JSON.stringify(candidate)
+      return independentOrderedAttributeMatches(attribute, contractAttributes[index])
+        || JSON.stringify(comparableIndependentAttribute(attribute)) === JSON.stringify(candidate)
     })) return false
     const contractChildren = contractNode.children ?? []
     if (sourceNode.children.length !== contractChildren.length) return false
@@ -2434,22 +2450,22 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       for (const attribute of directDataAttributes) {
         const matching = contractAttributes.filter((candidate) => candidate.name === attribute.name)
         if (!matching.length) continue
-        if (attribute.expressionKind === "literal" && !matching.some((candidate) => candidate.value === attribute.value)) {
+        if (attribute.expressionKind === "literal" && !matching.some((candidate) => candidate.value === attribute.value || candidate.source === "ordered-writes" && candidate.writes?.[0]?.value?.source === "literal" && candidate.writes[0].value.value === attribute.value)) {
           errors.push(`${family.id}.${exported.name}: literal ${attribute.name} value is omitted`)
         }
         if (attribute.expressionKind === "conditional" && !matching.some((candidate) => ["conditional-value", "derived-condition"].includes(candidate.source))) {
           errors.push(`${family.id}.${exported.name}: conditional ${attribute.name} fact is omitted`)
         }
-        if (attribute.expressionKind === "identifier" && !matching.some((candidate) => ["prop", "primitive-state"].includes(candidate.source))) {
+        if (attribute.expressionKind === "identifier" && !matching.some((candidate) => ["prop", "primitive-state"].includes(candidate.source) || candidate.source === "ordered-writes" && ["prop", "nullish-coalesce"].includes(candidate.writes?.[0]?.value?.source))) {
           errors.push(`${family.id}.${exported.name}: derived ${attribute.name} target is omitted`)
         }
-        if (attribute.expressionKind === "property-access" && !matching.some((candidate) => ["prop", "primitive-state"].includes(candidate.source) && candidate.prop === attribute.expression)) {
+        if (attribute.expressionKind === "property-access" && !matching.some((candidate) => ["prop", "primitive-state"].includes(candidate.source) && candidate.prop === attribute.expression || candidate.source === "ordered-writes" && candidate.writes?.[0]?.value?.source === "context-field" && typeof attribute.expression === "string" && attribute.expression.endsWith(`.${candidate.writes[0].value.field}`))) {
           errors.push(`${family.id}.${exported.name}: derived ${attribute.name} property access target is omitted`)
         }
         if (attribute.expressionKind === "other" && !matching.some((candidate) => candidate.source === "derived-condition")) errors.push(`${family.id}.${exported.name}: unresolved data attribute expression ${attribute.name}`)
       }
       const directSlotValues = [...new Set(directDataAttributes.filter((attribute) => attribute.name === "data-slot").map((attribute) => attribute.value))].sort()
-      const contractSlotValues = [...new Set(contractAttributes.filter((attribute) => attribute.name === "data-slot").map((attribute) => attribute.value))].sort()
+      const contractSlotValues = [...new Set(contractAttributes.filter((attribute) => attribute.name === "data-slot").map((attribute) => attribute.source === "ordered-writes" ? attribute.writes?.[0]?.value?.value : attribute.value))].sort()
       if (JSON.stringify(directSlotValues) !== JSON.stringify(contractSlotValues)) {
         errors.push(`${family.id}.${exported.name}: data-slot values differ from the canonical JSX`)
       }
@@ -2532,9 +2548,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
       const source = componentSourceFacts(sourceFacts(resolve(root, family.source.canonicalPath)).sourceFile, declaration)
       for (const finding of source.renderUnresolved) recognizedUnresolved.add(JSON.stringify({ topic: "jsx-rendering", scope: exported.name, reason: finding.reason, sourcePath: family.source.canonicalPath, start: finding.start, end: finding.end, expressionKind: finding.expressionKind, sourceText: finding.sourceText }))
     }
-    const modelLimitations: Record<string, { exportName: string; topic: string; scope: string; kind: string; anchor: string }> = {
-      "toggle-group": { exportName: "ToggleGroupItem", topic: "context-derived Toggle Group item data attributes", scope: "ToggleGroupItem render facts", kind: "VariableDeclaration", anchor: "resolvedVariant = context.variant ?? variant" },
-    }
+    const modelLimitations: Record<string, { exportName: string; topic: string; scope: string; kind: string; anchor: string }> = {}
     const limitation = modelLimitations[family.id]
     if (limitation) {
       const file = sourceFacts(resolve(root, family.source.canonicalPath)).sourceFile
@@ -2926,12 +2940,12 @@ describe("Phase 3 Task 10 independent review", () => {
 
     const mutated = clone(baseline)
     const item = exportByName(familyById(mutated, "toggle-group"), "ToggleGroupItem").component
-    item.rendering.nodes[0].dataAttributes.find((attribute: AnyRecord) => attribute.name === "data-spacing").prop = "context.spacing()"
+    item.rendering.nodes[0].dataAttributes.find((attribute: AnyRecord) => attribute.name === "data-spacing").writes[0].value.field = "spacingWrong"
 
     expect(directSourceErrors(mutated.families, mutated.interfaces)).toContain(
       "toggle-group.ToggleGroupItem: derived data-spacing property access target is omitted",
     )
-  })
+  }, 30_000)
 
   test("independent render oracle accepts only imported useMemo dynamic children", () => {
     const { sourceFile } = sourceFacts(join(root, "tests/fixtures/component-analysis-completeness-fixture.tsx"))

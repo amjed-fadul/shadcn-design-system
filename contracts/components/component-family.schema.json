@@ -202,6 +202,34 @@
         { "type": "object", "additionalProperties": false, "required": ["source", "name"], "properties": { "source": { "enum": ["prop", "state"] }, "name": { "type": "string" } } }
       ]
     },
+    "renderAttributeValue": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["source", "value"], "properties": { "source": { "const": "literal" }, "value": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }, { "type": "null" }] } } },
+        { "type": "object", "additionalProperties": false, "required": ["source", "name"], "properties": { "source": { "const": "prop" }, "name": { "type": "string" } } },
+        { "type": "object", "additionalProperties": false, "required": ["source", "contextId", "field"], "properties": { "source": { "const": "context-field" }, "contextId": { "type": "string" }, "field": { "type": "string" } } },
+        { "type": "object", "additionalProperties": false, "required": ["source", "first", "fallback"], "properties": { "source": { "const": "nullish-coalesce" }, "first": { "$ref": "#/$defs/renderAttributeValue" }, "fallback": { "$ref": "#/$defs/renderAttributeValue" } } }
+      ]
+    },
+    "contextFact": {
+      "type": "object", "additionalProperties": false, "required": ["id", "defaultFields", "evidenceRefs"],
+      "properties": {
+        "id": { "type": "string" },
+        "defaultFields": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["name", "value"], "properties": { "name": { "type": "string" }, "value": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }, { "type": "null" }] } } } },
+        "provider": { "type": "object", "additionalProperties": false, "required": ["nodeId", "fields"], "properties": { "nodeId": { "type": "string" }, "fields": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["name", "value"], "properties": { "name": { "type": "string" }, "value": { "$ref": "#/$defs/renderAttributeValue" } } } } } },
+        "providerExportName": { "type": "string" },
+        "evidenceRefs": { "$ref": "#/$defs/refs" }
+      },
+      "oneOf": [
+        { "required": ["provider"], "properties": { "provider": true }, "not": { "required": ["providerExportName"], "properties": { "providerExportName": true } } },
+        { "required": ["providerExportName"], "properties": { "providerExportName": true }, "not": { "required": ["provider"], "properties": { "provider": true } } }
+      ]
+    },
+    "renderAttributeWrite": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind", "value"], "properties": { "kind": { "const": "value" }, "value": { "$ref": "#/$defs/renderAttributeValue" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "const": "public-props-spread" } } }
+      ]
+    },
     "renderChildRef": {
       "type": "object", "additionalProperties": false, "required": ["nodeId", "evidenceRefs"],
       "properties": { "nodeId": { "type": "string" }, "when": { "$ref": "#/$defs/renderCondition" }, "repeat": { "type": "object", "additionalProperties": false, "required": ["collectionId", "count", "evidenceRefs"], "properties": { "collectionId": { "type": "string" }, "count": { "enum": ["collection-length", "matching-items"] }, "itemWhen": { "type": "object", "additionalProperties": false, "required": ["op", "itemProperty", "optionalItem"], "properties": { "op": { "const": "truthy" }, "itemProperty": { "type": "string" }, "optionalItem": { "type": "boolean" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }, "evidenceRefs": { "$ref": "#/$defs/refs" } }
@@ -212,7 +240,8 @@
         { "type": "object", "additionalProperties": false, "required": ["name", "source", "prop", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "prop" }, "prop": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
         { "type": "object", "additionalProperties": false, "required": ["name", "source", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "primitive-state" }, "value": { "type": "string" }, "prop": { "type": "string" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
         { "type": "object", "additionalProperties": false, "required": ["name", "source", "condition", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "derived-condition" }, "condition": { "$ref": "#/$defs/renderCondition" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
-        { "type": "object", "additionalProperties": false, "required": ["name", "source", "condition", "whenTrue", "whenFalse", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "conditional-value" }, "condition": { "$ref": "#/$defs/renderCondition" }, "whenTrue": { "$ref": "#/$defs/renderValue" }, "whenFalse": { "$ref": "#/$defs/renderValue" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "condition", "whenTrue", "whenFalse", "evidenceRefs"], "properties": { "name": { "type": "string" }, "source": { "const": "conditional-value" }, "condition": { "$ref": "#/$defs/renderCondition" }, "whenTrue": { "$ref": "#/$defs/renderValue" }, "whenFalse": { "$ref": "#/$defs/renderValue" }, "evidenceRefs": { "$ref": "#/$defs/refs" } } },
+        { "type": "object", "additionalProperties": false, "required": ["name", "source", "writes", "evidenceRefs"], "properties": { "name": { "type": "string", "pattern": "^data-" }, "source": { "const": "ordered-writes" }, "writes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/renderAttributeWrite" } }, "evidenceRefs": { "$ref": "#/$defs/refs" } } }
       ]
     },
     "renderNode": {
@@ -266,7 +295,7 @@
     "component": {
       "type": "object", "additionalProperties": false,
       "required": ["localProps", "inherits", "slots", "composition", "stateChannels", "conditionalApi", "events", "tokenDependencies", "rendering", "accessibility", "inheritedPropDefaults"],
-      "properties": { "localProps": { "type": "array", "items": { "$ref": "#/$defs/localProp" } }, "inherits": { "type": "array", "items": { "type": "string" } }, "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } }, "inheritedPropDefaults": { "type": "array", "items": { "$ref": "#/$defs/inheritedPropDefault" } }, "composition": { "$ref": "#/$defs/composition" }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "conditionalApi": { "type": "array", "items": { "$ref": "#/$defs/conditional" } }, "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }, "tokenDependencies": { "type": "array", "items": { "$ref": "#/$defs/token" } }, "rendering": { "$ref": "#/$defs/rendering" }, "renderingFlow": { "$ref": "#/$defs/renderingFlow" }, "accessibility": { "type": "array", "items": { "$ref": "#/$defs/accessibility" } } }
+      "properties": { "localProps": { "type": "array", "items": { "$ref": "#/$defs/localProp" } }, "inherits": { "type": "array", "items": { "type": "string" } }, "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } }, "inheritedPropDefaults": { "type": "array", "items": { "$ref": "#/$defs/inheritedPropDefault" } }, "composition": { "$ref": "#/$defs/composition" }, "stateChannels": { "type": "array", "items": { "$ref": "#/$defs/state" } }, "conditionalApi": { "type": "array", "items": { "$ref": "#/$defs/conditional" } }, "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }, "tokenDependencies": { "type": "array", "items": { "$ref": "#/$defs/token" } }, "context": { "type": "array", "items": { "$ref": "#/$defs/contextFact" } }, "rendering": { "$ref": "#/$defs/rendering" }, "renderingFlow": { "$ref": "#/$defs/renderingFlow" }, "accessibility": { "type": "array", "items": { "$ref": "#/$defs/accessibility" } } }
     },
     "export": {
       "type": "object", "additionalProperties": false, "required": ["name", "kind", "authorableJsx", "evidenceRefs"],

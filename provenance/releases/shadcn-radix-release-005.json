@@ -43,8 +43,8 @@
     },
     {
       "path": "contracts/components/component-family.schema.json",
-      "gitBlob": "6c37ed52333863a47e339e4f3605b84c80042290",
-      "sha256": "502f1a2957ad7de50a30c58bb23cef31c1bbc0485e84078619720f31446cc514"
+      "gitBlob": "4dffb338c398367ca02b79a5935a2b11f67cb143",
+      "sha256": "d602b5395c37c939f6e5ceb9e51cdb563fcade11a28b6dc4a21f592c16c42c72"
     },
     {
       "path": "contracts/components/families/accordion.json",
@@ -223,8 +223,8 @@
     },
     {
       "path": "contracts/components/families/toggle-group.json",
-      "gitBlob": "f08f75a0b264ace5cf00bba42ad6ce32eb08ca21",
-      "sha256": "f3748f7ee68976fb92941764b6887cc42fa153110eed748938f5c6881d126b3e"
+      "gitBlob": "c874f99e90311138bb547d5cda77552344fad0b2",
+      "sha256": "ea693945abb5476836fdc2b15fcca36b9ee5ae98f51e56487930fcfdb8c68611"
     },
     {
       "path": "contracts/components/families/toggle.json",
@@ -1597,11 +1597,6 @@
       "sha256": "9f376facadf8538ccce1049636dfa2173619680f25c853ab76295b36529f19df"
     },
     {
-      "path": "src/contracts/components/canonical-model-limitations.ts",
-      "gitBlob": "de5f718302ff64d8cad9aae211bee677770cf142",
-      "sha256": "9714d45df6910cf39faf41aab3cb1abe421f9fbcb309a01a47fa58a38b662c14"
-    },
-    {
       "path": "src/contracts/components/canonical-render-source-conventions.ts",
       "gitBlob": "21de13a178ef6412b5d8dd4c96ec8be093f43afa",
       "sha256": "9edc916c598052ad5a99dd29118b9e6864d0f4ffea06b1bf9e6e693fba7ad784"
@@ -1618,8 +1613,8 @@
     },
     {
       "path": "src/contracts/components/canonical-source-reconciliation.ts",
-      "gitBlob": "95a2958f49b0674da87944b561d1aee125634612",
-      "sha256": "fe0bdaa9fa273e599dd1cd4f18e2647721f89b9bf3c8eb221e097c79aea896aa"
+      "gitBlob": "b00dcb4aa70c6a0cca96ca87ecb94a5f2b69ed80",
+      "sha256": "c2f17788cf97380e2bfe3888a7f7045e9d6fe86fc0e5a6a5b2c9db36edf09441"
     },
     {
       "path": "src/contracts/components/canonical-token-source-analysis.ts",
@@ -1630,6 +1625,11 @@
       "path": "src/contracts/components/component-prop-source-analysis.ts",
       "gitBlob": "5cbc6b4d41ea1b68732286225f3bdc886772d865",
       "sha256": "56c2bc307073df92ec1cfe84a781320d83bf6181588fafe4f5cbda5abfc5e976"
+    },
+    {
+      "path": "src/contracts/components/context-render-source-analysis.ts",
+      "gitBlob": "06bef2eeed90eff4d79756fa913607c584f8b154",
+      "sha256": "4bcb65f334a2174911b331c379bf67a009a69e7e348b128e08fcebdcd3ff7ff3"
     },
     {
       "path": "src/contracts/components/delegated-host-source-analysis.ts",
@@ -1643,8 +1643,8 @@
     },
     {
       "path": "src/contracts/components/invariants.ts",
-      "gitBlob": "c7a5f148726f9138d4879b3db663a04508841ca2",
-      "sha256": "43bdff4f00883f0a432bbf548ce54ae7c884424f58242ab9bd907c31b7d33f3e"
+      "gitBlob": "8e588b2ab919f2e9aba02d1a74e4d491b61035a4",
+      "sha256": "cb56b4b7727f2ded40108e5270431e13b9534b6401a60b54a75d922194f9fe14"
     },
     {
       "path": "src/contracts/components/loader.ts",
@@ -1658,8 +1658,8 @@
     },
     {
       "path": "src/contracts/components/render-source-analysis.ts",
-      "gitBlob": "44339a08e1b9e82222770e07b56c4240c890f2c5",
-      "sha256": "6752a63a6c156eb221d582006c638adbeb5b5b525cc8460c71b2d3ab71ec8d54"
+      "gitBlob": "b32406eb1bc1ff216c7d503a8cafd53e4e14d985",
+      "sha256": "8771ebd6b036fe2d50e878d762f408318598362023a2d44922729ed480e46d25"
     },
     {
       "path": "src/contracts/components/source-reconciliation.ts",
@@ -1673,8 +1673,8 @@
     },
     {
       "path": "src/contracts/components/types.ts",
-      "gitBlob": "24f61384288d0734028f9d692f42ae892c045ea3",
-      "sha256": "b0304d16ec68e98fa04a04c4bb8b3ab043f1d472d644113202d8a86d9932668a"
+      "gitBlob": "18624c7bb4082f3a0e8da2a36802bb6fc8ebb796",
+      "sha256": "73495dab596857d6780d0267516637ad8296dab7e030d2786a5d4ed440bc2af0"
     },
     {
       "path": "src/contracts/tokens/contract.ts",
@@ -489825,49 +489825,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "context-derived Toggle Group item data attributes",
-              "scope": "ToggleGroupItem render facts",
-              "reason": "The render-contract model cannot express data-variant, data-size, and data-spacing as parent ToggleGroupContext-derived values with local variant/size fallbacks and later forwarded-prop overrides. The primitive-state labels record local expression targets only; they do not establish the final attribute values or make item-local variant/size authoritative.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/toggle-group.tsx provider and item implementations",
-                "component rendering data-attribute schema"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/toggle-group.tsx",
-                "start": 1871,
-                "end": 1915,
-                "expressionKind": "VariableDeclaration",
-                "sourceText": "resolvedVariant = context.variant ?? variant"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "context-derived Toggle Group item data attributes",
-            "scope": "ToggleGroupItem render facts",
-            "reason": "The render-contract model cannot express data-variant, data-size, and data-spacing as parent ToggleGroupContext-derived values with local variant/size fallbacks and later forwarded-prop overrides. The primitive-state labels record local expression targets only; they do not establish the final attribute values or make item-local variant/size authoritative.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/toggle-group.tsx provider and item implementations",
-              "component rendering data-attribute schema"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/toggle-group.tsx",
-              "start": 1871,
-              "end": 1915,
-              "expressionKind": "VariableDeclaration",
-              "sourceText": "resolvedVariant = context.variant ?? variant"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "toggle-group\u0000ToggleGroupItem": {
         "familyId": "toggle-group",
@@ -493973,49 +493933,9 @@
               ]
             }
           ],
-          "unresolved": [
-            {
-              "topic": "context-derived Toggle Group item data attributes",
-              "scope": "ToggleGroupItem render facts",
-              "reason": "The render-contract model cannot express data-variant, data-size, and data-spacing as parent ToggleGroupContext-derived values with local variant/size fallbacks and later forwarded-prop overrides. The primitive-state labels record local expression targets only; they do not establish the final attribute values or make item-local variant/size authoritative.",
-              "evidenceAttempted": [
-                "canonical src/components/ui/toggle-group.tsx provider and item implementations",
-                "component rendering data-attribute schema"
-              ],
-              "evidenceRefs": [
-                "source"
-              ],
-              "source": {
-                "sourcePath": "src/components/ui/toggle-group.tsx",
-                "start": 1871,
-                "end": 1915,
-                "expressionKind": "VariableDeclaration",
-                "sourceText": "resolvedVariant = context.variant ?? variant"
-              }
-            }
-          ]
+          "unresolved": []
         },
-        "unresolved": [
-          {
-            "topic": "context-derived Toggle Group item data attributes",
-            "scope": "ToggleGroupItem render facts",
-            "reason": "The render-contract model cannot express data-variant, data-size, and data-spacing as parent ToggleGroupContext-derived values with local variant/size fallbacks and later forwarded-prop overrides. The primitive-state labels record local expression targets only; they do not establish the final attribute values or make item-local variant/size authoritative.",
-            "evidenceAttempted": [
-              "canonical src/components/ui/toggle-group.tsx provider and item implementations",
-              "component rendering data-attribute schema"
-            ],
-            "evidenceRefs": [
-              "source"
-            ],
-            "source": {
-              "sourcePath": "src/components/ui/toggle-group.tsx",
-              "start": 1871,
-              "end": 1915,
-              "expressionKind": "VariableDeclaration",
-              "sourceText": "resolvedVariant = context.variant ?? variant"
-            }
-          }
-        ]
+        "unresolved": []
       },
       "tooltip\u0000Tooltip": {
         "familyId": "tooltip",
@@ -494465,5 +494385,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "38f2b39524e3d988592abd7f77c4d5c576b9ae33078f5267ec361459f82e2e3d"
+  "sha256": "82b01c3948a2a70e87830a017f5bb9b41d8f0a6d6e19ab5eb4fcf71c54be3d80"
 }

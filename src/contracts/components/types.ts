@@ -52,6 +52,18 @@ export type RenderAtomicCondition =
   | { source: "state"; name: string; nullishness: "nullish" | "non-nullish" }
 export type RenderCondition = RenderAtomicCondition | { all: AtLeastTwo<RenderCondition> }
 export type RenderValue = { source: "literal"; value: string | number | boolean } | { source: "prop" | "state"; name: string }
+export type RenderAttributeValue =
+  | { source: "literal"; value: string | number | boolean | null }
+  | { source: "prop"; name: string }
+  | { source: "context-field"; contextId: string; field: string }
+  | { source: "nullish-coalesce"; first: RenderAttributeValue; fallback: RenderAttributeValue }
+export type ContextFact = EvidenceRef & {
+  id: string
+  defaultFields: Array<{ name: string; value: string | number | boolean | null }>
+  provider?: { nodeId: string; fields: Array<{ name: string; value: RenderAttributeValue }> }
+  providerExportName?: string
+}
+export type RenderAttributeWrite = { kind: "value"; value: RenderAttributeValue } | { kind: "public-props-spread" }
 export type RenderChildRef = EvidenceRef & { nodeId: string; when?: RenderCondition; repeat?: EvidenceRef & { collectionId: string; count: "collection-length" | "matching-items"; itemWhen?: { op: "truthy"; itemProperty: string; optionalItem: boolean } } }
 export type RenderDataAttribute = EvidenceRef & { name: string; value?: string; prop?: string; condition?: RenderCondition } & (
   | { source: "literal" }
@@ -59,6 +71,7 @@ export type RenderDataAttribute = EvidenceRef & { name: string; value?: string; 
   | { source: "primitive-state" }
   | { source: "derived-condition"; condition: RenderCondition }
   | { source: "conditional-value"; condition: RenderCondition; whenTrue: RenderValue; whenFalse: RenderValue }
+  | { source: "ordered-writes"; writes: RenderAttributeWrite[] }
 )
 export type DerivedRenderSpread = EvidenceRef & { source: "prop" | "state"; name: string }
 export type RenderNode = { id: string; host: RenderHost; receivesPublicProps: boolean; dataAttributes: RenderDataAttribute[]; derivedSpreads?: DerivedRenderSpread[]; children: RenderChildRef[]; evidenceRefs: string[] }
@@ -94,7 +107,7 @@ export type RenderFlowBranch = EvidenceRef & (
 export type RenderingFlow = { collections: DerivedCollection[]; branches: RenderFlowBranch[] }
 export type InheritedPropDefault = EvidenceRef & { propName: string; value: string | number | boolean | null }
 export type AccessibilityFact = EvidenceRef & { feature: string; owner: "native" | "author" | "component"; mechanism: string }
-export type ComponentDefinition = { localProps: LocalPropContract[]; inherits: string[]; slots: SlotContract[]; inheritedPropDefaults: InheritedPropDefault[]; composition: CompositionContract; stateChannels: StateChannel[]; conditionalApi: ConditionalApiCase[]; events: EventContract[]; tokenDependencies: TokenDependency[]; rendering: RenderingFact; renderingFlow?: RenderingFlow; accessibility: AccessibilityFact[] }
+export type ComponentDefinition = { localProps: LocalPropContract[]; inherits: string[]; slots: SlotContract[]; inheritedPropDefaults: InheritedPropDefault[]; composition: CompositionContract; stateChannels: StateChannel[]; conditionalApi: ConditionalApiCase[]; events: EventContract[]; tokenDependencies: TokenDependency[]; context?: ContextFact[]; rendering: RenderingFact; renderingFlow?: RenderingFlow; accessibility: AccessibilityFact[] }
 export type EffectivePublicProp = { name: string; availability: "available"; required: boolean; type: StructuredPropType } | { name: string; availability: "unavailable" }
 export type EffectiveComponentApiShape = { props: EffectivePublicProp[]; events: EventContract[] }
 export type PublicExportContract = EvidenceRef & { name: string; kind: ComponentExportKind; authorableJsx: boolean; component?: ComponentDefinition }

@@ -74,13 +74,13 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Automatic child count mismatch at ToggleGroupPrimitive.Root.")
   })
 
-  test("reconciles ToggleGroupItem derived-state attribute targets and rejects drift", () => {
+  test("reconciles ToggleGroupItem contextual attribute writes and rejects drift", () => {
     const component = toggleGroupContract.exports.find((entry: any) => entry.name === "ToggleGroupItem").component
     const source = sourceAnalysis.analyzeJsxRenderTree(toggleGroup, "ToggleGroupItem")
 
     expect(sourceAnalysis.compareJsxRenderTree(component.rendering, source)).toEqual([])
     const mutated = structuredClone(component.rendering)
-    mutated.nodes[0].dataAttributes.find((attribute: any) => attribute.name === "data-variant").prop = "variant"
+    mutated.nodes[0].dataAttributes.find((attribute: any) => attribute.name === "data-variant").writes[0].value.first.field = "size"
     expect(sourceAnalysis.compareJsxRenderTree(mutated, source)).toContain("Data attributes mismatch at ToggleGroupPrimitive.Item.")
   })
 
@@ -103,12 +103,19 @@ describe("generic render-model alternatives and factual aliases", () => {
     expect(compareRenderFlowSource(contract, flow, canonicalRenderSourceAnalysisConventions)).toEqual([])
   })
 
-  test("records direct local property access as primitive-state provenance", () => {
+  test("records direct context field access and later forwarded override", () => {
     const tree = sourceAnalysis.analyzeJsxRenderTree(toggleGroup, "ToggleGroupItem")
 
     expect(tree.unresolved).toEqual([])
     expect(tree.root?.dataAttributes).toEqual(expect.arrayContaining([
-      { name: "data-spacing", source: "primitive-state", prop: "context.spacing" },
+      {
+        name: "data-spacing",
+        source: "ordered-writes",
+        writes: [
+          { kind: "value", value: { source: "context-field", contextId: "ToggleGroupContext", field: "spacing" } },
+          { kind: "public-props-spread" },
+        ],
+      },
     ]))
   })
 

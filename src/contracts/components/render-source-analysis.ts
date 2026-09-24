@@ -2,7 +2,8 @@ import { execFileSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import ts from "typescript"
 
-import type { SourceExpressionIdentity } from "./types"
+import { analyzeContextRenderSource, type ContextRenderSource } from "./context-render-source-analysis"
+import type { RenderAttributeValue, RenderAttributeWrite, SourceExpressionIdentity } from "./types"
 
 export type ModuleExportEvidence = { name: string; declarationKind: string }
 
@@ -73,11 +74,12 @@ type JsxAtomicRenderCondition =
   | { source: "state"; name: string; nullishness: "nullish" | "non-nullish" }
 export type JsxRenderCondition = JsxAtomicRenderCondition | { all: [JsxRenderCondition, JsxRenderCondition, ...JsxRenderCondition[]] }
 export type JsxRenderValue = { source: "literal"; value: string | number | boolean } | { source: "prop" | "state"; name: string }
-type JsxDataAttribute = { name: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: JsxRenderValue; whenFalse?: JsxRenderValue; expression?: string } & (
+type JsxDataAttribute = { name: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: JsxRenderValue; whenFalse?: JsxRenderValue; expression?: string; writes?: RenderAttributeWrite[] } & (
   | { source: "literal" | "primitive-state" }
   | { source: "prop"; prop: string }
   | { source: "derived-condition"; condition: JsxRenderCondition }
   | { source: "conditional-value"; condition: JsxRenderCondition; whenTrue: JsxRenderValue; whenFalse: JsxRenderValue }
+  | { source: "ordered-writes"; writes: RenderAttributeWrite[] }
   | { source: "unresolved" }
 )
 export type JsxDerivedSpread = { source: "prop" | "state"; name: string }
@@ -89,7 +91,7 @@ export type JsxSourceUnresolvedFinding = SourceExpressionIdentity & { reason: st
 export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; absent?: true; unresolved: string[]; unresolvedFindings: JsxSourceUnresolvedFinding[] }
 type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment">; importBinding?: JsxImportBinding }
 type JsxBranch<T> = { value: T; when?: JsxRenderCondition; otherwise?: true; otherwiseFor?: JsxRenderCondition }
-type JsxScope = { aliases: Map<string, JsxBranch<JsxRenderNode[]>[]>; dynamicChildren: Set<string>; hostAliases: Map<string, JsxBranch<JsxHost>[]>; derivedSpreads: Map<string, JsxDerivedSpread>; importBindings: Map<string, JsxImportBinding>; stateBindings: Set<string> }
+type JsxScope = { aliases: Map<string, JsxBranch<JsxRenderNode[]>[]>; dynamicChildren: Set<string>; hostAliases: Map<string, JsxBranch<JsxHost>[]>; derivedSpreads: Map<string, JsxDerivedSpread>; importBindings: Map<string, JsxImportBinding>; stateBindings: Set<string>; contextValues: ContextRenderSource["values"]; contextBindings: ContextRenderSource["bindings"]; contextActive: boolean }
 type JsxUnresolved = { messages: string[]; findings: JsxSourceUnresolvedFinding[] }
 
 function recordUnresolved(unresolved: JsxUnresolved, node: ts.Node, file: ts.SourceFile, reason: string) {
@@ -269,10 +271,54 @@ function directDataAttributeReference(expression: ts.Expression, file: ts.Source
     : { name: "", source: "primitive-state", prop }
 }
 
+function contextualAttributeValue(expression: ts.Expression | undefined, publicBindings: Set<string>, scope: JsxScope): RenderAttributeValue | undefined {
+  if (!expression) return undefined
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) return contextualAttributeValue(expression.expression, publicBindings, scope)
+  const scalarValue = literal(expression)
+  if (scalarValue !== undefined) return { source: "literal", value: scalarValue }
+  if (ts.isIdentifier(expression)) {
+    if (publicBindings.has(expression.text)) return { source: "prop", name: expression.text }
+    return scope.contextValues.get(expression.text)
+  }
+  if (ts.isPropertyAccessExpression(expression) && ts.isIdentifier(expression.expression)) {
+    const contextId = scope.contextBindings.get(expression.expression.text)
+    if (contextId) return { source: "context-field", contextId, field: expression.name.text }
+  }
+  if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) {
+    const first = contextualAttributeValue(expression.left, publicBindings, scope)
+    const fallback = contextualAttributeValue(expression.right, publicBindings, scope)
+    return first && fallback ? { source: "nullish-coalesce", first, fallback } : undefined
+  }
+  return undefined
+}
+
 function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved, scope: JsxScope) {
   let receivesPublicProps = false
   const dataAttributes: JsxRenderNode["dataAttributes"] = []
   const derivedSpreads: JsxDerivedSpread[] = []
+  if (scope.contextActive) {
+    const names = [...new Set(attributes.properties.filter((property): property is ts.JsxAttribute & { name: ts.Identifier } => ts.isJsxAttribute(property) && ts.isIdentifier(property.name) && property.name.text.startsWith("data-")).map((property) => property.name.text))]
+    const writes = new Map(names.map((name) => [name, [] as RenderAttributeWrite[]]))
+    for (const property of attributes.properties) {
+      if (ts.isJsxSpreadAttribute(property)) {
+        if (ts.isIdentifier(property.expression) && publicBindings.has(property.expression.text)) {
+          receivesPublicProps = true
+          for (const chain of writes.values()) chain.push({ kind: "public-props-spread" })
+        } else if (ts.isIdentifier(property.expression) && scope.derivedSpreads.has(property.expression.text)) derivedSpreads.push(scope.derivedSpreads.get(property.expression.text)!)
+        else recordUnresolved(unresolved, property.expression, file, `Unsupported spread provenance: ${property.expression.getText(file)}`)
+        continue
+      }
+      if (!ts.isJsxAttribute(property) || !ts.isIdentifier(property.name) || !property.name.text.startsWith("data-")) continue
+      const expression = property.initializer && ts.isJsxExpression(property.initializer) ? property.initializer.expression : undefined
+      const value = property.initializer && ts.isStringLiteral(property.initializer)
+        ? { source: "literal", value: property.initializer.text } as const
+        : contextualAttributeValue(expression, publicBindings, scope)
+      if (!value) recordUnresolved(unresolved, expression ?? property, file, `Unsupported contextual data attribute: ${property.name.text}`)
+      else writes.get(property.name.text)!.push({ kind: "value", value })
+    }
+    for (const name of names) dataAttributes.push({ name, source: "ordered-writes", writes: writes.get(name)! })
+    return { receivesPublicProps, dataAttributes, derivedSpreads }
+  }
   for (const property of attributes.properties) {
     if (ts.isJsxSpreadAttribute(property)) {
       if (ts.isIdentifier(property.expression) && publicBindings.has(property.expression.text)) receivesPublicProps = true
@@ -570,7 +616,7 @@ function returnedJsx(functionDeclaration: SourceFunction, file: ts.SourceFile, p
   return rendered
 }
 
-function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved, conventions: RenderSourceAnalysisConventions) {
+function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved, conventions: RenderSourceAnalysisConventions, contextSource: ContextRenderSource) {
   const importBindings = new Map<string, JsxImportBinding>()
   for (const statement of file.statements) {
     if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue
@@ -581,7 +627,7 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
     if (bindings && ts.isNamespaceImport(bindings)) importBindings.set(bindings.name.text, { importedName: "*", localName: bindings.name.text, moduleSpecifier })
     if (bindings && ts.isNamedImports(bindings)) for (const element of bindings.elements) importBindings.set(element.name.text, { importedName: element.propertyName?.text ?? element.name.text, localName: element.name.text, moduleSpecifier })
   }
-  const scope: JsxScope = { aliases: new Map(), dynamicChildren: new Set(), hostAliases: new Map(), derivedSpreads: new Map(), importBindings, stateBindings: new Set() }
+  const scope: JsxScope = { aliases: new Map(), dynamicChildren: new Set(), hostAliases: new Map(), derivedSpreads: new Map(), importBindings, stateBindings: new Set(), contextValues: contextSource.values, contextBindings: contextSource.bindings, contextActive: contextSource.context.length > 0 && contextSource.unresolved.length === 0 }
   const recognizedStateBinding = (declaration: ts.VariableDeclaration) => {
     if (!ts.isObjectBindingPattern(declaration.name) || !declaration.initializer || !conventions.isStateBinding?.(declaration.initializer)) return
     for (const element of declaration.name.elements) if (ts.isIdentifier(element.name)) scope.stateBindings.add(element.name.text)
@@ -632,7 +678,11 @@ export function analyzeJsxRenderTree(sourcePath: string, exportName: string, con
     return { unresolved: unresolved.messages, unresolvedFindings: unresolved.findings }
   }
   const bindings = publicPropBindings(declaration)
-  const scope = aliases(declaration, file, bindings, unresolved, conventions)
+  const contextSource = analyzeContextRenderSource(sourcePath, exportName)
+  // Existing components with richer context programs retain their established
+  // render facts. A contract that opts into context facts is checked separately
+  // by canonical reconciliation and cannot silently claim an unsupported form.
+  const scope = aliases(declaration, file, bindings, unresolved, conventions, contextSource)
   const returned = returnedJsx(declaration, file, bindings, scope.stateBindings, unresolved)
   const expressions = returned.filter((item): item is ReturnedJsx & { expression: ts.Expression } => Boolean(item.expression))
   if (!expressions.length) {
@@ -666,7 +716,7 @@ type ContractRenderNode = {
   id: string
   host: { kind: string; tag?: string; interfaceId?: string; familyId?: string; exportName?: string }
   receivesPublicProps: boolean
-  dataAttributes: Array<{ name: string; source: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: unknown; whenFalse?: unknown }>
+  dataAttributes: Array<{ name: string; source: string; value?: string; prop?: string; condition?: JsxRenderCondition; whenTrue?: unknown; whenFalse?: unknown; writes?: RenderAttributeWrite[] }>
   derivedSpreads?: Array<{ source: string; name: string }>
   children: Array<{
     nodeId: string
@@ -711,7 +761,7 @@ function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNo
 function sameDataAttributes(expected: ContractRenderNode["dataAttributes"], actual: JsxRenderNode["dataAttributes"]) {
   return expected.length === actual.length && expected.every((attribute, index) => {
     const candidate = actual[index]
-    return attribute.name === candidate?.name && attribute.source === candidate?.source && attribute.value === candidate?.value && attribute.prop === candidate?.prop && JSON.stringify(attribute.condition ?? null) === JSON.stringify(candidate?.condition ?? null) && JSON.stringify(attribute.source === "conditional-value" ? attribute.whenTrue : null) === JSON.stringify(candidate?.source === "conditional-value" ? candidate.whenTrue : null) && JSON.stringify(attribute.source === "conditional-value" ? attribute.whenFalse : null) === JSON.stringify(candidate?.source === "conditional-value" ? candidate.whenFalse : null)
+    return attribute.name === candidate?.name && attribute.source === candidate?.source && attribute.value === candidate?.value && attribute.prop === candidate?.prop && JSON.stringify(attribute.condition ?? null) === JSON.stringify(candidate?.condition ?? null) && JSON.stringify(attribute.source === "conditional-value" ? attribute.whenTrue : null) === JSON.stringify(candidate?.source === "conditional-value" ? candidate.whenTrue : null) && JSON.stringify(attribute.source === "conditional-value" ? attribute.whenFalse : null) === JSON.stringify(candidate?.source === "conditional-value" ? candidate.whenFalse : null) && JSON.stringify(attribute.source === "ordered-writes" ? attribute.writes : null) === JSON.stringify(candidate?.source === "ordered-writes" ? candidate.writes : null)
   })
 }
 
