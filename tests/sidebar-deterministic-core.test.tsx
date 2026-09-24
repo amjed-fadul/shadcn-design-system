@@ -38,6 +38,26 @@ function sidebarSignature(root: ParentNode) {
 }
 
 describe("Sidebar deterministic core", () => {
+  test("coordinates desktop panel, gap, and Canvas spacer width motion", () => {
+    const container = render(
+      <SidebarProvider isMobile={false}>
+        <Sidebar collapsible="icon"><SidebarContent>Navigation</SidebarContent></Sidebar>
+        <SidebarTrigger />
+      </SidebarProvider>
+    )
+    const slots = ["sidebar-flow-spacer", "sidebar-gap", "sidebar-container"]
+
+    for (const slot of slots) {
+      const classes = container.querySelector(`[data-slot="${slot}"]`)?.classList
+      expect(classes?.contains(slot === "sidebar-container" ? "transition-[left,right,width,transform]" : "transition-[width]")).toBe(true)
+      expect(classes?.contains("duration-200")).toBe(true)
+      expect(classes?.contains("ease-out")).toBe(true)
+    }
+
+    click(container.querySelector('[data-slot="sidebar-trigger"]')!)
+    expect(container.querySelector('[data-slot="sidebar"]')?.getAttribute("data-state")).toBe("collapsed")
+  })
+
   test("keeps a fixed explicit desktop branch identical across browser widths", () => {
     const originalWidth = window.innerWidth
     const renderAtWidth = (width: number) => {

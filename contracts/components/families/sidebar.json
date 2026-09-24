@@ -3,7 +3,7 @@
   "id": "sidebar",
   "source": {
     "canonicalPath": "src/components/ui/sidebar.tsx",
-    "canonicalBlobSha": "8db9b0a0ddb6a51a7d22104d9b1f42b366ad7a23",
+    "canonicalBlobSha": "30877f7508ba49fe48992ca744f53a3903ed4482",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
     "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sidebar.tsx@8db9b0a0ddb6a51a7d22104d9b1f42b366ad7a23"
+      "source": "src/components/ui/sidebar.tsx@30877f7508ba49fe48992ca744f53a3903ed4482"
     },
     "tokens": {
       "kind": "token-contract",
