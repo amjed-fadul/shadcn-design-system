@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
 import Ajv2020 from "ajv/dist/2020"
+import ts from "typescript"
 import { describe, expect, test } from "vitest"
 
 import familySchema from "../contracts/components/component-family.schema.json"
@@ -32,6 +33,7 @@ import {
 } from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependenciesForExport } from "./helpers/component-token-analysis"
 import { canonicalRenderSourceAnalysisConventions } from "../src/contracts/components/canonical-render-source-conventions"
+import { createComponentPropSourceAnalyzer } from "../src/contracts/components/component-prop-source-analysis"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const sourcePath = join(repoRoot, "src/components/ui/command.tsx")
@@ -52,6 +54,21 @@ const eventNames = new Map<string, string[]>([
   ["Command.Input", ["onValueChange"]],
   ["Command.Item", ["onSelect"]],
 ])
+
+const propSourceAnalyzer = createComponentPropSourceAnalyzer({
+  compilerOptions: {
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    jsx: ts.JsxEmit.ReactJSX,
+    strict: true,
+    skipLibCheck: true,
+    esModuleInterop: true,
+    allowSyntheticDefaultImports: true,
+    baseUrl: repoRoot,
+    paths: { "@/*": ["src/*"] },
+  },
+})
 
 function schemaValid(schema: object, value: unknown) {
   return new Ajv2020({ allErrors: true, strict: true }).compile(schema)(value)
@@ -230,6 +247,26 @@ describe("release.5 Command", () => {
       description: "Search for a command to run...",
       showCloseButton: true,
     })
+  })
+
+  test("exposes only the optional local portalContainer prop on CommandDialog", () => {
+    const dialog = family.exports.find((entry) => entry.name === "CommandDialog")!.component!
+    expect(dialog.localProps).toEqual(expect.arrayContaining([
+      {
+        name: "portalContainer",
+        required: false,
+        type: { kind: "typescript", typeText: 'ComponentProps<typeof DialogContent>["portalContainer"]' },
+        evidenceRefs: ["source"],
+      },
+    ]))
+    expect(family.exports.find((entry) => entry.name === "CommandDialog")!.authorableJsx).toBe(true)
+    expect(family.exports.map((entry) => entry.name)).toHaveLength(9)
+  })
+
+  test("reconciles CommandDialog local props directly against source", () => {
+    const dialog = family.exports.find((entry) => entry.name === "CommandDialog")!.component!
+    const analysis = propSourceAnalyzer.analyzeComponentPropSource(sourcePath, "CommandDialog")
+    expect(propSourceAnalyzer.compareComponentLocalProps(dialog.localProps, analysis)).toEqual([])
   })
 
   test("keeps cmdk slot/context composition and CommandInput wrapper structure", () => {

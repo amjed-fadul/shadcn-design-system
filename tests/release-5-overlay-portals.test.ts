@@ -6,6 +6,7 @@ describe("Release 005 overlay portal containers", () => {
   for (const [familyId, exportName, parent] of [
     ["popover", "PopoverContent", "Popover"],
     ["alert-dialog", "AlertDialogContent", "AlertDialog"],
+    ["command", "CommandDialog", "Command"],
   ]) {
     test(`${exportName} projects the primitive Portal container type without widening authorable JSX`, () => {
       const entry = getExecutableRelease().projection.exports[`${familyId}\0${exportName}`]
@@ -16,7 +17,9 @@ describe("Release 005 overlay portal containers", () => {
         required: false,
         type: {
           kind: "typescript",
-          typeText: `ComponentProps<typeof ${familyId === "popover" ? "PopoverPrimitive" : "AlertDialogPrimitive"}.Portal>["container"]`,
+          typeText: familyId === "command"
+            ? 'ComponentProps<typeof DialogContent>["portalContainer"]'
+            : `ComponentProps<typeof ${familyId === "popover" ? "PopoverPrimitive" : "AlertDialogPrimitive"}.Portal>["container"]`,
         },
       })
     })
