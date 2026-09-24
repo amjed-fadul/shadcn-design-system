@@ -3,7 +3,7 @@
   "id": "slider",
   "source": {
     "canonicalPath": "src/components/ui/slider.tsx",
-    "canonicalBlobSha": "6de9b281313adac1271ac2c4bf53a9aa1c3e4b1b",
+    "canonicalBlobSha": "b14e60098990804b7665f451f1b88d99beedd265",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/slider.tsx",
     "upstreamBlobSha": "d94d3d8fca2e309caca599fca181720e8b6f2524"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/slider.tsx@6de9b281313adac1271ac2c4bf53a9aa1c3e4b1b"
+      "source": "src/components/ui/slider.tsx@b14e60098990804b7665f451f1b88d99beedd265"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -31,7 +31,30 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "thumbAriaLabelledBy",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "string[]"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "thumbAriaLabels",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "string[]"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
         "inherits": [
           "radix.slider.root"
         ],
@@ -300,9 +323,9 @@
             ]
           },
           {
-            "feature": "accessible name",
-            "owner": "author",
-            "mechanism": "provide aria-label or equivalent labeling for the slider/thumb values",
+      "feature": "accessible name",
+      "owner": "author",
+      "mechanism": "Provide exactly one of thumbAriaLabels or thumbAriaLabelledBy. The selected array must contain exactly one nonblank entry per generated Thumb; each array index names that Thumb. Supplying both, a mismatched length, or a blank entry throws. Omitting both delegates accessible-name behavior to Radix.",
             "evidenceRefs": [
               "source"
             ]

@@ -3,6 +3,8 @@ import { expect, test } from "vitest"
 
 import { FieldError } from "../src/components/ui/field"
 import { Slider } from "../src/components/ui/slider"
+// @ts-expect-error jsdom is present as a test dependency without bundled declarations.
+import { JSDOM } from "jsdom"
 
 test("FieldError omits output when it has no usable content", () => {
   expect(renderToStaticMarkup(<FieldError />)).toBe("")
@@ -100,4 +102,75 @@ test("Slider falls back to one thumb for min when neither value prop is an array
 
   expect(markup.match(/data-slot="slider-thumb"/g)).toHaveLength(1)
   expect(markup).toContain('aria-valuemin="12"')
+})
+
+function sliderThumbs(markup: string) {
+  return [...new JSDOM(markup).window.document.querySelectorAll<HTMLElement>('[role="slider"]')]
+}
+
+test.each([
+  { values: [25], labels: ["Volume"] },
+  { values: [20, 80], labels: ["Minimum price", "Maximum price"] },
+  { values: [10, 50, 90], labels: ["Low", "Middle", "High"] },
+])("Slider applies each aria label to its generated thumb by index", ({ values, labels }) => {
+  const thumbs = sliderThumbs(renderToStaticMarkup(<Slider value={values} thumbAriaLabels={labels} />))
+
+  expect(thumbs).toHaveLength(values.length)
+  expect(thumbs.map((thumb) => thumb.getAttribute("aria-label"))).toEqual(labels)
+})
+
+test.each([
+  { values: [25], ids: ["volume-label"] },
+  { values: [20, 80], ids: ["minimum-label", "maximum-label"] },
+  { values: [10, 50, 90], ids: ["low-label", "middle-label", "high-label"] },
+])("Slider applies each aria labelledby reference to its generated thumb by index", ({ values, ids }) => {
+  const thumbs = sliderThumbs(renderToStaticMarkup(<Slider value={values} thumbAriaLabelledBy={ids} />))
+
+  expect(thumbs).toHaveLength(values.length)
+  expect(thumbs.map((thumb) => thumb.getAttribute("aria-labelledby"))).toEqual(ids)
+})
+
+test("Slider preserves per-thumb names when disabled, RTL, and vertical", () => {
+  const thumbs = sliderThumbs(renderToStaticMarkup(
+    <Slider value={[20, 80]} thumbAriaLabels={["Lower bound", "Upper bound"]} disabled dir="rtl" orientation="vertical" />
+  ))
+
+  expect(thumbs.map((thumb) => thumb.getAttribute("aria-label"))).toEqual(["Lower bound", "Upper bound"])
+  expect(thumbs.every((thumb) => thumb.hasAttribute("data-disabled"))).toBe(true)
+})
+
+test("Slider keeps Radix fallback naming when thumb names are omitted", () => {
+  const one = sliderThumbs(renderToStaticMarkup(<Slider value={[25]} aria-label="Root label" />))
+  const two = sliderThumbs(renderToStaticMarkup(<Slider value={[20, 80]} />))
+
+  expect(one[0].getAttribute("aria-label")).toBeNull()
+  expect(two.map((thumb) => thumb.getAttribute("aria-label"))).toEqual([null, null])
+})
+
+test("Slider accepts empty thumb names only when it renders zero thumbs", () => {
+  const thumbs = sliderThumbs(renderToStaticMarkup(<Slider value={[]} thumbAriaLabels={[]} />))
+
+  expect(thumbs).toHaveLength(0)
+})
+
+test.each([
+  { value: [20, 80], names: ["Only one"] },
+  { value: [20], names: ["First", "Extra"] },
+  { value: [20], names: ["   "] },
+])("Slider rejects invalid thumb label arrays", ({ value, names }) => {
+  expect(() => renderToStaticMarkup(<Slider value={value} thumbAriaLabels={names} />)).toThrow(/thumbAriaLabels/)
+})
+
+test.each([
+  { value: [20, 80], ids: ["only-one"] },
+  { value: [20], ids: ["first", "extra"] },
+  { value: [20], ids: ["  "] },
+])("Slider rejects invalid thumb label reference arrays", ({ value, ids }) => {
+  expect(() => renderToStaticMarkup(<Slider value={value} thumbAriaLabelledBy={ids} />)).toThrow(/thumbAriaLabelledBy/)
+})
+
+test("Slider rejects two naming mechanisms supplied together", () => {
+  expect(() => renderToStaticMarkup(
+    <Slider value={[20]} thumbAriaLabels={["Value"]} thumbAriaLabelledBy={["value-label"]} />
+  )).toThrow(/only one/)
 })

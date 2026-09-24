@@ -29,7 +29,7 @@ const meta = {
       include: ["min", "max", "step", "disabled", "orientation"],
     },
   },
-  render: (args) => <Slider {...args} aria-label="Volume" />,
+  render: (args) => <Slider {...args} thumbAriaLabels={["Volume"]} />,
 } satisfies Meta<typeof Slider>
 
 export default meta
@@ -45,7 +45,7 @@ export const Range: Story = {
       min={0}
       max={100}
       step={5}
-      aria-label="Price range"
+      thumbAriaLabels={["Minimum price", "Maximum price"]}
     />
   ),
 }
@@ -57,7 +57,7 @@ export const MultipleThumbs: Story = {
       min={0}
       max={100}
       step={5}
-      aria-label="Multiple values"
+      thumbAriaLabels={["Low value", "Middle value", "High value"]}
     />
   ),
 }
@@ -68,7 +68,7 @@ export const Vertical: Story = {
       <Slider
         defaultValue={[40]}
         orientation="vertical"
-        aria-label="Vertical value"
+        thumbAriaLabels={["Vertical value"]}
       />
     </div>
   ),
@@ -76,7 +76,7 @@ export const Vertical: Story = {
 
 export const Disabled: Story = {
   render: () => (
-    <Slider defaultValue={[60]} disabled aria-label="Disabled value" />
+    <Slider defaultValue={[60]} disabled thumbAriaLabels={["Disabled value"]} />
   ),
 }
 
@@ -88,7 +88,7 @@ function ControlledSliderStory() {
       <Slider
         value={value}
         onValueChange={setValue}
-        aria-label="Controlled value"
+        thumbAriaLabels={["Controlled value"]}
       />
       <span className="text-sm text-muted-foreground">
         Value: {value[0]}
@@ -110,7 +110,7 @@ export const Rtl: Story = {
       <Slider
         defaultValue={[35]}
         dir="rtl"
-        aria-label="القيمة"
+        thumbAriaLabels={["القيمة"]}
       />
     </div>
   ),

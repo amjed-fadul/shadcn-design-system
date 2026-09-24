@@ -193,8 +193,8 @@
     },
     {
       "path": "contracts/components/families/slider.json",
-      "gitBlob": "6ac97bcd0689dceb7ae56a911ff14b1b04d2b708",
-      "sha256": "63bf0c14523108023d58f51310fd63591d4d0a5ad51e8396337c7da89ce5ff87"
+      "gitBlob": "90682828feff001ebc6c4c9e543e51574a5673f5",
+      "sha256": "313259d44ad53b4e4f69328d9a81c1a88a4b67b8bd30686d29f38c9c5b4f3420"
     },
     {
       "path": "contracts/components/families/spinner.json",
@@ -1123,13 +1123,13 @@
     },
     {
       "path": "provenance/component-contract-source.json",
-      "gitBlob": "933bff3ba598a27ab796fe0a17dff267594942a7",
-      "sha256": "87111285639ece87a2b1e5f51b7452ccbe4a8f551e68a109faf4240d216492ae"
+      "gitBlob": "25c83ce72e52f631c8e64f189cd9c3996be27ee8",
+      "sha256": "eab403a13130b8971883d68d7b208ec1b34f0d21aefdb76a76fbf7f7b2e67407"
     },
     {
       "path": "provenance/seed-components.json",
-      "gitBlob": "b3e4275985fca1890b691b8c36eef54019c4ac4a",
-      "sha256": "0a24e3a0bc01a949a04d2da68e5171c051d03596593c2bbd7878e9b9e646d879"
+      "gitBlob": "365d2e409639cffe78fb0e09b1903d6659437e46",
+      "sha256": "b2716190cf873f95246294e8562138826b4be8842d860d36af7cf759863a784d"
     },
     {
       "path": "provenance/token-contract-source.json",
@@ -1493,13 +1493,13 @@
     },
     {
       "path": "src/components/ui/slider.stories.tsx",
-      "gitBlob": "df718cd67090208c72b3efe3c9d6202bf1642629",
-      "sha256": "36599ca1bcb2e0cd4773cf755a62cbe229d18c4669118b25fb9a75f5b2dadc43"
+      "gitBlob": "10c4c3d63ba0c22631665fea7c3599e1ba95ddf0",
+      "sha256": "6ac3848fe88885bc14ac7b342a6c54993c220d4f51eaff81ebe26410a7e894b2"
     },
     {
       "path": "src/components/ui/slider.tsx",
-      "gitBlob": "6de9b281313adac1271ac2c4bf53a9aa1c3e4b1b",
-      "sha256": "983742c05e610bd838b0226d3765aad1ece6d56c62bf65c3494a2dc9a151d826"
+      "gitBlob": "b14e60098990804b7665f451f1b88d99beedd265",
+      "sha256": "c023fd046493af3ed5b9496cbcfb3baa73bfcc01e45f095f1403b4a01ed3b0b1"
     },
     {
       "path": "src/components/ui/spinner.stories.tsx",
@@ -1653,13 +1653,13 @@
     },
     {
       "path": "src/contracts/components/render-flow-source-analysis.ts",
-      "gitBlob": "3391515493260d29d1217822231a658957dfc56e",
-      "sha256": "9f82449de9f1ea0d9e99053e05fffd2b4686109868e474ee5d6a9828b2040c9c"
+      "gitBlob": "7563f09cc590eec699d3db16898dcd2b318fc32d",
+      "sha256": "2fd8e205f6849380682ac2cd97aab2f3eac6f7d38bce2f1f8dc5291f6b9b202e"
     },
     {
       "path": "src/contracts/components/render-source-analysis.ts",
-      "gitBlob": "b32406eb1bc1ff216c7d503a8cafd53e4e14d985",
-      "sha256": "8771ebd6b036fe2d50e878d762f408318598362023a2d44922729ed480e46d25"
+      "gitBlob": "bf10b4aeb78a97b7dd69baaddb1012c2f1e5f67c",
+      "sha256": "9d162ec490a221a4c3b226bf19a9bc446f90ac9b30dfb29734a8426aed09a108"
     },
     {
       "path": "src/contracts/components/source-reconciliation.ts",
@@ -429163,6 +429163,26 @@
         "component": {
           "props": [
             {
+              "name": "thumbAriaLabelledBy",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "typescript",
+                "typeText": "string[]"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "thumbAriaLabels",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "typescript",
+                "typeText": "string[]"
+              },
+              "origin": "local"
+            },
+            {
               "name": "about",
               "availability": "available",
               "required": false,
@@ -494385,5 +494405,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "82b01c3948a2a70e87830a017f5bb9b41d8f0a6d6e19ab5eb4fcf71c54be3d80"
+  "sha256": "2ace5342e0efe8a2fde153a6d343f57a8707c1952e7f42c1b64ab61167e22ec9"
 }

@@ -292,6 +292,20 @@ function contextualAttributeValue(expression: ts.Expression | undefined, publicB
   return undefined
 }
 
+function isAriaAttributeBag(expression: ts.Expression): boolean {
+  if (ts.isParenthesizedExpression(expression) || ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression) || ts.isNonNullExpression(expression)) {
+    return isAriaAttributeBag(expression.expression)
+  }
+  if (ts.isConditionalExpression(expression)) return isAriaAttributeBag(expression.whenTrue) && isAriaAttributeBag(expression.whenFalse)
+  if (!ts.isObjectLiteralExpression(expression)) return false
+  return expression.properties.every((property) => {
+    if (!ts.isPropertyAssignment(property)) return false
+    const name = property.name
+    const text = ts.isIdentifier(name) || ts.isStringLiteral(name) ? name.text : undefined
+    return text?.startsWith("aria-") === true
+  })
+}
+
 function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved, scope: JsxScope) {
   let receivesPublicProps = false
   const dataAttributes: JsxRenderNode["dataAttributes"] = []
@@ -305,7 +319,7 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
           receivesPublicProps = true
           for (const chain of writes.values()) chain.push({ kind: "public-props-spread" })
         } else if (ts.isIdentifier(property.expression) && scope.derivedSpreads.has(property.expression.text)) derivedSpreads.push(scope.derivedSpreads.get(property.expression.text)!)
-        else recordUnresolved(unresolved, property.expression, file, `Unsupported spread provenance: ${property.expression.getText(file)}`)
+        else if (!isAriaAttributeBag(property.expression)) recordUnresolved(unresolved, property.expression, file, `Unsupported spread provenance: ${property.expression.getText(file)}`)
         continue
       }
       if (!ts.isJsxAttribute(property) || !ts.isIdentifier(property.name) || !property.name.text.startsWith("data-")) continue
@@ -323,7 +337,7 @@ function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, public
     if (ts.isJsxSpreadAttribute(property)) {
       if (ts.isIdentifier(property.expression) && publicBindings.has(property.expression.text)) receivesPublicProps = true
       else if (ts.isIdentifier(property.expression) && scope.derivedSpreads.has(property.expression.text)) derivedSpreads.push(scope.derivedSpreads.get(property.expression.text)!)
-      else recordUnresolved(unresolved, property.expression, file, `Unsupported spread provenance: ${property.expression.getText(file)}`)
+      else if (!isAriaAttributeBag(property.expression)) recordUnresolved(unresolved, property.expression, file, `Unsupported spread provenance: ${property.expression.getText(file)}`)
     }
     if (ts.isJsxAttribute(property) && ts.isIdentifier(property.name) && property.name.text.startsWith("data-")) {
       if (property.initializer && ts.isStringLiteral(property.initializer)) {

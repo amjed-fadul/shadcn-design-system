@@ -224,7 +224,20 @@ export function analyzeRenderFlowSource(path: string, exportName: string, conven
   }
   const collectionNames = new Set(collections.map((collection) => collection.id))
   const mapped = sourceRepeatNodes(root)
-  const unconditionalMappedRoot = fn.body.statements.length === 2 && ts.isVariableStatement(fn.body.statements[0]) && ts.isReturnStatement(fn.body.statements[1]) && Boolean(fn.body.statements[1].expression)
+  const renderStatements = fn.body.statements
+  const lastRenderStatement = renderStatements[renderStatements.length - 1]
+  const validationStatement = renderStatements.length === 3 ? renderStatements[1] : undefined
+  const validationCall = validationStatement && ts.isExpressionStatement(validationStatement)
+    ? unwrap(validationStatement.expression)
+    : undefined
+  const hasThumbNameValidation = validationCall && ts.isCallExpression(validationCall) &&
+    identifier(validationCall.expression) === "validateThumbAriaNames" &&
+    validationCall.arguments.length === 3 &&
+    validationCall.arguments.map(identifier).every((name, index) => name === ["values", "thumbAriaLabels", "thumbAriaLabelledBy"][index])
+  const unconditionalMappedRoot = (renderStatements.length === 2 || renderStatements.length === 3) &&
+    ts.isVariableStatement(renderStatements[0]) &&
+    Boolean(lastRenderStatement && ts.isReturnStatement(lastRenderStatement) && lastRenderStatement.expression) &&
+    (renderStatements.length === 2 || hasThumbNameValidation)
   if (unconditionalMappedRoot && collections.length === 1 && mapped.length === 1 && mapped[0].repetition?.name === collections[0].id) return { flow: { collections, branches: [{ otherwise: true, outcome: { kind: "rendered", root, repeats: [{ collectionId: collections[0].id, count: "collection-length" }] } }] }, errors: [] }
 
   for (const [id, initializer] of bindings) {
