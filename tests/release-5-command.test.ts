@@ -34,6 +34,7 @@ import {
 import { analyzeComponentTokenDependenciesForExport } from "./helpers/component-token-analysis"
 import { canonicalRenderSourceAnalysisConventions } from "../src/contracts/components/canonical-render-source-conventions"
 import { createComponentPropSourceAnalyzer } from "../src/contracts/components/component-prop-source-analysis"
+import type { LocalPropContract } from "../src/contracts/components/types"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const sourcePath = join(repoRoot, "src/components/ui/command.tsx")
@@ -266,7 +267,7 @@ describe("release.5 Command", () => {
   test("reconciles CommandDialog local props directly against source", () => {
     const dialog = family.exports.find((entry) => entry.name === "CommandDialog")!.component!
     const analysis = propSourceAnalyzer.analyzeComponentPropSource(sourcePath, "CommandDialog")
-    expect(propSourceAnalyzer.compareComponentLocalProps(dialog.localProps, analysis)).toEqual([])
+    expect(propSourceAnalyzer.compareComponentLocalProps(dialog.localProps as LocalPropContract[], analysis)).toEqual([])
   })
 
   test("keeps cmdk slot/context composition and CommandInput wrapper structure", () => {
