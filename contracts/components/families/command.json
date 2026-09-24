@@ -3,7 +3,7 @@
   "id": "command",
   "source": {
     "canonicalPath": "src/components/ui/command.tsx",
-    "canonicalBlobSha": "56b0f212aa627ddb0c650849a0cefc607e0a320c",
+    "canonicalBlobSha": "1ae9ef92262e0d5271e87eb29ccd32ecd3a95c3b",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/new-york-v4/ui/command.tsx",
     "upstreamBlobSha": "1605b2f525140db07b1d0f267721e22c185bd43c"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/command.tsx@56b0f212aa627ddb0c650849a0cefc607e0a320c"
+      "source": "src/components/ui/command.tsx@1ae9ef92262e0d5271e87eb29ccd32ecd3a95c3b"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -179,6 +179,17 @@
               "kind": "boolean"
             },
             "default": true,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof DialogContent>[\"portalContainer\"]"
+            },
             "evidenceRefs": [
               "source"
             ]

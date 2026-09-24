@@ -124,7 +124,7 @@ describe("release.5 Command", () => {
 
     expect(family.source.canonicalBlobSha).toBe(blobSha)
     expect(family.source.canonicalBlobSha).toBe(
-      "56b0f212aa627ddb0c650849a0cefc607e0a320c"
+      "1ae9ef92262e0d5271e87eb29ccd32ecd3a95c3b"
     )
     expect(family.source.upstreamPath).toBe(
       "apps/v4/registry/new-york-v4/ui/command.tsx"
