@@ -1,14 +1,17 @@
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
-import { readFileSync } from "node:fs"
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
 import ts from "typescript"
 
 import { describe, expect, test } from "vitest"
 
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import { canonicalComponentPropSourceAnalyzer } from "../src/contracts/components/canonical-component-prop-source-analysis"
+import { canonicalRenderSourceAnalysisConventions } from "../src/contracts/components/canonical-render-source-conventions"
 import { reconcileCanonicalComponentSources } from "../src/contracts/components/canonical-source-reconciliation"
-import type { ComponentContractSet, ComponentFamilyContract, InheritedInterfaceContract, LocalPropContract } from "../src/contracts/components/types"
+import { analyzeRenderFlowSource, compareRenderFlowSource } from "../src/contracts/components/render-flow-source-analysis"
+import type { ComponentContractSet, ComponentFamilyContract, InheritedInterfaceContract, LocalPropContract, RenderingFlow } from "../src/contracts/components/types"
 import { getTokenContract } from "../src/contracts/tokens/contract"
 import { projectExecutableContract } from "../src/validator/projection"
 
@@ -88,5 +91,31 @@ describe("Release 005 Slider thumb naming contract", () => {
     expect(hasThumbIndexedNames(removedForwarding)).toBe(false)
     const rootOnlyForwarding = sourceText.replace(/\s*\{\.\.\.\(thumbAriaLabels !== undefined[\s\S]*?\)\}/, "").replace("<SliderPrimitive.Root", '<SliderPrimitive.Root {...(thumbAriaLabels !== undefined ? { "aria-label": thumbAriaLabels[index] } : {})}')
     expect(hasThumbIndexedNames(rootOnlyForwarding)).toBe(false)
+  })
+
+  test("source reconciliation rejects naming validation behavior drift", () => {
+    const source = readFileSync(join(root, "src/components/ui/slider.tsx"), "utf8")
+    const directory = mkdtempSync(join(tmpdir(), "slider-validation-mutations-"))
+    const path = join(directory, "slider.tsx")
+    const flow = structuredClone(sliderEntry.component!.renderingFlow!) as RenderingFlow
+    try {
+      writeFileSync(path, source)
+      expect(compareRenderFlowSource(flow, analyzeRenderFlowSource(path, "Slider", canonicalRenderSourceAnalysisConventions), canonicalRenderSourceAnalysisConventions)).toEqual([])
+      const mutations = [
+        ["labels !== undefined && labelledBy !== undefined", "labels !== undefined && labelledBy === undefined"],
+        ["labels.length !== values.length", "labels.length > values.length"],
+        ["labelledBy.length !== values.length", "labelledBy.length > values.length"],
+        ["labels.some((label) => label.trim().length === 0)", "labels.some((label) => label.length === 0)"],
+        ["labelledBy.some((id) => id.trim().length === 0)", "labelledBy.every((id) => id.trim().length === 0)"],
+      ] as const
+      for (const [original, changed] of mutations) {
+        expect(source).toContain(original)
+        writeFileSync(path, source.replace(original, changed))
+        const analysis = analyzeRenderFlowSource(path, "Slider", canonicalRenderSourceAnalysisConventions)
+        expect(compareRenderFlowSource(flow, analysis, canonicalRenderSourceAnalysisConventions), changed).not.toEqual([])
+      }
+    } finally {
+      rmSync(directory, { recursive: true, force: true })
+    }
   })
 })

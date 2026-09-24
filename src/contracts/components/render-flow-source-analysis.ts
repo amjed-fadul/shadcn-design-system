@@ -206,6 +206,33 @@ function stable(value: unknown): unknown {
 }
 function sameFact(left: unknown, right: unknown) { return JSON.stringify(stable(left)) === JSON.stringify(stable(right)) }
 
+function validatesThumbAriaNames(file: ts.SourceFile): boolean {
+  const fn = file.statements.find((statement): statement is ts.FunctionDeclaration =>
+    ts.isFunctionDeclaration(statement) && statement.name?.text === "validateThumbAriaNames")
+  if (!fn?.body || fn.parameters.length !== 3 || !fn.parameters.every((parameter, index) =>
+    ts.isIdentifier(parameter.name) && parameter.name.text === ["values", "labels", "labelledBy"][index])) return false
+
+  const compact = (node: ts.Node) => node.getText(file).replace(/\s+/g, "")
+  const statements = (statement: ts.Statement) => ts.isBlock(statement) ? [...statement.statements] : [statement]
+  const throwsError = (statement: ts.Statement) => {
+    const body = statements(statement)
+    return body.length === 1 && ts.isThrowStatement(body[0]) && body[0].expression &&
+      ts.isNewExpression(body[0].expression) && identifier(body[0].expression.expression) === "Error"
+  }
+  const matchesIf = (statement: ts.Statement, condition: string, children: string[]) => {
+    if (!ts.isIfStatement(statement) || statement.elseStatement || compact(statement.expression) !== condition) return false
+    const body = statements(statement.thenStatement)
+    if (children.length === 0) return body.length === 1 && throwsError(body[0])
+    return body.length === children.length && body.every((child, index) =>
+      ts.isIfStatement(child) && !child.elseStatement && compact(child.expression) === children[index] && throwsError(child.thenStatement))
+  }
+  const body = fn.body.statements
+  return body.length === 3 &&
+    matchesIf(body[0], "labels!==undefined&&labelledBy!==undefined", []) &&
+    matchesIf(body[1], "labels!==undefined", ["labels.length!==values.length", "labels.some((label)=>label.trim().length===0)"]) &&
+    matchesIf(body[2], "labelledBy!==undefined", ["labelledBy.length!==values.length", "labelledBy.some((id)=>id.trim().length===0)"])
+}
+
 /** Closed AST recognizers for ordered memo content and array-selected mapped children. */
 export function analyzeRenderFlowSource(path: string, exportName: string, conventions: RenderSourceAnalysisConventions = {}): RenderFlowSourceResult {
   const file = ts.createSourceFile(path, readFileSync(path, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
@@ -233,7 +260,8 @@ export function analyzeRenderFlowSource(path: string, exportName: string, conven
   const hasThumbNameValidation = validationCall && ts.isCallExpression(validationCall) &&
     identifier(validationCall.expression) === "validateThumbAriaNames" &&
     validationCall.arguments.length === 3 &&
-    validationCall.arguments.map(identifier).every((name, index) => name === ["values", "thumbAriaLabels", "thumbAriaLabelledBy"][index])
+    validationCall.arguments.map(identifier).every((name, index) => name === ["values", "thumbAriaLabels", "thumbAriaLabelledBy"][index]) &&
+    validatesThumbAriaNames(file)
   const unconditionalMappedRoot = (renderStatements.length === 2 || renderStatements.length === 3) &&
     ts.isVariableStatement(renderStatements[0]) &&
     Boolean(lastRenderStatement && ts.isReturnStatement(lastRenderStatement) && lastRenderStatement.expression) &&
