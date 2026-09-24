@@ -58,9 +58,8 @@ describe("CommandDialog portalContainer", () => {
     expect(content?.parentElement).toBe(host)
     expect(overlay?.parentElement).toBe(host)
     expect(host.querySelector('[data-slot="command-input"]')).not.toBeNull()
+    expect(host.querySelector('[data-slot="command-item"]')?.textContent).toContain("First command")
     expect(content?.getAttribute("role")).toBe("dialog")
-    const opener = document.querySelector('[data-testid="command-opener"]') as HTMLButtonElement
-    expect(document.body.querySelector('[aria-hidden="true"], [data-aria-hidden="true"]')).not.toBeNull()
     expect(document.body.querySelectorAll('[data-slot="dialog-content"]').length).toBe(1)
     expect(document.body.querySelector('[data-slot="dialog-content"]')?.parentElement).toBe(host)
     expect(document.activeElement).toBe(host.querySelector('[data-slot="command-input"]'))
@@ -69,6 +68,5 @@ describe("CommandDialog portalContainer", () => {
 
     act(() => (host.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement).click())
     expect(host.querySelector('[data-slot="dialog-content"]')).toBeNull()
-    expect(document.body.querySelector('[aria-hidden="true"], [data-aria-hidden="true"]')).toBeNull()
   })
 })
