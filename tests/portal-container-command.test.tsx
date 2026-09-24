@@ -5,14 +5,29 @@ import { describe, expect, test } from "vitest"
 import { CommandDialog, CommandInput, CommandList, CommandItem } from "../src/package"
 import { render } from "./studio-test-utils"
 
-function renderCommandDialog(portalContainer?: HTMLElement) {
-  return render(
-    <CommandDialog defaultOpen {...(portalContainer ? { portalContainer } : {})}>
+function renderCommandDialog(portalContainer?: HTMLElement, controlled = false) {
+  const dialog = (open?: boolean, onOpenChange?: (nextOpen: boolean) => void) => (
+    <CommandDialog
+      {...(open === undefined ? { defaultOpen: true } : { open, onOpenChange })}
+      {...(portalContainer ? { portalContainer } : {})}
+    >
       <CommandInput aria-label="Search commands" />
       <CommandList>
         <CommandItem value="first">First command</CommandItem>
       </CommandList>
     </CommandDialog>
+  )
+
+  if (controlled) {
+    function ControlledDialog() {
+      const [open, setOpen] = React.useState(false)
+      return <><button data-testid="command-opener" onClick={() => setOpen(true)}>Open commands</button>{dialog(open, setOpen)}</>
+    }
+    return render(<ControlledDialog />)
+  }
+
+  return render(
+    dialog()
   )
 }
 
@@ -35,13 +50,17 @@ describe("CommandDialog portalContainer", () => {
   test("places the actual dialog portal in the supplied target", () => {
     const host = document.createElement("section")
     document.body.append(host)
-    renderCommandDialog(host)
+    renderCommandDialog(host, true)
+    act(() => (document.querySelector('[data-testid="command-opener"]') as HTMLButtonElement).click())
 
     const content = host.querySelector('[data-slot="dialog-content"]')
     const overlay = host.querySelector('[data-slot="dialog-overlay"]')
     expect(content?.parentElement).toBe(host)
     expect(overlay?.parentElement).toBe(host)
     expect(host.querySelector('[data-slot="command-input"]')).not.toBeNull()
+    expect(content?.getAttribute("role")).toBe("dialog")
+    const opener = document.querySelector('[data-testid="command-opener"]') as HTMLButtonElement
+    expect(document.body.querySelector('[aria-hidden="true"], [data-aria-hidden="true"]')).not.toBeNull()
     expect(document.body.querySelectorAll('[data-slot="dialog-content"]').length).toBe(1)
     expect(document.body.querySelector('[data-slot="dialog-content"]')?.parentElement).toBe(host)
     expect(document.activeElement).toBe(host.querySelector('[data-slot="command-input"]'))
@@ -50,5 +69,6 @@ describe("CommandDialog portalContainer", () => {
 
     act(() => (host.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement).click())
     expect(host.querySelector('[data-slot="dialog-content"]')).toBeNull()
+    expect(document.body.querySelector('[aria-hidden="true"], [data-aria-hidden="true"]')).toBeNull()
   })
 })
