@@ -3,15 +3,18 @@
 Release `shadcn-radix-release-005` merges the Release 004 Checkbox/Sidebar lineage with the Release 5 component hardening lineage. It ships 38 component families, 205 public exports, and the existing 82 token facts. Releases 001–004 are byte-for-byte unchanged.
 
 - Base source commit: `009483fca81d6bd47ab5d7d263009095b0a232e7` (`codex/release005-integrated`)
-- Implementation commit: `ef637ac` (overlay portal correction)
+- Producer source commit: `1499e51eb191ee83622d82d500f064832e787d6f` (CommandDialog portal correction)
+- Verification commit: `9ae1b5affe98362301498389b9c2758f18f2fc8a` (test typing correction)
 - Package: `@adc/shadcn-design-system@0.0.0-release.5`
-- Release payload SHA-256: `3dd233fa0245c0a3713836902b8f18c3ff1565b85cdb86d686320d90a368400e`
-- Candidate tarball SHA-256: `b5e690f899d2ffe3ffb2b834a4be295442ac535271066a92a8be4d727919f3ec`
-- Candidate tarball integrity: `sha512-PuE32FT4WK/xtEsXeKA3zv7t2wVgL/7fiqqBq/BoSHXs0BKYdEPliYKpRdr2BKTTCFnALODp6h3o8ACxeF5u1Q==`
-- Distribution manifest SHA-256: `e4d5a144f153b0fb7673277028cc2f3ab3d0e69a06edf10fb9b5802106a2336f`
-- External candidate: `/private/tmp/release005-overlay-portals-candidate-v1/`
+- Release payload SHA-256: `3eb8e00456118c9085f7a9faf246c82d134252d5346afb8c525268001d5e5bf1`
+- Candidate tarball SHA-256: `18493ac39611e5d3a236eb75835cf715689403734de423ec9a003df0b9d04f49`
+- Candidate tarball integrity: `sha512-KayvOoabxOLzynu06YHxFIO1c3pJNralUswSkovpdZl6crjAn9fU41voPAj01WS4MLaGFjUza018oFJLVcCDSA==`
+- Distribution manifest SHA-256: `e02ce7d11483faa6aba1852cf21a22ec7ebdacdf7c1af1746fa718faa8e7a8f6`
+- External candidate: `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-005-patch-a/`
 
 `PopoverContent` and `AlertDialogContent` now accept the generic optional `portalContainer` prop. Each internal portal uses the supplied target; omitting it preserves the default body portal. Alert Dialog keeps its overlay and content within the same portal boundary, with modal behavior and Action/Cancel semantics intact.
+
+`CommandDialog` now also accepts the same optional generic `portalContainer` prop and forwards it to its internal `DialogContent`. Omitting the prop preserves the default body portal; supplying it keeps the dialog overlay and content in the provided host. No Canvas implementation is included in this producer handoff.
 
 The candidate verifier rebuilt the package from source and compared the entire tarball byte-for-byte to the retained candidate; all 53 packed files matched. Canvas can vendor that exact tarball when integration begins. Its registry retains and exposes every Release 5 contract for queries, while its pre-existing closed authoring policy remains separate. In particular, new families are not automatically authorable.
 
