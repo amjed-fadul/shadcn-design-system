@@ -3,7 +3,7 @@
   "id": "dropdown-menu",
   "source": {
     "canonicalPath": "src/components/ui/dropdown-menu.tsx",
-    "canonicalBlobSha": "5945315b32dee98227d1caef0efb7e25308924bb",
+    "canonicalBlobSha": "df91c334480dc6d82f67319bdc3e44eea59c304b",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dropdown-menu.tsx",
     "upstreamBlobSha": "01a12bdc321ee20bab46e48748b4d8ff94058b04"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dropdown-menu.tsx@5945315b32dee98227d1caef0efb7e25308924bb"
+      "source": "src/components/ui/dropdown-menu.tsx@df91c334480dc6d82f67319bdc3e44eea59c304b"
     },
     "declaration": {
       "kind": "inherited-interface",

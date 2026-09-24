@@ -3,7 +3,7 @@
   "id": "dialog",
   "source": {
     "canonicalPath": "src/components/ui/dialog.tsx",
-    "canonicalBlobSha": "4f7b6b5c59eae5959a8f49959e5b5e8681d7b75f",
+    "canonicalBlobSha": "ab779c4c1ea8d400831d904c81a0a889a894ac88",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dialog.tsx",
     "upstreamBlobSha": "da9bc058324e4a676a1b9eedd86290a8d4f2213f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dialog.tsx@4f7b6b5c59eae5959a8f49959e5b5e8681d7b75f"
+      "source": "src/components/ui/dialog.tsx@ab779c4c1ea8d400831d904c81a0a889a894ac88"
     },
     "declaration": {
       "kind": "inherited-interface",

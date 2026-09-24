@@ -101,7 +101,7 @@ describe("release.5 Alert Dialog", () => {
 
       expect(family.source.canonicalBlobSha).toBe(blobSha)
       expect(family.source.canonicalBlobSha).toBe(
-        "8d837f749cf5ff7ca696184834255ce089037a83"
+        "113d17d9d1e0d1b2815f1e2f73900cf7066c09cc"
       )
       expect(family.source.upstreamPath).toBe(
         "apps/v4/registry/bases/radix/ui/alert-dialog.tsx"

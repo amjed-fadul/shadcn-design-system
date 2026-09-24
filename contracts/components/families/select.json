@@ -3,7 +3,7 @@
   "id": "select",
   "source": {
     "canonicalPath": "src/components/ui/select.tsx",
-    "canonicalBlobSha": "21dfa68abbd3ba800588a24dfc173898216504e4",
+    "canonicalBlobSha": "09748f73848930cd63c83bc2c87dd780f946d4bc",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/select.tsx",
     "upstreamBlobSha": "f576bf455da400681c62e9f5a80a95315ee52172"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/select.tsx@21dfa68abbd3ba800588a24dfc173898216504e4"
+      "source": "src/components/ui/select.tsx@09748f73848930cd63c83bc2c87dd780f946d4bc"
     },
     "declaration": {
       "kind": "inherited-interface",

@@ -14,6 +14,7 @@
     "test-storybook": "vitest run --project=storybook",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --project=unit --maxWorkers=1",
+    "test:overlay-rtl": "node tests/overlay-rtl.browser.mjs",
     "components:verify": "vitest run --project=unit --testTimeout=60000 tests/component-contract-*.test.ts tests/component-contract-runtime-evidence.test.tsx",
     "tokens:verify": "vitest run --project=unit tests/token-contract-*.test.ts",
     "snapshot:verify": "vitest run --project=unit tests/snapshot-integrity.test.ts",

@@ -3,7 +3,7 @@
   "id": "alert-dialog",
   "source": {
     "canonicalPath": "src/components/ui/alert-dialog.tsx",
-    "canonicalBlobSha": "8d837f749cf5ff7ca696184834255ce089037a83",
+    "canonicalBlobSha": "113d17d9d1e0d1b2815f1e2f73900cf7066c09cc",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/alert-dialog.tsx",
     "upstreamBlobSha": "9726776cda43f26e624e88a3dc54ec22eaefdcb3"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/alert-dialog.tsx@8d837f749cf5ff7ca696184834255ce089037a83"
+      "source": "src/components/ui/alert-dialog.tsx@113d17d9d1e0d1b2815f1e2f73900cf7066c09cc"
     },
     "declaration": {
       "kind": "inherited-interface",
