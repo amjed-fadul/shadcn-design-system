@@ -8,6 +8,7 @@ const meta = {
   args: {
     value: 60,
     max: 100,
+    "aria-label": "Upload progress",
   },
   argTypes: {
     value: {
@@ -36,11 +37,11 @@ export const States: Story = {
   },
   render: () => (
     <div className="grid w-80 gap-4">
-      <Progress value={0} />
-      <Progress value={25} />
-      <Progress value={50} />
-      <Progress value={75} />
-      <Progress value={100} />
+      <Progress value={0} aria-label="0% complete" />
+      <Progress value={25} aria-label="25% complete" />
+      <Progress value={50} aria-label="50% complete" />
+      <Progress value={75} aria-label="75% complete" />
+      <Progress value={100} aria-label="100% complete" />
     </div>
   ),
 }

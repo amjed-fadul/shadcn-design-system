@@ -142,7 +142,7 @@ describe("release.5 Command", () => {
 
     expect(family.source.canonicalBlobSha).toBe(blobSha)
     expect(family.source.canonicalBlobSha).toBe(
-      "1ae9ef92262e0d5271e87eb29ccd32ecd3a95c3b"
+      "a2cf3d0095bf4e2078268e12ffb688eb92cd4fe9"
     )
     expect(family.source.upstreamPath).toBe(
       "apps/v4/registry/new-york-v4/ui/command.tsx"
@@ -357,7 +357,7 @@ describe("release.5 Command", () => {
       .toBe(true)
 
     const source = readFileSync(sourcePath, "utf8")
-    expect(source).toContain('"ms-auto text-xs tracking-widest text-muted-foreground"')
+    expect(source).toContain('"ms-auto text-xs tracking-widest text-muted-foreground in-data-[selected=true]:text-accent-foreground"')
     expect(source).not.toContain('"ml-auto text-xs tracking-widest text-muted-foreground"')
   })
 })

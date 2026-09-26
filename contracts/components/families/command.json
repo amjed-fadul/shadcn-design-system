@@ -3,7 +3,7 @@
   "id": "command",
   "source": {
     "canonicalPath": "src/components/ui/command.tsx",
-    "canonicalBlobSha": "1ae9ef92262e0d5271e87eb29ccd32ecd3a95c3b",
+    "canonicalBlobSha": "a2cf3d0095bf4e2078268e12ffb688eb92cd4fe9",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/new-york-v4/ui/command.tsx",
     "upstreamBlobSha": "1605b2f525140db07b1d0f267721e22c185bd43c"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/command.tsx@1ae9ef92262e0d5271e87eb29ccd32ecd3a95c3b"
+      "source": "src/components/ui/command.tsx@a2cf3d0095bf4e2078268e12ffb688eb92cd4fe9"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -1246,6 +1246,23 @@
           },
           {
             "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.accent-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "in"
+                }
+              ],
+              "propName": "selected",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"

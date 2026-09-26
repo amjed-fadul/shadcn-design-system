@@ -72,9 +72,28 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const Playground: Story = {}
+// cmdk hard-codes role="separator" on Command.Separator and keeps
+// role="listbox" on Command.List when a search has no results, so axe reports
+// aria-required-children for the list. Only that rule is disabled, and only
+// for the stories that render a separator or an empty result. Story rule
+// arrays replace the preview's, so the preview's region rule is restated.
+const cmdkListboxA11y = {
+  a11y: {
+    config: {
+      rules: [
+        { id: "region", enabled: true },
+        { id: "aria-required-children", enabled: false },
+      ],
+    },
+  },
+}
+
+export const Playground: Story = {
+  parameters: cmdkListboxA11y,
+}
 
 export const Empty: Story = {
+  parameters: cmdkListboxA11y,
   render: () => (
     <Command className="w-[360px] rounded-lg border shadow-md">
       <CommandInput placeholder="Search..." value="does-not-exist" />

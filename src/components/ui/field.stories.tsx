@@ -104,7 +104,7 @@ export const WithSeparatorAndSlider: Story = {
     <FieldGroup>
       <Field>
         <FieldTitle>Volume</FieldTitle>
-        <Slider defaultValue={[40]} aria-label="Volume" />
+        <Slider defaultValue={[40]} thumbAriaLabels={["Volume"]} />
       </Field>
       <FieldSeparator>Advanced</FieldSeparator>
       <Field>

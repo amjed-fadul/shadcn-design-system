@@ -3,7 +3,7 @@
   "id": "avatar",
   "source": {
     "canonicalPath": "src/components/ui/avatar.tsx",
-    "canonicalBlobSha": "10ada4815176e030278593a74942f4dbe93631a3",
+    "canonicalBlobSha": "f108f352aa17e1fc30defdf5a63835e4a743dee0",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/avatar.tsx",
     "upstreamBlobSha": "5521146b8a3e525170852d5aa328aed6a7d69ac5"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/avatar.tsx@10ada4815176e030278593a74942f4dbe93631a3"
+      "source": "src/components/ui/avatar.tsx@f108f352aa17e1fc30defdf5a63835e4a743dee0"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -297,7 +297,7 @@
             ]
           },
           {
-            "tokenId": "color.muted-foreground",
+            "tokenId": "color.foreground",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -666,7 +666,7 @@
             ]
           },
           {
-            "tokenId": "color.muted-foreground",
+            "tokenId": "color.foreground",
             "evidenceRefs": [
               "source",
               "tokens"

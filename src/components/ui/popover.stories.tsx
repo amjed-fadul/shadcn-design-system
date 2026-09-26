@@ -92,9 +92,9 @@ export const CustomAnchor: Story = {
       <PopoverAnchor asChild>
         <div className="rounded-md border px-4 py-2 text-sm">Anchor target</div>
       </PopoverAnchor>
-      <PopoverContent side="bottom">
+      <PopoverContent side="bottom" aria-labelledby="custom-anchor-title">
         <PopoverHeader>
-          <PopoverTitle>Custom anchor</PopoverTitle>
+          <PopoverTitle id="custom-anchor-title">Custom anchor</PopoverTitle>
           <PopoverDescription>
             PopoverContent can position against PopoverAnchor.
           </PopoverDescription>

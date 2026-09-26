@@ -3,7 +3,7 @@
   "id": "alert",
   "source": {
     "canonicalPath": "src/components/ui/alert.tsx",
-    "canonicalBlobSha": "db210633ba702b566014146e2ae9fb3a201ff61a",
+    "canonicalBlobSha": "f11877d3297cd43bd0ad1cbc06a146ad6351881f",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/alert.tsx",
     "upstreamBlobSha": "e9aa02f381ef6e588cfb57696f76703c0f7c4ceb"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/alert.tsx@db210633ba702b566014146e2ae9fb3a201ff61a"
+      "source": "src/components/ui/alert.tsx@f11877d3297cd43bd0ad1cbc06a146ad6351881f"
     },
     "tokens": {
       "kind": "token-contract",
