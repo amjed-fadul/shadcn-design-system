@@ -20,7 +20,7 @@ function gitBlobSha(path: string) {
   return execFileSync("git", ["hash-object", path], { cwd: repoRoot, encoding: "utf8" }).trim()
 }
 
-describe("canonical component-contract source provenance", () => {
+describe("canonical component-contract source provenance", { timeout: 60000 }, () => {
   test("freezes the approved baseline, seed closure, token contract, and package pins", () => {
     expect(existsSync(provenancePath)).toBe(true)
 

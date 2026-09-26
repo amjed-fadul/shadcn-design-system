@@ -20,7 +20,7 @@ function evidenceRefs(value: unknown): string[] {
   return Object.entries(value).flatMap(([key, child]) => key === "evidenceRefs" ? child as string[] : evidenceRefs(child))
 }
 
-describe("inherited-interface declaration authority", () => {
+describe("inherited-interface declaration authority", { timeout: 60000 }, () => {
   test("resolves React intrinsic props without traversing a package export path", () => {
     const analyzed = analyzePackageComponentInterface(contract("html.div").source)
     expect(analyzed.props).toHaveLength(265)

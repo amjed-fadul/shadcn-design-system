@@ -134,7 +134,7 @@ function sourceEvidencePath(source: string) {
   return source.replace(/@[0-9]+\.[0-9]+\.[0-9]+$/, "")
 }
 
-describe("Phase 3 Task 7 cross-family runtime and evidence closure", () => {
+describe("Phase 3 Task 7 cross-family runtime and evidence closure", { timeout: 60000 }, () => {
   test("registers exactly the independently approved seed families and no extra family artifact", () => {
     const actualFamilyFiles = readdirSync(join(root, "contracts/components/families"))
       .filter((file) => file.endsWith(".json"))

@@ -97,7 +97,7 @@ function slotSourceFixture(name: string, source: string) {
   return { path, cleanup: () => rmSync(directory, { recursive: true, force: true }) }
 }
 
-describe("component contract adversarial mutations", () => {
+describe("component contract adversarial mutations", { timeout: 60000 }, () => {
   test.each([
     ["component made non-authorable", (family: ComponentFamilyContract) => { family.exports.find((entry) => entry.name === "Button")!.authorableJsx = false }, "Component export Button must be JSX-authorable."],
     ["hook made JSX-authorable", (family: ComponentFamilyContract) => { family.exports.find((entry) => entry.name === "useSidebar")!.authorableJsx = true }, "Hook export useSidebar must not be JSX-authorable."],

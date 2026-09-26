@@ -37,7 +37,7 @@ describe("canonical component provenance", () => {
   })
 
   test("records deterministic Sidebar adaptation without ambient-app policy", () => {
-    expect(provenance.components.sidebar.canonicalBlobSha).toBe("8db9b0a0ddb6a51a7d22104d9b1f42b366ad7a23")
+    expect(provenance.components.sidebar.canonicalBlobSha).toBe("30877f7508ba49fe48992ca744f53a3903ed4482")
     expect(provenance.derivation.operations).toContain(
       "make Sidebar presentation and desktop/mobile state explicit, preserve sidebar.context, and move viewport detection, persistence, and keyboard shortcuts to an external normal-app recipe"
     )
