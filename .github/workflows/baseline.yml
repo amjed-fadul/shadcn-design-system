@@ -7,7 +7,9 @@ on:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    # Releases are produced on macOS. The build input guard rejects Linux-only
+    # reads such as /proc/self/exe, and the frozen R4 producer cannot change.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,7 +20,7 @@ jobs:
           mkdir -p "$directory"
           git fetch --no-tags --depth=1 origin ci/release-artifacts
           git archive FETCH_HEAD | tar -x -C "$directory"
-          (cd "$directory" && sha256sum --check --strict SHA256SUMS)
+          (cd "$directory" && shasum -a 256 --check SHA256SUMS)
           echo "ADC_R3_ARTIFACT_DIRECTORY=$directory/shadcn-radix-release-003" >> "$GITHUB_ENV"
           echo "ADC_R4_ARTIFACT_DIRECTORY=$directory/shadcn-radix-release-004" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
