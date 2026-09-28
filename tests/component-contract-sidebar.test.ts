@@ -12,6 +12,7 @@ import type { ComponentFamilyContract, InheritedInterfaceContract } from "../src
 import * as sourceAnalysis from "./helpers/component-source-analysis"
 import { analyzeComponentTokenDependenciesForExport, analyzeComponentTokenSource, auditComponentTokenCoverage, compareComponentTokenDependenciesForExport } from "./helpers/component-token-analysis"
 import { analyzeIntrinsicReactInterface } from "./helpers/typescript-interface-analysis"
+import { canonicalFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const source = join(repoRoot, "src/components/ui/sidebar.tsx")
@@ -42,9 +43,9 @@ function authority() {
 }
 
 describe("Sidebar component family contract", () => {
-  test("registers Sidebar as the nineteenth and final family", () => {
-    expect(contractSet.familyCount).toBe(19)
-    expect(contractSet.familyFiles).toHaveLength(19)
+  test("preserves Sidebar within the independently approved family scope", () => {
+    expect(contractSet.familyCount).toBe(canonicalFamilyIds.length)
+    expect(contractSet.familyFiles).toHaveLength(canonicalFamilyIds.length)
     expect(contractSet.familyFiles).toContain("contracts/components/families/sidebar.json")
   })
 
@@ -66,20 +67,70 @@ describe("Sidebar component family contract", () => {
     expect(validateInheritedInterfaceInvariants(contract)).toEqual([])
   })
 
-  test("preserves provider state, factual context capabilities, and proven Slots without hard-coding an anatomy", () => {
+  test("records the explicit provider inputs and both controlled or uncontrolled state channels", () => {
     const contract = family()
     const provider = contract.exports.find(({ name }) => name === "SidebarProvider")!.component!
     expect(provider.localProps).toEqual(expect.arrayContaining([
-      expect.objectContaining({ name: "defaultOpen", default: true, type: { kind: "boolean" } }),
-      expect.objectContaining({ name: "open", type: { kind: "boolean" } }),
-      expect.objectContaining({ name: "onOpenChange" }),
+      { name: "isMobile", required: false, type: { kind: "boolean" }, default: false, evidenceRefs: ["source", "declaration"] },
+      { name: "defaultOpen", required: false, type: { kind: "boolean" }, default: true, evidenceRefs: ["source", "declaration"] },
+      { name: "open", required: false, type: { kind: "boolean" }, evidenceRefs: ["source", "declaration"] },
+      { name: "onOpenChange", required: false, type: { kind: "typescript", typeText: "(open: boolean) => void" }, evidenceRefs: ["source", "declaration"] },
+      { name: "defaultOpenMobile", required: false, type: { kind: "boolean" }, default: false, evidenceRefs: ["source", "declaration"] },
+      { name: "openMobile", required: false, type: { kind: "boolean" }, evidenceRefs: ["source", "declaration"] },
+      { name: "onOpenMobileChange", required: false, type: { kind: "typescript", typeText: "(open: boolean) => void" }, evidenceRefs: ["source", "declaration"] },
     ]))
-    expect(provider.localProps.map(({ name }) => name)).not.toContain("openMobile")
-    expect(provider.stateChannels).toEqual([expect.objectContaining({ name: "open", controlledProp: "open", defaultProp: "defaultOpen", changeEventProp: "onOpenChange" })])
+    expect(provider.stateChannels).toEqual([
+      { name: "open", controlledProp: "open", defaultProp: "defaultOpen", changeEventProp: "onOpenChange", evidenceRefs: ["source", "declaration", "runtime"] },
+      { name: "openMobile", controlledProp: "openMobile", defaultProp: "defaultOpenMobile", changeEventProp: "onOpenMobileChange", evidenceRefs: ["source", "declaration", "runtime"] },
+    ])
+    expect(provider.events).toEqual([
+      { propName: "onOpenChange", payload: { kind: "boolean" }, evidenceRefs: ["source", "declaration", "runtime"] },
+      { propName: "onOpenMobileChange", payload: { kind: "boolean" }, evidenceRefs: ["source", "declaration", "runtime"] },
+    ])
+  })
+
+  test("records explicit Sidebar branches, effective state, and portal containment", () => {
+    const contract = family()
+    const sidebar = contract.exports.find(({ name }) => name === "Sidebar")!.component!
+    expect(sidebar.localProps).toContainEqual({
+      name: "portalContainer",
+      required: false,
+      type: { kind: "typescript", typeText: 'ComponentProps<typeof SheetContent>["portalContainer"]' },
+      evidenceRefs: ["source", "declaration"],
+    })
+    expect(sidebar.rendering).toMatchObject({ alternatives: [
+      { when: { propName: "collapsible", equals: "none" } },
+      { when: { source: "state", name: "isMobile", truthiness: "truthy" } },
+      { otherwise: true },
+    ] })
+    const alternatives = "alternatives" in sidebar.rendering ? sidebar.rendering.alternatives : []
+    const noneRoot = alternatives[0].rendering.nodes.find(({ id }) => id === "plain")!
+    const mobileContent = alternatives[1].rendering.nodes.find(({ id }) => id === "sheet-content")!
+    const desktopRoot = alternatives[2].rendering.nodes.find(({ id }) => id === "desktop")!
+    expect(noneRoot.dataAttributes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: "data-state", source: "primitive-state", prop: "effectiveState", evidenceRefs: ["source"] }),
+      expect.objectContaining({ name: "data-collapsible", source: "literal", value: "", evidenceRefs: ["source"] }),
+    ]))
+    expect(mobileContent.dataAttributes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: "data-state", source: "conditional-value", condition: { source: "state", name: "openMobile", truthiness: "truthy" }, whenTrue: { source: "literal", value: "expanded" }, whenFalse: { source: "literal", value: "collapsed" }, evidenceRefs: ["source"] }),
+      expect.objectContaining({ name: "data-mobile", source: "literal", value: "true", evidenceRefs: ["source"] }),
+    ]))
+    expect(desktopRoot.dataAttributes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: "data-state", source: "primitive-state", prop: "effectiveState", evidenceRefs: ["source"] }),
+    ]))
+    expect(alternatives[1].rendering.portalBoundaries).toEqual([])
+  })
+
+  test("preserves factual context capabilities and proven Slots without ambient browser policy", () => {
+    const contract = family()
+    const provider = contract.exports.find(({ name }) => name === "SidebarProvider")!.component!
     expect(provider.composition.provides).toEqual(["sidebar.context"])
-    expect(contract.exports.find(({ name }) => name === "Sidebar")!.component!.composition.requires).toEqual(["sidebar.context"])
-    expect(contract.exports.find(({ name }) => name === "SidebarTrigger")!.component!.composition.requires).toEqual(["sidebar.context"])
-    expect(contract.exports.find(({ name }) => name === "SidebarMenuButton")!.component!.composition.requires).toEqual(["sidebar.context"])
+    const contextualExports = ["Sidebar", "SidebarTrigger", "SidebarRail", "SidebarMenuButton"]
+    for (const name of contextualExports) {
+      expect(contract.exports.find((entry) => entry.name === name)!.component!.composition.requires).toEqual(["sidebar.context"])
+    }
+    expect(contract.evidence).toHaveProperty("declaration")
+    expect(JSON.stringify(contract.evidence)).not.toMatch(/cookie|shortcut|matchMedia|use-mobile|browser viewport/i)
     for (const name of ["SidebarGroupLabel", "SidebarGroupAction", "SidebarMenuButton", "SidebarMenuAction", "SidebarMenuSubButton"]) {
       expect(contract.exports.find((entry) => entry.name === name)!.component!.slots).toHaveLength(1)
     }

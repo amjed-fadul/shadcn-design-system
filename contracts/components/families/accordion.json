@@ -19,7 +19,7 @@
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-001"
+      "source": "shadcn-radix-token-contract-002"
     }
   },
   "exports": [
@@ -213,17 +213,6 @@
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 4
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "font-size.sm",
             "evidenceRefs": [
               "source",
@@ -239,6 +228,17 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -349,18 +349,18 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 3
-            },
+            "tokenId": "font-size.sm",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "font-size.sm",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
             "evidenceRefs": [
               "source",
               "tokens"

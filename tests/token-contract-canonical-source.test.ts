@@ -92,10 +92,10 @@ describe("canonical token contract", () => {
   test("matches the contract identity and exact category shape", () => {
     const contract = readContract()
     expect(contract.schemaVersion).toBe(1)
-    expect(contract.id).toBe("shadcn-radix-token-contract-001")
+    expect(contract.id).toBe("shadcn-radix-token-contract-002")
     expect(contract.status).toBe("approved")
     expect(contract.baselineSnapshotId).toBe("shadcn-radix-bootstrap-000")
-    expect(contract.sourceBaselineCommit).toBe("f9682ce3238f1fc5f41a91b1d6953a40c12d2288")
+    expect(contract.sourceBaselineCommit).toBe("e04ee6822a0b49e227970e787940db96730c9222")
     expect(contract.modes).toEqual(["light", "dark"])
     const canonicalTokens = contract.tokens.filter((candidate) => candidate.sourceId === "canonical-theme")
     expect(canonicalTokens).toHaveLength(41)

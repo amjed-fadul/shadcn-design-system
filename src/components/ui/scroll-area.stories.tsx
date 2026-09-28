@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { expect, userEvent, waitFor } from "storybook/test"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -43,4 +44,42 @@ export const ScrollableList: Story = {
       </ScrollArea>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const viewport = canvasElement.querySelector<HTMLElement>(
+      '[data-slot="scroll-area-viewport"]'
+    )
+
+    await expect(viewport).not.toBeNull()
+    if (!viewport) throw new Error("ScrollArea viewport was not rendered")
+
+    await expect(viewport).toHaveAttribute("tabindex", "0")
+    await waitFor(() => {
+      expect(viewport.scrollHeight).toBeGreaterThan(viewport.clientHeight)
+      expect(getComputedStyle(viewport).overflowY).toBe("scroll")
+    })
+
+    const reference = document.createElement("span")
+    reference.hidden = true
+    reference.style.boxShadow =
+      "0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)"
+    canvasElement.append(reference)
+    const ring = getComputedStyle(reference).boxShadow
+    reference.remove()
+
+    await expect(ring).not.toBe("none")
+    await userEvent.click(canvasElement)
+    await expect(viewport).not.toHaveFocus()
+    await userEvent.tab()
+    await expect(viewport).toHaveFocus()
+    await expect(viewport.matches(":focus-visible")).toBe(true)
+    await waitFor(() => {
+      expect(getComputedStyle(viewport).boxShadow).toContain(ring)
+    })
+
+    viewport.scrollTo({ top: viewport.scrollHeight })
+    await waitFor(() => {
+      expect(viewport.scrollTop).toBeGreaterThan(0)
+    })
+    await expect(viewport).toHaveFocus()
+  },
 }

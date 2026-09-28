@@ -4,6 +4,7 @@ import type {
   ComponentDefinition,
   ComponentFamilyContract,
   CompositionContract,
+  ConditionalApiCondition,
   ConditionalApiCase,
   EventContract,
   RenderCondition,
@@ -101,7 +102,7 @@ export type ExecutableApiShape = Readonly<{
 }>
 
 export type ExecutableConditionalApi = Readonly<{
-  when: Readonly<{ propName: string; equals: string | number | boolean }>
+  when: Readonly<ConditionalApiCondition>
   shape: ExecutableApiShape
 }>
 
@@ -139,7 +140,17 @@ export type ExecutableContract = Readonly<{
   capabilityIds: readonly string[]
 }>
 
+export type ImplementationInput = Readonly<{ path: string; gitBlob: string | null; sha256: string }>
+export type PackageIdentity = Readonly<{
+  name: string
+  version: string
+  publicEntrypoints: Readonly<Record<string, string | Readonly<Record<string, string>>>>
+}>
+
 export type ExecutableReleasePayload = Readonly<{
+  documentSchemaVersion: 1
+  packageIdentity: PackageIdentity | null
+  implementationInputs: readonly ImplementationInput[]
   releaseId: string
   projectionSchemaVersion: 1
   componentContractSetId: string

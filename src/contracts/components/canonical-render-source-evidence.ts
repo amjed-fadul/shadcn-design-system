@@ -2,12 +2,13 @@ import { readFileSync } from "node:fs"
 
 import ts from "typescript"
 
+import { findDelegatedSourceFunction } from "./delegated-host-source-analysis"
 import { extractFunctionPropDefaults } from "./render-source-analysis"
 
 /** Extracts the canonical delegated-host source facts used by the pinned Button contract. */
 export function extractButtonRenderingEvidence(sourcePath: string, exportName: string): { asChildDefault: string | number | boolean | null | undefined; conditionProp: string; whenTrue: string; whenFalse: string; replacementHost: string; defaultHost: string; dataAttributes: Array<{ name: string; value?: string; sourceProp?: string }>; forwardsProps: boolean; portals: boolean } {
   const file = ts.createSourceFile(sourcePath, readFileSync(sourcePath, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
-  const functionDeclaration = file.statements.find((statement): statement is ts.FunctionDeclaration => ts.isFunctionDeclaration(statement) && statement.name?.text === exportName)
+  const functionDeclaration = findDelegatedSourceFunction(file, exportName)
   let conditionProp = "", replacementHost = "", defaultHost = "", forwardsProps = false, portals = false
   const dataAttributes: Array<{ name: string; value?: string; sourceProp?: string }> = []
   const visit = (node: ts.Node) => {

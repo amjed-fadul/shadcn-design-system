@@ -1,0 +1,10 @@
+import { createRef } from 'react'
+import { Button, DialogTrigger, SidebarMenuButton, SidebarMenuAction, TooltipTrigger, DropdownMenuTrigger, SheetTrigger } from '@adc/shadcn-design-system'
+const wrong = createRef<HTMLDivElement>()
+export const button = <Button ref={wrong} />
+export const dialog = <DialogTrigger ref={wrong} />
+export const menu = <SidebarMenuButton ref={wrong} />
+export const action = <SidebarMenuAction ref={wrong} />
+export const tooltip = <TooltipTrigger ref={wrong} />
+export const dropdown = <DropdownMenuTrigger ref={wrong} />
+export const sheet = <SheetTrigger ref={wrong} />

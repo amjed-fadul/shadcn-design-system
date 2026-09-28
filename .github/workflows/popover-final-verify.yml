@@ -1,0 +1,24 @@
+name: Release-wide verification (Popover branch)
+
+on:
+  push:
+    branches:
+      - feat/release-5-popover
+
+jobs:
+  verify-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+      - run: npm run test-storybook
+      - run: npm run build-storybook
+      - run: npm audit --omit=dev
+      - run: npm audit

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "alert-dialog-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "alert-dialog"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A modal dialog that interrupts the user with important content and expects a response.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.alert-dialog.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Alert Dialog when the user must explicitly confirm or cancel an important action before continuing.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert-dialog.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose AlertDialog with AlertDialogTrigger and AlertDialogContent; structure the content with Header, Title, Description, optional Media, and Footer.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert-dialog.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Place AlertDialogCancel and AlertDialogAction in AlertDialogFooter to provide the expected response choices.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert-dialog.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Set size=\"sm\" on AlertDialogContent for the smaller dialog layout; the default size is \"default\".",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert-dialog.docs"
+        ]
+      }
+    },
+    {
+      "statement": "AlertDialogMedia can add an icon or image area, and AlertDialogAction accepts Button variants such as destructive.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert-dialog.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Alert Dialog supports RTL layouts.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.alert-dialog.docs"
+        ]
+      }
+    }
+  ]
+}

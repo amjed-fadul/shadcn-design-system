@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "empty-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "empty"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays an empty state.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.empty.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Empty when a view has no data, results, or content to show.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.empty.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Empty from EmptyHeader with EmptyMedia, EmptyTitle, and EmptyDescription, followed by optional EmptyContent for actions or controls.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.empty.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use EmptyMedia variant=\"icon\" for icon media; the default variant can host richer media such as an Avatar or AvatarGroup.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.empty.docs"
+        ]
+      }
+    }
+  ]
+}

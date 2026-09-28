@@ -1,0 +1,1178 @@
+{
+  "schemaVersion": 1,
+  "id": "toggle-group",
+  "source": {
+    "canonicalPath": "src/components/ui/toggle-group.tsx",
+    "canonicalBlobSha": "40ea41426039357364408eb60c53635830f2acc4",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/toggle-group.tsx",
+    "upstreamBlobSha": "7d892c5b6faf6e98f6e3231ae0ab1e7d40238abb"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/toggle-group.tsx@40ea41426039357364408eb60c53635830f2acc4"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "radix.toggle-group.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-002"
+    }
+  },
+  "exports": [
+    {
+      "name": "ToggleGroup",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "outline"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "sm",
+                "lg"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "spacing",
+            "required": false,
+            "type": {
+              "kind": "number"
+            },
+            "default": 2,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "radix.toggle-group.root"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [
+            "toggle-group.context"
+          ],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [
+          {
+            "when": {
+              "propName": "type",
+              "equals": "single"
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [
+              {
+                "name": "value",
+                "controlledProp": "value",
+                "defaultProp": "defaultValue",
+                "changeEventProp": "onValueChange",
+                "evidenceRefs": [
+                  "declaration"
+                ]
+              }
+            ],
+            "evidenceRefs": [
+              "declaration"
+            ]
+          },
+          {
+            "when": {
+              "propName": "type",
+              "equals": "multiple"
+            },
+            "propRefinements": [],
+            "eventRefinements": [],
+            "stateChannels": [
+              {
+                "name": "value",
+                "controlledProp": "value",
+                "defaultProp": "defaultValue",
+                "changeEventProp": "onValueChange",
+                "evidenceRefs": [
+                  "declaration"
+                ]
+              }
+            ],
+            "evidenceRefs": [
+              "declaration"
+            ]
+          }
+        ],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "radius.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.toggle-group.root"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "literal",
+                        "value": "toggle-group"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                },
+                {
+                  "name": "data-variant",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "variant"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                },
+                {
+                  "name": "data-size",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "size"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                },
+                {
+                  "name": "data-spacing",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "spacing"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                },
+                {
+                  "name": "data-orientation",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "prop",
+                        "name": "orientation"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "context",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "context",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "group selection and keyboard semantics",
+            "owner": "component",
+            "mechanism": "Radix Toggle Group uses radiogroup semantics for single selection and toolbar semantics for multiple selection, with optional roving focus and orientation/direction support",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [
+          {
+            "propName": "orientation",
+            "value": "horizontal",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "context": [
+          {
+            "id": "ToggleGroupContext",
+            "defaultFields": [
+              {
+                "name": "size",
+                "value": "default"
+              },
+              {
+                "name": "variant",
+                "value": "default"
+              },
+              {
+                "name": "spacing",
+                "value": 2
+              },
+              {
+                "name": "orientation",
+                "value": "horizontal"
+              }
+            ],
+            "provider": {
+              "nodeId": "context",
+              "fields": [
+                {
+                  "name": "variant",
+                  "value": {
+                    "source": "prop",
+                    "name": "variant"
+                  }
+                },
+                {
+                  "name": "size",
+                  "value": {
+                    "source": "prop",
+                    "name": "size"
+                  }
+                },
+                {
+                  "name": "spacing",
+                  "value": {
+                    "source": "prop",
+                    "name": "spacing"
+                  }
+                },
+                {
+                  "name": "orientation",
+                  "value": {
+                    "source": "prop",
+                    "name": "orientation"
+                  }
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ToggleGroupItem",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "outline"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "sm",
+                "lg"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "radix.toggle-group.item"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [
+            "toggle-group.context"
+          ],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[spacing=0]/toggle-group"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "icon",
+              "equals": "inline-end"
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[spacing=0]/toggle-group"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "icon",
+              "equals": "inline-start"
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[spacing=0]/toggle-group"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "spacing",
+              "equals": 0
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[orientation=horizontal]/toggle-group",
+                "first"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "spacing",
+              "equals": 0
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[orientation=horizontal]/toggle-group",
+                "last"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "spacing",
+              "equals": 0
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[orientation=vertical]/toggle-group",
+                "first"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "spacing",
+              "equals": 0
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[orientation=vertical]/toggle-group",
+                "last"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "on"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "sm"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 9
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-end"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "all": [
+                {
+                  "propName": "size",
+                  "equals": "lg"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "has"
+                    }
+                  ],
+                  "propName": "icon",
+                  "equals": "inline-start"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "item",
+          "publicPropsTargetNodeId": "item",
+          "nodes": [
+            {
+              "id": "item",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "radix.toggle-group.item"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "literal",
+                        "value": "toggle-group-item"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                },
+                {
+                  "name": "data-variant",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "nullish-coalesce",
+                        "first": {
+                          "source": "context-field",
+                          "contextId": "ToggleGroupContext",
+                          "field": "variant"
+                        },
+                        "fallback": {
+                          "source": "prop",
+                          "name": "variant"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                },
+                {
+                  "name": "data-size",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "nullish-coalesce",
+                        "first": {
+                          "source": "context-field",
+                          "contextId": "ToggleGroupContext",
+                          "field": "size"
+                        },
+                        "fallback": {
+                          "source": "prop",
+                          "name": "size"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                },
+                {
+                  "name": "data-spacing",
+                  "evidenceRefs": [
+                    "source"
+                  ],
+                  "source": "ordered-writes",
+                  "writes": [
+                    {
+                      "kind": "value",
+                      "value": {
+                        "source": "context-field",
+                        "contextId": "ToggleGroupContext",
+                        "field": "spacing"
+                      }
+                    },
+                    {
+                      "kind": "public-props-spread"
+                    }
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "item selection semantics",
+            "owner": "component",
+            "mechanism": "Radix owns pressed/selected semantics from the group value; single-selection items use radio semantics",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "feature": "icon-only accessible name",
+            "owner": "author",
+            "mechanism": "provide aria-label when an item contains only an icon",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "context": [
+          {
+            "id": "ToggleGroupContext",
+            "defaultFields": [
+              {
+                "name": "size",
+                "value": "default"
+              },
+              {
+                "name": "variant",
+                "value": "default"
+              },
+              {
+                "name": "spacing",
+                "value": 2
+              },
+              {
+                "name": "orientation",
+                "value": "horizontal"
+              }
+            ],
+            "providerExportName": "ToggleGroup",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "unresolved": []
+}

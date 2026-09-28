@@ -3,7 +3,7 @@
   "id": "dialog",
   "source": {
     "canonicalPath": "src/components/ui/dialog.tsx",
-    "canonicalBlobSha": "e51b829a56b094b0e0aa7c8552fdfab0c3cb368c",
+    "canonicalBlobSha": "ab779c4c1ea8d400831d904c81a0a889a894ac88",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dialog.tsx",
     "upstreamBlobSha": "da9bc058324e4a676a1b9eedd86290a8d4f2213f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dialog.tsx@e51b829a56b094b0e0aa7c8552fdfab0c3cb368c"
+      "source": "src/components/ui/dialog.tsx@ab779c4c1ea8d400831d904c81a0a889a894ac88"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -19,7 +19,7 @@
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-001"
+      "source": "shadcn-radix-token-contract-002"
     }
   },
   "exports": [
@@ -175,6 +175,17 @@
       ],
       "component": {
         "localProps": [
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof DialogPrimitive.Portal>[\"container\"]"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
           {
             "name": "showCloseButton",
             "required": false,

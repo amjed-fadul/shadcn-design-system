@@ -1,4 +1,1047 @@
 {
+  "documentSchemaVersion": 1,
+  "packageIdentity": {
+    "name": "@adc/shadcn-design-system",
+    "version": "0.0.0-release.1",
+    "publicEntrypoints": {
+      ".": {
+        "types": "./dist-library/types/src/package/index.d.ts",
+        "import": "./dist-library/index.js"
+      },
+      "./styles.css": "./dist-library/styles.css",
+      "./release": {
+        "types": "./dist-library/types/src/package/release.d.ts",
+        "import": "./dist-library/release.js"
+      }
+    }
+  },
+  "implementationInputs": [
+    {
+      "path": ".gitignore",
+      "gitBlob": "a7e4e644a0b102f59fcc848a765546acb7cf43e9",
+      "sha256": "0002afc4c2e5cd5dfaca1c049fa1b6255c109fbd23cd626ae86216ae38d780fd"
+    },
+    {
+      "path": "README.md",
+      "gitBlob": "c37a5efd3e7e3f8092f1434308ae329e93a1bad7",
+      "sha256": "601406f7d62e7c9f85f7ae2bdf3b01f18f65ea9b92b01c8fa6d2523d36c713da"
+    },
+    {
+      "path": "components.json",
+      "gitBlob": "5c23ec49120d22a89a3907b1338c372f9a710894",
+      "sha256": "d0ada54e59710099b766eae59a1a35d31b717a6ec43d73a8814de1815ddc1749"
+    },
+    {
+      "path": "contracts/components/component-contract-set.json",
+      "gitBlob": "5e2c3aaf7e4ea9c9f092aeaaad2046125842daf5",
+      "sha256": "ab0af11d33e420f65e7637159e9a3e4891c8f0a2a17da774502ec2e211771b8c"
+    },
+    {
+      "path": "contracts/components/component-contract-set.schema.json",
+      "gitBlob": "fe954b458cdb0de6e4cbef7c35078592804811a7",
+      "sha256": "d918147f97270552b29505580ddc92518d65f26aaecabe154dee4aa4dbc1cc20"
+    },
+    {
+      "path": "contracts/components/component-family.schema.json",
+      "gitBlob": "d269a361a04b0e28b555c21ae78f28455d78c1e4",
+      "sha256": "99b2c58a00575a49f5e18b1d10a7ba3284bca6a640fe81109478bd36fcd5d3f7"
+    },
+    {
+      "path": "contracts/components/families/accordion.json",
+      "gitBlob": "a1f69dfa174d59438565bff6dbbf4f8f5f8293cc",
+      "sha256": "65b1f40e26587f2e29ba53d189cb1ac9358b59b4b23cabc6d73e3680019a7c3f"
+    },
+    {
+      "path": "contracts/components/families/badge.json",
+      "gitBlob": "5ad1ebb99ccc74190137a54a24c524266e175762",
+      "sha256": "f90702719d263a923f4cdd7a18ea8850df0b747a255d79a9f27d4fb029551489"
+    },
+    {
+      "path": "contracts/components/families/button.json",
+      "gitBlob": "f83b649a4b358907c36d796f58663f7600590de4",
+      "sha256": "784b3fb079bb68b70bc2e6003c0a4776d498d2ae518c9f23b14a302e1c32358d"
+    },
+    {
+      "path": "contracts/components/families/card.json",
+      "gitBlob": "4dc6e088f68cf47fdab179a7ae8de03de1ba0978",
+      "sha256": "6a53290f64e7eedac23312346088421d41d6e4f6e1e290e0459e1c2fc2661f7f"
+    },
+    {
+      "path": "contracts/components/families/checkbox.json",
+      "gitBlob": "aec3d0d6eb2d5b6f1226e184cb35efcd8168b259",
+      "sha256": "fac4ff0100fe4c9871a93134f010fe7d591e9eeff8627be71972739ce71818a4"
+    },
+    {
+      "path": "contracts/components/families/dialog.json",
+      "gitBlob": "6ec4e386b01e0181744205d684fe2d5a3abddcc6",
+      "sha256": "6242e5b7fa99a3d34d088cbd3b3e2c2a4abd346a4f56c9a07ad95729582d70d9"
+    },
+    {
+      "path": "contracts/components/families/dropdown-menu.json",
+      "gitBlob": "da446c917bb8fb6ba1e634b1f99bdb1839759f97",
+      "sha256": "c86e4c7435617095cf6e2b980ffa39215334983bec01b956fc11c21216c86fe9"
+    },
+    {
+      "path": "contracts/components/families/input.json",
+      "gitBlob": "91edd8c1c5fdaf4b6e65647c6ddd1dd6a9c6eb07",
+      "sha256": "cad203efaf220ed7603ab4da7391038227b6caaec377d5ea715dfb81b1bf8226"
+    },
+    {
+      "path": "contracts/components/families/label.json",
+      "gitBlob": "980db6c22843541915dcaec8c029449c952bb3e4",
+      "sha256": "72beaf147638dfc63e84aa2748068dff9e73aa42a7414b45c9da94a5054a17b1"
+    },
+    {
+      "path": "contracts/components/families/scroll-area.json",
+      "gitBlob": "f569d62ced772a436db5138530073aae97515e7a",
+      "sha256": "6a28fc9a47d8e346d5a6334f8584f93b6aa379daec64f270712dff56918f0951"
+    },
+    {
+      "path": "contracts/components/families/select.json",
+      "gitBlob": "0c3a2812ffc8e328ba8f1b8cbf684bfcd1fcfbd4",
+      "sha256": "3937ad91fb0243133d0308436041e89e8c282d432594d95fdc56c3830b3cb462"
+    },
+    {
+      "path": "contracts/components/families/separator.json",
+      "gitBlob": "aa6c12c90a0985b0efcf7a61ba044ebd5ebd7e69",
+      "sha256": "a9ab6a66d910d5c2f56a34fde98b28109de9c3b73b98ff47d19f5c467ac3c568"
+    },
+    {
+      "path": "contracts/components/families/sheet.json",
+      "gitBlob": "2a554f08121318ab10002a50f7fe108b3ad928c4",
+      "sha256": "3ae860a12504e57e2d0a78a041657b529f0376337f268b3a5ffa86765e99ec4e"
+    },
+    {
+      "path": "contracts/components/families/sidebar.json",
+      "gitBlob": "f4cc379f1b88481bdabc5fb04eac63f4919b2d96",
+      "sha256": "50a2bc32f953cff411859b5d4b80df80889c5ef917efd75e42bd490aac748b3f"
+    },
+    {
+      "path": "contracts/components/families/skeleton.json",
+      "gitBlob": "e9565a7059ffabf8eac79a847200d0f2479918cd",
+      "sha256": "e7fe12f1ffd3ae8c39447dcb023829f1aba759d6b1025904a9d1b9d6b7bcc491"
+    },
+    {
+      "path": "contracts/components/families/table.json",
+      "gitBlob": "d3d2b0532e1912001a9510ecbb3218b9a488773f",
+      "sha256": "fe9f94542e3f5bfe1663724404d70383fa194942028a1a5c2464b37aac639de3"
+    },
+    {
+      "path": "contracts/components/families/tabs.json",
+      "gitBlob": "00cfc70342101c3192880d20479be3e48e5e68be",
+      "sha256": "b276f844f1f41edb090801c53cdd9e5951e843a61eab99a288b7feb3a1d6208d"
+    },
+    {
+      "path": "contracts/components/families/textarea.json",
+      "gitBlob": "2df29a14bb2a0865a9cadfdb31e6608d5ead047f",
+      "sha256": "3d63c95aae21fbac95e08950f73b44ee2b7b4b336e7490bcc164b525c5bd0ca8"
+    },
+    {
+      "path": "contracts/components/families/tooltip.json",
+      "gitBlob": "b7a67693647988933f026ae0a119d51585cb478b",
+      "sha256": "166c94298f0e200f268b8d310acb976be3e59ae327ef583d572505d9365a47db"
+    },
+    {
+      "path": "contracts/components/index.json",
+      "gitBlob": "e0ebdf574cc2a24b4e8c9aa12831545bf9d28b67",
+      "sha256": "f0bfb4ef366531c3d3821734c48553a3193e5e8e8e04e7b6d18a5a701f7c6d80"
+    },
+    {
+      "path": "contracts/components/inherited-interface.schema.json",
+      "gitBlob": "513ed804321fa4828c5598830237afd47991f7da",
+      "sha256": "ab2176e3f086c8e5cb9e26d4d82be2a5f6c1567f2ccd6a99369a286f5a320289"
+    },
+    {
+      "path": "contracts/components/interfaces/html.a.json",
+      "gitBlob": "3d5a3b988ce66ea34b652648a92f883bded70cb2",
+      "sha256": "6bc42f3e112247122ebf9ff19cbd066948cd53cd828f5ed93f58ab60184f9490"
+    },
+    {
+      "path": "contracts/components/interfaces/html.button.json",
+      "gitBlob": "ef910ecf63a43607bc1d5f2887d6c2c80f263576",
+      "sha256": "3a4a5e6e5ccd7e90a0d150ffa09ad108e74e24b9a031c4c3eea40ebc07468297"
+    },
+    {
+      "path": "contracts/components/interfaces/html.caption.json",
+      "gitBlob": "3f63a47a909bee38b9ff71e30552367810cf5dd1",
+      "sha256": "1ee4b0dd68c41e50c958cfd3d0cf8ef7309380ef631b7f724f114eb3761f9a53"
+    },
+    {
+      "path": "contracts/components/interfaces/html.div.json",
+      "gitBlob": "8b6e2c5c509e398ec4fbe541291a5c9541b63bd0",
+      "sha256": "28e89891c9c9e42bca1537fdd0b54b1a000be30da95af5cf09a49bdac628eb4d"
+    },
+    {
+      "path": "contracts/components/interfaces/html.input.json",
+      "gitBlob": "758e4574fd42a6b4881921ad137182ceb443e3cf",
+      "sha256": "d19efc0ada267e09ef13137b3af8babcc7dbf0ab45a59200698e9e79a41c9fb0"
+    },
+    {
+      "path": "contracts/components/interfaces/html.li.json",
+      "gitBlob": "eeef74f448b5e029de77355ae4dbc2393492b990",
+      "sha256": "b0db45cec1a20c232d2e12f7a3959faba0d37170926afeb6e73aedb0de6808d9"
+    },
+    {
+      "path": "contracts/components/interfaces/html.main.json",
+      "gitBlob": "65897220616d5d05ead0c0c3e5f3699344e08394",
+      "sha256": "79b544abb9ee07dd5f7a096d5a9ec365e861d5d8961dadd4075d1b59c1b9314e"
+    },
+    {
+      "path": "contracts/components/interfaces/html.span.json",
+      "gitBlob": "bdbc0e9a36afeac1edd9e988a695b67691d2397c",
+      "sha256": "7d3b2ed159cae4de4fc9f8035ecbaf3527eb2708a79324d9c047ff7433f9b80d"
+    },
+    {
+      "path": "contracts/components/interfaces/html.table.json",
+      "gitBlob": "ac6a4ec023fa39ca901db240873b5d8d366bcd59",
+      "sha256": "f05476f7a808bb5e8579d0509c2e79fcef269ee1b93c43c94cdfea9efb085739"
+    },
+    {
+      "path": "contracts/components/interfaces/html.tbody.json",
+      "gitBlob": "09a9fbc44220dad11bde6c263dfe1225b261c490",
+      "sha256": "57d9636ceb86687c22ea3c8bf3396ffbf757e61805cf431ec33a60f675734d72"
+    },
+    {
+      "path": "contracts/components/interfaces/html.td.json",
+      "gitBlob": "41c9fda0e70652630450ea49f2bd682466b4de1c",
+      "sha256": "90b3f267b48ce2831fbbe6c8a32f1c0d7e7c9b40ca6c8b7c636eeb8bed3d1398"
+    },
+    {
+      "path": "contracts/components/interfaces/html.textarea.json",
+      "gitBlob": "f5af7b8bd391929b82914616c4c0707c278b2cf5",
+      "sha256": "e13bd03f1b58001614acca402d797bad83e0939aae0b400b08b6a130401ccc52"
+    },
+    {
+      "path": "contracts/components/interfaces/html.tfoot.json",
+      "gitBlob": "ccd7da63dc155ac5ec30bead5d99fad27f38ac72",
+      "sha256": "e2ab26585f48ce724ef4139b0baf40df0885cf21206b594c7ba77ecb7097cbc6"
+    },
+    {
+      "path": "contracts/components/interfaces/html.th.json",
+      "gitBlob": "8ae5a412e8747f050fa24adc084f6fb983d73507",
+      "sha256": "fdce3485cfa2da658673691d08a57fc5e9a13a53868a1d212761a7dd5ba56f87"
+    },
+    {
+      "path": "contracts/components/interfaces/html.thead.json",
+      "gitBlob": "4606fa934cbdda10dc5a56e5991186eb700bfc8c",
+      "sha256": "5dedd2fe0e2e5ccb3344038786d8a714b386aa76da2ad19d4f50056d80edf781"
+    },
+    {
+      "path": "contracts/components/interfaces/html.tr.json",
+      "gitBlob": "674013541396a04e11c9d7ca3e12ce4032e0facb",
+      "sha256": "35968b05aa8ee9a80bde95b22e2415ea521d3a073429de059288463ac686d523"
+    },
+    {
+      "path": "contracts/components/interfaces/html.ul.json",
+      "gitBlob": "2782844e3e4cd7694295147d011b9bfcb7c186c7",
+      "sha256": "cf3f81b30d87201ad33a9b4a4df1769ad13ed3fc425a7c19ebac79f853cc07d8"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.accordion.content.json",
+      "gitBlob": "dd8e24aaf33860dd57276b1a6be6c9bdbaed9801",
+      "sha256": "8938cfdcf0b2e1d413b3b989afc933497f7ac8a3ce176de59a9625445a7aa5bb"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.accordion.header.json",
+      "gitBlob": "abafcd0e90da7a6d06be43e123c0ba04e9c118f3",
+      "sha256": "543e577ad7c67ad875262e580ec42fdd7bcdd3ac0e3f97dbf99626cdcd209fd6"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.accordion.item.json",
+      "gitBlob": "cf540fa5dcd644364b382464146e6640e7826ba6",
+      "sha256": "01dd552a1772c760b3ebc935e52d93642af1a746997a51163b39d5bf0db0b592"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.accordion.root.json",
+      "gitBlob": "be0425407dfd306fb3e57b8797e33ec0548af000",
+      "sha256": "74737f3d4ffa19a9e0c51a91613f7ec58aea0dabf59961f8ec9df6a4fd9147c8"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.accordion.trigger.json",
+      "gitBlob": "eb7f94e9ec221255d4d4ccbfd78c7a20c8daf98a",
+      "sha256": "1230ffe4e0af56a880f21d7a774bd1d487acfbea3f4c191b0bd5b86220ed1d52"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.checkbox.indicator.json",
+      "gitBlob": "9dc9c6ffe15ee5bccad3193c5583eedb2985030f",
+      "sha256": "e1e8b0e7d9fa0069f5016496e491ed967f0d13d6beadb3bfbbf032a13ec18a43"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.checkbox.root.json",
+      "gitBlob": "72c1a804133753133bdca40e2ede60cab80b9f73",
+      "sha256": "3b4acad9fb4aaf3d4e28629e5a201e41f99e42f1cacad127e1b9f2bb2738d774"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.close.json",
+      "gitBlob": "5ad96879480e96c14998d09bd38792cde296f3d0",
+      "sha256": "5675a59266b85b16792d857f4f7454c72cbdd1bb835c0923e92e4dac016b2610"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.content.json",
+      "gitBlob": "dabb1faae0bd885fdb7d0a0b836a7d707b4999d2",
+      "sha256": "911ebcc989746221b3f687a8661c1065543d448f7f61e9d97e6c1a78244624e6"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.description.json",
+      "gitBlob": "c98bb1c565eec69b4965623c18ced016bd5285b7",
+      "sha256": "d2a8cb583eb1082ba94b2408cb66f0cf3e589f717dfb1bbe51df15481c7eaef7"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.overlay.json",
+      "gitBlob": "702feb631096f4094faf2bdb7a950f509f736a42",
+      "sha256": "fdccfc4f9e9d6273918c5ff30c9a0156ce6af47e041a3c7142f3f38137319a9b"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.portal.json",
+      "gitBlob": "bff7e6f7f4e1e2c8c2f2eb474c9da41d74063ed6",
+      "sha256": "e8902d4a98e304330b730cc795d3a1f5a0714315254d8f2afceb37a889e4fe32"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.root.json",
+      "gitBlob": "14d43b3f6008912f5f1e144c815d2e5cbe2c95a7",
+      "sha256": "342c5d562c95d9b3a7cd18de47ac3aaa0fe2dbb1e5e3b4b51a6b24649a9add38"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.title.json",
+      "gitBlob": "77604ed76678180bb3a5b6365a627dc2a97b8f1c",
+      "sha256": "e7e40fb689a65784736a808a36a911b15e0ada983b54710d9e90782ea4a469ff"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dialog.trigger.json",
+      "gitBlob": "921b6f061741a24166a70f87325a4dcb7e37a741",
+      "sha256": "b08a6e20dd0f8defce5d7c27f996cde529d3b69b93d45b90ca859ae5f85c5661"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.checkbox-item.json",
+      "gitBlob": "4721ef1eb6f492bde0ed46836be00896db5ea93c",
+      "sha256": "788f964df46a13285b76dfd022824db57b05629f1a8f5eb6cfe56b684653c0c3"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.content.json",
+      "gitBlob": "5df7075d32400275de5bf3faa094d0c5ecea9d2b",
+      "sha256": "c9a958c815965e1acd0a8b3af25409f851dea5f56ff94b6b52182397262e1274"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.group.json",
+      "gitBlob": "486d7fa2e41fa495f69ab12b9c9d96ba52d8c05d",
+      "sha256": "249c7efe80bdf35b98ae501c56839b86393a2f5fd960cf86b57fc3d8f63b4c6d"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.item.json",
+      "gitBlob": "db25092161f7f8873672451f994e293003184982",
+      "sha256": "14c4be2092f5eec56f4158b7ca80ff2cc5601caa23806b18380230fce70c0a7f"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.label.json",
+      "gitBlob": "9d635eadf78afbf43a0dc4ad37d4d128a4c27d1f",
+      "sha256": "a56bca7964f11ef127839ba779c18b9860b8130c14ebc902b1355d5510f26774"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.portal.json",
+      "gitBlob": "30a4836a259ab9ad7ca0e5120ecf33e90035e866",
+      "sha256": "728f249befa9b6175f9b160327abc8ff789d0d239ce98ddf8d28a4b83078cddf"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.radio-group.json",
+      "gitBlob": "b131a3ff295debe84b7b677bdc4637dc0d9ed2cd",
+      "sha256": "0c65d17f2eb13432304e3c23cfa0876b053d649180a2d31bbf1a75a36120e6d8"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.radio-item.json",
+      "gitBlob": "d7055eec1cf4a371c71cf2735f2145a6aa0d4fb9",
+      "sha256": "fe0949d5807c9e727638105b421dd1c3fc416f0b4fad33906de6bd091a22618b"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.root.json",
+      "gitBlob": "114d7f71ebb1375bbd62b6e347b06a1e1bf189dd",
+      "sha256": "82477a831cbb480b1ac38e01dc5bd9a050d05d63c6c6ae8d1f082857fcee89c7"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.separator.json",
+      "gitBlob": "529ea8a39b8f44d0b1dad192aa8df60ca44f2445",
+      "sha256": "6b92a0775bec0a96d70358da295386ad5a989a0c3d6dfa5ae76476621834ae2a"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.sub-content.json",
+      "gitBlob": "b362bcd104a0fc82ecb344775f4bbc5dc1ca090d",
+      "sha256": "8c20cb4e51ef848adc7f90286d292c9190cbe9f21aeb9d6bcba01d5235b9308b"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.sub-trigger.json",
+      "gitBlob": "19bfbed9fbd0fe5f8c7f65d1d0c34d1b7aaf565c",
+      "sha256": "b142a6233b61a41452eac602e9d3a437f2460d1f24e4293a4fc71312900603cc"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.sub.json",
+      "gitBlob": "d8203f749bb6b31239526a1969090ea465e3b895",
+      "sha256": "97bbb7f82741ab9376a8bd3fcf3e10b716269ae1790503702a7cd56ff858469d"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.dropdown-menu.trigger.json",
+      "gitBlob": "6cbd4c4a1d51df48bfa527d861ca3f975ba896ac",
+      "sha256": "e2954c1e399ad97964ef207dd1f27ab4f44e83d3a65420b66f2a883d2c1ecca4"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.label.root.json",
+      "gitBlob": "a44f57306e64c13cbe9dc73248af029fea4c274c",
+      "sha256": "82d5b0b52fb0db4229b826ddcd888fd22aca93ce3d5fbe12ed11d2b6216c76ed"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.scroll-area.corner.json",
+      "gitBlob": "b2dacaf9002ad7d21568a67b12bc13ead995a34c",
+      "sha256": "a08db111b8e4707a5c64934c109fc9ef26120847270118c621bc23d03e03a8cb"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.scroll-area.root.json",
+      "gitBlob": "f344af9a05ebef7b24e788a4cd416c6b1e405c0f",
+      "sha256": "43a89267021b2b6fcbbd41fc5169b224e5c6f9dedc2997b6e9f384964a41e0fc"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.scroll-area.scrollbar.json",
+      "gitBlob": "a6e1049d7a73b23de0d1847553400483c226a0f7",
+      "sha256": "e9e150246123a365f079f60a4c415360e33d77aa45edcd9e0d30347e3da5bdb7"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.scroll-area.thumb.json",
+      "gitBlob": "e840b3e89231fa02df991883fcce6597f690f54c",
+      "sha256": "ee3949448094b1218c2c3720b3dd7efbd5221f89384eb96be343b1096de2c32a"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.scroll-area.viewport.json",
+      "gitBlob": "c3534bcb01d1a04460cd72b5c313cff07e3b9be1",
+      "sha256": "a75c73b32b1df2d54050b9e7cabeaef54ef59a0801a3b18902668edc3d9daba3"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.content.json",
+      "gitBlob": "5972fb6e067b2f18e69c719e6bd58b09c0d7c05a",
+      "sha256": "bb119baeadf04021f7f6e38dbfa58350b7a51c717ed075b91ebcdec263ab8e08"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.group.json",
+      "gitBlob": "dbb130efedb60a003bc8194cfa4c650f781ba873",
+      "sha256": "52966b0f1fdf5d832278d6b29a6211f6898e8ef957fe1d3ce5970b7bad5c2af4"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.item-indicator.json",
+      "gitBlob": "d3f4b7837f2d20650f97d69d0545121ec2290059",
+      "sha256": "50f6e5b376f4ff4229a00f3bf6b5c92b493d19a67fee87db04f671748dcf1260"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.item-text.json",
+      "gitBlob": "c6a428126700bb9cb0442fbd31beba3ee1cdb4e3",
+      "sha256": "60cf8b034c7889af38c3903a9d647e92b2c2fafd045fd4556e4b3ec4a0fd4286"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.item.json",
+      "gitBlob": "addb12886df727afc55220fba7a529f7b673009d",
+      "sha256": "e77fee54952a9ab9962e154a3e1b3768d00086ebd421b8a8ec2f6e3dd65addb3"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.label.json",
+      "gitBlob": "4c8ba3625f33158f2aef46aa15ca8f18504d0afa",
+      "sha256": "1dc5b5365c51f368bf31766becc5f98c1ce5fdf86693210625e31c1cfd17b2fa"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.portal.json",
+      "gitBlob": "976367dcaf564121a328e5e958de5c904d72a0c7",
+      "sha256": "ab4397abf3340a0482bc78295a80c8442d6f9eac404b3740270cb39f25ab3c30"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.root.json",
+      "gitBlob": "9e8665e79e01f8661c308e7f4a675a38f53f7cdf",
+      "sha256": "4bc9f9e6c4a36762f4181038092ed4e4e9cf77a81c87fcf33220aa8901f1a5d8"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.scroll-down-button.json",
+      "gitBlob": "16d1e78490c114be384ad2148db8146c5ba2d040",
+      "sha256": "020f2e0346e6b4dd06de05d7d06dc12390103e0916c956070c253f199473cc56"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.scroll-up-button.json",
+      "gitBlob": "2cf01dd7d734a02f7c6aa789bc3139af7cebbb6d",
+      "sha256": "f76469713d0c533d1d8ea8c356f01df334d376b6e02dc16c86516315de5214b8"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.separator.json",
+      "gitBlob": "17e238c8ac51f023ef572acc3efb1b773fbf1a52",
+      "sha256": "4772127cd805241e33e27120de950a8c76860c2502d97fcf80a552e374a4829c"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.trigger.json",
+      "gitBlob": "b9cad4023e37725a73823c8e2b852540e566dd83",
+      "sha256": "1b9926374936fa48333552ee8c79afd454b1acd48b8f7a29f934fc77e5726706"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.value.json",
+      "gitBlob": "14921768381f6e4f602e34f12ddc1cf95bb7e7f5",
+      "sha256": "7fa5aab273124dae3fa674ce5c6f91b5b8c30e706eac47dd1709fb625639e6b5"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.select.viewport.json",
+      "gitBlob": "9d72e59de12c8da7adfb03be590351916ef5de0c",
+      "sha256": "2379945afbd464e86f3e57ff43c03c3154f5d77d46adee9c9dca975884a2d504"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.separator.root.json",
+      "gitBlob": "e020a6638fc96da9499678910bbfa814d927c77a",
+      "sha256": "0f64d8827f580df011e0b4e4abd44b02b9545e20a497e3fb50dff303d890336c"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tabs.content.json",
+      "gitBlob": "bc146ee8a14d8947f621c5009384a2ade6a228fd",
+      "sha256": "f1dbd4f8d564f7a0d544b91d152d0d624b66814a7528729dcc98a54298e998f0"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tabs.list.json",
+      "gitBlob": "077657ee83c4b496fb1e08169dac471891230068",
+      "sha256": "e3ad5467881993ea25bbe83bc98e30ff0079b1c5744cdbd18bcd7c46f3c6beca"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tabs.root.json",
+      "gitBlob": "51045eec9f0414016ddd952c5b51974977f6b9da",
+      "sha256": "2887736ca1028b4a136ebef88a62c28e216ab08de3f58c6280a914e5e31bb067"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tabs.trigger.json",
+      "gitBlob": "55c3de7aceb89bdce7903d937d0e6bab6560490d",
+      "sha256": "769626c44a60e24c11e41700029da1450f5d325b7edf87c01d1c14c645db5ad9"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tooltip.arrow.json",
+      "gitBlob": "9b1dfe5b669cfbb96b0fc542fa4c11899b8ddcb7",
+      "sha256": "96f25166c8432b05b5d76f4ac5282044edd8ca6df7cbfa3175856cff4466f6cf"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tooltip.content.json",
+      "gitBlob": "0c4f39bb01fddcea5def18447851ed2c2e1b8f36",
+      "sha256": "78aaa2341db5fc9731593d59d20440c2d6a9534a2fbdfb51065962ff98422a49"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tooltip.portal.json",
+      "gitBlob": "9f6dbbfcb56ff08764438e168b5ad09465c0598d",
+      "sha256": "79135fa8623d55f95b69b086f18e0f4e64cf7a9dc503ada4ae2cafbe23a6c881"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tooltip.provider.json",
+      "gitBlob": "88d9a4cff4f2b089f0d5c73f87ab75ff65e1294a",
+      "sha256": "d3fda62fb9f47d73011962e0edc09b5761c212945354fa998bfdb2ca1f315930"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tooltip.root.json",
+      "gitBlob": "0d189a683d6cd702a0655b0beb49874edfe23b9b",
+      "sha256": "a37ba23e336df41517a50b224cb8e408e9528084db3f8793da65353c2a478435"
+    },
+    {
+      "path": "contracts/components/interfaces/radix.tooltip.trigger.json",
+      "gitBlob": "d25de19d1eb941cff7db05e7a87b78e735443f5c",
+      "sha256": "5e14a644db3fca689e17b3eb8757be3ce71eac2a478255eee05bf245277cd0c4"
+    },
+    {
+      "path": "contracts/tokens/index.json",
+      "gitBlob": "32a6d1f3762c91bcef0c6783ca076d8684a85614",
+      "sha256": "0f4573061a065009a3e6295347c0196ebac3e28bcd6bf55880346beb99406612"
+    },
+    {
+      "path": "contracts/tokens/token-contract.json",
+      "gitBlob": "ce317330e888d3b1561bb45fafc4aed6a571cbf8",
+      "sha256": "68093f3c618e8b3d729c3642ba5786b1ad45da76eb22f94fb3e196acbf30cdd9"
+    },
+    {
+      "path": "contracts/tokens/token-contract.schema.json",
+      "gitBlob": "f5e09a6f4469acb47faa2002364b59c59270926f",
+      "sha256": "4a227706a5b8f18a6b7fb556cc6ff386cb0229e3126d6998a1a315a3f22ceb95"
+    },
+    {
+      "path": "node_modules/@fontsource-variable/geist/files/geist-cyrillic-ext-wght-normal.woff2",
+      "gitBlob": null,
+      "sha256": "2317fa4bb293c9c0b110e18315d529235c47a0ddd3338cea3d8c7955e927899e"
+    },
+    {
+      "path": "node_modules/@fontsource-variable/geist/files/geist-cyrillic-wght-normal.woff2",
+      "gitBlob": null,
+      "sha256": "6894439694946a589d157ece003086960a6a4013d74a813dab7602efdb3d8c09"
+    },
+    {
+      "path": "node_modules/@fontsource-variable/geist/files/geist-latin-ext-wght-normal.woff2",
+      "gitBlob": null,
+      "sha256": "824f485b5d26e2f2da3c2b236132ece1bc8e4e43373452950bb0e40548b4313f"
+    },
+    {
+      "path": "node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2",
+      "gitBlob": null,
+      "sha256": "19f9c92546aa300c312235e3125af1b81394d8db9a4bc4a425cd5b641d2d54e1"
+    },
+    {
+      "path": "node_modules/@fontsource-variable/geist/files/geist-vietnamese-wght-normal.woff2",
+      "gitBlob": null,
+      "sha256": "8fa40e5d248247735eb97a0bd593b8852440430600d6ba01364c31fe0abc1fe1"
+    },
+    {
+      "path": "node_modules/@fontsource-variable/geist/index.css",
+      "gitBlob": null,
+      "sha256": "97fe28a6688629d5a016347a47282efabffc85e5dd49bd953217d048e47c6872"
+    },
+    {
+      "path": "node_modules/@fontsource-variable/geist/package.json",
+      "gitBlob": null,
+      "sha256": "a620c612704c6fd5f37d28d987ec545300264261154403d62d913815d5ce228d"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-accordion/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "f60d8ad8a1015f2f813f665d3a6164d4af8f4ebdd896d067506a21b1c0f57c66"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-checkbox/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "2c57db2bf2dbd9e8ef4853be7257d62a1cb72845f7b976bb4ee827d362675f96"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-dialog/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "2059b04988eece7f6e992a5c218e9c5361b8fed24cb04caddb7e1cb4339e236b"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-dropdown-menu/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "26e6c521a290630ea31f0205a46a87cab35faac96e2b30606f37bae7bcda4f9d"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-label/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "71acd198e19fa38447a3cbc5c33f2f5a719d933fccf314aaff0e8b0593271324"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-scroll-area/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "99d1a601593495371e798da1850b52877bf63d0678f15722d5f048e404f002e4"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-select/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "a0fa43b27364a340ea7639ff5fdffbcd375ecf49e6ed5df3eec73b3d74a84d58"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-separator/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "9c580c6eae94f8c9a38373566e59d5c3282dc194aa266b23a50686fe10560159"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-tabs/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "7a14bf21ae8a29d64c42173c08f026928daf418bed1b97b37ac4bb2aa197b89b"
+    },
+    {
+      "path": "node_modules/@radix-ui/react-tooltip/dist/index.d.ts",
+      "gitBlob": null,
+      "sha256": "233267a4a036c64aee95f66a0d31e3e0ef048cccc57dd66f9cf87582b38691e4"
+    },
+    {
+      "path": "node_modules/@types/react/index.d.ts",
+      "gitBlob": null,
+      "sha256": "8ca4709dbd22a34bcc1ebf93e1877645bdb02ebd3f3d9a211a299a8db2ee4ba1"
+    },
+    {
+      "path": "node_modules/shadcn/dist/tailwind.css",
+      "gitBlob": null,
+      "sha256": "bc7d83425702955b4cb67cb14ede9d603f9d912376d57a2d81d661094d2a782a"
+    },
+    {
+      "path": "node_modules/shadcn/package.json",
+      "gitBlob": null,
+      "sha256": "1059a7d83fea2b3a40622b3a235c6be0d78e6c378a5aba16e3f46c8696204521"
+    },
+    {
+      "path": "node_modules/tailwindcss/dist/chunk-5JIJA4QV.mjs",
+      "gitBlob": null,
+      "sha256": "c24e6bf22af878f559ed55bf81c6023d0413abd0e7854286944088cb44473149"
+    },
+    {
+      "path": "node_modules/tailwindcss/dist/chunk-C2OYBFIH.mjs",
+      "gitBlob": null,
+      "sha256": "4b15bfa07f438749d3512e4e0decfa2acdb4c3268e3293853af51bdf1b0535f4"
+    },
+    {
+      "path": "node_modules/tailwindcss/dist/chunk-DCG7AFIE.mjs",
+      "gitBlob": null,
+      "sha256": "b162bd2089f644e13bbd7138a5efe678f837b55e513b51bc9ed0002d64ddd85b"
+    },
+    {
+      "path": "node_modules/tailwindcss/dist/lib.mjs",
+      "gitBlob": null,
+      "sha256": "8ebfd51c44d6cca0ef675007e97e6aa918944df2b662c2d7bfa50fdfaa98bb64"
+    },
+    {
+      "path": "node_modules/tailwindcss/index.css",
+      "gitBlob": null,
+      "sha256": "175f88737ecb7e033059eac4a3b22a3b5f971d5a05d9fd50811610a0714633b2"
+    },
+    {
+      "path": "node_modules/tailwindcss/package.json",
+      "gitBlob": null,
+      "sha256": "3dc86b46c511947ca00838aa3f1776243abe923ac347c092e60a0cbc7ae68559"
+    },
+    {
+      "path": "node_modules/tailwindcss/theme.css",
+      "gitBlob": null,
+      "sha256": "443d7af364200f8ec8352dc78e39485a118a1840d498c97967bf0ae402b39167"
+    },
+    {
+      "path": "node_modules/tw-animate-css/dist/tw-animate.css",
+      "gitBlob": null,
+      "sha256": "6035b41301945cd65eb233b4653965e3c235338faae51b0f55676d591daaef23"
+    },
+    {
+      "path": "node_modules/tw-animate-css/package.json",
+      "gitBlob": null,
+      "sha256": "66849c41b809ccca55c6484bf102044c73847b21a7d3bc3fd95df133c0a578e1"
+    },
+    {
+      "path": "package-lock.json",
+      "gitBlob": "08bb7960eb4d0719f7099b5a62f415f8e682100c",
+      "sha256": "4e55ff90a39bc9bb04cba1d2b57c48a62549d872c8369cce36be814bed0d2793"
+    },
+    {
+      "path": "package.json",
+      "gitBlob": "2a14cd620d1c8f70fae02dc5b7cd29387be4833d",
+      "sha256": "c39cfb48c7e8adad0220be76ef84c0bd4fd626e75cf9d94dd020b3023c28493b"
+    },
+    {
+      "path": "provenance/baseline.json",
+      "gitBlob": "b748a148c1a70d3ce87e3d6c4977294b3f5d7033",
+      "sha256": "e085b9df5b216c6ebd4db09fb2b0e4aac2f64f7854a75e4f192a1ebf32c2dede"
+    },
+    {
+      "path": "provenance/component-contract-source.json",
+      "gitBlob": "7e178534601c60cde42d8b160541a9bc301dc1ce",
+      "sha256": "11ed9edc9f72573112b245b2e7f45b45c93dcfa455139336863386bcc43b5032"
+    },
+    {
+      "path": "provenance/seed-components.json",
+      "gitBlob": "3e8eede2b023cca687363dcb9ad318c7d5163599",
+      "sha256": "789cd7bfac959dfe69498f39704f6ad0b964caedb30fcd226c989fe346b8d964"
+    },
+    {
+      "path": "provenance/token-contract-source.json",
+      "gitBlob": "b3e48033d1303f2b96b00de367814eca92226c1d",
+      "sha256": "80ab4746193b6360c97d44b5390356df109fcd4ad8d78021ac589408f4a64de0"
+    },
+    {
+      "path": "provenance/token-source.json",
+      "gitBlob": "d145e1747d99a51b66752b1ce9245fb12b157f8a",
+      "sha256": "7e82dc6c698038aa3a02419d3195c0a89a98b9ee03701304fa1b68322a047765"
+    },
+    {
+      "path": "provenance/upstream.json",
+      "gitBlob": "27b2831b6c8a8e9404ab5952838a7599ce303b7e",
+      "sha256": "9e2d330f47ca2ea9d1d5df191487d8d557e7e8222beb9fa01f465980a1e7fe8c"
+    },
+    {
+      "path": "scripts/build-input-guard.mjs",
+      "gitBlob": "521e23462da919f77bb88de4e816209bf4316a65",
+      "sha256": "efe737ea07d5ba50cfa769b1d40837650b9c8e8da4fe67029c20e73d8ac120fe"
+    },
+    {
+      "path": "scripts/build-library.mjs",
+      "gitBlob": "8130ce11af170e5c87a8055554cab60a123894cb",
+      "sha256": "c9976d994e7ec5e2052c76ec765527fc5796109651e613a5d07167f42900dc78"
+    },
+    {
+      "path": "scripts/css-inputs.ts",
+      "gitBlob": "e8365813d29aa93962fa5fc575555c65227265ec",
+      "sha256": "302ecb12615c4a6ad7ec5016635234a3b49e52e036c5690ad43f5df65fd1711e"
+    },
+    {
+      "path": "scripts/distribution-identity.ts",
+      "gitBlob": "41ddbde7a767dc717138b405c0b0552aa8ef4627",
+      "sha256": "353a618152f0c442a35f3a43ace3e77d373e8826ced812cd54c54da588570a0a"
+    },
+    {
+      "path": "scripts/generate-executable-release.ts",
+      "gitBlob": "1b1919fa39942adcff008381b7c32b7ecf24444a",
+      "sha256": "6f8c9120c2b1c7cfb2e31d7f8489b388c0a76c0e6c4f55eac02125c6a19ea9a1"
+    },
+    {
+      "path": "scripts/library-data.ts",
+      "gitBlob": "de0fc6ca1dc4126fe280c327dc1052b0ddb1a286",
+      "sha256": "93a44c116ce45ea78c6f62a8a4d20ecf502d4b11db44c3f99a34d27694f38833"
+    },
+    {
+      "path": "scripts/library-licenses.ts",
+      "gitBlob": "b78fb52a4ea07552784c0a4312dc0c1627176d3e",
+      "sha256": "d08395f2e0034e566f154e5c748623c97a489f64b493db30f579e3366f70e5f8"
+    },
+    {
+      "path": "scripts/package-candidate.mjs",
+      "gitBlob": "27902ff852265f57e90e1ea6806372b442edd961",
+      "sha256": "14bd36c3e0c497953565b736f16c6843b41c62908db1fb8a36aed54d9c58b035"
+    },
+    {
+      "path": "scripts/release-inputs.ts",
+      "gitBlob": "20e476c25d9745715c9cc1abbe9ccc3ec5039944",
+      "sha256": "37763ba7cc286c616f984cb3d9862d1c3ceba95e71482c7ea6cfd1c149154cc4"
+    },
+    {
+      "path": "scripts/run-release-generation.mjs",
+      "gitBlob": "99e08166afce2a97b4ae95d6091f74af4a87732b",
+      "sha256": "e89fd8caf5c01def904c3217e66071f23c7944d30de0e3cf89d669cf0ddd0003"
+    },
+    {
+      "path": "src/components/ui/accordion.tsx",
+      "gitBlob": "c02677242e0b1dc17285c0554868e0553a530666",
+      "sha256": "6e28317b07fca5e5944f82fb1468997e2b55aceea28f33664a7d6b9d18efa88a"
+    },
+    {
+      "path": "src/components/ui/badge.tsx",
+      "gitBlob": "5428b137d2d275b7cf801ced6e45f8b3a26e5ab9",
+      "sha256": "917cfa85c0190e0e2fe8ccc8909436edbd6d14aff1f7707c3ee35073b5e8d8cf"
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "gitBlob": "caf37b313a7688b22189fc681d04920ae877601b",
+      "sha256": "7b35cf50a1e9add212bfd96fb3644caf33639847c1b87372f49b08aae02829a6"
+    },
+    {
+      "path": "src/components/ui/card.tsx",
+      "gitBlob": "eba8433e5f48f2bba4a4a45866c6fb505470274c",
+      "sha256": "f9a6d37fd40aa34f9ec5b2bc01fb1cd6ef7cc7e87cee4ce8e969cf84a3851c82"
+    },
+    {
+      "path": "src/components/ui/checkbox.tsx",
+      "gitBlob": "8f27ed4f7788845a88fd6961e684b9806f944387",
+      "sha256": "96ef6fa1b8825547f49e1fab2ae0a66754b821c8c21d9b6930ed9161dfdbc33c"
+    },
+    {
+      "path": "src/components/ui/dialog.tsx",
+      "gitBlob": "8b9c275722af0717e9bbb005df13ed9831717538",
+      "sha256": "ab4791a085a429757e10bf3d9e7c72041ff0742590ca03c0c7b6b0883c11d9b3"
+    },
+    {
+      "path": "src/components/ui/dropdown-menu.tsx",
+      "gitBlob": "0f9e680f16fadefcb54b0b84427861379e8817d6",
+      "sha256": "4632c3febfb3552e1e4c222298f7ae67641d14ac7649cb53e6457539d8213c60"
+    },
+    {
+      "path": "src/components/ui/input.tsx",
+      "gitBlob": "b136f1b9dd57c87fa67a09c4f7170702586cc325",
+      "sha256": "da24b5f44ccdd7577a6ce9f61d30f73d07ab6febb7bbfe51eaf5da14f635c9f2"
+    },
+    {
+      "path": "src/components/ui/label.tsx",
+      "gitBlob": "aff6008cd7073fe0093a50a5efe31593d43ba85d",
+      "sha256": "28b6aa1e4b2b46966f838fc8b2c18206841c5149e29fb7ea2385a62632dc1468"
+    },
+    {
+      "path": "src/components/ui/scroll-area.tsx",
+      "gitBlob": "a985bb3d696610aa61b0f27cb179af28be24302f",
+      "sha256": "2f1cd179f1f8446df073df348a0129e3b69dc2335d1682a4b5812af4fe4d48fe"
+    },
+    {
+      "path": "src/components/ui/select.tsx",
+      "gitBlob": "a18203c391b82e6c74cb9965e3ad850cd4543b25",
+      "sha256": "f35034203e56bdf50dc441cad943ab46280cf1ea8cdef9f621e4e3211df8e18f"
+    },
+    {
+      "path": "src/components/ui/separator.tsx",
+      "gitBlob": "ca11501513c539f3bba6d6dd28332e9acfd6eef6",
+      "sha256": "28e6fd5832396247a84bd8a27e57e1c9aa967efca0ec27055b08b1cb3de744bf"
+    },
+    {
+      "path": "src/components/ui/sheet.tsx",
+      "gitBlob": "c3d3afa31f063f1f46dceb1bc61c67477d52455d",
+      "sha256": "e38ccf713ede1d15ef1d636a15aa0f5fc4b4f89bc1c5663e64657f042923ce03"
+    },
+    {
+      "path": "src/components/ui/sidebar.tsx",
+      "gitBlob": "8e7f876e56f80fff979b9aab8fc7b201bd779a09",
+      "sha256": "ae55c482674efe371db44fee2dc8823fe3e037db08dc34d77e270cff6d34808d"
+    },
+    {
+      "path": "src/components/ui/skeleton.tsx",
+      "gitBlob": "6973ca2767016afa60964bba606f5c4df266aa55",
+      "sha256": "2ea6ab52aee7899072441760046b7b743ca6c0ddad112073eef1068cb75ee72f"
+    },
+    {
+      "path": "src/components/ui/table.tsx",
+      "gitBlob": "0d8a7c8801cc49dc40196330b9f3aa05f0a1614a",
+      "sha256": "e88b25ed436b3f302bc06f60df898b7dc1ac58ddc1a5f7e0dbe860f67b056808"
+    },
+    {
+      "path": "src/components/ui/tabs.tsx",
+      "gitBlob": "89cd04299cbfcde5693105c2cfcff6e6aa178cd4",
+      "sha256": "a3c2f5456d2f524ed9d9f09cfcaf3cd382b9d2ca79bb5982a67c6ad414fef87b"
+    },
+    {
+      "path": "src/components/ui/textarea.tsx",
+      "gitBlob": "fbba18bddf871f5658d6081edfb11fa4c0ac48f7",
+      "sha256": "afcae7919303f1fa777c27b63d5464944e95d24af6e094b38ad85839875283b7"
+    },
+    {
+      "path": "src/components/ui/tooltip.tsx",
+      "gitBlob": "a628cee5b006b12c153b5fa21f80d4ea8a9fb286",
+      "sha256": "51c404df20f7ebc99a06a6c6c83916ec3df60bb72a4081130a67f1c46b5aa830"
+    },
+    {
+      "path": "src/contracts/components/canonical-interface-member-authority.ts",
+      "gitBlob": "4a98f44b762b2c83c970385acd294b6ce74cb4bd",
+      "sha256": "d4e40197ed1e323073c84d4d915a12d7da415e9fc99e112771fde583140aad77"
+    },
+    {
+      "path": "src/contracts/components/canonical-loader.ts",
+      "gitBlob": "dd25a79c2b623e1cdf8b6aed8209fa082113d9d9",
+      "sha256": "7cd649ebbebad0329725c5d07de96754cf978ce2918b881a4ec7a4cac3e85f72"
+    },
+    {
+      "path": "src/contracts/components/canonical-render-source-conventions.ts",
+      "gitBlob": "c91b9225b8625a59ea777d46401b87b4da903f97",
+      "sha256": "276c7ac055d726a9d2989d748b068f13e863ad82f3840a1607dbe6f231452416"
+    },
+    {
+      "path": "src/contracts/components/canonical-slot-source-analysis.ts",
+      "gitBlob": "a8f4667ff0a33306c9e7d9b99a848f8096875e97",
+      "sha256": "a9e3644e5d6fc867f6bb2be2c9c98c5b4a58a64aae339d6d88ab10a9b3b40dcd"
+    },
+    {
+      "path": "src/contracts/components/canonical-source-reconciliation.ts",
+      "gitBlob": "00d087585211c1a6a9e67380c395648a614caf6c",
+      "sha256": "b607750f306d748519e4bc3bbe101c3130e70e0b798edea46bc889ef63423bbb"
+    },
+    {
+      "path": "src/contracts/components/canonical-token-source-analysis.ts",
+      "gitBlob": "8deb739b689b99a4d98f9deb3886ad26f00a39f7",
+      "sha256": "54be6e6d0257bb9a1d89d3b694c064cf432a870e97f7d118181694a1299a9218"
+    },
+    {
+      "path": "src/contracts/components/delegated-host-source-analysis.ts",
+      "gitBlob": "cf35192bac6532dd03b5f8659776e9b7f175a885",
+      "sha256": "92576021f8516be4b708927904c473e440272a984c07e40a4082fc1dd59f9b93"
+    },
+    {
+      "path": "src/contracts/components/inherited-interface-source-analysis.ts",
+      "gitBlob": "c06e0a18aa754493a5353a6c2294f462e8dcda41",
+      "sha256": "bf550feb73d1323ceae3c5fa8e3b83cb3e0e69349737c2ef4e59cbdfb63243f9"
+    },
+    {
+      "path": "src/contracts/components/invariants.ts",
+      "gitBlob": "c5f8c045c45f3ac7ef30fc823b8c31a079bc6e67",
+      "sha256": "94bc3fd8e9aa8e0185677f576d54f07ae6070ca94194b808fb73c38089e472e1"
+    },
+    {
+      "path": "src/contracts/components/loader.ts",
+      "gitBlob": "eeacb775bfc494269ce50fad1f61925be0f94979",
+      "sha256": "cb78f0e189158a4cda7a09522ca88cd0696963ce28d015a5f8f55e9b0bb54f63"
+    },
+    {
+      "path": "src/contracts/components/render-source-analysis.ts",
+      "gitBlob": "01f68991985dc17bcfa1f77fa33a73156721a993",
+      "sha256": "e3f1e4ac871a4a807937b7d1cb90c32f58459c958d02d36f1d52d0029eae9bf5"
+    },
+    {
+      "path": "src/contracts/components/source-reconciliation.ts",
+      "gitBlob": "e9a9fbc010e51dc2c573d2425c3ddd59b1158d50",
+      "sha256": "165b144ebf307e52c7335806582241aaa71a5aa72c10d245b96cbb1b395f4194"
+    },
+    {
+      "path": "src/contracts/components/token-source-analysis.ts",
+      "gitBlob": "ac2e14e30b85ac35a8e97569af0a56180d4fc721",
+      "sha256": "080153b2e6e67c6a61d8aad47f86740ec77aa6ec660e5f7a0ff306b1ba7d68fa"
+    },
+    {
+      "path": "src/contracts/components/types.ts",
+      "gitBlob": "1d366cb40a75c0b338883123baf12237044b6265",
+      "sha256": "89a3d65cd473e6a7e2f4d8a003f4eca7a1ead5bbaf3b3820c7b787ffc569e8c0"
+    },
+    {
+      "path": "src/contracts/tokens/contract.ts",
+      "gitBlob": "f9838a95d78530c48433d6a92e43498785473279",
+      "sha256": "4a2828907db3eba6062fc7cb7b98be51a0755995d403d2823d1b972b9464f117"
+    },
+    {
+      "path": "src/contracts/tokens/invariants.ts",
+      "gitBlob": "95585ed6a95a3416c1e06ee276b5ccf6720768ef",
+      "sha256": "c898ac40eef30db0a2a620e9c57d65f22e9566a99e052d1eb1d117bca49b11b8"
+    },
+    {
+      "path": "src/contracts/tokens/types.ts",
+      "gitBlob": "257edd45f106d7ba9abf03d72d8da002dbb84c7a",
+      "sha256": "12e47e52b3ba1e64d3a3255722c1bf4e5e3b91d0356ce2c79e337f8562b48fc8"
+    },
+    {
+      "path": "src/hooks/use-mobile.ts",
+      "gitBlob": "2b0fe1dfef3b17850bbac040665f514a8ffd0f15",
+      "sha256": "ad0936f84f1df79d3697bfbff9c18f8ad58431c1cbaf2359c6a853b0fcc9f28b"
+    },
+    {
+      "path": "src/index.css",
+      "gitBlob": "d8c0cfe33f88e04af7aea72c952abee5903d836e",
+      "sha256": "90e509d5cca49455040d0cfd8a65fba17dffe8d0964e4fa52602da28c4337e4b"
+    },
+    {
+      "path": "src/lib/utils.ts",
+      "gitBlob": "bd0c391ddd1088e9067844c48835bf4abcd61783",
+      "sha256": "7c8c3dfc0cdd370d44932828eb067ef771c8fe7996693221d5d4b90af6d54f2d"
+    },
+    {
+      "path": "src/package/index.ts",
+      "gitBlob": "76b7da12b7918d37a99c75c596cb5df06214fabb",
+      "sha256": "c5c8475c8129b082241a5f3d78151a5bff67b8d4af8b1ee3eae4dc692d135ebf"
+    },
+    {
+      "path": "src/package/release.ts",
+      "gitBlob": "88b92c69129742428a062682212138744515076f",
+      "sha256": "3532f906890e7e668a02da79dbf03d6dcc27bb8cc2330a8fa77fd58c6070f2e2"
+    },
+    {
+      "path": "src/package/virtual-data.d.ts",
+      "gitBlob": "5891f7289a1d4c56e1b0449eb055c034308a918a",
+      "sha256": "d42a5d9135377f2319ae80101a1d7cc09503a0f4dbf1fadf4bd36b127cfcfada"
+    },
+    {
+      "path": "src/validator/canonical-release.ts",
+      "gitBlob": "abee7b3cbe9bca4a109adfcac51cc8449d97976c",
+      "sha256": "bcd95c6227c5663144596579deeff796f60e1bfd3933237858affb7909403230"
+    },
+    {
+      "path": "src/validator/errors.ts",
+      "gitBlob": "ade5098e77e2c227cd1ede516b468f385f51c825",
+      "sha256": "ff49a1a97bfe370fdb367e5aa91cae7faebd165421b48d9b264469b186ffae38"
+    },
+    {
+      "path": "src/validator/projection.ts",
+      "gitBlob": "94d5da53990979b54c8a38765a2f94e4992c9013",
+      "sha256": "a0539077b415d2c26d188559551e8d4d55d7942bd787de9b9e60b27d9b6860b6"
+    },
+    {
+      "path": "src/validator/release.ts",
+      "gitBlob": "332b23f2534a0923a4cc7f80acc07000ab778793",
+      "sha256": "aee904f890531004912f02fda9b69d716174077742df0e18e423fff63ada43de"
+    },
+    {
+      "path": "src/validator/types.ts",
+      "gitBlob": "a847e5830858279857547ab83ad293fd5d129a9d",
+      "sha256": "1182bdb5b5f22b207f8f8bfc5341da1d3b5c02f4c3a97979477ae66774f6ffb7"
+    },
+    {
+      "path": "src/validator/validate.ts",
+      "gitBlob": "d54757d2b0cbedd0c8aa9d30caf15b449f5c42b2",
+      "sha256": "46922ec397cee7ade5dfed5b38ea53c079458597a402033969f3524e215ae418"
+    },
+    {
+      "path": "tsconfig.json",
+      "gitBlob": "83a38cf089706fb34cfa67672de8e7332ec24345",
+      "sha256": "18e8be10031f870881896439fcdc372cdb19cf70fa156d490e13c0ed8ca87673"
+    },
+    {
+      "path": "tsconfig.library.json",
+      "gitBlob": "98501bd31db00b5fad8b9d1b9577a677845e9925",
+      "sha256": "bae9362a7a218a516018d2b3aa784705ffe6cd00649509cd950d149db5acf7c7"
+    },
+    {
+      "path": "vite.library.config.ts",
+      "gitBlob": "4b4f643c9364a0f1290f49fa34006544cfeb370e",
+      "sha256": "9f16a3dd7ca0c5cd7f6cb46df30eff33e7561e84e382efbbb5680ed78256c2aa"
+    }
+  ],
   "releaseId": "shadcn-radix-release-001",
   "projectionSchemaVersion": 1,
   "componentContractSetId": "shadcn-radix-component-contracts-001",
@@ -3215,6 +4258,17 @@
               }
             },
             {
+              "tokenId": "color.background",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ],
+              "when": {
+                "propName": "variant",
+                "equals": "destructive"
+              }
+            },
+            {
               "tokenId": "color.border",
               "evidenceRefs": [
                 "source",
@@ -6049,7 +7103,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source"
               ]
@@ -6219,6 +7273,17 @@
             },
             {
               "tokenId": "color.destructive",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ],
+              "when": {
+                "propName": "variant",
+                "equals": "destructive"
+              }
+            },
+            {
+              "tokenId": "color.background",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -14560,6 +15625,22 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[size=sm]/card"
+                ]
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 3
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -19802,6 +20883,22 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[size=sm]/card"
+                ]
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 3
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -22424,6 +23521,22 @@
               "viaDerivedRule": {
                 "id": "spacing.multiplier",
                 "multiplier": 4
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[size=sm]/card"
+                ]
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 3
               },
               "evidenceRefs": [
                 "source",
@@ -25055,6 +26168,18 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "font-size.sm",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[size=sm]/card"
+                ]
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -25981,7 +27106,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source",
                 "declaration"
@@ -27028,6 +28153,17 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -1
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -27413,7 +28549,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source",
                 "declaration"
@@ -33968,6 +35104,17 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -1
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -37483,7 +38630,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source",
                 "declaration"
@@ -40164,6 +41311,22 @@
             },
             {
               "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[collapsible=offcanvas]"
+                ]
+              },
               "viaDerivedRule": {
                 "id": "spacing.multiplier",
                 "multiplier": 0
@@ -50781,6 +51944,31 @@
           "tokenDependencies": [
             {
               "tokenId": "radius.md",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.ring",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -2
+              },
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -69578,7 +70766,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source"
               ]
@@ -69632,6 +70820,31 @@
             },
             {
               "tokenId": "color.sidebar-accent-foreground",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.ring",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -2
+              },
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -75003,7 +76216,7 @@
               "childRequires": [
                 "multiple children require a Radix Slottable that resolves to one React element"
               ],
-              "refForwarding": "unresolved",
+              "refForwarding": "supported",
               "evidenceRefs": [
                 "source"
               ]
@@ -75192,6 +76405,13 @@
                 "propName": "size",
                 "equals": "lg"
               },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.ring",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -85950,6 +87170,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "color.ring",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -93950,7 +95177,95 @@
               ]
             },
             {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[side=right]"
+                ]
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
               "tokenId": "color.sidebar",
+              "sourceContext": {
+                "applicability": [
+                  "hover",
+                  "group-data-[collapsible=offcanvas]"
+                ]
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[side=left]"
+                ]
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -4
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "[[data-side=left][data-collapsible=offcanvas]_&]"
+                ]
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -2
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "[[data-side=right][data-collapsible=offcanvas]_&]"
+                ]
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -2
+              },
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -123186,7 +124501,19 @@
             "provides": [],
             "hardConstraints": []
           },
-          "tokenDependencies": [],
+          "tokenDependencies": [
+            {
+              "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 2
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            }
+          ],
           "unresolved": []
         },
         "unresolved": []
@@ -123419,6 +124746,120 @@
             },
             {
               "tokenId": "shadow.sm",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.foreground",
+              "sourceContext": {
+                "applicability": [],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[orientation=horizontal]/tabs"
+                ],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[orientation=horizontal]/tabs"
+                ],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0.5
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[orientation=vertical]/tabs"
+                ],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[orientation=vertical]/tabs"
+                ],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0.5
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[orientation=vertical]/tabs"
+                ],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": -1
+              },
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -126649,8 +128090,7 @@
         "baseTokenId": "spacing.unit",
         "parameter": {
           "name": "multiplier",
-          "type": "number",
-          "minimum": 0
+          "type": "number"
         }
       }
     ],
@@ -126666,5 +128106,5 @@
       "sidebar.context"
     ]
   },
-  "sha256": "e403fa46ccf35744029582371cf8838a1a9d9b5f3c0b906b48052743dacf3547"
+  "sha256": "97eb857c7de37fbb88793f7f28cc3a684e2f644b30c51867b471e842d0d86697"
 }

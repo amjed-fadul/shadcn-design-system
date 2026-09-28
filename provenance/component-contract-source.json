@@ -5,35 +5,54 @@
   },
   "familySource": {
     "path": "provenance/seed-components.json",
-    "blobSha": "c873fd53b1d791c205965d060ae8bea686a903a8",
-    "familyCount": 19,
+    "blobSha": "31354da224bee6d2dc167c0091ad93c208249930",
+    "familyCount": 38,
     "familyIds": [
       "accordion",
+      "alert",
+      "alert-dialog",
+      "avatar",
       "badge",
+      "breadcrumb",
       "button",
       "card",
       "checkbox",
+      "collapsible",
+      "command",
       "dialog",
+      "drawer",
       "dropdown-menu",
+      "empty",
+      "field",
       "input",
+      "input-group",
       "label",
+      "pagination",
+      "popover",
+      "progress",
+      "radio-group",
       "scroll-area",
       "select",
       "separator",
       "sheet",
       "sidebar",
       "skeleton",
+      "slider",
+      "spinner",
+      "switch",
       "table",
       "tabs",
       "textarea",
+      "toggle",
+      "toggle-group",
       "tooltip"
     ]
   },
   "tokenContract": {
-    "id": "shadcn-radix-token-contract-001",
+    "id": "shadcn-radix-token-contract-002",
     "status": "approved",
     "path": "contracts/tokens/token-contract.json",
-    "blobSha": "230f0da8d00ee20a0e4d8de0a2fde0054e58b21f"
+    "blobSha": "b24fd6e7ec267cc0ce9381b88566f3219e941b84"
   },
   "packages": {
     "react": {
@@ -50,6 +69,29 @@
     },
     "class-variance-authority": {
       "version": "0.7.1"
+    },
+    "cmdk": {
+      "version": "1.1.1"
+    },
+    "vaul": {
+      "version": "1.1.2"
     }
-  }
+  },
+  "capabilityIds": [
+    "alert-dialog.context",
+    "avatar-group.context",
+    "avatar.context",
+    "collapsible.context",
+    "command.context",
+    "dialog.context",
+    "drawer.context",
+    "dropdown-menu.context",
+    "dropdown-menu.subcontext",
+    "popover.context",
+    "radio-group.context",
+    "select.context",
+    "sheet.context",
+    "sidebar.context",
+    "toggle-group.context"
+  ]
 }

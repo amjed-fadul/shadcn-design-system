@@ -2,6 +2,7 @@ import { resolveConditionalApiShape } from "../contracts/components/invariants"
 import type {
   ComponentDefinition,
   ComponentFamilyContract,
+  ConditionalApiCondition,
   EventContract,
   InheritedInterfaceContract,
   PublicExportContract,
@@ -103,20 +104,25 @@ function effectiveEvents(component: ComponentDefinition, authority: InterfaceAut
 }
 
 function conditionalSelections(component: ComponentDefinition, authority: InterfaceAuthority) {
-  const cases = new Map<string, { propName: string; equals: string | number | boolean }>()
+  const cases = new Map<string, ConditionalApiCondition>()
+  const key = (condition: ConditionalApiCondition) => `${condition.propName}:${"equals" in condition ? `equals=${JSON.stringify(condition.equals)}` : `presence=${condition.presence}`}`
   for (const contract of inheritedContracts(component, authority)) {
-    for (const entry of contract.conditionalApi ?? []) cases.set(`${entry.when.propName}:${JSON.stringify(entry.when.equals)}`, entry.when)
+    for (const entry of contract.conditionalApi ?? []) cases.set(key(entry.when), entry.when)
   }
-  for (const entry of component.conditionalApi) cases.set(`${entry.when.propName}:${JSON.stringify(entry.when.equals)}`, entry.when)
-  return [...cases.values()].sort((left, right) => compareText(left.propName, right.propName) || compareText(JSON.stringify(left.equals), JSON.stringify(right.equals)))
+  for (const entry of component.conditionalApi) cases.set(key(entry.when), entry.when)
+  return [...cases.values()].sort((left, right) => compareText(key(left), key(right)))
 }
 
-function branchStateChannels(component: ComponentDefinition, authority: InterfaceAuthority, selection: { propName: string; equals: string | number | boolean }): readonly StateChannel[] {
+function sameCondition(left: ConditionalApiCondition, right: ConditionalApiCondition) {
+  return left.propName === right.propName && ("equals" in left && "equals" in right ? left.equals === right.equals : "presence" in left && "presence" in right && left.presence === right.presence)
+}
+
+function branchStateChannels(component: ComponentDefinition, authority: InterfaceAuthority, selection: ConditionalApiCondition): readonly StateChannel[] {
   const channels: StateChannel[] = []
   for (const contract of inheritedContracts(component, authority)) {
-    for (const entry of contract.conditionalApi ?? []) if (entry.when.propName === selection.propName && entry.when.equals === selection.equals) channels.push(...entry.stateChannels)
+    for (const entry of contract.conditionalApi ?? []) if (sameCondition(entry.when, selection)) channels.push(...entry.stateChannels)
   }
-  for (const entry of component.conditionalApi) if (entry.when.propName === selection.propName && entry.when.equals === selection.equals) channels.push(...entry.stateChannels)
+  for (const entry of component.conditionalApi) if (sameCondition(entry.when, selection)) channels.push(...entry.stateChannels)
   return Object.freeze(channels)
 }
 
@@ -126,7 +132,7 @@ function branchProps(shape: ReturnType<typeof resolveConditionalApiShape>): read
     : { name: prop.name, availability: "unavailable" as const, origin: "conditional" as const }))
 }
 
-function branchShape(component: ComponentDefinition, authority: InterfaceAuthority, selection: { propName: string; equals: string | number | boolean }): ExecutableApiShape {
+function branchShape(component: ComponentDefinition, authority: InterfaceAuthority, selection: ConditionalApiCondition): ExecutableApiShape {
   const shape = resolveConditionalApiShape(component, selection, authority)
   return {
     props: branchProps(shape),
@@ -219,7 +225,11 @@ export function projectExecutableContract(source: ExecutableContractSource): Exe
     derivedTokenRules: [...new Map(tokenContract.derivedRules.map((rule) => [rule.id, {
       id: rule.id,
       baseTokenId: rule.baseTokenId,
-      parameter: { name: rule.parameter.name, type: rule.parameter.type, minimum: rule.parameter.minimum },
+      parameter: {
+        name: rule.parameter.name,
+        type: rule.parameter.type,
+        ...(rule.parameter.minimum !== undefined ? { minimum: rule.parameter.minimum } : {}),
+      },
     }])).values()].sort((left, right) => compareText(left.id, right.id)),
     derivedTokenRuleIds: [...new Set(tokenContract.derivedRules.map((rule) => rule.id))].sort(compareText),
     capabilityIds: capabilities,

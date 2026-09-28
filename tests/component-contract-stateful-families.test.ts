@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
 import { describe, expect, test } from "vitest"
+import ts from "typescript"
+import { findDelegatedSourceFunction } from "../src/contracts/components/delegated-host-source-analysis"
 
 import contractSet from "../contracts/components/component-contract-set.json"
 import tokenContract from "../contracts/tokens/token-contract.json"
@@ -37,7 +39,7 @@ function interfaceContract(id: string) {
 }
 
 const expectedInterfaceFacts = [
-  ["radix.checkbox.root", "checkbox", "Root", ["checked", "defaultChecked", "required"], ["onCheckedChange"]],
+  ["radix.checkbox.root", "checkbox", "Root", ["checked", "defaultChecked", "required", "id"], ["onCheckedChange"]],
   ["radix.checkbox.indicator", "checkbox", "Indicator", ["forceMount"], []],
   ["radix.tabs.root", "tabs", "Root", ["value", "defaultValue", "orientation", "activationMode"], ["onValueChange"]],
   ["radix.tabs.list", "tabs", "List", ["loop"], []],
@@ -127,15 +129,21 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
 
   test("tracks parameter-derived rest spreads and unresolved dynamic render evidence without losing static nodes", () => {
     const tree = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "RenderCompletenessFixture")
-    expect(tree).toMatchObject({ root: { tag: "Primitive.Root", receivesPublicProps: true, dataAttributes: [expect.objectContaining({ name: "data-slot", value: "static" }), expect.objectContaining({ name: "data-x" })], children: [expect.objectContaining({ tag: "StaticChild" })] } })
+    expect(tree.alternatives).toEqual([
+      { when: { propName: "className", equals: true }, root: expect.objectContaining({ tag: "Primitive.Root", receivesPublicProps: true, dataAttributes: [expect.objectContaining({ name: "data-slot", value: "static" }), expect.objectContaining({ name: "data-x" })], children: [expect.objectContaining({ tag: "StaticChild" })] }) },
+      { otherwise: true, root: expect.objectContaining({ tag: "Primitive.Root", receivesPublicProps: true, children: [] }) },
+    ])
     expect(tree.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("data-x"), expect.stringContaining("dynamicChild")]))
     const unsupportedSpread = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "UnsupportedSpreadFixture")
     expect(unsupportedSpread.root).toMatchObject({ receivesPublicProps: true })
     expect(unsupportedSpread.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("Unsupported spread"), expect.stringContaining("data-state")]))
     expect(sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "UnrelatedSpreadFixture")).toMatchObject({ root: { receivesPublicProps: false }, unresolved: [expect.stringContaining("Unsupported spread")] })
     const conditional = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "ConditionalRenderFixture")
-    expect(conditional.root).toMatchObject({ children: expect.arrayContaining([expect.objectContaining({ tag: "StaticChild" })]) })
-    expect(conditional.unresolved).toEqual(expect.arrayContaining([expect.stringContaining("Conditional JSX child")]))
+    expect(conditional.alternatives).toEqual([
+      { when: { propName: "condition", equals: true }, root: expect.objectContaining({ children: [expect.objectContaining({ tag: "StaticChild", when: { propName: "condition", equals: true } }), expect.objectContaining({ tag: "StaticChild" })] }) },
+      { otherwise: true, root: expect.objectContaining({ children: [expect.objectContaining({ tag: "StaticChild", when: { propName: "condition", equals: true } }), expect.objectContaining({ tag: "Primitive.Root" })] }) },
+    ])
+    expect(conditional.unresolved).toEqual([])
     const multipleReturns = sourceAnalysis.analyzeJsxRenderTree(completenessFixture, "MultipleReturnFixture")
     expect(multipleReturns.alternatives).toEqual([
       { when: { propName: "condition", truthiness: "truthy" }, root: expect.objectContaining({ tag: "Primitive.Root" }) },
@@ -145,7 +153,7 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
   })
 
   test("discovers direct, conditional, and CVA compound class-bearing expressions without harvesting unrelated strings", () => {
-    const normalize = (dependencies: Array<{ tokenId: string; viaDerivedRule?: { id: string; multiplier: number }; when?: { propName: string; equals: string | number | boolean } }>) => dependencies.map(({ tokenId, viaDerivedRule, when }) => ({ tokenId, ...(viaDerivedRule ? { viaDerivedRule } : {}), ...(when ? { when } : {}) })).sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)))
+    const normalize = (dependencies: Array<{ tokenId: string; viaDerivedRule?: { id: string; multiplier: number }; when?: unknown }>) => dependencies.map(({ tokenId, viaDerivedRule, when }) => ({ tokenId, ...(viaDerivedRule ? { viaDerivedRule } : {}), ...(when ? { when } : {}) })).sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)))
     expect(normalize(analyzeComponentTokenDependencies(analysisFixture))).toEqual(normalize([
       { tokenId: "radius.md" },
       { tokenId: "font-size.sm" },
@@ -165,8 +173,11 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const analyzeJsxRenderTree = (sourceAnalysis as { analyzeJsxRenderTree?: (sourcePath: string, exportName: string) => unknown }).analyzeJsxRenderTree
     expect(analyzeJsxRenderTree).toBeTypeOf("function")
     expect(analyzeJsxRenderTree!(analysisFixture, "RenderFixture")).toMatchObject({
-      root: { tag: "Primitive.Root", receivesPublicProps: true, children: [expect.objectContaining({ tag: "Primitive.Portal", portal: true })] },
-      unresolved: [expect.stringContaining("Conditional JSX child")],
+      alternatives: [
+        { when: { propName: "visible", equals: true }, root: { tag: "Primitive.Root", receivesPublicProps: true, children: [expect.objectContaining({ tag: "Primitive.Portal", portal: true })] } },
+        { otherwise: true, root: { tag: "Primitive.Root", receivesPublicProps: true, children: [expect.objectContaining({ tag: "Primitive.Portal", portal: true })] } },
+      ],
+      unresolved: [],
     })
   })
 
@@ -237,7 +248,12 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const { canonicalPath, canonicalBlobSha, implementationKind, upstreamPath, upstreamBlobSha } = seed
     expect(contract!.source).toMatchObject({ canonicalPath, canonicalBlobSha, implementationKind, upstreamPath, upstreamBlobSha })
     expect(contract!.source.canonicalBlobSha).toBe(readCanonicalSourceBlobSha(source))
-    expect(contract!.exports.map(({ name, kind, authorableJsx }) => [name, kind, authorableJsx]).sort()).toEqual(listModuleExports(source).map(({ name, declarationKind }) => [name, declarationKind === "FunctionDeclaration" ? "component" : "helper", declarationKind === "FunctionDeclaration"]).sort())
+    const sourceFile = ts.createSourceFile(source, readFileSync(source, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+    const exports = listModuleExports(source).map(({ name }) => {
+      const isComponent = Boolean(findDelegatedSourceFunction(sourceFile, name))
+      return [name, isComponent ? "component" : "helper", isComponent]
+    })
+    expect(contract!.exports.map(({ name, kind, authorableJsx }) => [name, kind, authorableJsx]).sort()).toEqual(exports.sort())
   })
 
   test.each(expectedInterfaceFacts)("derives %s facts from its pinned declaration", (id, packageName, symbol, props, events) => {
@@ -263,6 +279,19 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
       expect.objectContaining({ id: "icon", host: { kind: "unresolved" } }),
     ]))
     expect(validateComponentFamilyInvariants(checkbox, authority())).toEqual([])
+  })
+
+  test("models Switch's authoritative checked state and automatic thumb", () => {
+    const switchFamily = family("switch")!
+    const component = switchFamily.exports[0].component!
+    expect(component.inherits).toEqual(["radix.switch.root"])
+    expect(component.localProps).toEqual([{ name: "size", required: false, type: { kind: "enum", values: ["sm", "default"] }, default: "default", evidenceRefs: ["source"] }])
+    expect(component.stateChannels).toEqual([{ name: "checked", controlledProp: "checked", defaultProp: "defaultChecked", changeEventProp: "onCheckedChange", evidenceRefs: ["source", "declaration"] }])
+    expect(tree(component.rendering).nodes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "root", host: { kind: "inherited-interface", interfaceId: "radix.switch.root" }, receivesPublicProps: true, children: [expect.objectContaining({ nodeId: "thumb" })] }),
+      expect.objectContaining({ id: "thumb", host: { kind: "inherited-interface", interfaceId: "radix.switch.thumb" }, receivesPublicProps: false }),
+    ]))
+    expect(validateComponentFamilyInvariants(switchFamily, authority())).toEqual([])
   })
 
   test("models Tabs' source-owned defaults and inherited value state", () => {
@@ -304,6 +333,12 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     const rootComponent = scrollArea.exports.find((entry) => entry.name === "ScrollArea")!.component!
     const barComponent = scrollArea.exports.find((entry) => entry.name === "ScrollBar")!.component!
     expect(tree(rootComponent.rendering).nodes.find((node) => node.id === "root")!.children.map((child) => child.nodeId)).toEqual(["viewport", "scrollbar", "corner"])
+    expect(rootComponent.accessibility).toEqual([{
+      feature: "scrollable viewport keyboard focusability",
+      owner: "component",
+      mechanism: "tabIndex=0 on internal Radix viewport",
+      evidenceRefs: ["source"],
+    }])
     expect(barComponent.inheritedPropDefaults).toEqual([{ propName: "orientation", value: "vertical", evidenceRefs: ["source"] }])
     expect(tree(barComponent.rendering).nodes.find((node) => node.id === "scrollbar")!.children.map((child) => child.nodeId)).toEqual(["thumb"])
     expect(validateComponentFamilyInvariants(scrollArea, authority())).toEqual([])

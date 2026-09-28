@@ -1,0 +1,7 @@
+# Release 005 Patch B source audit
+
+FieldError first uses truthy authored `children`. Without children, an absent or empty `errors` array produces `null`. Otherwise it deduplicates entries by optional `error.message` using a `Map`: the first key position is retained and the last entry for each key wins. A single unique entry returns its optional message; a falsy message then makes the outer component return `null`. Two or more unique entries produce a `ul`; each entry produces an `li` only when its message is truthy. In particular, two distinct falsy keys can produce an alert with an empty list. The outer `div` and its `role="alert"` exist only for truthy content.
+
+Slider chooses the first array among `value` and `defaultValue`, then `[min]`. Empty arrays are valid choices and produce zero mapped Thumb templates. The fallback has one element. The source establishes one Thumb JSX template per chosen collection element and says nothing further about Radix's final DOM.
+
+The model needs ordered, source-backed choices and branches; an explicit absent outcome; a bounded deduplication relation; derived content; and child repetition whose count follows a collection, optionally filtered by an item property. References and operators must stay closed and inspectable. Reconciliation must compare the entire branch and collection structure, including order. Toggle Group, Canvas authoring policy, and Radix final DOM behavior remain outside this patch.

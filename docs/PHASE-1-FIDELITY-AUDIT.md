@@ -34,6 +34,23 @@ component does not depend on an unplanned external package.
 | Tooltip | Provider delay, root, trigger, portal content, arrow, and positioning props remain available. | Accepted: repository alias and semantic class normalization. |
 | Scroll Area | Root, viewport, scrollbar orientation, thumb, and corner composition remain available. | Accepted: repository alias and semantic class normalization. |
 | Sidebar | Provider controlled/uncontrolled state, cookie persistence, Cmd/Ctrl+B, mobile Sheet rendering, desktop variants, trigger callback ordering, and all upstream public subcomponents remain available. Missing group action, menu badge/skeleton/submenu APIs and responsive/provider behavior were restored. | Accepted: pinned local hook, local component reuse, icon replacement, and semantic class normalization. No public API reduction accepted. |
+| Switch | `Switch` (Radix `Root`/`Thumb`), controlled/uncontrolled `checked`/`defaultChecked`, `onCheckedChange`, `required`, `disabled`, and the upstream `size` (`"sm"` \| `"default"`) variant all remain available. | Accepted: Nova `cn-switch`/`cn-switch-thumb` custom-variant shorthand (`data-checked`, `data-disabled`) flattened to literal Radix `data-[state=checked]`/native `disabled:` selectors bound to canonical semantic-token utilities (`bg-primary`, `bg-input`, `bg-background`, `border-ring`, `ring-ring`), consistent with the Checkbox precedent; upstream's extended `after:` hit-area and `aria-invalid` form-validation theming were dropped, matching the same simplification already accepted for Checkbox. |
+
+## Release 003 addition: Switch
+
+Audit date: 2026-09-08.
+
+Switch was scaffolded by hand from the pinned upstream commit's
+`apps/v4/registry/bases/radix/ui/switch.tsx` (fetched and diffed line by line
+against `git hash-object`-verified content; `npx shadcn add switch` was not
+used) rather than through the CLI, per the same "CLI output is not sufficient
+evidence" policy as the rest of this table. The upstream source was screened
+before acceptance for viewport-conditional classes (`sm:`/`md:`/`lg:`/`xl:`)
+and viewport units (`svh`/`dvh`/`vh`/`vw`) — the same defect that excluded
+Sidebar's responsive variant from this release and that task A2 removed from
+Sheet. None were present in upstream `switch.tsx`, and none were introduced
+in the canonical derivative; the `size` variant's dimensions use fixed `px`/
+`rem`-scale Tailwind spacing utilities only.
 
 ## Explicit reductions
 
@@ -41,4 +58,7 @@ None. The audit found no Studio V1 justification for removing an upstream
 public prop, subcomponent, controlled/uncontrolled path, keyboard path,
 responsive path, accessibility behavior, provider behavior, or composition
 semantic. The initial `DialogFooter`, Dropdown Menu `inset`, and Sidebar
-reductions were restored and covered by regression tests.
+reductions were restored and covered by regression tests. Switch's dropped
+`after:` hit-area extension and `aria-invalid` theming are not public-API
+reductions (no prop, subcomponent, or behavioral path was removed) and match
+the simplification already accepted for Checkbox in this same table.

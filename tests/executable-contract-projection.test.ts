@@ -29,13 +29,13 @@ describe("executable contract projection", () => {
     ])
     expect(contract.tokenIds).toContain("color.primary")
     expect(contract.derivedTokenRuleIds).toContain("spacing.multiplier")
-    expect(contract.derivedTokenRules).toEqual([{ id: "spacing.multiplier", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number", minimum: 0 } }])
+    expect(contract.derivedTokenRules).toEqual([{ id: "spacing.multiplier", baseTokenId: "spacing.unit", parameter: { name: "multiplier", type: "number" } }])
   })
 
   test("projects Accordion's single and multiple conditional API shapes", () => {
     const accordion = contract.exports["accordion\u0000Accordion"].component!
-    const single = accordion.conditionalApi.find((entry) => entry.when.equals === "single")!
-    const multiple = accordion.conditionalApi.find((entry) => entry.when.equals === "multiple")!
+    const single = accordion.conditionalApi.find((entry) => "equals" in entry.when && entry.when.equals === "single")!
+    const multiple = accordion.conditionalApi.find((entry) => "equals" in entry.when && entry.when.equals === "multiple")!
 
     expect(single.shape.props).toEqual(expect.arrayContaining([
       expect.objectContaining({ name: "value", availability: "available", type: { kind: "string" } }),

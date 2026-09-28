@@ -1,0 +1,37 @@
+import { useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Sidebar, SidebarContent, SidebarProvider, SidebarTrigger, useSidebar } from '@adc/shadcn-design-system'
+import { getExecutableRelease } from '@adc/shadcn-design-system/release'
+import '@adc/shadcn-design-system/styles.css'
+
+function StateProbe() {
+  const value = useSidebar()
+  return <output id="state-probe">{JSON.stringify({ open: value.open, openMobile: value.openMobile, isMobile: value.isMobile, state: value.state })}</output>
+}
+
+function Fixture() {
+  const [isMobile, setIsMobile] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [openMobile, setOpenMobile] = useState(false)
+  const [collapsible, setCollapsible] = useState<'offcanvas' | 'none'>('offcanvas')
+  const [side, setSide] = useState<'left' | 'right'>('left')
+  const [dir, setDir] = useState<'ltr' | 'rtl'>('ltr')
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null)
+  return <main>
+    <button id="mobile-mode" onClick={() => setIsMobile(value => !value)}>set mobile</button>
+    <button id="collapsible-mode" onClick={() => setCollapsible(value => value === 'offcanvas' ? 'none' : 'offcanvas')}>set collapsible</button>
+    <button id="side-mode" onClick={() => setSide(value => value === 'left' ? 'right' : 'left')}>set side</button>
+    <button id="dir-mode" onClick={() => setDir(value => value === 'ltr' ? 'rtl' : 'ltr')}>set direction</button>
+    <div id="finite-host" ref={setPortalContainer} style={{ position: 'relative', transform: 'translateZ(0)', width: 700, height: 500, overflow: 'hidden', border: '2px solid black' }}>
+      <SidebarProvider isMobile={isMobile} open={open} onOpenChange={setOpen} openMobile={openMobile} onOpenMobileChange={setOpenMobile} style={{ minHeight: '100%' }}>
+        <Sidebar id="candidate-sidebar" side={side} dir={dir} collapsible={collapsible} portalContainer={portalContainer ?? undefined}>
+          <SidebarContent>literal R4 Sidebar</SidebarContent>
+        </Sidebar>
+        <div style={{ position: 'relative', zIndex: 60, padding: 16 }}><SidebarTrigger id="visible-sidebar-trigger">Toggle Sidebar</SidebarTrigger><SidebarTrigger id="cancelled-sidebar-trigger" onClick={event => event.preventDefault()}>Cancelled Sidebar</SidebarTrigger><StateProbe /></div>
+      </SidebarProvider>
+    </div>
+    <output id="release-data">{JSON.stringify(getExecutableRelease())}</output>
+  </main>
+}
+
+createRoot(document.getElementById('root')!).render(<Fixture />)

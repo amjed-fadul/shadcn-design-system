@@ -1,0 +1,23 @@
+{
+  "name": "task63-isolated-consumer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "vite build",
+    "verify": "node tools/acceptance.mjs"
+  },
+  "dependencies": {
+    "@adc/shadcn-design-system": "file:/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004/adc-shadcn-design-system-0.0.0-release.4.tgz",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "playwright": "1.58.2",
+    "typescript": "5.5.4",
+    "vite": "7.3.6"
+  }
+}

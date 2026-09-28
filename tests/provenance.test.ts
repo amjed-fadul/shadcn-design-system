@@ -5,12 +5,13 @@ import { describe, expect, test } from "vitest"
 type Provenance = {
   upstream: { repository: string; commit: string; tag: string }
   sourceResolution: { cliVersionIsInsufficient: boolean }
+  derivation: { operations: string[] }
   components: Record<string, { canonicalPath: string; canonicalBlobSha: string; implementationKind: string }>
 }
 
 const provenance = JSON.parse(readFileSync(new URL("../provenance/seed-components.json", import.meta.url), "utf8")) as Provenance
 
-describe("Phase 1 component provenance", () => {
+describe("canonical component provenance", () => {
   test("pins every included component to a local file and the exact upstream revision", () => {
     expect(provenance.upstream).toMatchObject({
       repository: "shadcn-ui/ui",
@@ -19,12 +20,12 @@ describe("Phase 1 component provenance", () => {
     })
     expect(provenance.sourceResolution.cliVersionIsInsufficient).toBe(true)
 
-    for (const component of Object.values(provenance.components)) {
+    for (const [id, component] of Object.entries(provenance.components)) {
       expect(existsSync(new URL(`../${component.canonicalPath}`, import.meta.url))).toBe(true)
       expect(component.canonicalBlobSha).toBe(
         execFileSync("git", ["hash-object", component.canonicalPath], { encoding: "utf8" }).trim()
       )
-      expect(component.implementationKind).toBe("semantic-token-normalized-derivative")
+      expect(component.implementationKind).toBe(id === "collapsible" ? "upstream-wrapper" : "semantic-token-normalized-derivative")
     }
   })
 
@@ -33,5 +34,13 @@ describe("Phase 1 component provenance", () => {
       const source = readFileSync(new URL(`../${component.canonicalPath}`, import.meta.url), "utf8")
       expect(source).not.toMatch(/(^|[^a-z])canvas([^a-z]|$)|host-chrome|status-ready|status-experiment/i)
     }
+  })
+
+  test("records deterministic Sidebar adaptation without ambient-app policy", () => {
+    expect(provenance.components.sidebar.canonicalBlobSha).toBe("30877f7508ba49fe48992ca744f53a3903ed4482")
+    expect(provenance.derivation.operations).toContain(
+      "make Sidebar presentation and desktop/mobile state explicit, preserve sidebar.context, and move viewport detection, persistence, and keyboard shortcuts to an external normal-app recipe"
+    )
+    expect(JSON.stringify(provenance.components.sidebar)).not.toMatch(/Canvas|authoring policy/i)
   })
 })

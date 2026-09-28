@@ -1,3 +1,5 @@
+import { useMemo as importedUseMemo } from "react"
+
 declare const cva: (...arguments_: unknown[]) => unknown
 declare const cn: (...arguments_: unknown[]) => string
 declare const styles: { root: string }
@@ -6,6 +8,7 @@ declare const cvaClasses: string
 declare const condition: boolean
 declare const tone: string
 declare const compute: { (): Record<string, unknown>; (value: unknown): unknown }
+declare const computeSomething: () => boolean
 declare const dynamicChild: unknown
 declare const dynamicVariants: Record<string, unknown>
 declare const Primitive: any
@@ -14,6 +17,10 @@ declare const unrelated: Record<string, unknown>
 declare const Tooltip: any
 declare const TooltipTrigger: any
 declare const TooltipContent: any
+
+function localMemo(callback: () => unknown) {
+  return callback()
+}
 
 function DynamicTokenFixture() {
   return (
@@ -64,6 +71,26 @@ function UnsupportedSpreadFixture(props: Record<string, unknown>) {
   return <Primitive.Root {...compute()} data-state={condition ? "open" : tone} {...props} />
 }
 
+function UnsupportedConditionalPresenceFixture({ flag }: { flag: boolean }) {
+  return <Primitive.Root data-state={flag || undefined} />
+}
+
+function ArbitraryLocalConditionalValueFixture() {
+  const flag = computeSomething()
+  return <Primitive.Root data-state={flag ? "a" : "b"} />
+}
+
+function ArbitraryLocalConditionalArmFixture({ enabled }: { enabled: boolean }) {
+  const value = computeSomething()
+  return <Primitive.Root data-state={enabled ? value : ""} />
+}
+
+function ArbitraryLocalReturnFixture() {
+  const flag = computeSomething()
+  if (flag) return <Primitive.Root />
+  return <Primitive.Fallback />
+}
+
 function UnrelatedSpreadFixture() {
   return <Primitive.Root {...unrelated} />
 }
@@ -85,16 +112,19 @@ function UnsupportedDerivedAttributeFixture({ mode = "a", ...rest }: { mode?: "a
   return <Primitive.Root data-match={compute(mode)} {...rest} />
 }
 
-function ConditionalRootFixture({ collapsible, ...rest }: { collapsible: "none" | "offcanvas" }) {
-  const isMobile = condition
+function ConditionalRootFixture({ collapsible, isMobile, ...rest }: { collapsible: "none" | "offcanvas"; isMobile: boolean }) {
   if (collapsible === "none") return <div {...rest} />
   if (isMobile) return <Primitive.Sheet {...rest} />
   return <div {...rest} />
 }
 
-function ConditionalValueFixture({ collapsible, ...rest }: { collapsible: string }) {
-  const state = tone
+function ConditionalValueFixture({ collapsible, state, ...rest }: { collapsible: string; state: string }) {
   return <Primitive.Root data-collapsible={state === "collapsed" ? collapsible : ""} {...rest} />
+}
+
+function ArbitraryLocalEqualityFixture() {
+  const state = tone
+  return <Primitive.Root data-collapsible={state === "collapsed" ? "a" : ""} />
 }
 
 function JsxAliasFixture({ tooltip, ...rest }: { tooltip?: string | Record<string, unknown> }) {
@@ -115,4 +145,106 @@ function UnsupportedReturnConditionFixture({ condition, mode, ...rest }: { condi
   return <Primitive.Fallback {...rest} />
 }
 
-export { ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, JsxAliasFixture, MultipleReturnFixture, RenderCompletenessFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }
+function ConditionalHostAliasFixture({ asChild, ...rest }: { asChild: boolean }) {
+  const Comp = asChild ? Primitive.Slot : "a"
+  return <Comp data-slot="conditional-host" {...rest} />
+}
+
+function ConditionalJsxAliasFixture({ expanded, ...rest }: { expanded: boolean }) {
+  const content = expanded
+    ? <Primitive.Expanded data-slot="expanded" {...rest} />
+    : <Primitive.Collapsed data-slot="collapsed" {...rest} />
+  return content
+}
+
+function NullishChildFixture({ children, ...rest }: { children?: string | number | boolean }) {
+  return (
+    <Primitive.Root data-slot="nullish-root" {...rest}>
+      {children ?? <Primitive.Fallback data-slot="nullish-fallback" />}
+    </Primitive.Root>
+  )
+}
+
+function NestedHostPortalFixture({ enabled, asChild, ...rest }: { enabled: boolean; asChild: boolean }) {
+  const Comp = asChild ? Primitive.Portal : "div"
+  if (!enabled) return <Primitive.Fallback {...rest} />
+  return <Comp data-slot="nested-portal" {...rest} />
+}
+
+function AndTernaryChildFixture({ enabled, compact, ...rest }: { enabled: boolean; compact: boolean }) {
+  return (
+    <Primitive.Root {...rest}>
+      {enabled && (compact ? <Primitive.Compact /> : <Primitive.Expanded />)}
+    </Primitive.Root>
+  )
+}
+
+function SamePredicateSiblingTernaryFixture({ enabled, ...rest }: { enabled: boolean }) {
+  return (
+    <Primitive.Root {...rest}>
+      {enabled ? <Primitive.FirstOn /> : <Primitive.FirstOff />}
+      {enabled ? <Primitive.SecondOn /> : <Primitive.SecondOff />}
+    </Primitive.Root>
+  )
+}
+
+function ConditionalDataBranchFixture({ enabled, state, ...rest }: { enabled: boolean; state: "open" | "closed" }) {
+  if (!enabled) return <Primitive.Fallback {...rest} />
+  return (
+    <Primitive.Root
+      data-state={state === "open" ? "visible" : "hidden"}
+      data-open={state === "open"}
+      {...rest}
+    />
+  )
+}
+
+function MappedChildrenFixture({ items, showLabels, ...rest }: { items: string[]; showLabels: boolean }) {
+  return (
+    <Primitive.Root data-slot="mapped-root" {...rest}>
+      {items.map((item) => (
+        <Primitive.Item data-slot="mapped-item" key={item}>
+          {showLabels && <Primitive.Label data-slot="mapped-label" />}
+        </Primitive.Item>
+      ))}
+    </Primitive.Root>
+  )
+}
+
+function NonMapCallbackFixture({ items, ...rest }: { items: string[] }) {
+  return (
+    <Primitive.Root {...rest}>
+      {items.filter((item) => <Primitive.NotRendered key={item} />)}
+    </Primitive.Root>
+  )
+}
+
+function ScalarPropChildFixture({ label, ...rest }: { label?: string }) {
+  return <Primitive.Root {...rest}>{label}</Primitive.Root>
+}
+
+function NonHostConditionalFixture({ value, ...rest }: { value?: number }) {
+  const fallback = 100
+  const resolvedValue = typeof value === "number" ? value : fallback
+  return <Primitive.Root data-value={resolvedValue} {...rest} />
+}
+
+function CoercedTruthinessFixture({ children, ...rest }: { children?: string }) {
+  return (
+    <Primitive.Root data-content={!!children} {...rest}>
+      {children && <StaticChild />}
+    </Primitive.Root>
+  )
+}
+
+function ImportedUseMemoChildFixture({ children, ...rest }: { children?: string }) {
+  const content = importedUseMemo(() => children ?? <StaticChild />, [children])
+  return <Primitive.Root {...rest}>{content}</Primitive.Root>
+}
+
+function CounterfeitMemoChildFixture({ children, ...rest }: { children?: string }) {
+  const content = localMemo(() => children ?? <StaticChild />)
+  return <Primitive.Root {...rest}>{content}</Primitive.Root>
+}
+
+export { AndTernaryChildFixture, CoercedTruthinessFixture, ConditionalDataBranchFixture, ConditionalHostAliasFixture, ConditionalJsxAliasFixture, ConditionalRenderFixture, ConditionalRootFixture, ConditionalValueFixture, CounterfeitMemoChildFixture, DerivedAttributeFixture, DynamicCvaFixture, DynamicTokenFixture, GenericUtilityFixture, ImportedUseMemoChildFixture, JsxAliasFixture, MappedChildrenFixture, MultipleReturnFixture, NestedHostPortalFixture, NonHostConditionalFixture, NonMapCallbackFixture, NullishChildFixture, RenderCompletenessFixture, SamePredicateSiblingTernaryFixture, ScalarPropChildFixture, ScopedCvaFixture, UnsupportedDerivedAttributeFixture, UnsupportedDerivedSpreadFixture, UnsupportedReturnConditionFixture, UnsupportedSpreadFixture, UnrelatedSpreadFixture }

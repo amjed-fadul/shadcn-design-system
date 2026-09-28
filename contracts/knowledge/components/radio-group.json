@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "id": "radio-group-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "radio-group"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A set of checkable buttons where no more than one option can be checked at a time.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.radio-group.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Radio Group when the user must choose one option from a set of mutually exclusive choices.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.radio-group.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose RadioGroup from RadioGroupItem children, give every item a distinct value, and associate visible labels with item ids.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.radio-group.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use disabled on an individual RadioGroupItem to make only that option unavailable.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.radio-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use orientation and dir on RadioGroup when keyboard navigation or layout direction needs to be explicit.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.radio-group.docs"
+        ]
+      }
+    }
+  ]
+}

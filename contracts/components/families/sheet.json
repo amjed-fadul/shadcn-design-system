@@ -3,7 +3,7 @@
   "id": "sheet",
   "source": {
     "canonicalPath": "src/components/ui/sheet.tsx",
-    "canonicalBlobSha": "660fdc011d46e48e0ce5a033fa9beac28f042589",
+    "canonicalBlobSha": "5f6704339667e8e2a6a10b1a0769c96801a2b8c1",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sheet.tsx",
     "upstreamBlobSha": "28f34f894ea37e24b46056fd040bc46ae8b5902e"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sheet.tsx@660fdc011d46e48e0ce5a033fa9beac28f042589"
+      "source": "src/components/ui/sheet.tsx@5f6704339667e8e2a6a10b1a0769c96801a2b8c1"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -19,7 +19,7 @@
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-001"
+      "source": "shadcn-radix-token-contract-002"
     }
   },
   "exports": [
@@ -176,6 +176,17 @@
       "component": {
         "localProps": [
           {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof SheetPrimitive.Portal>[\"container\"]"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
             "name": "side",
             "required": false,
             "type": {
@@ -268,17 +279,6 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 0
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
               "multiplier": 4
             },
             "evidenceRefs": [
@@ -306,6 +306,17 @@
           },
           {
             "tokenId": "shadow.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
             "evidenceRefs": [
               "source",
               "tokens"

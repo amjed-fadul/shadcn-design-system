@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "spinner-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "spinner"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available"
+  },
+  "whatItIs": {
+    "statement": "Displays an animated loading indicator with status semantics.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.spinner.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Spinner to indicate a loading state.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.spinner.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Inside a Button, place Spinner before the label with data-icon=\"inline-start\" or after the label with data-icon=\"inline-end\".",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.spinner.docs"
+        ]
+      }
+    }
+  ]
+}

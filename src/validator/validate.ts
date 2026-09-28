@@ -155,7 +155,7 @@ function branchSensitiveFacts(component: ExecutableComponent): BranchSensitiveFa
   for (const conditional of component.conditionalApi) {
     const values = component.conditionalApi
       .filter((candidate) => candidate.when.propName === conditional.when.propName)
-      .map((candidate) => candidate.when.equals)
+      .map((candidate) => "equals" in candidate.when ? candidate.when.equals : candidate.when.presence)
     for (const prop of conditional.shape.props) {
       const base = baseProp(component, prop.name)
       if (!base || propFactKey(base) !== propFactKey(prop)) addBranchFact(props, prop.name, conditional.when.propName, values)
@@ -193,7 +193,21 @@ function branchFor(component: ExecutableComponent, node: Extract<AuthoredNode, {
 
   for (const [propName, cases] of casesByProp) {
     const authored = node.props[propName]
-    const values = cases.map((entry) => entry.when.equals)
+    const values = cases.map((entry) => "equals" in entry.when ? entry.when.equals : entry.when.presence)
+    const presenceCases = cases.filter((entry) => "presence" in entry.when)
+    if (presenceCases.length === cases.length) {
+      const presence = authored ? "present" : "absent"
+      const match = presenceCases.find((entry) => "presence" in entry.when && entry.when.presence === presence)
+      if (!match) {
+        fullySelected = false
+        unresolvedDiscriminators.add(propName)
+        errors.push(error("CONDITIONAL_API_VIOLATION", `No factual API branch exists for ${propName} ${presence}.`, propTarget(node, propName), { kind: "conditional-branch", propName, values }, authored ? receivedValue(authored) : undefined))
+        continue
+      }
+      if (selected && selected !== match.shape) errors.push(error("CONDITIONAL_API_VIOLATION", `Multiple conditional API branches were selected for ${node.exportName}.`, propTarget(node, propName), { kind: "conditional-branch", propName, values }, authored ? receivedValue(authored) : undefined))
+      selected = match.shape
+      continue
+    }
     if (!authored) {
       fullySelected = false
       unresolvedDiscriminators.add(propName)
@@ -205,7 +219,7 @@ function branchFor(component: ExecutableComponent, node: Extract<AuthoredNode, {
       errors.push(error("UNRESOLVED_FACT", `Cannot select conditional API branch from unresolved prop ${propName}.`, propTarget(node, propName), { kind: "conditional-branch", propName, values }, receivedValue(authored)))
       continue
     }
-    const match = cases.find((entry) => entry.when.equals === authored.value)
+    const match = cases.find((entry) => "equals" in entry.when && entry.when.equals === authored.value)
     if (!match) {
       fullySelected = false
       unresolvedDiscriminators.add(propName)
@@ -289,7 +303,7 @@ function validateTokenUse(token: AuthoredTokenUse, contract: ExecutableContract,
     return
   }
   const parameter = viaDerivedRule.parameter.value
-  if (typeof parameter !== "number" || (rule.parameter.minimum !== undefined && parameter < rule.parameter.minimum)) {
+  if (typeof parameter !== "number" || !Number.isFinite(parameter) || (rule.parameter.minimum !== undefined && parameter < rule.parameter.minimum)) {
     errors.push(error("INVALID_DERIVED_TOKEN_PARAMETER", `Derived token rule ${rule.id} does not accept the authored parameter.`, target, { kind: "derived-token-parameter", ruleId: rule.id, baseTokenId: rule.baseTokenId, type: { kind: "number" }, ...(rule.parameter.minimum !== undefined ? { minimum: rule.parameter.minimum } : {}) }, parameter))
   }
 }

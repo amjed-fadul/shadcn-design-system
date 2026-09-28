@@ -1,0 +1,23 @@
+import { createRef, type ComponentProps, type ElementRef } from 'react'
+import { Button, DialogTrigger, SidebarMenuButton, SidebarMenuAction, TooltipTrigger, DropdownMenuTrigger, SheetTrigger } from '@adc/shadcn-design-system'
+type IsAny<T> = 0 extends (1 & T) ? true : false
+type AssertFalse<T extends false> = T
+export type RefBoundary = [
+  AssertFalse<IsAny<ComponentProps<typeof Button>['ref']>>, AssertFalse<IsAny<ElementRef<typeof Button>>>,
+  AssertFalse<IsAny<ComponentProps<typeof DialogTrigger>['ref']>>, AssertFalse<IsAny<ElementRef<typeof DialogTrigger>>>,
+  AssertFalse<IsAny<ComponentProps<typeof SidebarMenuButton>['ref']>>, AssertFalse<IsAny<ElementRef<typeof SidebarMenuButton>>>,
+  AssertFalse<IsAny<ComponentProps<typeof SidebarMenuAction>['ref']>>, AssertFalse<IsAny<ElementRef<typeof SidebarMenuAction>>>,
+  AssertFalse<IsAny<ComponentProps<typeof TooltipTrigger>['ref']>>, AssertFalse<IsAny<ElementRef<typeof TooltipTrigger>>>,
+  AssertFalse<IsAny<ComponentProps<typeof DropdownMenuTrigger>['ref']>>, AssertFalse<IsAny<ElementRef<typeof DropdownMenuTrigger>>>,
+  AssertFalse<IsAny<ComponentProps<typeof SheetTrigger>['ref']>>, AssertFalse<IsAny<ElementRef<typeof SheetTrigger>>>
+]
+const ref = createRef<HTMLButtonElement>()
+export const positiveRefs = [
+  <TooltipTrigger ref={ref} asChild><Button /></TooltipTrigger>,
+  <DropdownMenuTrigger ref={ref} asChild><Button /></DropdownMenuTrigger>,
+  <SheetTrigger ref={ref} asChild><Button /></SheetTrigger>,
+  <Button ref={ref} variant="outline" size="sm" asChild><button /></Button>,
+  <DialogTrigger ref={ref} asChild><Button /></DialogTrigger>,
+  <SidebarMenuButton ref={ref} variant="outline" size="lg" isActive tooltip="Workspace" asChild><button /></SidebarMenuButton>,
+  <SidebarMenuAction ref={ref} showOnHover asChild><button /></SidebarMenuAction>,
+]

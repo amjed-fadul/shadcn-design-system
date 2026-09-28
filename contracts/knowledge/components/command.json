@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "command-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "command"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A command menu for search and quick actions.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.command.docs"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Command when users need to search, filter, or quickly invoke actions from a keyboard-friendly menu.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.command.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Compose Command with CommandInput and CommandList; place CommandEmpty, CommandGroup, CommandItem, CommandSeparator, and optional CommandShortcut inside the list.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.command.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use CommandDialog when the command menu should appear in a modal dialog.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.command.docs"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Use CommandShortcut to display keyboard shortcut hints next to command items.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.command.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Use CommandGroup and CommandSeparator to organize larger command sets, and allow CommandList to scroll when many items are present.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.command.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Command supports RTL layouts.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.command.docs"
+        ]
+      }
+    }
+  ]
+}

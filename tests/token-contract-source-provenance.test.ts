@@ -25,7 +25,7 @@ describe("Phase 2 token contract source provenance", () => {
       sources: {
         canonicalTheme: {
           path: "src/index.css",
-          blobSha: "d8c0cfe33f88e04af7aea72c952abee5903d836e",
+          blobSha: "f0402b08be0c2ea80831805928d87977e5543e8d",
         },
         shadcnNeutral: {
           repository: "shadcn-ui/ui",
@@ -46,5 +46,36 @@ describe("Phase 2 token contract source provenance", () => {
 
     const packageLock = JSON.parse(readFileSync(join(repoRoot, "package-lock.json"), "utf8"))
     expect(tailwindTheme.packageLockIntegrity).toBe(packageLock.packages["node_modules/tailwindcss"].integrity)
+  })
+
+  test("records the owner brand layer and where its values match the pinned Tailwind palette", () => {
+    const provenance = JSON.parse(readFileSync(provenancePath, "utf8"))
+    const contract = JSON.parse(readFileSync(join(repoRoot, "contracts/tokens/token-contract.json"), "utf8"))
+    const brand = provenance.brandLayer
+
+    expect(brand.sourceCommit).toBe(contract.sourceBaselineCommit)
+    expect(brand.tokens).toEqual([
+      "color.primary",
+      "color.primary-foreground",
+      "color.ring",
+      "color.sidebar-primary",
+      "color.sidebar-primary-foreground",
+      "color.sidebar-ring",
+    ])
+
+    const valueOf = (id: string, mode: "light" | "dark") => contract.tokens.find((token: { id: string }) => token.id === id).value.values[mode]
+    for (const mode of ["light", "dark"] as const) {
+      const { brand: brandValue, foreground } = brand.values[mode]
+      for (const id of ["color.primary", "color.ring", "color.sidebar-primary", "color.sidebar-ring"]) expect(valueOf(id, mode)).toBe(brandValue)
+      for (const id of ["color.primary-foreground", "color.sidebar-primary-foreground"]) expect(valueOf(id, mode)).toBe(foreground)
+
+      const origin = brand.valueOrigin[mode]
+      expect(origin.path).toBe(provenance.sources.tailwindTheme.path)
+      expect(origin.version).toBe(provenance.sources.tailwindTheme.version)
+      const themeCss = readFileSync(join(repoRoot, origin.path), "utf8")
+      expect(themeCss).toContain(`${origin.variable}: ${origin.value};`)
+      const [, lightness, chroma, hue] = /^oklch\(([\d.]+)% ([\d.]+) ([\d.]+)\)$/.exec(origin.value)!
+      expect(brandValue).toBe(`oklch(${Number((Number(lightness) / 100).toFixed(6))} ${chroma} ${hue})`)
+    }
   })
 })

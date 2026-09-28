@@ -3,30 +3,10 @@ import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
 import { describe, expect, test } from "vitest"
+import { canonicalFamilyIds as expectedFamilyIds } from "./fixtures/canonical-component-inventory"
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
 const provenancePath = join(repoRoot, "provenance/component-contract-source.json")
-const expectedFamilyIds = [
-  "accordion",
-  "badge",
-  "button",
-  "card",
-  "checkbox",
-  "dialog",
-  "dropdown-menu",
-  "input",
-  "label",
-  "scroll-area",
-  "select",
-  "separator",
-  "sheet",
-  "sidebar",
-  "skeleton",
-  "table",
-  "tabs",
-  "textarea",
-  "tooltip",
-]
 
 type SeedComponent = {
   canonicalPath: string
@@ -40,7 +20,7 @@ function gitBlobSha(path: string) {
   return execFileSync("git", ["hash-object", path], { cwd: repoRoot, encoding: "utf8" }).trim()
 }
 
-describe("Phase 3 component-contract source provenance", () => {
+describe("canonical component-contract source provenance", { timeout: 60000 }, () => {
   test("freezes the approved baseline, seed closure, token contract, and package pins", () => {
     expect(existsSync(provenancePath)).toBe(true)
 
@@ -59,11 +39,11 @@ describe("Phase 3 component-contract source provenance", () => {
       familySource: {
         path: "provenance/seed-components.json",
         blobSha: gitBlobSha("provenance/seed-components.json"),
-        familyCount: 19,
+        familyCount: 38,
         familyIds: expectedFamilyIds,
       },
       tokenContract: {
-        id: "shadcn-radix-token-contract-001",
+        id: "shadcn-radix-token-contract-002",
         status: "approved",
         path: "contracts/tokens/token-contract.json",
         blobSha: gitBlobSha("contracts/tokens/token-contract.json"),
@@ -74,15 +54,17 @@ describe("Phase 3 component-contract source provenance", () => {
         "radix-ui": { version: "1.6.7" },
         typescript: { version: "5.5.4" },
         "class-variance-authority": { version: "0.7.1" },
+        cmdk: { version: "1.1.1" },
+        vaul: { version: "1.1.2" },
       },
     })
 
     expect(familyIds).toEqual(expectedFamilyIds)
-    expect(familyIds).toHaveLength(19)
+    expect(familyIds).toHaveLength(38)
     expect(provenance.familySource.familyIds).toEqual(familyIds)
     expect(provenance.familySource.blobSha).toBe(gitBlobSha(provenance.familySource.path))
 
-    expect(tokenContract.id).toBe("shadcn-radix-token-contract-001")
+    expect(tokenContract.id).toBe("shadcn-radix-token-contract-002")
     expect(tokenContract.status).toBe("approved")
     expect(tokenContract.tokens).toHaveLength(82)
     expect(tokenContract.derivedRules).toHaveLength(1)
@@ -94,6 +76,8 @@ describe("Phase 3 component-contract source provenance", () => {
       "radix-ui": "1.6.7",
       typescript: "5.5.4",
       "class-variance-authority": "0.7.1",
+      cmdk: "1.1.1",
+      vaul: "1.1.2",
     }
     for (const [packageName, expectedVersion] of Object.entries(expectedPackages)) {
       const declaredVersion = packageJson.dependencies[packageName] ?? packageJson.devDependencies[packageName]
@@ -102,7 +86,15 @@ describe("Phase 3 component-contract source provenance", () => {
       expect(provenance.packages[packageName].version).toBe(expectedVersion)
     }
 
-    for (const component of Object.values(seed.components)) {
+    for (const [id, component] of Object.entries(seed.components)) {
+      const family = JSON.parse(readFileSync(join(repoRoot, `contracts/components/families/${id}.json`), "utf8"))
+      expect(family.source).toMatchObject({
+        canonicalPath: component.canonicalPath,
+        canonicalBlobSha: component.canonicalBlobSha,
+        upstreamPath: component.upstreamPath,
+        upstreamBlobSha: component.upstreamBlobSha,
+        implementationKind: component.implementationKind,
+      })
       expect(existsSync(join(repoRoot, component.canonicalPath))).toBe(true)
       expect(component.canonicalBlobSha).toBe(gitBlobSha(component.canonicalPath))
       expect(component.upstreamPath).not.toBe("")

@@ -3,7 +3,7 @@
   "id": "sidebar",
   "source": {
     "canonicalPath": "src/components/ui/sidebar.tsx",
-    "canonicalBlobSha": "a2cc82dbfd31c8f75a326946cf9fe87389d334d0",
+    "canonicalBlobSha": "30877f7508ba49fe48992ca744f53a3903ed4482",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
     "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4"
@@ -11,15 +11,19 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sidebar.tsx@a2cc82dbfd31c8f75a326946cf9fe87389d334d0"
+      "source": "src/components/ui/sidebar.tsx@30877f7508ba49fe48992ca744f53a3903ed4482"
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-001"
+      "source": "shadcn-radix-token-contract-002"
     },
     "runtime": {
       "kind": "runtime-test",
       "source": "tests/studio-components-sidebar.test.tsx"
+    },
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "html.div"
     }
   },
   "exports": [
@@ -33,6 +37,18 @@
       "component": {
         "localProps": [
           {
+            "name": "isMobile",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
             "name": "defaultOpen",
             "required": false,
             "type": {
@@ -40,7 +56,8 @@
             },
             "default": true,
             "evidenceRefs": [
-              "source"
+              "source",
+              "declaration"
             ]
           },
           {
@@ -50,7 +67,8 @@
               "kind": "boolean"
             },
             "evidenceRefs": [
-              "source"
+              "source",
+              "declaration"
             ]
           },
           {
@@ -61,7 +79,43 @@
               "typeText": "(open: boolean) => void"
             },
             "evidenceRefs": [
-              "source"
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "name": "defaultOpenMobile",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "name": "openMobile",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "name": "onOpenMobileChange",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "(open: boolean) => void"
+            },
+            "evidenceRefs": [
+              "source",
+              "declaration"
             ]
           }
         ],
@@ -85,6 +139,18 @@
             "changeEventProp": "onOpenChange",
             "evidenceRefs": [
               "source",
+              "declaration",
+              "runtime"
+            ]
+          },
+          {
+            "name": "openMobile",
+            "controlledProp": "openMobile",
+            "defaultProp": "defaultOpenMobile",
+            "changeEventProp": "onOpenMobileChange",
+            "evidenceRefs": [
+              "source",
+              "declaration",
               "runtime"
             ]
           }
@@ -98,13 +164,46 @@
             },
             "evidenceRefs": [
               "source",
+              "declaration",
+              "runtime"
+            ]
+          },
+          {
+            "propName": "onOpenMobileChange",
+            "payload": {
+              "kind": "boolean"
+            },
+            "evidenceRefs": [
+              "source",
+              "declaration",
               "runtime"
             ]
           }
         ],
         "tokenDependencies": [
           {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.sidebar",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "has"
+                }
+              ],
+              "propName": "variant",
+              "equals": "inset"
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -113,30 +212,10 @@
         ],
         "rendering": {
           "rootNodeId": "provider",
-          "publicPropsTargetNodeId": "wrapper",
+          "publicPropsTargetNodeId": "flow-spacer",
           "nodes": [
             {
-              "id": "provider",
-              "host": {
-                "kind": "unresolved"
-              },
-              "receivesPublicProps": false,
-              "dataAttributes": [],
-              "derivedSpreads": [],
-              "children": [
-                {
-                  "nodeId": "wrapper",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                }
-              ],
-              "evidenceRefs": [
-                "source"
-              ]
-            },
-            {
-              "id": "wrapper",
+              "id": "flow-spacer",
               "host": {
                 "kind": "intrinsic",
                 "tag": "div"
@@ -150,10 +229,61 @@
                   "evidenceRefs": [
                     "source"
                   ]
+                },
+                {
+                  "name": "data-mobile",
+                  "source": "derived-condition",
+                  "condition": {
+                    "propName": "isMobile",
+                    "truthiness": "truthy"
+                  },
+                  "evidenceRefs": [
+                    "source"
+                  ]
                 }
               ],
               "derivedSpreads": [],
               "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "runtime-provider",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "derivedSpreads": [],
+              "children": [
+                {
+                  "nodeId": "flow-spacer",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "id": "provider",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "derivedSpreads": [],
+              "children": [
+                {
+                  "nodeId": "runtime-provider",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
               "evidenceRefs": [
                 "source"
               ]
@@ -174,6 +304,35 @@
       "component": {
         "localProps": [
           {
+            "name": "collapsible",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "icon",
+                "none",
+                "offcanvas"
+              ]
+            },
+            "default": "offcanvas",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof SheetContent>[\"portalContainer\"]"
+            },
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
             "name": "side",
             "required": false,
             "type": {
@@ -186,7 +345,7 @@
             "default": "left",
             "evidenceRefs": [
               "source",
-              "runtime"
+              "declaration"
             ]
           },
           {
@@ -195,30 +354,15 @@
             "type": {
               "kind": "enum",
               "values": [
-                "sidebar",
                 "floating",
-                "inset"
+                "inset",
+                "sidebar"
               ]
             },
             "default": "sidebar",
             "evidenceRefs": [
-              "source"
-            ]
-          },
-          {
-            "name": "collapsible",
-            "required": false,
-            "type": {
-              "kind": "enum",
-              "values": [
-                "offcanvas",
-                "icon",
-                "none"
-              ]
-            },
-            "default": "offcanvas",
-            "evidenceRefs": [
-              "source"
+              "source",
+              "declaration"
             ]
           }
         ],
@@ -239,6 +383,38 @@
         "events": [],
         "tokenDependencies": [
           {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "collapsible",
+              "equals": "offcanvas"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.sidebar",
             "evidenceRefs": [
               "source",
@@ -254,6 +430,53 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "side",
+              "equals": "left"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "side",
+              "equals": "right"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[collapsible=offcanvas]"
+              ]
+            },
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 0
@@ -283,9 +506,68 @@
                 "equals": "none"
               },
               "rendering": {
-                "rootNodeId": "plain",
+                "rootNodeId": "plain-provider",
                 "publicPropsTargetNodeId": "plain",
                 "nodes": [
+                  {
+                    "id": "flow-spacer",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-flow-spacer",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "effectiveState",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-collapsible",
+                        "source": "conditional-value",
+                        "condition": {
+                          "source": "state",
+                          "name": "effectiveState",
+                          "equals": "collapsed"
+                        },
+                        "whenTrue": {
+                          "source": "prop",
+                          "name": "collapsible"
+                        },
+                        "whenFalse": {
+                          "source": "literal",
+                          "value": ""
+                        },
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-side",
+                        "source": "prop",
+                        "prop": "side",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
                   {
                     "id": "plain",
                     "host": {
@@ -301,10 +583,88 @@
                         "evidenceRefs": [
                           "source"
                         ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "effectiveState",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-collapsible",
+                        "source": "literal",
+                        "value": "",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-side",
+                        "source": "prop",
+                        "prop": "side",
+                        "evidenceRefs": [
+                          "source"
+                        ]
                       }
                     ],
                     "derivedSpreads": [],
                     "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "plain-fragment",
+                    "host": {
+                      "kind": "fragment"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "flow-spacer",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "plain",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "plain-provider",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "plain-fragment",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
                     "evidenceRefs": [
                       "source"
                     ]
@@ -323,76 +683,31 @@
                 "truthiness": "truthy"
               },
               "rendering": {
-                "rootNodeId": "sheet",
-                "publicPropsTargetNodeId": "sheet",
+                "rootNodeId": "mobile-provider",
+                "publicPropsTargetNodeId": "sheet-content",
                 "nodes": [
                   {
-                    "id": "sheet",
+                    "id": "sheet-title",
                     "host": {
                       "kind": "unresolved"
                     },
-                    "receivesPublicProps": true,
+                    "receivesPublicProps": false,
                     "dataAttributes": [],
                     "derivedSpreads": [],
-                    "children": [
-                      {
-                        "nodeId": "sheet-content",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
+                    "children": [],
                     "evidenceRefs": [
                       "source"
                     ]
                   },
                   {
-                    "id": "sheet-content",
+                    "id": "sheet-description",
                     "host": {
                       "kind": "unresolved"
                     },
                     "receivesPublicProps": false,
-                    "dataAttributes": [
-                      {
-                        "name": "data-sidebar",
-                        "source": "literal",
-                        "value": "sidebar",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      },
-                      {
-                        "name": "data-slot",
-                        "source": "literal",
-                        "value": "sidebar",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      },
-                      {
-                        "name": "data-mobile",
-                        "source": "literal",
-                        "value": "true",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
+                    "dataAttributes": [],
                     "derivedSpreads": [],
-                    "children": [
-                      {
-                        "nodeId": "sheet-header",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      },
-                      {
-                        "nodeId": "mobile-inner",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
+                    "children": [],
                     "evidenceRefs": [
                       "source"
                     ]
@@ -424,32 +739,6 @@
                     ]
                   },
                   {
-                    "id": "sheet-title",
-                    "host": {
-                      "kind": "unresolved"
-                    },
-                    "receivesPublicProps": false,
-                    "dataAttributes": [],
-                    "derivedSpreads": [],
-                    "children": [],
-                    "evidenceRefs": [
-                      "source"
-                    ]
-                  },
-                  {
-                    "id": "sheet-description",
-                    "host": {
-                      "kind": "unresolved"
-                    },
-                    "receivesPublicProps": false,
-                    "dataAttributes": [],
-                    "derivedSpreads": [],
-                    "children": [],
-                    "evidenceRefs": [
-                      "source"
-                    ]
-                  },
-                  {
                     "id": "mobile-inner",
                     "host": {
                       "kind": "intrinsic",
@@ -459,6 +748,145 @@
                     "dataAttributes": [],
                     "derivedSpreads": [],
                     "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sheet-content",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-mobile",
+                        "source": "literal",
+                        "value": "true",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "conditional-value",
+                        "condition": {
+                          "source": "state",
+                          "name": "openMobile",
+                          "truthiness": "truthy"
+                        },
+                        "whenTrue": {
+                          "source": "literal",
+                          "value": "expanded"
+                        },
+                        "whenFalse": {
+                          "source": "literal",
+                          "value": "collapsed"
+                        },
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-collapsible",
+                        "source": "conditional-value",
+                        "condition": {
+                          "source": "state",
+                          "name": "openMobile",
+                          "truthiness": "truthy"
+                        },
+                        "whenTrue": {
+                          "source": "literal",
+                          "value": ""
+                        },
+                        "whenFalse": {
+                          "source": "prop",
+                          "name": "collapsible"
+                        },
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sheet-header",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "mobile-inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sheet",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sheet-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "mobile-provider",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sheet",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
                     "evidenceRefs": [
                       "source"
                     ]
@@ -473,9 +901,160 @@
             {
               "otherwise": true,
               "rendering": {
-                "rootNodeId": "desktop",
+                "rootNodeId": "desktop-provider",
                 "publicPropsTargetNodeId": "container",
                 "nodes": [
+                  {
+                    "id": "flow-spacer",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-flow-spacer",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "effectiveState",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-collapsible",
+                        "source": "conditional-value",
+                        "condition": {
+                          "source": "state",
+                          "name": "effectiveState",
+                          "equals": "collapsed"
+                        },
+                        "whenTrue": {
+                          "source": "prop",
+                          "name": "collapsible"
+                        },
+                        "whenFalse": {
+                          "source": "literal",
+                          "value": ""
+                        },
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-side",
+                        "source": "prop",
+                        "prop": "side",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "gap",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-gap",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "inner",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "container",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-container",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-side",
+                        "source": "prop",
+                        "prop": "side",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
                   {
                     "id": "desktop",
                     "host": {
@@ -487,7 +1066,7 @@
                       {
                         "name": "data-state",
                         "source": "primitive-state",
-                        "prop": "state",
+                        "prop": "effectiveState",
                         "evidenceRefs": [
                           "source"
                         ]
@@ -497,7 +1076,7 @@
                         "source": "conditional-value",
                         "condition": {
                           "source": "state",
-                          "name": "state",
+                          "name": "effectiveState",
                           "equals": "collapsed"
                         },
                         "whenTrue": {
@@ -557,57 +1136,22 @@
                     ]
                   },
                   {
-                    "id": "gap",
+                    "id": "desktop-fragment",
                     "host": {
-                      "kind": "intrinsic",
-                      "tag": "div"
+                      "kind": "fragment"
                     },
                     "receivesPublicProps": false,
-                    "dataAttributes": [
-                      {
-                        "name": "data-slot",
-                        "source": "literal",
-                        "value": "sidebar-gap",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
-                    "derivedSpreads": [],
-                    "children": [],
-                    "evidenceRefs": [
-                      "source"
-                    ]
-                  },
-                  {
-                    "id": "container",
-                    "host": {
-                      "kind": "intrinsic",
-                      "tag": "div"
-                    },
-                    "receivesPublicProps": true,
-                    "dataAttributes": [
-                      {
-                        "name": "data-slot",
-                        "source": "literal",
-                        "value": "sidebar-container",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      },
-                      {
-                        "name": "data-side",
-                        "source": "prop",
-                        "prop": "side",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
+                    "dataAttributes": [],
                     "derivedSpreads": [],
                     "children": [
                       {
-                        "nodeId": "inner",
+                        "nodeId": "flow-spacer",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "desktop",
                         "evidenceRefs": [
                           "source"
                         ]
@@ -618,32 +1162,21 @@
                     ]
                   },
                   {
-                    "id": "inner",
+                    "id": "desktop-provider",
                     "host": {
-                      "kind": "intrinsic",
-                      "tag": "div"
+                      "kind": "unresolved"
                     },
                     "receivesPublicProps": false,
-                    "dataAttributes": [
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
                       {
-                        "name": "data-sidebar",
-                        "source": "literal",
-                        "value": "sidebar",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      },
-                      {
-                        "name": "data-slot",
-                        "source": "literal",
-                        "value": "sidebar-inner",
+                        "nodeId": "desktop-fragment",
                         "evidenceRefs": [
                           "source"
                         ]
                       }
                     ],
-                    "derivedSpreads": [],
-                    "children": [],
                     "evidenceRefs": [
                       "source"
                     ]
@@ -668,7 +1201,62 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "icon",
+                "icon-lg",
+                "icon-sm",
+                "icon-xs",
+                "lg",
+                "sm",
+                "xs"
+              ]
+            },
+            "default": "icon-sm",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "destructive",
+                "ghost",
+                "link",
+                "outline",
+                "secondary"
+              ]
+            },
+            "default": "ghost",
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
+          }
+        ],
         "inherits": [
           "html.button"
         ],
@@ -837,7 +1425,113 @@
             ]
           },
           {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[side=left]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[side=right]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.sidebar",
+            "sourceContext": {
+              "applicability": [
+                "hover",
+                "group-data-[collapsible=offcanvas]"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "[[data-side=left][data-collapsible=offcanvas]_&]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [
+                "[[data-side=right][data-collapsible=offcanvas]_&]"
+              ]
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -845,11 +1539,19 @@
           }
         ],
         "rendering": {
-          "rootNodeId": "rail",
-          "publicPropsTargetNodeId": "rail",
+          "alternatives": [
+            {
+              "when": {
+                "source": "state",
+                "name": "isMobile",
+                "truthiness": "falsy"
+              },
+              "rendering": {
+          "rootNodeId": "sidebarrail-0-0",
+          "publicPropsTargetNodeId": "sidebarrail-0-0",
           "nodes": [
             {
-              "id": "rail",
+              "id": "sidebarrail-0-0",
               "host": {
                 "kind": "intrinsic",
                 "tag": "button"
@@ -881,6 +1583,12 @@
             }
           ],
           "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ]
         },
         "accessibility": []
       }
@@ -1544,41 +2252,97 @@
           }
         ],
         "rendering": {
-          "rootNodeId": "group-label",
-          "publicPropsTargetNodeId": "group-label",
-          "nodes": [
+          "alternatives": [
             {
-              "id": "group-label",
-              "host": {
-                "kind": "unresolved"
+              "when": {
+                "propName": "asChild",
+                "equals": true
               },
-              "receivesPublicProps": true,
-              "dataAttributes": [
-                {
-                  "name": "data-sidebar",
-                  "source": "literal",
-                  "value": "group-label",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-slot",
-                  "source": "literal",
-                  "value": "sidebar-group-label",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                }
-              ],
-              "derivedSpreads": [],
-              "children": [],
+              "rendering": {
+                "rootNodeId": "group-label",
+                "publicPropsTargetNodeId": "group-label",
+                "nodes": [
+                  {
+                    "id": "group-label",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "group-label",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-group-label",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "group-label",
+                "publicPropsTargetNodeId": "group-label",
+                "nodes": [
+                  {
+                    "id": "group-label",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "group-label",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-group-label",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
               "evidenceRefs": [
                 "source"
               ]
             }
-          ],
-          "portalBoundaries": []
+          ]
         },
         "accessibility": []
       }
@@ -1642,44 +2406,125 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {
-          "rootNodeId": "group-action",
-          "publicPropsTargetNodeId": "group-action",
-          "nodes": [
+          "alternatives": [
             {
-              "id": "group-action",
-              "host": {
-                "kind": "unresolved"
+              "when": {
+                "propName": "asChild",
+                "equals": true
               },
-              "receivesPublicProps": true,
-              "dataAttributes": [
-                {
-                  "name": "data-sidebar",
-                  "source": "literal",
-                  "value": "group-action",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-slot",
-                  "source": "literal",
-                  "value": "sidebar-group-action",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                }
-              ],
-              "derivedSpreads": [],
-              "children": [],
+              "rendering": {
+                "rootNodeId": "group-action",
+                "publicPropsTargetNodeId": "group-action",
+                "nodes": [
+                  {
+                    "id": "group-action",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "group-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-group-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "group-action",
+                "publicPropsTargetNodeId": "group-action",
+                "nodes": [
+                  {
+                    "id": "group-action",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "group-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-group-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
               "evidenceRefs": [
                 "source"
               ]
             }
-          ],
-          "portalBoundaries": []
+          ]
         },
         "accessibility": []
       }
@@ -1997,7 +2842,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "unresolved",
+            "refForwarding": "supported",
             "evidenceRefs": [
               "source"
             ]
@@ -2052,6 +2897,13 @@
             ]
           },
           {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -2085,10 +2937,49 @@
             ]
           },
           {
+            "tokenId": "color.sidebar-accent",
+            "when": {
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "active",
+                  "equals": true
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "font-weight.medium",
             "when": {
-              "propName": "variant",
-              "equals": "default"
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "active",
+                  "equals": true
+                }
+              ]
             },
             "evidenceRefs": [
               "source",
@@ -2200,15 +3091,23 @@
           "alternatives": [
             {
               "when": {
-                "propName": "tooltip",
-                "truthiness": "falsy"
+                "all": [
+                  {
+                    "propName": "tooltip",
+                    "truthiness": "falsy"
+                  },
+                  {
+                    "propName": "asChild",
+                    "equals": true
+                  }
+                ]
               },
               "rendering": {
-                "rootNodeId": "button",
-                "publicPropsTargetNodeId": "button",
+                "rootNodeId": "sidebarmenubutton-0-0",
+                "publicPropsTargetNodeId": "sidebarmenubutton-0-0",
                 "nodes": [
                   {
-                    "id": "button",
+                    "id": "sidebarmenubutton-0-0",
                     "host": {
                       "kind": "unresolved"
                     },
@@ -2242,6 +3141,14 @@
                         "name": "data-active",
                         "source": "prop",
                         "prop": "isActive",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "effectiveState",
                         "evidenceRefs": [
                           "source"
                         ]
@@ -2262,61 +3169,23 @@
             },
             {
               "when": {
-                "propName": "tooltip",
-                "truthiness": "truthy"
+                "all": [
+                  {
+                    "propName": "tooltip",
+                    "truthiness": "falsy"
+                  },
+                  {
+                    "propName": "asChild",
+                    "equals": false
+                  }
+                ]
               },
               "rendering": {
-                "rootNodeId": "tooltip",
-                "publicPropsTargetNodeId": "button",
+                "rootNodeId": "sidebarmenubutton-0-0",
+                "publicPropsTargetNodeId": "sidebarmenubutton-0-0",
                 "nodes": [
                   {
-                    "id": "tooltip",
-                    "host": {
-                      "kind": "unresolved"
-                    },
-                    "receivesPublicProps": false,
-                    "dataAttributes": [],
-                    "derivedSpreads": [],
-                    "children": [
-                      {
-                        "nodeId": "tooltip-trigger",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      },
-                      {
-                        "nodeId": "tooltip-content",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
-                    "evidenceRefs": [
-                      "source"
-                    ]
-                  },
-                  {
-                    "id": "tooltip-trigger",
-                    "host": {
-                      "kind": "unresolved"
-                    },
-                    "receivesPublicProps": false,
-                    "dataAttributes": [],
-                    "derivedSpreads": [],
-                    "children": [
-                      {
-                        "nodeId": "button",
-                        "evidenceRefs": [
-                          "source"
-                        ]
-                      }
-                    ],
-                    "evidenceRefs": [
-                      "source"
-                    ]
-                  },
-                  {
-                    "id": "button",
+                    "id": "sidebarmenubutton-0-0",
                     "host": {
                       "kind": "unresolved"
                     },
@@ -2353,6 +3222,92 @@
                         "evidenceRefs": [
                           "source"
                         ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "effectiveState",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "tooltip",
+                    "truthiness": "truthy"
+                  },
+                  {
+                    "propName": "asChild",
+                    "equals": true
+                  }
+                ]
+              },
+              "rendering": {
+                "rootNodeId": "sidebarmenubutton-1-0",
+                "publicPropsTargetNodeId": "sidebarmenubutton-1-0-0-0",
+                "nodes": [
+                  {
+                    "id": "sidebarmenubutton-1-0-0-0",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-active",
+                        "source": "prop",
+                        "prop": "isActive",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "effectiveState",
+                        "evidenceRefs": [
+                          "source"
+                        ]
                       }
                     ],
                     "derivedSpreads": [],
@@ -2362,7 +3317,27 @@
                     ]
                   },
                   {
-                    "id": "tooltip-content",
+                    "id": "sidebarmenubutton-1-0-0",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sidebarmenubutton-1-0-0-0",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sidebarmenubutton-1-0-1",
                     "host": {
                       "kind": "unresolved"
                     },
@@ -2378,6 +3353,177 @@
                       }
                     ],
                     "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sidebarmenubutton-1-0",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sidebarmenubutton-1-0-0",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "sidebarmenubutton-1-0-1",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "tooltip",
+                    "truthiness": "truthy"
+                  },
+                  {
+                    "propName": "asChild",
+                    "equals": false
+                  }
+                ]
+              },
+              "rendering": {
+                "rootNodeId": "sidebarmenubutton-1-0",
+                "publicPropsTargetNodeId": "sidebarmenubutton-1-0-0-0",
+                "nodes": [
+                  {
+                    "id": "sidebarmenubutton-1-0-0-0",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-active",
+                        "source": "prop",
+                        "prop": "isActive",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-state",
+                        "source": "primitive-state",
+                        "prop": "effectiveState",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sidebarmenubutton-1-0-0",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sidebarmenubutton-1-0-0-0",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sidebarmenubutton-1-0-1",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [
+                      {
+                        "source": "prop",
+                        "name": "tooltip",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "sidebarmenubutton-1-0",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "derivedSpreads": [],
+                    "children": [
+                      {
+                        "nodeId": "sidebarmenubutton-1-0-0",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "sidebarmenubutton-1-0-1",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
                     "evidenceRefs": [
                       "source"
                     ]
@@ -2442,7 +3588,7 @@
             "childRequires": [
               "multiple children require a Radix Slottable that resolves to one React element"
             ],
-            "refForwarding": "unresolved",
+            "refForwarding": "supported",
             "evidenceRefs": [
               "source"
             ]
@@ -2499,7 +3645,43 @@
             ]
           },
           {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.sidebar-accent-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "peer",
+                  "name": "menu-button"
+                }
+              ],
+              "propName": "active",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -2507,41 +3689,97 @@
           }
         ],
         "rendering": {
-          "rootNodeId": "menu-action",
-          "publicPropsTargetNodeId": "menu-action",
-          "nodes": [
+          "alternatives": [
             {
-              "id": "menu-action",
-              "host": {
-                "kind": "unresolved"
+              "when": {
+                "propName": "asChild",
+                "equals": true
               },
-              "receivesPublicProps": true,
-              "dataAttributes": [
-                {
-                  "name": "data-sidebar",
-                  "source": "literal",
-                  "value": "menu-action",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-slot",
-                  "source": "literal",
-                  "value": "sidebar-menu-action",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                }
-              ],
-              "derivedSpreads": [],
-              "children": [],
+              "rendering": {
+                "rootNodeId": "menu-action",
+                "publicPropsTargetNodeId": "menu-action",
+                "nodes": [
+                  {
+                    "id": "menu-action",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "menu-action",
+                "publicPropsTargetNodeId": "menu-action",
+                "nodes": [
+                  {
+                    "id": "menu-action",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-action",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
               "evidenceRefs": [
                 "source"
               ]
             }
-          ],
-          "portalBoundaries": []
+          ]
         },
         "accessibility": []
       }
@@ -2627,7 +3865,21 @@
             },
             "default": false,
             "evidenceRefs": [
-              "source"
+              "source",
+              "declaration"
+            ]
+          },
+          {
+            "name": "width",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "CSSProperties[\"width\"]"
+            },
+            "default": "70%",
+            "evidenceRefs": [
+              "source",
+              "declaration"
             ]
           }
         ],
@@ -3122,6 +4374,13 @@
             ]
           },
           {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.sidebar-accent",
             "evidenceRefs": [
               "source",
@@ -3136,7 +4395,34 @@
             ]
           },
           {
+            "tokenId": "color.sidebar-accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "active",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "font-weight.medium",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "active",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -3162,57 +4448,129 @@
           }
         ],
         "rendering": {
-          "rootNodeId": "menu-sub-button",
-          "publicPropsTargetNodeId": "menu-sub-button",
-          "nodes": [
+          "alternatives": [
             {
-              "id": "menu-sub-button",
-              "host": {
-                "kind": "unresolved"
+              "when": {
+                "propName": "asChild",
+                "equals": true
               },
-              "receivesPublicProps": true,
-              "dataAttributes": [
-                {
-                  "name": "data-sidebar",
-                  "source": "literal",
-                  "value": "menu-sub-button",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-slot",
-                  "source": "literal",
-                  "value": "sidebar-menu-sub-button",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-size",
-                  "source": "prop",
-                  "prop": "size",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-active",
-                  "source": "prop",
-                  "prop": "isActive",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                }
-              ],
-              "derivedSpreads": [],
-              "children": [],
+              "rendering": {
+                "rootNodeId": "menu-sub-button",
+                "publicPropsTargetNodeId": "menu-sub-button",
+                "nodes": [
+                  {
+                    "id": "menu-sub-button",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-sub-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-sub-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-active",
+                        "source": "prop",
+                        "prop": "isActive",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
+              "evidenceRefs": [
+                "source"
+              ]
+            },
+            {
+              "otherwise": true,
+              "rendering": {
+                "rootNodeId": "menu-sub-button",
+                "publicPropsTargetNodeId": "menu-sub-button",
+                "nodes": [
+                  {
+                    "id": "menu-sub-button",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "menu-sub-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-menu-sub-button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-active",
+                        "source": "prop",
+                        "prop": "isActive",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              },
               "evidenceRefs": [
                 "source"
               ]
             }
-          ],
-          "portalBoundaries": []
+          ]
         },
         "accessibility": []
       }

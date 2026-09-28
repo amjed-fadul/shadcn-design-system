@@ -125,6 +125,11 @@ describe("production validator against immutable release", () => {
         viaDerivedRule: { id: "spacing.multiplier", parameter: literal(2) },
         location: { path: "page.tokens.spacing.unit" },
       },
+      {
+        tokenId: "spacing.unit",
+        viaDerivedRule: { id: "spacing.multiplier", parameter: literal(-1) },
+        location: { path: "page.tokens.spacing.unit.negative" },
+      },
     ]))
 
     expect(result).toEqual({ ok: true, errors: [] })
@@ -226,6 +231,9 @@ describe("production validator against immutable release", () => {
     const candidate = cloneRelease(release)
     candidate.projection = { ...candidate.projection, tokenIds: [...candidate.projection.tokenIds, "forged.token"] }
 
-    expect(() => loadExecutableRelease(candidate, { expectedProjection: release.projection })).toThrowError(/PROJECTION_MISMATCH|HASH_MISMATCH/)
+    expect(() => loadExecutableRelease(candidate, {
+      expectedProjection: release.projection,
+      expectedReleaseId: "shadcn-radix-release-006",
+    })).toThrowError(/PROJECTION_MISMATCH|HASH_MISMATCH/)
   })
 })

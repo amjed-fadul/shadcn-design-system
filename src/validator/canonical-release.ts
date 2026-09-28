@@ -1,18 +1,22 @@
-import executableReleaseArtifact from "../../provenance/releases/shadcn-radix-release-001.json"
+import executableReleaseArtifact from "../../provenance/releases/shadcn-radix-release-006.json"
 
 import { loadComponentContracts } from "../contracts/components/canonical-loader"
 import { getTokenContract } from "../contracts/tokens/contract"
 import { projectExecutableContract } from "./projection"
 import { loadExecutableRelease } from "./release"
 import { validateAuthoredUi } from "./validate"
-import type { AuthoredUi, ExecutableRelease, ExecutableContractSource } from "./types"
+import type { AuthoredUi, ExecutableContractSource, ExecutableRelease } from "./types"
 
 const approvedSource: ExecutableContractSource = {
   componentContracts: loadComponentContracts(),
   tokenContract: getTokenContract(),
 }
 const approvedProjection = projectExecutableContract(approvedSource)
-const executableRelease = loadExecutableRelease(executableReleaseArtifact, { expectedProjection: approvedProjection })
+const executableRelease = loadExecutableRelease(executableReleaseArtifact, {
+  expectedProjection: approvedProjection,
+  expectedReleaseId: "shadcn-radix-release-006",
+  requirePackageIdentity: true,
+})
 
 /** Returns the one immutable release used by production validation. */
 export function getExecutableRelease(): ExecutableRelease {

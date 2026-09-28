@@ -17,12 +17,26 @@ export type DelegatedHostSourceAnalysis = {
 
 type SourceFunction = ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression
 
-function sourceFunction(file: ts.SourceFile, exportName: string): SourceFunction | undefined {
+export function findDelegatedSourceFunction(file: ts.SourceFile, exportName: string): SourceFunction | undefined {
   let result: SourceFunction | undefined
+  const reactNamespaces = new Set<string>()
+  for (const statement of file.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || statement.moduleSpecifier.text !== "react") continue
+    const clause = statement.importClause
+    if (clause?.name) reactNamespaces.add(clause.name.text)
+    if (clause?.namedBindings && ts.isNamespaceImport(clause.namedBindings)) reactNamespaces.add(clause.namedBindings.name.text)
+  }
   const visit = (node: ts.Node) => {
     if (result) return
     if (ts.isFunctionDeclaration(node) && node.name?.text === exportName) result = node
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === exportName && node.initializer && (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))) result = node.initializer
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === exportName && node.initializer && ts.isCallExpression(node.initializer)) {
+      const callee = node.initializer.expression
+      if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression) && reactNamespaces.has(callee.expression.text) && callee.name.text === "forwardRef") {
+        const render = node.initializer.arguments[0]
+        if (render && (ts.isArrowFunction(render) || ts.isFunctionExpression(render))) result = render
+      }
+    }
     ts.forEachChild(node, visit)
   }
   visit(file)
@@ -139,7 +153,7 @@ function sourceOwnedChildCardinality(node: ts.Node): ChildCardinality {
 }
 
 function hostImplementation(file: ts.SourceFile, sourcePath: string, expression: ts.Expression, conventions: DelegatedHostSourceAnalysisConventions): ts.Node | undefined {
-  if (ts.isIdentifier(expression)) return sourceFunction(file, expression.text)
+  if (ts.isIdentifier(expression)) return findDelegatedSourceFunction(file, expression.text)
   const implementationPath = conventions.resolveReplacementHostSource?.(expression, sourcePath)
   return implementationPath ? sourceFile(implementationPath) : undefined
 }
@@ -151,7 +165,7 @@ function hostImplementation(file: ts.SourceFile, sourcePath: string, expression:
  */
 export function analyzeConfiguredDelegatedHostFacts(sourcePath: string, exportName: string, conventions: DelegatedHostSourceAnalysisConventions): DelegatedHostSourceAnalysis {
   const file = sourceFile(sourcePath)
-  const declaration = sourceFunction(file, exportName)
+  const declaration = findDelegatedSourceFunction(file, exportName)
   if (!declaration) return { facts: [], errors: [] }
   const restProps = sourceRestProps(declaration)
   const facts: SourceOwnedSlotFact[] = []

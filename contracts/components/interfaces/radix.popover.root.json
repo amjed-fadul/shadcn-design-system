@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "id": "radix.popover.root",
+  "source": {
+    "kind": "package-declaration",
+    "package": "@radix-ui/react-popover",
+    "version": "1.1.23",
+    "declarationPath": "node_modules/@radix-ui/react-popover/dist/index.d.ts",
+    "declarationSha256": "2535fc1a5fe64892783ff8f61321b181c24f824e688a4a05ae738da33466605b",
+    "symbol": "Root"
+  },
+  "evidence": {
+    "declaration": {
+      "kind": "inherited-interface",
+      "source": "node_modules/@radix-ui/react-popover/dist/index.d.ts@2535fc1a5fe64892783ff8f61321b181c24f824e688a4a05ae738da33466605b"
+    }
+  },
+  "props": [
+    {
+      "name": "children",
+      "required": false,
+      "type": {
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "number"
+          },
+          {
+            "kind": "literal",
+            "value": false
+          },
+          {
+            "kind": "literal",
+            "value": true
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Iterable<React.ReactNode>"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "React.ReactPortal"
+          }
+        ]
+      },
+      "typeText": "React.ReactNode",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "defaultOpen",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "modal",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "open",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "propName": "onOpenChange",
+      "required": false,
+      "payload": {
+        "kind": "boolean"
+      },
+      "payloadTypeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    }
+  ],
+  "conditionalApi": [],
+  "unresolved": []
+}

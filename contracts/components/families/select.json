@@ -3,7 +3,7 @@
   "id": "select",
   "source": {
     "canonicalPath": "src/components/ui/select.tsx",
-    "canonicalBlobSha": "a18203c391b82e6c74cb9965e3ad850cd4543b25",
+    "canonicalBlobSha": "09748f73848930cd63c83bc2c87dd780f946d4bc",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/select.tsx",
     "upstreamBlobSha": "f576bf455da400681c62e9f5a80a95315ee52172"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/select.tsx@a18203c391b82e6c74cb9965e3ad850cd4543b25"
+      "source": "src/components/ui/select.tsx@09748f73848930cd63c83bc2c87dd780f946d4bc"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -19,7 +19,7 @@
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-001"
+      "source": "shadcn-radix-token-contract-002"
     }
   },
   "exports": [
@@ -107,7 +107,19 @@
         "source"
       ],
       "component": {
-        "localProps": [],
+        "localProps": [
+          {
+            "name": "portalContainer",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ComponentProps<typeof SelectPrimitive.Portal>[\"container\"]"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
         "inherits": [
           "radix.select.content"
         ],
@@ -152,24 +164,6 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "radius.md",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -192,6 +186,13 @@
             ]
           },
           {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.popover",
             "evidenceRefs": [
               "source",
@@ -207,6 +208,17 @@
           },
           {
             "tokenId": "shadow.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -483,6 +495,13 @@
         "events": [],
         "tokenDependencies": [
           {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -523,14 +542,17 @@
             ]
           },
           {
-            "tokenId": "radius.sm",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "color.accent",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -538,6 +560,16 @@
           },
           {
             "tokenId": "color.accent-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "highlighted",
+              "equals": true
+            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -732,18 +764,18 @@
             ]
           },
           {
-            "tokenId": "font-size.xs",
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1.5
+            },
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 1.5
-            },
+            "tokenId": "font-size.xs",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1073,6 +1105,17 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
+              "multiplier": -1
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
               "multiplier": 1
             },
             "evidenceRefs": [
@@ -1184,17 +1227,6 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 4
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
               "multiplier": 8
             },
             "evidenceRefs": [
@@ -1276,6 +1308,17 @@
           },
           {
             "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
             "evidenceRefs": [
               "source",
               "tokens"

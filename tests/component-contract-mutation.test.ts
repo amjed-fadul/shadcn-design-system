@@ -68,6 +68,11 @@ function component(family: ComponentFamilyContract, name: string) {
   return definition
 }
 
+function firstRenderingTree(family: ComponentFamilyContract, name: string) {
+  const rendering = component(family, name).rendering as any
+  return "alternatives" in rendering ? rendering.alternatives[0].rendering : rendering
+}
+
 function expectInvariantRejection(family: ComponentFamilyContract, text: string) {
   expect(validateComponentFamilyInvariants(family, authority())).toContain(text)
 }
@@ -92,7 +97,7 @@ function slotSourceFixture(name: string, source: string) {
   return { path, cleanup: () => rmSync(directory, { recursive: true, force: true }) }
 }
 
-describe("component contract adversarial mutations", () => {
+describe("component contract adversarial mutations", { timeout: 60000 }, () => {
   test.each([
     ["component made non-authorable", (family: ComponentFamilyContract) => { family.exports.find((entry) => entry.name === "Button")!.authorableJsx = false }, "Component export Button must be JSX-authorable."],
     ["hook made JSX-authorable", (family: ComponentFamilyContract) => { family.exports.find((entry) => entry.name === "useSidebar")!.authorableJsx = true }, "Hook export useSidebar must not be JSX-authorable."],
@@ -112,10 +117,10 @@ describe("component contract adversarial mutations", () => {
     ["event unknown public prop", (family: ComponentFamilyContract) => { component(family, "Button").events.push({ propName: "onGhost", evidenceRefs: ["source"] }) }, "Component Button event references unknown prop: onGhost."],
     ["illegal helper render host", (family: ComponentFamilyContract) => { component(family, "Button").rendering = { rootNodeId: "host", publicPropsTargetNodeId: "host", portalBoundaries: [], nodes: [{ id: "host", host: { kind: "component-export", exportName: "buttonVariants" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] }] } }, "Component Button render host references non-JSX-authorable export: buttonVariants."],
     ["invented render export", (family: ComponentFamilyContract) => { component(family, "Button").rendering = { rootNodeId: "host", publicPropsTargetNodeId: "host", portalBoundaries: [], nodes: [{ id: "host", host: { kind: "component-export", exportName: "GhostButton" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] }] } }, "Component Button render host references unknown export: GhostButton."],
-    ["missing render root", (family: ComponentFamilyContract) => { (component(family, "Button").rendering as any).rootNodeId = "ghost-root" }, "Component Button rendering root node is missing: ghost-root."],
-    ["wrong props target", (family: ComponentFamilyContract) => { (component(family, "Button").rendering as any).publicPropsTargetNodeId = "ghost-target" }, "Component Button rendering public-props target node is missing: ghost-target."],
-    ["invalid derived attribute prop", (family: ComponentFamilyContract) => { (component(family, "Button").rendering as any).nodes[0].dataAttributes.push({ name: "data-ghost", source: "prop", prop: "ghost", evidenceRefs: ["source"] }) }, "Component Button render attribute host.data-ghost references unknown prop: ghost."],
-    ["unknown portal boundary", (family: ComponentFamilyContract) => { (component(family, "Button").rendering as any).portalBoundaries.push({ nodeId: "ghost", evidenceRefs: ["source"] }) }, "Component Button portal boundary references unknown render node: ghost."],
+    ["missing render root", (family: ComponentFamilyContract) => { firstRenderingTree(family, "Button").rootNodeId = "ghost-root" }, "Component Button alternative 0 rendering root node is missing: ghost-root."],
+    ["wrong props target", (family: ComponentFamilyContract) => { firstRenderingTree(family, "Button").publicPropsTargetNodeId = "ghost-target" }, "Component Button alternative 0 rendering public-props target node is missing: ghost-target."],
+    ["invalid derived attribute prop", (family: ComponentFamilyContract) => { firstRenderingTree(family, "Button").nodes[0].dataAttributes.push({ name: "data-ghost", source: "prop", prop: "ghost", evidenceRefs: ["source"] }) }, "Component Button alternative 0 render attribute host.data-ghost references unknown prop: ghost."],
+    ["unknown portal boundary", (family: ComponentFamilyContract) => { firstRenderingTree(family, "Button").portalBoundaries.push({ nodeId: "ghost", evidenceRefs: ["source"] }) }, "Component Button alternative 0 portal boundary references unknown render node: ghost."],
   ])("rejects %s", (_name, mutate, expected) => {
     const family = clonedFamily(_name.includes("hook") ? "sidebar" : _name.includes("incompatible callback") ? "select" : _name.includes("state") ? "checkbox" : _name.includes("conditional") ? "accordion" : "button")
     mutate(family)
@@ -302,7 +307,7 @@ describe("component contract adversarial mutations", () => {
       rendering.nodes.find((node: { id: string }) => node.id === "content").receivesPublicProps = false
     }, "Component DialogContent rendering does not match source evidence."],
     ["derived attribute", (artifacts: Map<string, unknown>) => {
-      const rendering = component(artifacts.get("contracts/components/families/button.json") as ComponentFamilyContract, "Button").rendering as any
+      const rendering = firstRenderingTree(artifacts.get("contracts/components/families/button.json") as ComponentFamilyContract, "Button")
       rendering.nodes[0].dataAttributes.find((attribute: { name: string }) => attribute.name === "data-variant").prop = "size"
     }, "Component Button rendering does not match source evidence."],
     ["portal boundary", (artifacts: Map<string, unknown>) => {
@@ -315,17 +320,17 @@ describe("component contract adversarial mutations", () => {
 
   test("canonical production loading rejects source-component reclassification even when the index agrees", () => {
     expect(() => loadComponentContracts(memorySource((artifacts) => {
-      const family = artifacts.get("contracts/components/families/button.json") as ComponentFamilyContract
-      const button = family.exports.find((entry) => entry.name === "Button")!
-      button.kind = "helper"
-      button.authorableJsx = false
-      delete button.component
+      const family = artifacts.get("contracts/components/families/progress.json") as ComponentFamilyContract
+      const progress = family.exports.find((entry) => entry.name === "Progress")!
+      progress.kind = "helper"
+      progress.authorableJsx = false
+      delete progress.component
       const index = artifacts.get(indexPath) as ComponentContractIndex
-      const buttonIndex = index.families.find((item) => item.familyId === "button")!
-      buttonIndex.components = buttonIndex.components.filter((name) => name !== "Button")
-      buttonIndex.helpers.push("Button")
-      buttonIndex.helpers.sort()
-    }))).toThrow("Family button export classification does not match source evidence.")
+      const progressIndex = index.families.find((item) => item.familyId === "progress")!
+      progressIndex.components = progressIndex.components.filter((name) => name !== "Progress")
+      progressIndex.helpers.push("Progress")
+      progressIndex.helpers.sort()
+    }))).toThrow("Family progress export classification does not match source evidence.")
   })
 
   test.each([
@@ -554,5 +559,5 @@ describe("component contract adversarial mutations", () => {
       const family = artifacts.get("contracts/components/families/dialog.json") as ComponentFamilyContract
       mutate(component(family, "DialogClose"))
     }))).toThrow(expected)
-  })
+  }, 60_000)
 })

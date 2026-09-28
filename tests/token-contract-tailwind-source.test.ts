@@ -39,11 +39,11 @@ function expectedIds(category: keyof typeof names): string[] {
 
 describe("pinned Tailwind theme token source", () => {
   test("pins Tailwind 4.3.3 and the installed theme.css integrity", () => {
-    const packageJson = JSON.parse(readFileSync(packagePath, "utf8")) as { dependencies: Record<string, string> }
+    const packageJson = JSON.parse(readFileSync(packagePath, "utf8")) as { devDependencies: Record<string, string> }
     const provenance = JSON.parse(readFileSync(provenancePath, "utf8")) as { sources: { tailwindTheme: { version: string, themeCssSha256: string } } }
     const themeCss = readFileSync(themePath)
 
-    expect(packageJson.dependencies.tailwindcss).toBe("4.3.3")
+    expect(packageJson.devDependencies.tailwindcss).toBe("4.3.3")
     expect(provenance.sources.tailwindTheme.version).toBe("4.3.3")
     expect(createHash("sha256").update(themeCss).digest("hex")).toBe(provenance.sources.tailwindTheme.themeCssSha256)
   })
@@ -56,6 +56,7 @@ describe("pinned Tailwind theme token source", () => {
             path: string
             sha256: string
             bareValueMarker: string
+            negativeBareValueMarker: string
             resolverMarker: string
             semantics: string
           }
@@ -67,10 +68,12 @@ describe("pinned Tailwind theme token source", () => {
 
     expect(createHash("sha256").update(source).digest("hex")).toBe(evidence.sha256)
     expect(source.toString("utf8")).toContain(evidence.bareValueMarker)
+    expect(source.toString("utf8")).toContain(evidence.negativeBareValueMarker)
     expect(source.toString("utf8")).toContain(evidence.resolverMarker)
     expect(evidence.bareValueMarker).toBe('handleBareValue:({value:K})=>!e.resolve(null,["--spacing"])||!Q(K)?null:`--spacing(${K})`')
+    expect(evidence.negativeBareValueMarker).toBe('handleNegativeBareValue:({value:K})=>!e.resolve(null,["--spacing"])||!Q(K)?null:`--spacing(-${K})`')
     expect(evidence.resolverMarker).toBe('d=`calc(${f} * ${l.value.value})`')
-    expect(evidence.semantics).toBe("The compiler maps a numeric bare utility value to --spacing(<multiplier>) when --spacing resolves, and resolves spacing values as calc(<resolved --spacing> * <multiplier>).")
+    expect(evidence.semantics).toBe("The compiler maps numeric bare utility values to --spacing(<multiplier>) when --spacing resolves. For utilities registered with supportsNegative, negative bare values map to --spacing(-<multiplier>), preserving the sign. Spacing values resolve as calc(<resolved --spacing> * <multiplier>).")
   })
 
   test("reconciles every contracted Tailwind value to @theme default only", () => {

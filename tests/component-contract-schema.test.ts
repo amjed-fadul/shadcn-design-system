@@ -59,6 +59,23 @@ describe("component contract JSON Schemas", () => {
     }
   })
 
+  test("accepts exact presence conditions and rejects mixed or unknown presence predicates", () => {
+    const family = validFamily()
+    family.exports[0].component.conditionalApi = [{ when: { propName: "optional", presence: "present" }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] }]
+    const inherited = validInterface() as any
+    inherited.conditionalApi = [{ when: { propName: "title", presence: "absent" }, propRefinements: [], eventRefinements: [], stateChannels: [], evidenceRefs: ["declaration"] }]
+
+    expect(validate(familySchema, family)).toBe(true)
+    expect(validate(interfaceSchema, inherited)).toBe(true)
+
+    const mixed = structuredClone(inherited)
+    mixed.conditionalApi[0].when.equals = true
+    expect(validate(interfaceSchema, mixed)).toBe(false)
+    const unknown = structuredClone(inherited)
+    unknown.conditionalApi[0].when.presence = "maybe"
+    expect(validate(interfaceSchema, unknown)).toBe(false)
+  })
+
   test("accepts an evidence-backed node-targeted portal boundary", () => {
     const family = validFamily()
     family.exports[0].component.rendering = {
@@ -86,6 +103,54 @@ describe("component contract JSON Schemas", () => {
     expect(validate(familySchema, family)).toBe(true)
   })
 
+  test("accepts an exact conjunction for a stacked conditional token utility", () => {
+    const family = validFamily()
+    family.exports[0].component.tokenDependencies.push({
+      tokenId: "spacing.unit",
+      when: { all: [
+        { subject: "data", path: [{ kind: "group", name: "root" }], propName: "orientation", equals: "vertical" },
+        { subject: "data", path: [{ kind: "self" }], propName: "spacing", equals: 0 },
+      ] },
+      viaDerivedRule: { id: "spacing.multiplier", multiplier: 2 },
+      evidenceRefs: ["source"],
+    })
+    expect(validate(familySchema, family)).toBe(true)
+
+    const malformed = structuredClone(family)
+    malformed.exports[0].component.tokenDependencies[0].when.all = [{ propName: "spacing", equals: 0 }]
+    expect(validate(familySchema, malformed)).toBe(false)
+
+    const incompleteScopedAtom = structuredClone(family)
+    delete incompleteScopedAtom.exports[0].component.tokenDependencies[0].when.all[0].path
+    expect(validate(familySchema, incompleteScopedAtom)).toBe(false)
+  })
+
+  test("accepts ordered utility relation paths and rejects names on unnamed segments", () => {
+    const family = validFamily()
+    family.exports[0].component.tokenDependencies.push({
+      tokenId: "color.primary",
+      when: { subject: "data", path: [{ kind: "has" }, { kind: "group", name: "root" }], propName: "state", equals: "open" },
+      evidenceRefs: ["source"],
+    })
+    expect(validate(familySchema, family)).toBe(true)
+
+    for (const kind of ["self", "in"] as const) {
+      const malformed = structuredClone(family)
+      malformed.exports[0].component.tokenDependencies[0].when.path = [{ kind, name: "root" }]
+      expect(validate(familySchema, malformed)).toBe(false)
+    }
+  })
+
+  test("accepts an evidence-backed cross-family component host", () => {
+    const family = validFamily()
+    family.exports[0].component.rendering.nodes[0].host = {
+      kind: "cross-family-export",
+      familyId: "button",
+      exportName: "Button",
+    }
+    expect(validate(familySchema, family)).toBe(true)
+  })
+
   test("accepts factual render alternatives, conditional values, and derived spreads", () => {
     const family = validFamily()
     const branch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], derivedSpreads: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] })
@@ -103,6 +168,19 @@ describe("component contract JSON Schemas", () => {
     const malformed = structuredClone(family)
     malformed.exports[0].component.rendering.alternatives[2] = { otherwise: false, rendering: branch("bad"), evidenceRefs: ["source"] }
     expect(validate(familySchema, malformed)).toBe(false)
+  })
+
+  test("accepts exact nullish and compound render conditions", () => {
+    const family = validFamily()
+    const branch = (id: string) => ({ rootNodeId: id, publicPropsTargetNodeId: id, nodes: [{ id, host: { kind: "intrinsic", tag: "div" }, receivesPublicProps: true, dataAttributes: [], children: [], evidenceRefs: ["source"] }], portalBoundaries: [] })
+    family.exports[0].component.rendering = {
+      alternatives: [
+        { when: { propName: "children", nullishness: "non-nullish" }, rendering: branch("present"), evidenceRefs: ["source"] },
+        { when: { all: [{ propName: "enabled", equals: true }, { propName: "children", nullishness: "nullish" }] }, rendering: branch("fallback"), evidenceRefs: ["source"] },
+      ],
+    }
+
+    expect(validate(familySchema, family)).toBe(true)
   })
 
   test.each([

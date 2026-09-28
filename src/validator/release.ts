@@ -6,10 +6,12 @@ import type {
   ExecutableContractSource,
   ExecutableRelease,
   ExecutableReleasePayload,
+  PackageIdentity,
+  ImplementationInput,
 } from "./types"
 
-export const EXECUTABLE_RELEASE_ID = "shadcn-radix-release-001"
-export const EXECUTABLE_RELEASE_PATH = "provenance/releases/shadcn-radix-release-001.json"
+export const EXECUTABLE_RELEASE_ID = "shadcn-radix-release-006"
+export const EXECUTABLE_RELEASE_PATH = "provenance/releases/shadcn-radix-release-006.json"
 
 export type ExecutableReleaseLoadErrorCode =
   | "RELEASE_SHAPE_INVALID"
@@ -31,6 +33,7 @@ export class ExecutableReleaseLoadError extends Error {
 export type ExecutableReleaseVerificationOptions = Readonly<{
   expectedProjection: ExecutableContract
   expectedReleaseId?: string
+  requirePackageIdentity?: boolean
 }>
 
 type JsonRecord = Record<string, unknown>
@@ -94,6 +97,9 @@ function deepFreeze<T>(value: T, seen = new WeakSet<object>()): T {
 
 function payloadForProjection(projection: ExecutableContract, releaseId: string): ExecutableReleasePayload {
   return {
+    documentSchemaVersion: 1,
+    packageIdentity: null,
+    implementationInputs: [],
     releaseId,
     projectionSchemaVersion: projection.schemaVersion,
     componentContractSetId: projection.componentContractSetId,
@@ -106,8 +112,8 @@ function payloadForProjection(projection: ExecutableContract, releaseId: string)
   }
 }
 
-export function createExecutableRelease(source: ExecutableContractSource, releaseId = EXECUTABLE_RELEASE_ID): ExecutableRelease {
-  const payload = payloadForProjection(projectExecutableContract(source), releaseId)
+export function createExecutableRelease(source: ExecutableContractSource, releaseId = EXECUTABLE_RELEASE_ID, identity?: { packageIdentity: PackageIdentity; implementationInputs: readonly ImplementationInput[] }): ExecutableRelease {
+  const payload = { ...payloadForProjection(projectExecutableContract(source), releaseId), ...identity }
   return deepFreeze(structuredClone({ ...payload, sha256: hashExecutableReleasePayload(payload) }))
 }
 
@@ -124,7 +130,34 @@ function requireProjection(value: unknown): ExecutableContract {
 /** Verifies and deep-freezes a release payload against its approved projection. */
 export function loadExecutableRelease(raw: unknown, options: ExecutableReleaseVerificationOptions): ExecutableRelease {
   if (!isRecord(raw)) failShape("Release must be an object.")
-  exactKeys(raw, ["releaseId", "projectionSchemaVersion", "componentContractSetId", "tokenContractId", "sourceBaselines", "projection", "sha256"], "Release")
+  exactKeys(raw, ["documentSchemaVersion", "packageIdentity", "implementationInputs", "releaseId", "projectionSchemaVersion", "componentContractSetId", "tokenContractId", "sourceBaselines", "projection", "sha256"], "Release")
+
+  if (raw.documentSchemaVersion !== 1) failShape("Unsupported release document schema.")
+  if (raw.packageIdentity === null) {
+    if (options.requirePackageIdentity) failShape("Canonical release requires package identity.")
+  } else {
+    if (!isRecord(raw.packageIdentity)) failShape("Package identity must be an object.")
+    exactKeys(raw.packageIdentity, ["name", "version", "publicEntrypoints"], "Package identity")
+    for (const key of ["name", "version"]) if (!requireString(raw.packageIdentity, key, "Package identity")) failShape("Empty package identity.")
+    if (!isRecord(raw.packageIdentity.publicEntrypoints) || !Object.keys(raw.packageIdentity.publicEntrypoints).length) failShape("Package entrypoints required.")
+    for (const [key, target] of Object.entries(raw.packageIdentity.publicEntrypoints)) {
+      if (key !== "." && !key.startsWith("./")) failShape("Invalid public entrypoint.")
+      const targets = typeof target === "string" ? [target] : isRecord(target) ? Object.values(target) : []
+      if (!targets.length || targets.some(value => typeof value !== "string" || !value.startsWith("./dist-library/") || value.includes("..\/"))) failShape("Invalid entrypoint target.")
+    }
+  }
+  if (!Array.isArray(raw.implementationInputs)) failShape("Implementation inputs must be an array.")
+  let previous = ""
+  for (const entry of raw.implementationInputs) {
+    if (!isRecord(entry)) failShape("Invalid implementation input.")
+    exactKeys(entry, ["path", "gitBlob", "sha256"], "Implementation input")
+    const file = requireString(entry, "path", "Implementation input")
+    if (!file || file <= previous || file.startsWith("/") || file.includes("\\") || file.split("/").some(part => !part || part === "." || part === "..")) failShape("Input paths must be normalized, unique and sorted.")
+    if (/^(provenance\/releases\/|dist-library\/)|\.tgz$|distribution-manifest|acceptance-digest/.test(file)) failShape("Circular identity input.")
+    if ((file.startsWith("node_modules/") ? entry.gitBlob !== null : !/^[0-9a-f]{40}$/.test(String(entry.gitBlob))) || !/^[0-9a-f]{64}$/.test(String(entry.sha256))) failShape("Invalid input digest.")
+    previous = file
+  }
+  if (options.requirePackageIdentity && !raw.implementationInputs.length) failShape("Canonical release requires implementation inputs.")
 
   const expectedReleaseId = options.expectedReleaseId ?? EXECUTABLE_RELEASE_ID
   if (raw.releaseId !== expectedReleaseId) throw new ExecutableReleaseLoadError("RELEASE_ID_MISMATCH", `Expected release ${expectedReleaseId}, received ${String(raw.releaseId)}.`)

@@ -1,7 +1,7 @@
 # Storybook Contract Verification Design
 
 **Status:** Implemented
-**Date:** 2026-09-03  
+**Date:** 2026-09-03
 **Repository:** `amjed-fadul/shadcn-design-system`
 
 ## Purpose

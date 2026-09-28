@@ -3,8 +3,10 @@ import { describe, expect, test } from "vitest"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import type { StructuredPropType } from "../src/contracts/components/types"
 import { getTokenContract } from "../src/contracts/tokens/contract"
-import { projectExecutableContract, validateAuthoredUi, type ValidationError } from "../src/validator"
+import type { ValidationError } from "../src/validator/errors"
+import { projectExecutableContract } from "../src/validator/projection"
 import type { AuthoredNode, AuthoredUi, AuthoredValue, ExecutableComponent, ExecutableExport, JsonValue } from "../src/validator/types"
+import { validateAuthoredUi } from "../src/validator/validate"
 
 const contract = projectExecutableContract({
   componentContracts: loadComponentContracts(),
@@ -13,23 +15,42 @@ const contract = projectExecutableContract({
 
 const familyIds = [
   "accordion",
+  "alert",
+  "alert-dialog",
+  "avatar",
   "badge",
+  "breadcrumb",
   "button",
   "card",
   "checkbox",
+  "collapsible",
+  "command",
   "dialog",
+  "drawer",
   "dropdown-menu",
+  "empty",
+  "field",
+  "input-group",
   "input",
   "label",
+  "pagination",
+  "popover",
+  "progress",
+  "radio-group",
   "scroll-area",
   "select",
   "separator",
   "sheet",
   "sidebar",
   "skeleton",
+  "slider",
+  "spinner",
+  "switch",
   "table",
   "tabs",
   "textarea",
+  "toggle",
+  "toggle-group",
   "tooltip",
 ] as const
 
@@ -71,7 +92,7 @@ function bareNode(entry: ExecutableExport, childrenOverride?: AuthoredNode[], pr
   }
   const selected = new Map<string, string | number | boolean>()
   for (const conditional of componentContract.conditionalApi) {
-    if (!selected.has(conditional.when.propName)) selected.set(conditional.when.propName, conditional.when.equals)
+    if ("equals" in conditional.when && !selected.has(conditional.when.propName)) selected.set(conditional.when.propName, conditional.when.equals)
   }
   for (const [propName, value] of selected) props[propName] ??= literal(value)
   Object.assign(props, propsOverride)
@@ -114,21 +135,44 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
-describe("Phase 5 executable validator coverage across all 19 Phase 3 families", () => {
-  test("projects and resolves every authorable Phase 3 export", () => {
+describe("Phase 5 executable validator coverage across all 38 canonical families", () => {
+  test("projects and resolves every authorable canonical export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
     const authorable = Object.values(contract.exports).filter((entry) => entry.authorableJsx && entry.kind === "component")
     const nonAuthorable = Object.values(contract.exports).filter((entry) => !entry.authorableJsx)
     const hardConstraints = Object.values(contract.exports).flatMap((entry) => entry.component?.composition.hardConstraints ?? [])
 
     expect([...projectedFamilies].sort()).toEqual([...familyIds].sort())
-    expect(authorable).toHaveLength(103)
-    expect(nonAuthorable).toHaveLength(4)
+    expect(authorable).toHaveLength(199)
+    expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
     for (const entry of authorable) {
+      const exportId = `${entry.familyId}.${entry.name}`
       const result = validateAuthoredUi({ root: nodeFor(entry.familyId, entry.name) }, contract)
-      expect(result.errors, `${entry.familyId}.${entry.name}`).toEqual([])
+      if (entry.unresolved.length) {
+        expect(result.errors.length, exportId).toBeGreaterThan(0)
+        expect([...new Set(result.errors.map((error) => error.code))], exportId).toEqual(["UNRESOLVED_FACT"])
+      } else expect(result.errors, exportId).toEqual([])
     }
+  })
+
+  test("selects Drawer fadeFromIndex presence branches and enforces required snapPoints", () => {
+    const absent = validateAuthoredUi({ root: component("drawer", "Drawer"), tokenUses: [] }, contract)
+    const incomplete = validateAuthoredUi({ root: component("drawer", "Drawer", { fadeFromIndex: literal(0) }), tokenUses: [] }, contract)
+    const complete = validateAuthoredUi({ root: component("drawer", "Drawer", { fadeFromIndex: literal(0), snapPoints: literal([0.25, "320px"]) }), tokenUses: [] }, contract)
+
+    expect(absent).toEqual({ ok: true, errors: [] })
+    expect(incomplete.errors).toContainEqual(expect.objectContaining({ code: "INVALID_PROP", message: "Required prop Drawer.snapPoints is missing." }))
+    expect(complete).toEqual({ ok: true, errors: [] })
+  })
+
+  test("keeps FieldError's full rendering flow outside the executable projection", async () => {
+    const { analyzeJsxRenderTree } = await import("../src/contracts/components/render-source-analysis")
+    const result = analyzeJsxRenderTree("src/components/ui/field.tsx", "FieldError")
+    expect(result.unresolved).toEqual([])
+    expect(result.root?.kind).toBe("intrinsic")
+    expect(contract.exports["field\u0000FieldError"].unresolved).toEqual([])
+    expect("renderingFlow" in contract.exports["field\u0000FieldError"].component!).toBe(false)
   })
 
   test.each([
@@ -184,18 +228,32 @@ describe("Phase 5 executable validator coverage across all 19 Phase 3 families",
     expect(validateAuthoredUi(invalid, contract).errors[0]).toMatchObject({ code: "INVALID_DERIVED_TOKEN_RULE" })
   })
 
-  test("fails closed for unresolved or out-of-range derived token parameters", () => {
+  test("fails closed for an unresolved derived token parameter", () => {
     const unresolvedParameter: AuthoredValue = { kind: "expression", expression: "multiplier" }
     const expression = {
       root: component("button", "Button"),
       tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: unresolvedParameter }, location: { path: "button-Button.tokenUses[0]" } }],
     }
-    const negative = {
-      root: component("button", "Button"),
-      tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: literal(-1) }, location: { path: "button-Button.tokenUses[0]" } }],
-    }
-
     expect(validateAuthoredUi(expression, contract).errors[0]).toMatchObject({ code: "UNRESOLVED_FACT" })
-    expect(validateAuthoredUi(negative, contract).errors[0]).toMatchObject({ code: "INVALID_DERIVED_TOKEN_PARAMETER" })
+  })
+
+  test("accepts signed finite derived token multipliers", () => {
+    for (const multiplier of [-1, 2]) {
+      const finite = {
+        root: component("button", "Button"),
+        tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: literal(multiplier) }, location: { path: "button-Button.tokenUses[0]" } }],
+      }
+      expect(validateAuthoredUi(finite, contract), String(multiplier)).toEqual({ ok: true, errors: [] })
+    }
+  })
+
+  test("fails closed for nonfinite derived token multipliers", () => {
+    for (const multiplier of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      const nonfinite = {
+        root: component("button", "Button"),
+        tokenUses: [{ tokenId: "spacing.unit", viaDerivedRule: { id: "spacing.multiplier", parameter: literal(multiplier) }, location: { path: "button-Button.tokenUses[0]" } }],
+      }
+      expect(validateAuthoredUi(nonfinite, contract).errors[0], String(multiplier)).toMatchObject({ code: "INVALID_DERIVED_TOKEN_PARAMETER" })
+    }
   })
 })

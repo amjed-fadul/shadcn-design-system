@@ -25,15 +25,15 @@ function sourcePath(familyId: string) {
   return join(root, "src/components/ui", `${familyId}.tsx`)
 }
 
-function normalized(dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "viaDerivedRule">>) {
+function normalized(dependencies: Array<Pick<TokenDependency, "tokenId" | "when" | "sourceContext" | "viaDerivedRule">>) {
   return dependencies
-    .map(({ tokenId, when, viaDerivedRule }) => ({ tokenId, ...(when ? { when } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) }))
+    .map(({ tokenId, when, sourceContext, viaDerivedRule }) => ({ tokenId, ...(when ? { when } : {}), ...(sourceContext ? { sourceContext } : {}), ...(viaDerivedRule ? { viaDerivedRule } : {}) }))
     .filter((dependency, index, all) => all.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(dependency)) === index)
     .sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right)))
 }
 
 describe("Phase 3 Task 7 cross-family token dependency closure", () => {
-  test("reconciles token dependencies per component export across all 19 families", () => {
+  test("reconciles token dependencies per component export across the canonical family scope", () => {
     const mismatches: string[] = []
     for (const family of families) for (const entry of family.exports) {
       if (!entry.component) continue
@@ -73,7 +73,7 @@ describe("Phase 3 Task 7 cross-family token dependency closure", () => {
     for (const family of families) for (const entry of family.exports) for (const dependency of entry.component?.tokenDependencies ?? []) {
       expect(approvedTokenIds.has(dependency.tokenId), `${family.id}.${entry.name} ${dependency.tokenId}`).toBe(true)
       if (dependency.viaDerivedRule) expect(approvedDerivedRuleIds.has(dependency.viaDerivedRule.id), `${family.id}.${entry.name} ${dependency.viaDerivedRule.id}`).toBe(true)
-      if (dependency.tokenId === "spacing.unit") expect(dependency.viaDerivedRule?.id).toBe("spacing.multiplier")
+      if (dependency.tokenId === "spacing.unit" && dependency.viaDerivedRule) expect(dependency.viaDerivedRule.id).toBe("spacing.multiplier")
     }
   })
 

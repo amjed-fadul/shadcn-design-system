@@ -1,0 +1,28 @@
+import type { ComponentProps, MouseEvent } from 'react'
+import { Button, Card, Tabs, Dialog, DialogContent, ScrollArea, buttonVariants, useSidebar } from '@adc/shadcn-design-system'
+import { getExecutableRelease, getComponentContracts, getTokenContract } from '@adc/shadcn-design-system/release'
+type IsAny<T> = 0 extends (1 & T) ? true : false
+type AssertFalse<T extends false> = T
+type Props<C extends typeof Button | typeof Card | typeof Tabs | typeof Dialog | typeof DialogContent | typeof ScrollArea> = ComponentProps<C>
+export type StrictBoundary = [
+  AssertFalse<IsAny<Props<typeof Button>>>, AssertFalse<IsAny<Props<typeof Button>['variant']>>,
+  AssertFalse<IsAny<Props<typeof Card>>>, AssertFalse<IsAny<Props<typeof Card>['size']>>,
+  AssertFalse<IsAny<Props<typeof Tabs>>>, AssertFalse<IsAny<Parameters<NonNullable<Props<typeof Tabs>['onValueChange']>>[0]>>,
+  AssertFalse<IsAny<Props<typeof Dialog>>>, AssertFalse<IsAny<Parameters<NonNullable<Props<typeof Dialog>['onOpenChange']>>[0]>>,
+  AssertFalse<IsAny<Props<typeof DialogContent>>>, AssertFalse<IsAny<Props<typeof ScrollArea>>>,
+  AssertFalse<IsAny<Props<typeof ScrollArea>['type']>>, AssertFalse<IsAny<ReturnType<typeof buttonVariants>>>,
+  AssertFalse<IsAny<ReturnType<typeof useSidebar>>>, AssertFalse<IsAny<ReturnType<typeof useSidebar>['open']>>,
+  AssertFalse<IsAny<ReturnType<typeof getExecutableRelease>['releaseId']>>,
+  AssertFalse<IsAny<ReturnType<typeof getComponentContracts>['families'][number]>>,
+  AssertFalse<IsAny<ReturnType<typeof getTokenContract>['tokens'][number]>>
+]
+export const positive = [
+  <Button variant="outline" size="sm" onClick={event => { const typed: MouseEvent<HTMLButtonElement> = event; typed.currentTarget.focus() }}>OK</Button>,
+  <Card size="sm" aria-label="Card" />,
+  <Tabs defaultValue="one" onValueChange={value => { const typed: string = value; typed.toUpperCase() }} />,
+  <Dialog open onOpenChange={value => { const typed: boolean = value; void typed }}><DialogContent showCloseButton={false} /></Dialog>,
+  <ScrollArea type="always" scrollHideDelay={100} />,
+]
+export const classes: string = buttonVariants({ variant: 'secondary', size: 'lg' })
+export const releaseId: string = getExecutableRelease().releaseId
+export const tokenId: string = getTokenContract().tokens[0].id
