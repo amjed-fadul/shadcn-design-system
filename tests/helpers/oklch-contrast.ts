@@ -39,9 +39,7 @@ export function composite(foreground: LinearRgb, alpha: number, background: Line
 }
 
 export function relativeLuminance([r, g, b]: LinearRgb): number {
-  // WCAG luminance uses 8-bit sRGB, so round-trip through gamma to match measured values.
-  const quantize = (channel: number) => toLinear(Math.round(toGamma(channel) * 255) / 255)
-  return 0.2126 * quantize(r) + 0.7152 * quantize(g) + 0.0722 * quantize(b)
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 
 export function contrastRatio(first: LinearRgb, second: LinearRgb): number {

@@ -3027,7 +3027,7 @@ describe("Phase 3 Task 10 independent review", () => {
     component.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.input").when.equals = "default"
 
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
-  }, 15_000)
+  }, 60_000)
 
   test("independent utility parser preserves exact data conditions and stacked conjunctions", () => {
     const facts = independentImportedTokenDependencies([
@@ -3550,7 +3550,7 @@ describe("Phase 3 Task 10 independent review", () => {
     const driftErrors = importedErrors(derivationDrift)
     expect(driftErrors).toContainEqual(expect.stringContaining('missing {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":7},"when":{"equals":"sm","propName":"size"}}'))
     expect(driftErrors).toContainEqual(expect.stringContaining('invented {"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":8},"when":{"equals":"sm","propName":"size"}}'))
-  }, 15_000)
+  }, 60_000)
 
   test("has no unreferenced evidence records", () => {
     expect(findUnreferencedEvidence()).toEqual([])

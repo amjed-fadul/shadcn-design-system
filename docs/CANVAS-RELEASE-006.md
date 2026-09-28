@@ -37,11 +37,11 @@ The light brand is Tailwind 4.3.3 `blue-700` (`#1447E6`); the dark brand is `blu
 
 ## Contrast and rendered verification
 
-The contract test computes WCAG 2.x contrast after converting OKLCH to sRGB. Both modes meet the 4.5:1 floor for primary foreground on primary, the `/80` primary hover composite, primary text on background, and sidebar primary foreground on sidebar primary. The exact full-strength ratios are 6.83:1 in light mode and 7.51:1 in dark mode.
+The contract test computes WCAG 2.x contrast from continuous linear-sRGB channels after converting the exact OKLCH values, without threshold rounding. Both modes meet the 4.5:1 floor for primary foreground on primary, the `/80` primary hover composite, primary text on background, and sidebar primary foreground on sidebar primary. The exact-value ratios round to 6.82:1 in light mode and 7.51:1 in dark mode; the hover composites round to 4.59:1 and 5.10:1 respectively.
 
 The Storybook browser suite runs the rendered axe gate over all component stories. Release generation was run twice and produced byte-identical JSON. Historical release hashes for Releases 001–005 were checked before and after each generation.
 
-Final verification completed with Node 22.18.0: TypeScript typecheck passed; the production Vite build passed; the unit suite passed 88 files and 1,215 tests; the Storybook browser/axe suite passed 39 files and 157 tests; and the static Storybook build passed. The static build emitted only its existing large-chunk advisory.
+Final verification completed with Node 22.18.0: TypeScript typecheck passed; the production Vite build passed; the unit suite passed 88 files and 1,216 tests; the Storybook browser/axe suite passed 39 files and 157 tests; and the static Storybook build passed. The static build emitted only its existing large-chunk advisory.
 
 ## Canvas consumption boundary
 

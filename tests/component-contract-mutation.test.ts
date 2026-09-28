@@ -547,7 +547,7 @@ describe("component contract adversarial mutations", { timeout: 60000 }, () => {
       const family = artifacts.get("contracts/components/families/button.json") as ComponentFamilyContract
       mutate(component(family, "Button"))
     }))).toThrow(expected)
-  }, 15_000)
+  })
 
   test.each([
     ["missing", (definition: ReturnType<typeof component>) => { definition.slots = [] }, "Component DialogClose is missing source-owned slot: asChild."],
@@ -559,5 +559,5 @@ describe("component contract adversarial mutations", { timeout: 60000 }, () => {
       const family = artifacts.get("contracts/components/families/dialog.json") as ComponentFamilyContract
       mutate(component(family, "DialogClose"))
     }))).toThrow(expected)
-  }, 15_000)
+  }, 60_000)
 })

@@ -25,8 +25,15 @@ describe("oklch contrast helper", () => {
     const white = oklchToLinearSrgb("oklch(1 0 0)")
     const black = oklchToLinearSrgb("oklch(0 0 0)")
     expect(contrastRatio(white, black)).toBeCloseTo(21, 5)
-    expect(contrastRatio(oklchToLinearSrgb("oklch(0.488 0.243 264.376)"), white)).toBeCloseTo(6.83, 2)
-    expect(contrastRatio(oklchToLinearSrgb("oklch(70.7% 0.165 254.624)"), oklchToLinearSrgb("oklch(0.145 0 0)"))).toBeCloseTo(7.51, 2)
+    expect(contrastRatio(oklchToLinearSrgb("oklch(0.488 0.243 264.376)"), white)).toBeCloseTo(6.824, 3)
+    expect(contrastRatio(oklchToLinearSrgb("oklch(70.7% 0.165 254.624)"), oklchToLinearSrgb("oklch(0.145 0 0)"))).toBeCloseTo(7.506, 3)
+  })
+
+  test("does not round a sub-threshold contrast ratio into an AA pass", () => {
+    const justBelowAa: LinearRgb = [0.6183445468540216, 0.011645430905844125, 0.6038273388553378]
+
+    expect(contrastRatio(justBelowAa, [1, 1, 1])).toBe(4.499)
+    expect(contrastRatio(justBelowAa, [1, 1, 1])).toBeLessThan(AA_TEXT)
   })
 
   test("rejects colour syntaxes it cannot measure", () => {

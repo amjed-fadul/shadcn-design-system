@@ -1,6 +1,6 @@
 # Brand Blue Token Contract 002 Design
 
-**Status:** Approved colours; contract awaiting owner approval
+**Status:** Approved; token contract 002 approved and Release 006 generated
 **Date:** 2026-09-28
 **Repository:** `amjed-fadul/shadcn-design-system`
 **Base:** `codex/release005-overlay-rtl` at `ca313a7` (open PR #12, Release 005)
@@ -14,9 +14,9 @@ Give the shadcn design system a brand colour. The owner reviewed live previews o
 | Ruling | Reason | Cost if wrong |
 | --- | --- | --- |
 | Remap semantic tokens instead of adding a `--brand` token | Every component already consumes `primary`, `ring` and `sidebar-primary`. A new token would reach no component without source edits and new component facts. | Low. A dedicated brand token can be added later as a new contract version. |
-| Light brand is `oklch(0.488 0.243 264.376)` (#1447E6) | Owner's choice. It is the dark `--sidebar-primary` shadcn already ships, and Tailwind 4.3.3 `--color-blue-700`. White text reaches 6.83:1. | Low; values only. |
+| Light brand is `oklch(0.488 0.243 264.376)` (#1447E6) | Owner's choice. It is the dark `--sidebar-primary` shadcn already ships, and Tailwind 4.3.3 `--color-blue-700`. White text reaches 6.82:1 from the exact OKLCH value. | Low; values only. |
 | Dark brand is `oklch(0.707 0.165 254.624)` (#51A2FF) with near-black text | #1447E6 as `text-primary` on the dark background is 2.90:1 and fails AA. No single blue passes both white button text and text on near-black. The owner chose the lighter blue for dark mode. It is Tailwind 4.3.3 `--color-blue-400`. | Low; values only. |
-| Light `--primary-foreground` becomes pure white `oklch(1 0 0)` | The button hover is `bg-primary/80`. With `#FAFAFA` text it drops just under 4.5:1; with white it is 4.58:1. | None; visually identical. |
+| Light `--primary-foreground` becomes pure white `oklch(1 0 0)` | The button hover is `bg-primary/80`. With `#FAFAFA` text it drops just under 4.5:1; with white it is 4.59:1. | None; visually identical. |
 | Destructive, accent, muted, border, chart and all non-brand tokens are unchanged | Blue and red do not collide, so there is no reason to widen the change. | None. |
 | New contract id `shadcn-radix-token-contract-002` | Releases 001–005 shipped `-001` with neutral values. Reusing the id would give one id two sets of values. | Mechanical churn: the component set and 38 family evidence references move to `-002`. |
 | Component contract set keeps id `-001`; only its `tokenContractId` and family token-evidence references change | Repository precedent: the set kept `-001` while it grew from 19 to 38 families. No component facts change. | Low. |
@@ -41,10 +41,10 @@ These pairings are measured with WCAG 2.x relative luminance, after converting O
 
 | Pairing | Light | Dark | Floor |
 | --- | --- | --- | --- |
-| `primary-foreground` on `primary` | 6.83 | 7.51 | 4.5 |
-| `primary-foreground` on `primary/80` over `background` (hover) | 4.58 | 5.12 | 4.5 |
-| `primary` text on `background` (links) | 6.83 | 7.51 | 4.5 |
-| `sidebar-primary-foreground` on `sidebar-primary` | 6.83 | 7.51 | 4.5 |
+| `primary-foreground` on `primary` | 6.82 | 7.51 | 4.5 |
+| `primary-foreground` on `primary/80` over `background` (hover) | 4.59 | 5.10 | 4.5 |
+| `primary` text on `background` (links) | 6.82 | 7.51 | 4.5 |
+| `sidebar-primary-foreground` on `sidebar-primary` | 6.82 | 7.51 | 4.5 |
 
 A new unit test computes these from the contract values, so a later value change cannot silently fall below the floor. The Storybook axe gate remains the rendered-UI check.
 
@@ -59,7 +59,7 @@ A new unit test computes these from the contract values, so a later value change
 
 ## Approval
 
-The owner approved the colours on 2026-09-28. Contract approval is separate: the executable projection refuses a `candidate` token contract, so Release 006 can only be generated after the owner flips `-002` to `approved`. The branch is prepared up to that point, and approval, release generation and candidate verification happen in one final step.
+The owner approved the colours on 2026-09-28. Contract approval is separate: the executable projection refuses a `candidate` token contract, so Release 006 can only be generated after the owner flips `-002` to `approved`. The owner then approved `-002`, and approval, Release 006 generation and candidate verification landed together in commit `4ff8a1e`.
 
 ## Out of scope
 

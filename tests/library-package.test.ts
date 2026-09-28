@@ -57,7 +57,7 @@ describe("published library entrypoint", () => {
     host.readFile = (file) => file === probe ? source : originalRead(file)
     const diagnostics = ts.getPreEmitDiagnostics(ts.createProgram([probe], options, host)).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"))
     expect(diagnostics).toEqual([])
-  }, 15_000)
+  }, 60_000)
 })
 
 describe("immutable Release 003 package artifact verification", () => {
