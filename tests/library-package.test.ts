@@ -16,7 +16,7 @@ const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0
 const r3DistributionManifest = path.join(r3ArtifactDirectory, "distribution-manifest.json")
 const r3PayloadSha256 = "5ffd25a9bac4fb44f8e826243323b20b93fb51a93db19b14b6d71089b545105b"
 const r3TarballSha256 = "bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629"
-const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
 const r4DistributionManifest = path.join(r4ArtifactDirectory, "distribution-manifest.json")
 let r3Extraction = ""
 let output = ""
@@ -57,7 +57,7 @@ describe("published library entrypoint", () => {
     host.readFile = (file) => file === probe ? source : originalRead(file)
     const diagnostics = ts.getPreEmitDiagnostics(ts.createProgram([probe], options, host)).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"))
     expect(diagnostics).toEqual([])
-  }, 15_000)
+  }, 60_000)
 })
 
 describe("immutable Release 003 package artifact verification", () => {

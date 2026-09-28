@@ -6,7 +6,7 @@ import schema from "../contracts/tokens/token-contract.schema.json"
 function validContract() {
   return {
     schemaVersion: 1,
-    id: "shadcn-radix-token-contract-001",
+    id: "shadcn-radix-token-contract-002",
     status: "candidate",
     baselineSnapshotId: "shadcn-radix-bootstrap-000",
     sourceBaselineCommit: "f9682ce3238f1fc5f41a91b1d6953a40c12d2288",

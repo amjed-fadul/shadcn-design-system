@@ -14,7 +14,7 @@ const root = process.cwd()
 const temporary: string[] = []
 const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
 const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0-release.3.tgz")
-const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
 const r4DistributionManifest = path.join(r4ArtifactDirectory, "distribution-manifest.json")
 const r3TarballSha256 = "bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629"
 const r3PayloadSha256 = "5ffd25a9bac4fb44f8e826243323b20b93fb51a93db19b14b6d71089b545105b"
@@ -214,12 +214,12 @@ describe("release package input identity", () => {
     const { directory, put } = fixture()
     const currentPackage = packageIdentity(root)
     put("package.json", JSON.stringify({ name: currentPackage.name, version: currentPackage.version, exports: currentPackage.publicEntrypoints }))
-    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-005.json"), "utf8"))
+    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-006.json"), "utf8"))
     raw.packageIdentity = packageIdentity(directory)
-    for (const file of ["provenance/releases/shadcn-radix-release-005.json", "dist-library/index.js", "candidate.tgz", "distribution-manifest.json"]) {
+    for (const file of ["provenance/releases/shadcn-radix-release-006.json", "dist-library/index.js", "candidate.tgz", "distribution-manifest.json"]) {
       raw.implementationInputs = [{ path: file, gitBlob: "a".repeat(40), sha256: "b".repeat(64) }]
       const { sha256: _hash, ...payload } = raw; raw.sha256 = hashExecutableReleasePayload(payload)
-      put("provenance/releases/shadcn-radix-release-005.json", JSON.stringify(raw))
+      put("provenance/releases/shadcn-radix-release-006.json", JSON.stringify(raw))
       expect(() => verifyRepositoryRelease(directory)).toThrow(/Circular identity input/)
     }
   })
@@ -227,29 +227,30 @@ describe("release package input identity", () => {
     const { directory, put } = fixture()
     const currentPackage = packageIdentity(root)
     put("package.json", JSON.stringify({ name: currentPackage.name, version: currentPackage.version, exports: currentPackage.publicEntrypoints }))
-    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-005.json"), "utf8"))
+    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-006.json"), "utf8"))
     const expectedDigest = raw.sha256
     put("src/shared.ts", "export const value = 99")
     raw.packageIdentity = packageIdentity(directory); raw.implementationInputs = createImplementationManifest(directory)
     const { sha256: _hash, ...payload } = raw; raw.sha256 = hashExecutableReleasePayload(payload)
-    put("provenance/releases/shadcn-radix-release-005.json", JSON.stringify(raw))
+    put("provenance/releases/shadcn-radix-release-006.json", JSON.stringify(raw))
     expect(() => verifyRepositoryRelease(directory, expectedDigest)).toThrow(/RELEASE_ANCHOR/)
   })
-  test("allows immutable release history beside the active release-005", () => {
+  test("allows immutable release history beside the active release-006", () => {
     const { directory, put } = fixture()
     const currentPackage = packageIdentity(root)
     put("package.json", JSON.stringify({ name: currentPackage.name, version: currentPackage.version, exports: currentPackage.publicEntrypoints }))
-    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-005.json"), "utf8"))
+    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-006.json"), "utf8"))
     raw.packageIdentity = packageIdentity(directory); raw.implementationInputs = createImplementationManifest(directory)
     const { sha256: _hash, ...payload } = raw; raw.sha256 = hashExecutableReleasePayload(payload)
-    put("provenance/releases/shadcn-radix-release-005.json", JSON.stringify(raw))
+    put("provenance/releases/shadcn-radix-release-006.json", JSON.stringify(raw))
+    put("provenance/releases/shadcn-radix-release-005.json", "{}")
     put("provenance/releases/shadcn-radix-release-004.json", "{}")
     put("provenance/releases/shadcn-radix-release-002.json", "{}")
     put("provenance/releases/shadcn-radix-release-001.json", "{}")
-    expect(verifyRepositoryRelease(directory).releaseId).toBe("shadcn-radix-release-005")
+    expect(verifyRepositoryRelease(directory).releaseId).toBe("shadcn-radix-release-006")
   })
   test("maps the approved package name, version and exact public entrypoints", () => {
-    expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.5", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
+    expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.6", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
   })
   test("preserves the accepted R3 tarball and extracted release payload across release generation", async () => {
     expect(existsSync(r3Tarball)).toBe(true)
@@ -330,7 +331,7 @@ describe("release package input identity", () => {
     expect(handoff).toContain(manifest.release.payloadSha256)
     expect(handoff).toContain(manifest.tarball.sha256)
     expect(handoff).toContain(manifest.tarball.integrity)
-    expect(handoff).toContain(r4ArtifactDirectory)
+    expect(handoff).toContain("/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004") // the recorded producer location, not the override
     expect(handoff).toContain("Source commit: `0d480b49ec9c499628d8a3e32b3a56386ac2b13d`")
     expect(handoff).toContain("Manifest SHA-256: `ea074153c56bf6a012a0e9924369b9aa3a82a777e14b17ffade06b0b6349e46f`")
     expect(handoff).toMatch(/Release 003 unchanged: `true`/)

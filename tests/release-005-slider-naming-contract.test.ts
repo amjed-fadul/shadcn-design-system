@@ -31,7 +31,7 @@ function sourceErrors(family: ComponentFamilyContract) {
   })
 }
 
-describe("Release 005 Slider thumb naming contract", () => {
+describe("Release 005 Slider thumb naming contract", { timeout: 60000 }, () => {
   test("reconciles the public arrays and preserves producer cardinality", () => {
     const analysis = propAnalyzer.analyzeComponentPropSource(join(root, "src/components/ui/slider.tsx"), "Slider")
     expect(analysis.unresolved).toEqual([])

@@ -6,7 +6,7 @@
   "required": ["schemaVersion", "id", "status", "baselineSnapshotId", "sourceBaselineCommit", "sourceProvenancePath", "modes", "coverage", "derivedRules", "tokens"],
   "properties": {
     "schemaVersion": { "const": 1 },
-    "id": { "const": "shadcn-radix-token-contract-001" },
+    "id": { "const": "shadcn-radix-token-contract-002" },
     "status": { "enum": ["candidate", "approved"] },
     "baselineSnapshotId": { "const": "shadcn-radix-bootstrap-000" },
     "sourceBaselineCommit": { "type": "string" },

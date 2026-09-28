@@ -7,7 +7,7 @@
   "sources": {
     "canonicalTheme": {
       "path": "src/index.css",
-      "blobSha": "d8c0cfe33f88e04af7aea72c952abee5903d836e"
+      "blobSha": "f0402b08be0c2ea80831805928d87977e5543e8d"
     },
     "shadcnNeutral": {
       "repository": "shadcn-ui/ui",
@@ -29,6 +29,49 @@
         "resolverMarker": "d=`calc(${f} * ${l.value.value})`",
         "semantics": "The compiler maps numeric bare utility values to --spacing(<multiplier>) when --spacing resolves. For utilities registered with supportsNegative, negative bare values map to --spacing(-<multiplier>), preserving the sign. Spacing values resolve as calc(<resolved --spacing> * <multiplier>)."
       }
+    }
+  },
+  "brandLayer": {
+    "sourceCommit": "e04ee6822a0b49e227970e787940db96730c9222",
+    "decision": "Owner-approved brand colour, 2026-09-28. The brand applies by changing the values of existing semantic tokens; no token is added, renamed or removed.",
+    "tokens": [
+      "color.primary",
+      "color.primary-foreground",
+      "color.ring",
+      "color.sidebar-primary",
+      "color.sidebar-primary-foreground",
+      "color.sidebar-ring"
+    ],
+    "values": {
+      "light": {
+        "brand": "oklch(0.488 0.243 264.376)",
+        "foreground": "oklch(1 0 0)"
+      },
+      "dark": {
+        "brand": "oklch(0.707 0.165 254.624)",
+        "foreground": "oklch(0.145 0 0)"
+      }
+    },
+    "valueOrigin": {
+      "note": "Records where the chosen values match the pinned Tailwind palette. The contract creates no semantic-to-primitive relationship.",
+      "light": {
+        "package": "tailwindcss",
+        "version": "4.3.3",
+        "path": "node_modules/tailwindcss/theme.css",
+        "variable": "--color-blue-700",
+        "value": "oklch(48.8% 0.243 264.376)"
+      },
+      "dark": {
+        "package": "tailwindcss",
+        "version": "4.3.3",
+        "path": "node_modules/tailwindcss/theme.css",
+        "variable": "--color-blue-400",
+        "value": "oklch(70.7% 0.165 254.624)"
+      }
+    },
+    "contrastFloor": {
+      "minimumRatio": 4.5,
+      "test": "tests/token-contract-brand-contrast.test.ts"
     }
   }
 }
