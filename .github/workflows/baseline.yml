@@ -10,6 +10,10 @@ jobs:
     # Releases are produced on macOS. The build input guard rejects Linux-only
     # reads such as /proc/self/exe, and the frozen R4 producer cannot change.
     runs-on: macos-latest
+    env:
+      # Node sizes its default heap from host RAM: about 2 GB here, about 4 GB on the
+      # producer's machine. Release generation and candidate verification need the latter.
+      NODE_OPTIONS: --max-old-space-size=4096
     steps:
       - uses: actions/checkout@v4
         with:

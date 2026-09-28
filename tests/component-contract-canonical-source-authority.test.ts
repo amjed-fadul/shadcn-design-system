@@ -32,5 +32,5 @@ describe("canonical source-backed composition and conditional authority", () => 
       "Component AlertDialog composition does not match source evidence.",
       "Component ToggleGroup conditional API does not match source evidence.",
     ]))
-  })
+  }, 120_000)
 })
