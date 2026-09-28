@@ -12,6 +12,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Provision retained release artifacts
+        run: |
+          directory="$RUNNER_TEMP/release-artifacts"
+          mkdir -p "$directory"
+          git fetch --no-tags --depth=1 origin ci/release-artifacts
+          git archive FETCH_HEAD | tar -x -C "$directory"
+          (cd "$directory" && sha256sum --check --strict SHA256SUMS)
+          echo "ADC_R3_ARTIFACT_DIRECTORY=$directory/shadcn-radix-release-003" >> "$GITHUB_ENV"
+          echo "ADC_R4_ARTIFACT_DIRECTORY=$directory/shadcn-radix-release-004" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
         with:
           node-version: 22.18.0

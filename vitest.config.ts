@@ -21,6 +21,9 @@ export default mergeConfig(
           test: {
             name: "unit",
             setupFiles: ["./tests/yield-between-tests.ts"],
+            // The in-process TypeScript contract analysis needs more than 3 GB of heap.
+            // Pin it so the limit does not follow host RAM (about 2 GB on a 7 GB CI runner).
+            execArgv: ["--max-old-space-size=4096"],
           },
         },
         {

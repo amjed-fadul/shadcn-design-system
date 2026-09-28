@@ -17,7 +17,7 @@ const isolatedConsumerSection = (document: string) => {
 }
 const release = { releaseId: "shadcn-radix-release-001", sha256: "a".repeat(64), packageIdentity: { name: "@adc/shadcn-design-system", version: "0.0.0-release.1" } }
 const toolchain = { node: "22.18.0", npm: "10.9.3", platform: process.platform, arch: process.arch, tools: { vite: "7.3.6", typescript: "5.5.4" } }
-const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
 let directory: string
 let tarball: Buffer
 let manifest: any

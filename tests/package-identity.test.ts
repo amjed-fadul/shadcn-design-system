@@ -14,7 +14,7 @@ const root = process.cwd()
 const temporary: string[] = []
 const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
 const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0-release.3.tgz")
-const r4ArtifactDirectory = "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
 const r4DistributionManifest = path.join(r4ArtifactDirectory, "distribution-manifest.json")
 const r3TarballSha256 = "bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629"
 const r3PayloadSha256 = "5ffd25a9bac4fb44f8e826243323b20b93fb51a93db19b14b6d71089b545105b"
@@ -331,7 +331,7 @@ describe("release package input identity", () => {
     expect(handoff).toContain(manifest.release.payloadSha256)
     expect(handoff).toContain(manifest.tarball.sha256)
     expect(handoff).toContain(manifest.tarball.integrity)
-    expect(handoff).toContain(r4ArtifactDirectory)
+    expect(handoff).toContain("/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004") // the recorded producer location, not the override
     expect(handoff).toContain("Source commit: `0d480b49ec9c499628d8a3e32b3a56386ac2b13d`")
     expect(handoff).toContain("Manifest SHA-256: `ea074153c56bf6a012a0e9924369b9aa3a82a777e14b17ffade06b0b6349e46f`")
     expect(handoff).toMatch(/Release 003 unchanged: `true`/)
