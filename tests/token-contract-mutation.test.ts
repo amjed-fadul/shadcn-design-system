@@ -339,7 +339,7 @@ describe("Phase 2 token contract mutation resistance", () => {
     expect(() => { (tokens as TokenDefinition[]).pop() }).toThrow()
     expect(() => { (tokenIds as string[]).pop() }).toThrow()
 
-    expect(getTokenContract().status).toBe("approved")
+    expect(getTokenContract().status).toBe("candidate")
     expect(lookupToken("color.background")).toEqual(background)
     expect(listTokens()).toHaveLength(82)
     expect(listTokenIds()).toHaveLength(82)

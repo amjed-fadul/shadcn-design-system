@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "shadcn-radix-token-contract-001",
-  "status": "approved",
+  "id": "shadcn-radix-token-contract-002",
+  "status": "candidate",
   "baselineSnapshotId": "shadcn-radix-bootstrap-000",
-  "sourceBaselineCommit": "f9682ce3238f1fc5f41a91b1d6953a40c12d2288",
+  "sourceBaselineCommit": "e04ee6822a0b49e227970e787940db96730c9222",
   "sourceProvenancePath": "provenance/token-contract-source.json",
   "modes": ["light", "dark"],
   "coverage": {
@@ -120,14 +120,14 @@
       "category": "color",
       "sourceId": "canonical-theme",
       "binding": { "cssVariable": "--primary", "tailwindThemeVariable": "--color-primary", "tailwindExpression": "var(--primary)" },
-      "value": { "kind": "modes", "values": { "light": "oklch(0.205 0 0)", "dark": "oklch(0.922 0 0)" } }
+      "value": { "kind": "modes", "values": { "light": "oklch(0.488 0.243 264.376)", "dark": "oklch(0.707 0.165 254.624)" } }
     },
     {
       "id": "color.primary-foreground",
       "category": "color",
       "sourceId": "canonical-theme",
       "binding": { "cssVariable": "--primary-foreground", "tailwindThemeVariable": "--color-primary-foreground", "tailwindExpression": "var(--primary-foreground)" },
-      "value": { "kind": "modes", "values": { "light": "oklch(0.985 0 0)", "dark": "oklch(0.205 0 0)" } }
+      "value": { "kind": "modes", "values": { "light": "oklch(1 0 0)", "dark": "oklch(0.145 0 0)" } }
     },
     {
       "id": "color.secondary",
@@ -197,7 +197,7 @@
       "category": "color",
       "sourceId": "canonical-theme",
       "binding": { "cssVariable": "--ring", "tailwindThemeVariable": "--color-ring", "tailwindExpression": "var(--ring)" },
-      "value": { "kind": "modes", "values": { "light": "oklch(0.708 0 0)", "dark": "oklch(0.556 0 0)" } }
+      "value": { "kind": "modes", "values": { "light": "oklch(0.488 0.243 264.376)", "dark": "oklch(0.707 0.165 254.624)" } }
     },
     {
       "id": "color.chart-1",
@@ -253,14 +253,14 @@
       "category": "color",
       "sourceId": "canonical-theme",
       "binding": { "cssVariable": "--sidebar-primary", "tailwindThemeVariable": "--color-sidebar-primary", "tailwindExpression": "var(--sidebar-primary)" },
-      "value": { "kind": "modes", "values": { "light": "oklch(0.205 0 0)", "dark": "oklch(0.488 0.243 264.376)" } }
+      "value": { "kind": "modes", "values": { "light": "oklch(0.488 0.243 264.376)", "dark": "oklch(0.707 0.165 254.624)" } }
     },
     {
       "id": "color.sidebar-primary-foreground",
       "category": "color",
       "sourceId": "canonical-theme",
       "binding": { "cssVariable": "--sidebar-primary-foreground", "tailwindThemeVariable": "--color-sidebar-primary-foreground", "tailwindExpression": "var(--sidebar-primary-foreground)" },
-      "value": { "kind": "modes", "values": { "light": "oklch(0.985 0 0)", "dark": "oklch(0.985 0 0)" } }
+      "value": { "kind": "modes", "values": { "light": "oklch(1 0 0)", "dark": "oklch(0.145 0 0)" } }
     },
     {
       "id": "color.sidebar-accent",
@@ -288,7 +288,7 @@
       "category": "color",
       "sourceId": "canonical-theme",
       "binding": { "cssVariable": "--sidebar-ring", "tailwindThemeVariable": "--color-sidebar-ring", "tailwindExpression": "var(--sidebar-ring)" },
-      "value": { "kind": "modes", "values": { "light": "oklch(0.708 0 0)", "dark": "oklch(0.556 0 0)" } }
+      "value": { "kind": "modes", "values": { "light": "oklch(0.488 0.243 264.376)", "dark": "oklch(0.707 0.165 254.624)" } }
     },
     {
       "id": "radius.base",
