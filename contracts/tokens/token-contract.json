@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "shadcn-radix-token-contract-002",
-  "status": "candidate",
+  "status": "approved",
   "baselineSnapshotId": "shadcn-radix-bootstrap-000",
   "sourceBaselineCommit": "e04ee6822a0b49e227970e787940db96730c9222",
   "sourceProvenancePath": "provenance/token-contract-source.json",

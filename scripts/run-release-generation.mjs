@@ -7,13 +7,14 @@ import { fileURLToPath, pathToFileURL } from "node:url"
 import { runnerImport } from "vite"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const releaseId = "shadcn-radix-release-005"
+const releaseId = "shadcn-radix-release-006"
 const releasePath = path.join(root, `provenance/releases/${releaseId}.json`)
 const preservedReleaseHashes = {
   "001": "70795494166657dfcdc74a57626b5b9501621ffa8aaa11a17216a1cf72bbd6a9",
   "002": "f63207dedd4d8e3c8656db50583660f5ab16174051c4ae847b3b6ddc1954f3ae",
   "003": "2aa266790b3e74395750e0f6e703238f2e29192f46f4237094fae212263600eb",
   "004": "bd90164eb8065a2e5c8a3209d9d831e85a8cf6b1134b44011e4921f57ab3d797",
+  "005": "a8f0be8d622a8e9f773af522564ec2398860cb7fe6ff49e4c057f65f81cbff88",
 }
 function assertHistoricalReleases() {
   for (const [number, expected] of Object.entries(preservedReleaseHashes)) {
@@ -67,7 +68,7 @@ assertHistoricalReleases()
 const r3Before = await inspectR3Artifact("before")
 assertR3Artifact(r3Before, "before")
 const packageIdentity = inputs.packageIdentity(root)
-if (packageIdentity.version !== "0.0.0-release.5") throw new Error("R5 package version must be 0.0.0-release.5")
+if (packageIdentity.version !== "0.0.0-release.6") throw new Error("R6 package version must be 0.0.0-release.6")
 const release = releaseApi.createExecutableRelease({
   componentContracts: componentAuthority.loadComponentContracts(),
   tokenContract: tokenAuthority.getTokenContract(),

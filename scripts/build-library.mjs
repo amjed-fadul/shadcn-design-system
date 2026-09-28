@@ -16,11 +16,11 @@ const outputFlag = process.argv.indexOf("--out-dir")
 const output = outputFlag < 0 ? path.join(root, "dist-library") : path.resolve(process.argv[outputFlag + 1])
 // Compiler IPC files are generated outputs. Use a fresh private scratch
 // directory so unrelated pre-existing temporary files cannot become inputs.
-const scratch = mkdtempSync(path.join(tmpdir(), "release-005-compiler-"))
+const scratch = mkdtempSync(path.join(tmpdir(), "release-006-compiler-"))
 const previousTmpdir = process.env.TMPDIR
 process.env.TMPDIR = scratch
-const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-005.json")
-const fallbackReleasePath = path.join(root, "provenance/releases/shadcn-radix-release-004.json")
+const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-006.json")
+const fallbackReleasePath = path.join(root, "provenance/releases/shadcn-radix-release-005.json")
 const selectedReleasePath = existsSync(releasePath) ? releasePath : fallbackReleasePath
 const { module: identity } = await runnerImport(path.join(root, "scripts/release-inputs.ts"), { configFile: false })
 const { module: releaseApi } = await runnerImport(path.join(root, "src/validator/release.ts"), { configFile: false })
@@ -36,7 +36,7 @@ const expectedProjection = projectionApi.projectExecutableContract({ componentCo
 const release = releaseApi.loadExecutableRelease(rawRelease, { expectedProjection, expectedReleaseId: rawRelease.releaseId, requirePackageIdentity: true })
 if (JSON.stringify(release.packageIdentity) !== JSON.stringify(identity.packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
 identity.verifyImplementationManifest(root, release.implementationInputs)
-const buildConfigScratch = mkdtempSync(path.join(tmpdir(), "release-005-config-"))
+const buildConfigScratch = mkdtempSync(path.join(tmpdir(), "release-006-config-"))
 const buildDataPath = path.join(buildConfigScratch, "library-data.ts")
 const buildConfigPath = path.join(buildConfigScratch, "vite.library.config.ts")
 writeFileSync(buildDataPath, [

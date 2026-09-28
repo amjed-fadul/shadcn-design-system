@@ -93,7 +93,7 @@ describe("canonical token contract", () => {
     const contract = readContract()
     expect(contract.schemaVersion).toBe(1)
     expect(contract.id).toBe("shadcn-radix-token-contract-002")
-    expect(contract.status).toBe("candidate")
+    expect(contract.status).toBe("approved")
     expect(contract.baselineSnapshotId).toBe("shadcn-radix-bootstrap-000")
     expect(contract.sourceBaselineCommit).toBe("e04ee6822a0b49e227970e787940db96730c9222")
     expect(contract.modes).toEqual(["light", "dark"])
