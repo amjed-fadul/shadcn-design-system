@@ -3,7 +3,7 @@
   "id": "button",
   "source": {
     "canonicalPath": "src/components/ui/button.tsx",
-    "canonicalBlobSha": "caf37b313a7688b22189fc681d04920ae877601b",
+    "canonicalBlobSha": "4b3582fd35b612de7440a7a841a5a54db782aa8d",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
     "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/button.tsx@caf37b313a7688b22189fc681d04920ae877601b"
+      "source": "src/components/ui/button.tsx@4b3582fd35b612de7440a7a841a5a54db782aa8d"
     },
     "interface": {
       "kind": "inherited-interface",
@@ -74,6 +74,17 @@
           },
           {
             "name": "asChild",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "loading",
             "required": false,
             "type": {
               "kind": "boolean"
@@ -1152,9 +1163,309 @@
           "alternatives": [
             {
               "when": {
-                "propName": "asChild",
-                "equals": true
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "hasRawHtml",
+                    "equals": true
+                  }
+                ]
               },
+              "evidenceRefs": [
+                "source"
+              ],
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [
+                      {
+                        "nodeId": "loading-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "loading-content",
+                    "host": {
+                      "kind": "fragment"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
+                        "nodeId": "spinner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "slottable",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "spinner",
+                    "host": {
+                      "kind": "cross-family-export",
+                      "familyId": "spinner",
+                      "exportName": "Spinner"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-icon",
+                        "source": "literal",
+                        "value": "inline-start",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "slottable",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
+                        "nodeId": "raw-label",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "raw-label",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "span"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              }
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "hasRawHtml",
+                    "equals": false
+                  }
+                ]
+              },
+              "evidenceRefs": [
+                "source"
+              ],
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [
+                      {
+                        "nodeId": "loading-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "loading-content",
+                    "host": {
+                      "kind": "fragment"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
+                        "nodeId": "spinner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "slottable",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "spinner",
+                    "host": {
+                      "kind": "cross-family-export",
+                      "familyId": "spinner",
+                      "exportName": "Spinner"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-icon",
+                        "source": "literal",
+                        "value": "inline-start",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "slottable",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              }
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": false
+                  }
+                ]
+              },
+              "evidenceRefs": [
+                "source"
+              ],
               "rendering": {
                 "rootNodeId": "host",
                 "publicPropsTargetNodeId": "host",
@@ -1198,13 +1509,315 @@
                   }
                 ],
                 "portalBoundaries": []
+              }
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": false
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "hasRawHtml",
+                    "equals": true
+                  }
+                ]
               },
               "evidenceRefs": [
                 "source"
-              ]
+              ],
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "button"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [
+                      {
+                        "nodeId": "loading-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "loading-content",
+                    "host": {
+                      "kind": "fragment"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
+                        "nodeId": "spinner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "slottable",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "spinner",
+                    "host": {
+                      "kind": "cross-family-export",
+                      "familyId": "spinner",
+                      "exportName": "Spinner"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-icon",
+                        "source": "literal",
+                        "value": "inline-start",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "slottable",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
+                        "nodeId": "raw-label",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "raw-label",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "span"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              }
             },
             {
-              "otherwise": true,
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": false
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "hasRawHtml",
+                    "equals": false
+                  }
+                ]
+              },
+              "evidenceRefs": [
+                "source"
+              ],
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "button"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [
+                      {
+                        "nodeId": "loading-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "loading-content",
+                    "host": {
+                      "kind": "fragment"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
+                        "nodeId": "spinner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "nodeId": "slottable",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "spinner",
+                    "host": {
+                      "kind": "cross-family-export",
+                      "familyId": "spinner",
+                      "exportName": "Spinner"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-icon",
+                        "source": "literal",
+                        "value": "inline-start",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "slottable",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              }
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": false
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": false
+                  }
+                ]
+              },
+              "evidenceRefs": [
+                "source"
+              ],
               "rendering": {
                 "rootNodeId": "host",
                 "publicPropsTargetNodeId": "host",
@@ -1249,10 +1862,7 @@
                   }
                 ],
                 "portalBoundaries": []
-              },
-              "evidenceRefs": [
-                "source"
-              ]
+              }
             }
           ]
         },
@@ -1277,6 +1887,38 @@
             "feature": "host semantic suitability under asChild",
             "owner": "author",
             "mechanism": "replacement child must carry appropriate semantics for the intended interaction",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "loading state",
+            "owner": "component",
+            "mechanism": "loading is caller-controlled: Button does not start, track, or finish async work, so the caller sets loading back to false when the work ends. While loading is true on the native button host, Button renders the governed Spinner before the label with data-icon=\"inline-start\", sets aria-busy=\"true\", and sets the native disabled attribute, so pointer, keyboard (Enter and Space), and form-submit activation are blocked. A disabled button leaves the tab order and cannot keep keyboard focus, so move focus deliberately if the flow needs it. A leading data-icon=\"inline-start\" child is hidden while loading so the Spinner takes its place, and a button whose data-size starts with icon shows only the Spinner in place of its icon, including InputGroupButton icon sizes; a button with no leading icon grows by the Spinner and its gap",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "loading accessible name",
+            "owner": "component",
+            "mechanism": "the Spinner rendered by loading has aria-hidden=\"true\" and drops its default role=\"status\" and aria-label=\"Loading\", so it adds no accessible-name text and no live-region announcement; raw-HTML labels are retained inside a span while loading so they can coexist with the decorative Spinner; the accessible name stays the button's own content or aria-label, for example \"Log in\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "loading label wording",
+            "owner": "author",
+            "mechanism": "keep the action label unchanged while loading, so Log in stays Log in rather than becoming Loading\u2026 or Logging in\u2026; aria-busy conveys the busy state. Loading does not announce completion or failure, so report the result with a caller-provided Status (or Status variant=\"error\" for an important failure) from the alert family",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "loading under asChild",
+            "owner": "component",
+            "mechanism": "loading is ignored when asChild is true, because the replacement child owns its content and disabled state; use the native button host for loading",
             "evidenceRefs": [
               "source"
             ]

@@ -98,8 +98,9 @@ function inheritedContracts(component: ComponentDefinition, authority: Component
 
 function basePublicProps(component: ComponentDefinition, authority: ComponentInvariantAuthority): Map<string, PublicPropFact> {
   const props = new Map<string, PublicPropFact>()
+  const omissions = new Set((component.inheritedPropOmissions ?? []).map((entry) => entry.propName))
   for (const prop of component.localProps) props.set(prop.name, { name: prop.name, availability: "available", required: prop.required, type: prop.type })
-  for (const contract of inheritedContracts(component, authority)) for (const prop of contract.props) if (!props.has(prop.name)) props.set(prop.name, { name: prop.name, availability: "available", required: prop.required, type: prop.type })
+  for (const contract of inheritedContracts(component, authority)) for (const prop of contract.props) if (!props.has(prop.name) && !omissions.has(prop.name)) props.set(prop.name, { name: prop.name, availability: "available", required: prop.required, type: prop.type })
   return props
 }
 
@@ -639,6 +640,14 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
     }
     if (hasMissingInheritedContract) continue
     for (const propName of localNames) if (inheritedNames.has(propName)) errors.push(`Component ${entry.name} local prop collides with inherited prop: ${propName}.`)
+    const omissionNames = new Set<string>()
+    for (const omission of component.inheritedPropOmissions ?? []) {
+      if (omissionNames.has(omission.propName)) errors.push(`Component ${entry.name} has duplicate inherited prop omission: ${omission.propName}.`)
+      omissionNames.add(omission.propName)
+      hasEvidence(errors, omission.evidenceRefs, family.evidence, `Inherited prop omission ${entry.name}.${omission.propName}`)
+      if (!inheritedNames.has(omission.propName)) errors.push(`Component ${entry.name} inherited prop omission references unknown inherited prop: ${omission.propName}.`)
+      if (localNames.has(omission.propName)) errors.push(`Component ${entry.name} inherited prop omission collides with local prop: ${omission.propName}.`)
+    }
     const defaultNames = new Set<string>()
     for (const inheritedDefault of component.inheritedPropDefaults) {
       if (defaultNames.has(inheritedDefault.propName)) errors.push(`Component ${entry.name} has duplicate inherited prop default: ${inheritedDefault.propName}.`)
@@ -646,6 +655,7 @@ export function validateComponentFamilyInvariants(family: ComponentFamilyContrac
       hasEvidence(errors, inheritedDefault.evidenceRefs, family.evidence, `Inherited prop default ${entry.name}.${inheritedDefault.propName}`)
       if (!inheritedNames.has(inheritedDefault.propName)) errors.push(`Component ${entry.name} inherited prop default references unknown inherited prop: ${inheritedDefault.propName}.`)
       if (localNames.has(inheritedDefault.propName)) errors.push(`Component ${entry.name} inherited prop default collides with local prop: ${inheritedDefault.propName}.`)
+      if (omissionNames.has(inheritedDefault.propName)) errors.push(`Component ${entry.name} inherited prop default targets omitted prop: ${inheritedDefault.propName}.`)
     }
     const props = basePublicProps(component, authority)
     const events = new Map<string, EventContract>()

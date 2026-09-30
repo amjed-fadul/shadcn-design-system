@@ -59,6 +59,7 @@
     "contracts/components/interfaces/html.caption.json",
     "contracts/components/interfaces/html.div.json",
     "contracts/components/interfaces/html.fieldset.json",
+    "contracts/components/interfaces/html.form.json",
     "contracts/components/interfaces/html.input.json",
     "contracts/components/interfaces/html.legend.json",
     "contracts/components/interfaces/html.li.json",

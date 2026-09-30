@@ -15,6 +15,10 @@
     {
       "statement": "Use Field, FieldLabel, and FieldDescription to create an input with a label and description.",
       "basis": { "kind": "source-derived", "referenceIds": ["shadcn.input.docs"] }
+    },
+    {
+      "statement": "Use the native autoComplete prop, which maps to the HTML autocomplete attribute, to give browsers and password managers a hint about the field: for example type=\"email\" with autoComplete=\"email\", type=\"text\" with autoComplete=\"username\", and type=\"password\" with autoComplete=\"current-password\" (autoComplete=\"new-password\" when choosing a password). Other standard values include name, one-time-code, organization, street-address, postal-code, and tel. The value is a plain string that the component passes through without validating it. Browsers and password managers may ignore or override the hint.",
+      "basis": { "kind": "source-derived", "referenceIds": ["whatwg.html.autofill"] }
     }
   ],
   "options": [

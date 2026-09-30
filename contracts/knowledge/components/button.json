@@ -1,7 +1,10 @@
 {
   "schemaVersion": 1,
   "id": "button-knowledge",
-  "subject": { "kind": "component", "id": "button" },
+  "subject": {
+    "kind": "component",
+    "id": "button"
+  },
   "guidanceStatus": {
     "whatItIs": "available",
     "whenToUse": "available",
@@ -13,52 +16,142 @@
   },
   "whatItIs": {
     "statement": "Displays a button or a component that looks like a button.",
-    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs"] }
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.button.docs"
+      ]
+    }
   },
   "whenToUse": [
     {
       "statement": "Use a button when the control triggers an action or event, such as submitting a form, opening a dialog, cancelling an action, or deleting an item.",
-      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.button.apg"
+        ]
+      }
     }
   ],
   "whenNotToUse": [
     {
       "statement": "Do not use a button for navigation; match the visual treatment and role to the link function.",
-      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.button.apg"
+        ]
+      }
     }
   ],
   "howToUse": [
     {
       "statement": "For a link-shaped navigation control, use the buttonVariants helper with a plain link element instead of Button.",
-      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs", "canonical.button.source"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.button.docs",
+          "canonical.button.source"
+        ]
+      }
     },
     {
       "statement": "Give the button an accessible label; text content is the default accessible name.",
-      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.button.apg"
+        ]
+      }
+    },
+    {
+      "statement": "To announce the result of a Button action, such as Logging in… or Login failed, render a caller-controlled <Status> (or <Status variant=\"error\"> for an important failure) next to the Button; Button loading itself announces nothing. Keep the Status mounted and change its children.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.status-role",
+          "w3c.aria.alert-role"
+        ]
+      }
+    },
+    {
+      "statement": "Inside a Form, use <Button type=\"submit\"> for the submit action. A native button with no type inside a form submits it, so give every other Button, such as Cancel or a toggle, type=\"button\".",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.form-element"
+        ]
+      }
     }
   ],
   "options": [
     {
       "statement": "Use the size option to change the size of the button.",
-      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.button.docs"
+        ]
+      }
     },
     {
       "statement": "When placing an icon before or after the label, use the documented icon-position marker so the component can apply the corresponding spacing.",
-      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.button.docs", "canonical.button.source"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.button.docs",
+          "canonical.button.source"
+        ]
+      }
+    },
+    {
+      "statement": "Use the loading prop to show that the action the button triggers is in progress, for example <Button loading>Log in</Button>. While loading, Button renders the Spinner before the label, sets aria-busy=\"true\", and disables the native button so it cannot be activated again by pointer, keyboard, or form submit. The caller controls the state: Button does not run or track async work, so set loading back to false when the work ends. Loading has no effect when asChild is true.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.button.source",
+          "shadcn.spinner.docs"
+        ]
+      }
     }
   ],
   "writing": [
     {
       "statement": "Keep a toggle button's label unchanged when its pressed state changes.",
-      "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.button.apg"
+        ]
+      }
+    },
+    {
+      "statement": "Keep the label unchanged while loading, so Log in stays Log in rather than becoming Loading…. The Spinner is hidden from assistive technology and aria-busy conveys the busy state, which keeps the accessible name the action name. Loading does not announce the result, so report success or failure with a separate status or alert message.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.button.source",
+          "shadcn.spinner.docs"
+        ]
+      }
     }
   ],
   "useInstead": [
     {
-      "target": { "kind": "component", "id": "link" },
+      "target": {
+        "kind": "component",
+        "id": "link"
+      },
       "guidance": {
         "statement": "When the element navigates rather than triggers an action, use a link.",
-        "basis": { "kind": "source-derived", "referenceIds": ["w3c.button.apg", "shadcn.button.docs"] }
+        "basis": {
+          "kind": "source-derived",
+          "referenceIds": [
+            "w3c.button.apg",
+            "shadcn.button.docs"
+          ]
+        }
       }
     }
   ]

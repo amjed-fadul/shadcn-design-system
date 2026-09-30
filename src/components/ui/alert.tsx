@@ -19,6 +19,18 @@ const alertVariants = cva(
   }
 )
 
+const statusVariants = cva("text-sm", {
+  variants: {
+    variant: {
+      default: "text-muted-foreground",
+      error: "text-destructive",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+})
+
 function Alert({
   className,
   variant,
@@ -73,4 +85,35 @@ function AlertAction({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
-export { Alert, AlertTitle, AlertDescription, AlertAction, alertVariants }
+type StatusProps = Omit<
+  React.ComponentPropsWithoutRef<"div">,
+  "role" | "aria-live"
+> & {
+  variant?: "default" | "error"
+  /** Keeps the message in the accessibility tree but hides it visually. */
+  visuallyHidden?: boolean
+}
+
+const Status = React.forwardRef<HTMLDivElement, StatusProps>(({
+  className,
+  variant = "default",
+  visuallyHidden = false,
+  ...props
+}, ref) => (
+    <div
+      ref={ref}
+      data-slot="status"
+      data-variant={variant}
+      {...props}
+      role={variant === "error" ? "alert" : "status"}
+      aria-live={variant === "error" ? "assertive" : "polite"}
+      className={cn(
+        statusVariants({ variant }),
+        visuallyHidden && "sr-only",
+        className
+      )}
+    />
+  ))
+Status.displayName = "Status"
+
+export { Alert, AlertTitle, AlertDescription, AlertAction, Status, alertVariants }

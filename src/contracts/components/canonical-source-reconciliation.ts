@@ -301,14 +301,21 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
         errors.push(`Component ${entry.name} rendering does not match source evidence.`)
         errors.push(...renderErrors.map((error) => `Component ${entry.name}: ${error}`))
       }
+      const propAnalysis = propAnalyzer.analyzeComponentPropSource(path, entry.name)
       const propErrors = propAnalyzer.compareComponentLocalProps(
         entry.component.localProps,
-        propAnalyzer.analyzeComponentPropSource(path, entry.name),
+        propAnalysis,
         new Set((entry.component.inheritedPropDefaults ?? []).map((defaultFact) => defaultFact.propName)),
       )
       if (propErrors.some((error) => error.includes(" default "))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)
       if (propErrors.some((error) => !error.includes(" default "))) errors.push(`Component ${entry.name} local prop surface does not match source evidence.`)
       errors.push(...propErrors.map((error) => `Component ${entry.name}: ${error}`))
+      const inheritedPropNames = new Set(context.interfaces
+        .filter((contract) => entry.component!.inherits.includes(contract.id))
+        .flatMap((contract) => contract.props.map((prop) => prop.name)))
+      const omissionErrors = propAnalyzer.compareComponentInheritedPropOmissions(entry.component.inheritedPropOmissions ?? [], propAnalysis, inheritedPropNames)
+      if (omissionErrors.length) errors.push(`Component ${entry.name} inherited prop omissions do not match source evidence.`)
+      errors.push(...omissionErrors.map((error) => `Component ${entry.name}: ${error}`))
     }
     errors.push(...reconcileSourceEvidenceCompleteness(family, unresolved))
   }

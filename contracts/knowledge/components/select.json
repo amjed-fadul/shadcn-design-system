@@ -32,6 +32,10 @@
     {
       "statement": "Preserve the component's managed focus, keyboard navigation, and typeahead behavior when using it.",
       "basis": { "kind": "source-derived", "referenceIds": ["radix.select.docs"] }
+    },
+    {
+      "statement": "Select is a supported control inside Field: give SelectTrigger the id that FieldLabel htmlFor targets, set aria-invalid and aria-describedby on SelectTrigger rather than on Select, and set required and disabled on Select, which Radix reflects onto the trigger.",
+      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.field.docs", "shadcn.select.docs", "radix.select.docs"] }
     }
   ],
   "options": [

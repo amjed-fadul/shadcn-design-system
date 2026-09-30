@@ -151,6 +151,14 @@
             "evidenceRefs": [
               "source"
             ]
+          },
+          {
+            "feature": "field composition",
+            "owner": "author",
+            "mechanism": "InputGroup may be a direct child of Field; the labelled control is the InputGroupInput or InputGroupTextarea inside it, so FieldLabel htmlFor targets that control's id and aria-describedby and aria-invalid belong on the control, not on the InputGroup group element",
+            "evidenceRefs": [
+              "source"
+            ]
           }
         ],
         "inheritedPropDefaults": [
@@ -470,6 +478,17 @@
             "evidenceRefs": [
               "source"
             ]
+          },
+          {
+            "name": "loading",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
           }
         ],
         "inherits": [
@@ -690,6 +709,30 @@
             "evidenceRefs": [
               "source"
             ]
+          },
+          {
+            "feature": "form submission",
+            "owner": "component",
+            "mechanism": "type defaults to \"button\", so an inline action does not submit a surrounding form; pass type=\"submit\" explicitly to opt in",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "keyboard reachability",
+            "owner": "native",
+            "mechanism": "renders a native button that is reachable with Tab and activated with Enter or Space; its tab order follows its authored DOM order, so place it where the reading and tab sequence should put it relative to the control, and do not set tabIndex=-1 on essential actions",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "toggle state",
+            "owner": "author",
+            "mechanism": "for a toggle such as Show/Hide password, expose state with either aria-pressed on a constant label or a label that changes with state, not both",
+            "evidenceRefs": [
+              "source"
+            ]
           }
         ],
         "inheritedPropDefaults": [
@@ -850,6 +893,14 @@
             "feature": "accessible name",
             "owner": "author",
             "mechanism": "provide label association or an accessible name for the input control",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "field relationships",
+            "owner": "author",
+            "mechanism": "inside Field, set id, aria-describedby, aria-invalid, required, and disabled on InputGroupInput; addons and inline buttons do not alter these relationships. Invalid state also renders the group border and ring from the control's aria-invalid",
             "evidenceRefs": [
               "source"
             ]

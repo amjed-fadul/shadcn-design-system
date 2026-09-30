@@ -17,7 +17,7 @@ import {
 } from "../src/contracts/knowledge"
 import type { KnowledgeArtifact } from "../src/contracts/knowledge/types"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
-import release005Artifact from "../provenance/releases/shadcn-radix-release-005.json"
+import release007Artifact from "../provenance/releases/shadcn-radix-release-007.json"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const baseline = "f77976e"
@@ -257,7 +257,7 @@ describe("knowledge contract boundary", () => {
     expect(() => ((loaded.components[0] as unknown as { id: string }).id = "mutated")).toThrow(TypeError)
   })
 
-  test("records all merged component evidence changes in the Release 005 input manifest", () => {
+  test("records all merged component evidence changes in the Release 007 input manifest", () => {
     const changedPaths = execFileSync("git", [
       "diff",
       baseline,
@@ -267,7 +267,7 @@ describe("knowledge contract boundary", () => {
       "src/contracts/components",
       "provenance/component-contract-source.json",
     ], { cwd: root, stdio: "pipe", maxBuffer: 64 * 1024 * 1024 }).toString().trim().split("\n").filter(Boolean).sort()
-    const releaseInputs = new Set(release005Artifact.implementationInputs.map((entry) => entry.path))
+    const releaseInputs = new Set(release007Artifact.implementationInputs.map((entry) => entry.path))
     expect(changedPaths.length).toBeGreaterThan(0)
     expect(changedPaths.filter((path) => !releaseInputs.has(path))).toEqual([])
   })

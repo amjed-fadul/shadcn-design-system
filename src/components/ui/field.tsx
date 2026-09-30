@@ -8,6 +8,19 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
+/**
+ * A native <form>. Submission, Enter-key submission, and constraint
+ * validation are browser behavior; application validation and async
+ * submission stay with the caller.
+ */
+const Form = React.forwardRef<
+  HTMLFormElement,
+  React.ComponentPropsWithoutRef<"form">
+>(({ className, ...props }, ref) => (
+  <form ref={ref} data-slot="form" className={className} {...props} />
+))
+Form.displayName = "Form"
+
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (
     <fieldset
@@ -222,6 +235,7 @@ function FieldError({
 }
 
 export {
+  Form,
   Field,
   FieldLabel,
   FieldDescription,

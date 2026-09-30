@@ -1255,6 +1255,18 @@
               "source",
               "declaration"
             ]
+          },
+          {
+            "name": "loading",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source",
+              "declaration"
+            ]
           }
         ],
         "inherits": [
@@ -3537,7 +3549,64 @@
             }
           ]
         },
-        "accessibility": []
+        "accessibility": [
+          {
+            "feature": "native host semantics",
+            "owner": "native",
+            "mechanism": "button by default; under asChild the replacement child is the host, so an anchor child makes the menu button a native link",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "navigation item",
+            "owner": "author",
+            "mechanism": "to navigate, compose an anchor through asChild: <SidebarMenuButton asChild><a href=\"/follow-ups\">Follow-ups</a></SidebarMenuButton>. The anchor is the menu button itself, so nest no Button or second link inside it. href is the destination and the text content is the accessible name; Enter activation, modified click, middle click, context menu, and open in new tab stay native browser behaviour. Do not emulate navigation with a button onClick",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "action item",
+            "owner": "author",
+            "mechanism": "an item that performs an action, such as expanding a section, opening an account menu, or running a command, uses SidebarMenuButton without asChild and stays a native button; do not give it href or aria-current",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "current page",
+            "owner": "author",
+            "mechanism": "isActive only sets data-active and the active styling; it never adds aria-current. The authored anchor owns current-page semantics: put aria-current=\"page\" on the one link for the page being shown and on no action button. When a router link component sets aria-current itself, the router owns it",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "routing",
+            "owner": "author",
+            "mechanism": "SidebarMenuButton does not own application routing and does no client-side navigation. A plain href navigates natively; a router link component that renders an anchor and forwards its props and ref can be the asChild child, and the router owns navigation",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "disabled",
+            "owner": "author",
+            "mechanism": "the disabled attribute applies to button items only; on an anchor, aria-disabled only adds inert, dimmed styling (pointer-events-none and reduced opacity) and does not stop keyboard activation of an anchor that has an href; the design system adds no disabled-link behaviour and intercepts no link activation, so omit an unavailable link or render a non-navigating placeholder instead of an anchor with href",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "collapsed presentation",
+            "owner": "component",
+            "mechanism": "in the icon-collapsed presentation an anchor menu button keeps its link role, href, aria-current, keyboard focus, and accessible name from its content, so keep the label text inside the anchor; the tooltip prop, which requires a TooltipProvider ancestor, does not replace that name",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
       }
     },
     {

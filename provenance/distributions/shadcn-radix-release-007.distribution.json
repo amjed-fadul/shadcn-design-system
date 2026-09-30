@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "release": {
+    "id": "shadcn-radix-release-007",
+    "payloadSha256": "a43c3f3237f72a8db6e904640c47c66b88d2ae230d14e8418c4906096e7d294d"
+  },
+  "package": {
+    "name": "@adc/shadcn-design-system",
+    "version": "0.0.0-release.7"
+  },
+  "toolchain": {
+    "node": "22.18.0",
+    "npm": "10.9.3",
+    "platform": "darwin",
+    "arch": "arm64",
+    "tools": {
+      "vite": "7.3.6",
+      "typescript": "5.5.4",
+      "@vitejs/plugin-react": "4.7.0",
+      "@tailwindcss/vite": "4.3.3",
+      "tailwindcss": "4.3.3",
+      "rollup": "4.63.1",
+      "esbuild": "0.28.2"
+    }
+  },
+  "tarball": {
+    "filename": "adc-shadcn-design-system-0.0.0-release.7.tgz",
+    "sha256": "269c862f86183cfecb59f3d1e2708aa2cfc085352d116d842ed15f6f3a3d6c02",
+    "integrity": "sha512-ljs4KA0HV0XM4Uh4JlG4q/LNHKanvd/s1cbhOWmeOEW7o0IGSJpQhqCEP0Rxix6L0n0ENcNFuh/2W49PkDpiQQ=="
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "size": 7378,
+      "sha256": "1a0c7f18dde1a9852341f6b45ceb12d723e9901ac9070cf273fc38f7134dcb63"
+    },
+    {
+      "path": "dist-library/THIRD_PARTY_LICENSES.txt",
+      "size": 104580,
+      "sha256": "aea45dada6c57059780e04c03dc937274aac3db5fd75742d26b3facfa018f24c"
+    },
+    {
+      "path": "dist-library/index.js",
+      "size": 510336,
+      "sha256": "e9ebc7a6cd460fa3bbcc53e143248b8c0d1032f287694a9f53db1b19a27217f3"
+    },
+    {
+      "path": "dist-library/release.js",
+      "size": 11191961,
+      "sha256": "dee0d8e94d10a7ee71d5ec4d65129fe9ad5571bc9acea06e3da46e28823ba15c"
+    },
+    {
+      "path": "dist-library/styles.css",
+      "size": 190180,
+      "sha256": "55ac80ab13813390ffed1a2d4ac4fecc8f28e94a172557fa4bec4b774ba0cacc"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/accordion.d.ts",
+      "size": 801,
+      "sha256": "6c7abeaa5418a753d21fd1ca2ee397b5987ff6adebe4d670d151af215be1598d"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/alert-dialog.d.ts",
+      "size": 2485,
+      "sha256": "ea51b5c3cd599da7cc9a7c258cd3031daa927faea48b98f46808bc87817baf6d"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/alert.d.ts",
+      "size": 1265,
+      "sha256": "9241f2c98fb177f2f5988e5ff01d7e78d083364d55876c8bd896721e013cf784"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/avatar.d.ts",
+      "size": 1052,
+      "sha256": "dd7c3704921742b4c1b5fb1ee8859276042ddbe95c330889c39914efec3f13d5"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/badge.d.ts",
+      "size": 557,
+      "sha256": "f4b667f3df658bb0c1d30273253fb779d866e21d040f8373ceac9d551339737e"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/breadcrumb.d.ts",
+      "size": 1107,
+      "sha256": "59424ceecd6e7bd7a0522bd08086496617736de51bede16489f6a0baca93a5a0"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/button.d.ts",
+      "size": 1105,
+      "sha256": "0347812f5a251c544c879c90325bff4ac06ecbaf571d45975f2731a9bbb0c143"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/card.d.ts",
+      "size": 1034,
+      "sha256": "f52a46ab32275c1e8390112719c009194290e1473a72f4714fc116bf009d3593"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/checkbox.d.ts",
+      "size": 257,
+      "sha256": "e97bb622bef39a5bd54af78ba21e055507ddf3d55eefd6213224638497ac7049"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/collapsible.d.ts",
+      "size": 625,
+      "sha256": "3dedbfa50a926a238b7c7ba612675aedc89bb474dca0d9d527635aa616c03ecf"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/command.d.ts",
+      "size": 1826,
+      "sha256": "2649983ed68ae991621ab20dc446aacaf9f4f8dfb838b8de788324a4c971b1e1"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/dialog.d.ts",
+      "size": 1960,
+      "sha256": "e05950e7fe51dda0f95e69735e63341027cc4cd5c495be5a0389cf3da4c2bb1e"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/drawer.d.ts",
+      "size": 1656,
+      "sha256": "65a81b8a1b3c52581f3428cd9ae87bfcaf75c0bd8ecf3facdee6a3694d613107"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/dropdown-menu.d.ts",
+      "size": 3244,
+      "sha256": "5a2bb427c9fe588e94225112e558590970f8104930619145cadbdd9911af1f0c"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/empty.d.ts",
+      "size": 1159,
+      "sha256": "379024574d603556161a4aac5065bc630f4769517b810813e569c3c44098e1a3"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/field.d.ts",
+      "size": 2347,
+      "sha256": "146a1f153ba452c7f0fcce113f8fd07443fa9be18e8945200d92c83781be80ca"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/input-group.d.ts",
+      "size": 1597,
+      "sha256": "7512a289164da89f8cd1fdb62c3665df6e092c0b114eac5b1f25dfdbc909adc0"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/input.d.ts",
+      "size": 177,
+      "sha256": "f774a7e8875649db68f5952801f001f3c316560ede472e5663af7a8c9c18f938"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/label.d.ts",
+      "size": 242,
+      "sha256": "5eb22f1450a20efb3e3060d8881e74d6de7d2ebb2955ecb6a4a3c8dfbf46c10f"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/pagination.d.ts",
+      "size": 1320,
+      "sha256": "d5146283c904c1dde1c8dc719b0a6c4c5abd36c815d223342521d484777b2fb5"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/popover.d.ts",
+      "size": 1290,
+      "sha256": "50cb45c087b3a7b66ca09d88348b3b5b8de4713aa9c0bbc37c5d451c065b3fd7"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/progress.d.ts",
+      "size": 269,
+      "sha256": "39296984ec5ce6ff8f3ae117269578cd6eb1b7620a0e2fbd6756b2bcc61eb71b"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/radio-group.d.ts",
+      "size": 437,
+      "sha256": "c3d279119904b1c63b4256833a8fabd5f3e27aa87952ec682460f30cc7e058ac"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/scroll-area.d.ts",
+      "size": 465,
+      "sha256": "458b890fb07a867fd5e9792a602501742ea05319f77c0bf4311184e1e5408682"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/select.d.ts",
+      "size": 1954,
+      "sha256": "263d666b9e47d7b3bdbb250f39d5552d55d62c3fba9c97ba40cdf48f419cfe7b"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/separator.d.ts",
+      "size": 287,
+      "sha256": "b9f1bf3713fc43fd9e929b746540e6d606807cc121fe59d4454efdf3b009c18a"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/sheet.d.ts",
+      "size": 1565,
+      "sha256": "1b57b651e67b63e3026ab40924cfc8399810b3f4170c1e5fb74b6bcae0c9276a"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/sidebar.d.ts",
+      "size": 5996,
+      "sha256": "200d24ffee9e1eb191d5227eb07c4024b83adb3113007e6085b519cf0d9be8ea"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/skeleton.d.ts",
+      "size": 143,
+      "sha256": "b3ee5184dbf154ca01ff12e4703e5dc467ad7c79d8b16c98b8361118de54cea4"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/slider.d.ts",
+      "size": 422,
+      "sha256": "609a71af7540b2be1d2f5d4cf7de50452194af02651df33ab1e9fe127d39c211"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/spinner.d.ts",
+      "size": 173,
+      "sha256": "c752a09102517188cfff3b30f2d1368939b14c039db9cb3969c13ce94dda898e"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/switch.d.ts",
+      "size": 288,
+      "sha256": "fff78d55a5efd4bc32447cbf63580f39272c762b7cf884017db7cf5a5dadef9b"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/table.d.ts",
+      "size": 1128,
+      "sha256": "b907f8a604634f5f107ff64f226972dbb1b80eb3236fa9414c52aeedfa1113fd"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/tabs.d.ts",
+      "size": 1030,
+      "sha256": "f9f7b608197d9af5c280783e2b0159fa15da2bd2279521052c42d4b531f20412"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/textarea.d.ts",
+      "size": 180,
+      "sha256": "aa333ffa319c18796c9104d75082dfd218334109f702eb6e9ad369beac518833"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/toggle-group.d.ts",
+      "size": 778,
+      "sha256": "e8c9dea1b4c61dda1c3a2cf63c1f40c0ef355c2114d752dbe7b2a779acc9f2dc"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/toggle.d.ts",
+      "size": 611,
+      "sha256": "973449d57ebb773f314ba501655e6468562e33b522942ce379091e207971ec85"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/tooltip.d.ts",
+      "size": 934,
+      "sha256": "331370381ec79aa9df4e6875be9c967e13b2b2bfbabd7bcbb44c30777c2f4027"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/invariants.d.ts",
+      "size": 1324,
+      "sha256": "1c95efac35cb6fd51b0c1bbc591993c52ed5f747a82a9514c03fb45273f1c72b"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/loader.d.ts",
+      "size": 2546,
+      "sha256": "4e2238bd60cf5e8e9a918f6a908f78a65eee71eae394ee9e5c5751152dbe8e2d"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/source-reconciliation.d.ts",
+      "size": 1661,
+      "sha256": "8c716252d0a8578b705fc6003ea90bd2fc927796bf79b7a2457d11e33999e1fb"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/types.d.ts",
+      "size": 12788,
+      "sha256": "88038ce0404df8d5f321a2c3717eb6ea0b38e29a6ada587928954e0a4a522602"
+    },
+    {
+      "path": "dist-library/types/src/contracts/tokens/types.d.ts",
+      "size": 2274,
+      "sha256": "5adcbdccfa1409c762abb5a0ed69f40bb62536159c8ee33dbba8d369afcba23a"
+    },
+    {
+      "path": "dist-library/types/src/lib/utils.d.ts",
+      "size": 101,
+      "sha256": "512960c0e955a2324b34354dac25e3e4d431a1af4cd33077935eda5e95c8b7e1"
+    },
+    {
+      "path": "dist-library/types/src/package/index.d.ts",
+      "size": 1612,
+      "sha256": "9a2b93141e35a68cd61630f5e27687d8d6a6060ffcf669f8d252095d197137cd"
+    },
+    {
+      "path": "dist-library/types/src/package/release.d.ts",
+      "size": 888,
+      "sha256": "97ecc03baf91eb1979053acc5de2ad985ed9a558afe48ee32b8f9d961e205411"
+    },
+    {
+      "path": "dist-library/types/src/validator/types.d.ts",
+      "size": 5860,
+      "sha256": "6c5f22b6c0f1a323c36c176bdcbc29ce199c34cf8250261ffbf6421c0e79acef"
+    },
+    {
+      "path": "package.json",
+      "size": 3071,
+      "sha256": "1ce1cb033cf7f2672a5c343e03572284de434dc71d5852df7b87d8e53daf3fd7"
+    }
+  ]
+}

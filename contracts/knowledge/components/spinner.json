@@ -39,6 +39,26 @@
           "shadcn.spinner.docs"
         ]
       }
+    },
+    {
+      "statement": "To show a loading state on a Button, prefer <Button loading> over placing a Spinner inside the Button yourself. Button hides its Spinner from assistive technology and keeps the action label as the accessible name, whereas a bare Spinner keeps role=\"status\" and aria-label=\"Loading\", which are announced and become part of the Button's name.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.button.source",
+          "shadcn.spinner.docs"
+        ]
+      }
+    },
+    {
+      "statement": "A Spinner shows that work is in progress but is not the place for result text; announce changing status or result text with <Status>. Do not put a bare Spinner inside Status, because its role=\"status\" would nest a second live region; give it aria-hidden=\"true\" and remove its role and aria-label.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.status-role",
+          "w3c.aria.alert-role"
+        ]
+      }
     }
   ]
 }

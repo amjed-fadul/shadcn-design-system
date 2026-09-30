@@ -69,6 +69,7 @@ function propWithOrigin(prop: { name: string; required: boolean; type: Component
 function effectiveProps(component: ComponentDefinition, authority: InterfaceAuthority): readonly ExecutableProp[] {
   const props: ExecutableProp[] = []
   const inheritedDefaults = new Map(component.inheritedPropDefaults.map((entry) => [entry.propName, entry.value]))
+  const inheritedOmissions = new Set((component.inheritedPropOmissions ?? []).map((entry) => entry.propName))
   const names = new Set<string>()
   for (const prop of component.localProps) {
     if (!names.has(prop.name)) props.push(propWithOrigin(prop, "local"))
@@ -76,7 +77,7 @@ function effectiveProps(component: ComponentDefinition, authority: InterfaceAuth
   }
   for (const contract of inheritedContracts(component, authority)) {
     for (const prop of contract.props) {
-      if (!names.has(prop.name)) props.push(propWithOrigin(prop, "inherited"))
+      if (!names.has(prop.name) && !inheritedOmissions.has(prop.name)) props.push(propWithOrigin(prop, "inherited"))
       names.add(prop.name)
     }
   }

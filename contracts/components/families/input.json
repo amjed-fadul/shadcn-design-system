@@ -215,6 +215,14 @@
             "evidenceRefs": [
               "source"
             ]
+          },
+          {
+            "feature": "autocomplete hints",
+            "owner": "author",
+            "mechanism": "the autoComplete prop is inherited from html.input and forwarded unchanged to the native autocomplete attribute; pass a string holding a standard HTML autocomplete token, such as \"name\", \"email\", \"username\", \"current-password\", \"new-password\", \"one-time-code\", \"organization\", \"street-address\", \"postal-code\", or \"tel\", or \"on\"/\"off\", or a space-separated token list such as \"section-billing street-address\". The component does not validate the value or infer it from type, so the author chooses a token that matches the field, for example type=\"email\" with \"email\", type=\"text\" with \"username\", type=\"password\" with \"current-password\" or \"new-password\". Browsers and password managers may ignore or override the hint. Field pairing: inside Field, put autoComplete on the Input itself, next to the id that FieldLabel htmlFor targets",
+            "evidenceRefs": [
+              "source"
+            ]
           }
         ],
         "inheritedPropDefaults": []

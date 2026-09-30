@@ -58,6 +58,25 @@
           "shadcn.input-group.docs"
         ]
       }
+    },
+    {
+      "statement": "Inside Field, place InputGroup as a direct child and put the id, aria-describedby, aria-invalid, required, and disabled on InputGroupInput or InputGroupTextarea so FieldLabel and FieldDescription resolve to the control.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs",
+          "shadcn.input-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Give an icon-only InputGroupButton an aria-label; it defaults to type=\"button\" so an inline action such as Show/Hide password does not submit a surrounding form unless type=\"submit\" is set.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.input-group.docs"
+        ]
+      }
     }
   ],
   "options": [
