@@ -77,8 +77,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
       disabled={disabled || isLoading}
       aria-busy={isLoading || ariaBusy}
     >
-      {isLoading && <Spinner data-icon="inline-start" role={undefined} aria-label={undefined} aria-hidden="true" />}
-      <Slot.Slottable>{children}</Slot.Slottable>
+      {isLoading ? (
+        <>
+          <Spinner data-icon="inline-start" role={undefined} aria-label={undefined} aria-hidden="true" />
+          <Slot.Slottable>{children}</Slot.Slottable>
+        </>
+      ) : children}
     </Comp>
   )
 })

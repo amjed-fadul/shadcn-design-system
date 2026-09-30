@@ -3,7 +3,7 @@
   "id": "button",
   "source": {
     "canonicalPath": "src/components/ui/button.tsx",
-    "canonicalBlobSha": "dc40fa9f5653328ce290e943b68ce694b3a611a9",
+    "canonicalBlobSha": "00e816b21d3adf8847620c4aa36c7fca66bdb5f8",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
     "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/button.tsx@dc40fa9f5653328ce290e943b68ce694b3a611a9"
+      "source": "src/components/ui/button.tsx@00e816b21d3adf8847620c4aa36c7fca66bdb5f8"
     },
     "interface": {
       "kind": "inherited-interface",
@@ -1163,9 +1163,21 @@
           "alternatives": [
             {
               "when": {
-                "propName": "asChild",
-                "equals": true
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": true
+                  }
+                ]
               },
+              "evidenceRefs": [
+                "source"
+              ],
               "rendering": {
                 "rootNodeId": "host",
                 "publicPropsTargetNodeId": "host",
@@ -1204,12 +1216,26 @@
                     ],
                     "children": [
                       {
+                        "nodeId": "loading-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "loading-content",
+                    "host": {
+                      "kind": "fragment"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
                         "nodeId": "spinner",
-                        "when": {
-                          "source": "state",
-                          "name": "isLoading",
-                          "truthiness": "truthy"
-                        },
                         "evidenceRefs": [
                           "source"
                         ]
@@ -1262,13 +1288,87 @@
                   }
                 ],
                 "portalBoundaries": []
+              }
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": true
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": false
+                  }
+                ]
               },
               "evidenceRefs": [
                 "source"
-              ]
+              ],
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "unresolved"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              }
             },
             {
-              "otherwise": true,
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": false
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": true
+                  }
+                ]
+              },
+              "evidenceRefs": [
+                "source"
+              ],
               "rendering": {
                 "rootNodeId": "host",
                 "publicPropsTargetNodeId": "host",
@@ -1308,12 +1408,26 @@
                     ],
                     "children": [
                       {
+                        "nodeId": "loading-content",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
+                    "id": "loading-content",
+                    "host": {
+                      "kind": "fragment"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [],
+                    "children": [
+                      {
                         "nodeId": "spinner",
-                        "when": {
-                          "source": "state",
-                          "name": "isLoading",
-                          "truthiness": "truthy"
-                        },
                         "evidenceRefs": [
                           "source"
                         ]
@@ -1366,10 +1480,70 @@
                   }
                 ],
                 "portalBoundaries": []
+              }
+            },
+            {
+              "when": {
+                "all": [
+                  {
+                    "propName": "asChild",
+                    "equals": false
+                  },
+                  {
+                    "source": "state",
+                    "name": "isLoading",
+                    "equals": false
+                  }
+                ]
               },
               "evidenceRefs": [
                 "source"
-              ]
+              ],
+              "rendering": {
+                "rootNodeId": "host",
+                "publicPropsTargetNodeId": "host",
+                "nodes": [
+                  {
+                    "id": "host",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "button"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "button",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-variant",
+                        "source": "prop",
+                        "prop": "variant",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-size",
+                        "source": "prop",
+                        "prop": "size",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
+              }
             }
           ]
         },
@@ -1417,7 +1591,7 @@
           {
             "feature": "loading label wording",
             "owner": "author",
-            "mechanism": "keep the action label unchanged while loading, so Log in stays Log in rather than becoming Loading… or Logging in…; aria-busy conveys the busy state. Loading does not announce completion or failure, so report the result with a caller-provided Status (or Status variant=\"error\" for an important failure) from the alert family",
+            "mechanism": "keep the action label unchanged while loading, so Log in stays Log in rather than becoming Loading\u2026 or Logging in\u2026; aria-busy conveys the busy state. Loading does not announce completion or failure, so report the result with a caller-provided Status (or Status variant=\"error\" for an important failure) from the alert family",
             "evidenceRefs": [
               "source"
             ]

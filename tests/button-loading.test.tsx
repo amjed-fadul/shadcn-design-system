@@ -133,6 +133,13 @@ describe("Button loading", () => {
 })
 
 describe("Button without loading", () => {
+  test.each([undefined, false])("preserves native inner HTML when loading is %s", (loading) => {
+    const container = render(<Button loading={loading} dangerouslySetInnerHTML={{ __html: "<span>Save</span>" }} />)
+
+    expect(buttonOf(container).innerHTML).toBe("<span>Save</span>")
+    expect(hasAccessibleName(container, "Save")).toBe(true)
+  })
+
   test("renders no Spinner, no aria-busy, and stays enabled", async () => {
     const onClick = vi.fn()
     const button = buttonOf(render(<Button onClick={onClick}>Log in</Button>))

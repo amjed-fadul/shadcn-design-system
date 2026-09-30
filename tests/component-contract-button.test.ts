@@ -46,19 +46,16 @@ describe("Button component contract", () => {
     expect(component.localProps[3]).toMatchObject({ name: "loading", required: false, type: { kind: "boolean" }, default: false })
     const rendering = extractButtonRenderingEvidence(sourcePath, "Button")
     expect(component.slots[0]).toMatchObject({ propName: rendering.conditionProp, default: rendering.asChildDefault, replacesHost: rendering.whenTrue === "Slot.Root" && rendering.whenFalse === rendering.defaultHost, forwardsProps: rendering.forwardsProps, childCardinality: { min: 0, max: 1 }, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" })
-    expect(component.rendering.alternatives.map(({ when, otherwise }) => ({ when, otherwise }))).toEqual([
-      { when: { propName: rendering.conditionProp, equals: true }, otherwise: undefined },
-      { when: undefined, otherwise: true },
-    ])
-    const [slotBranch, defaultBranch] = component.rendering.alternatives.map(({ rendering: branch }) => branch)
-    expect(slotBranch.nodes[0].host).toEqual({ kind: "unresolved" })
-    expect(defaultBranch.nodes[0].host).toEqual({ kind: "intrinsic", tag: rendering.defaultHost })
-    for (const branch of [slotBranch, defaultBranch]) {
+    expect(component.rendering.alternatives.map(({ when }) => when)).toEqual([true, false].flatMap((asChild) => [true, false].map((isLoading) => ({ all: [{ propName: rendering.conditionProp, equals: asChild }, { source: "state", name: "isLoading", equals: isLoading }] }))))
+    for (const [index, { rendering: branch }] of component.rendering.alternatives.entries()) {
+      expect(branch.nodes[0].host).toEqual(index < 2 ? { kind: "unresolved" } : { kind: "intrinsic", tag: rendering.defaultHost })
       expect(branch.rootNodeId).toBe("host")
       expect(branch.publicPropsTargetNodeId).toBe("host")
-      expect(branch.nodes.map((node) => node.id)).toEqual(["host", "spinner", "slottable"])
-      expect(branch.nodes[0].children.map((child) => [child.nodeId, child.when])).toEqual([["spinner", { source: "state", name: "isLoading", truthiness: "truthy" }], ["slottable", undefined]])
-      expect(branch.nodes[1].host).toEqual({ kind: "cross-family-export", familyId: "spinner", exportName: "Spinner" })
+      expect(branch.nodes.map((node) => node.id)).toEqual(index % 2 === 0 ? ["host", "loading-content", "spinner", "slottable"] : ["host"])
+      if (index % 2 === 0) {
+        expect(branch.nodes[1].host).toEqual({ kind: "fragment" })
+        expect(branch.nodes[2].host).toEqual({ kind: "cross-family-export", familyId: "spinner", exportName: "Spinner" })
+      }
       expect((branch.nodes[0].dataAttributes as Array<{ name: string; value?: string; prop?: string }>).map(({ name, value, prop }) => ({ name, value, sourceProp: prop }))).toEqual(rendering.dataAttributes)
     }
     expect(extractDataSlotLiterals(sourcePath)).toContain("button")

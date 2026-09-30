@@ -18,12 +18,14 @@ describe("Button loading contract", () => {
   test("declares the Spinner as a conditional child rendered while loading", () => {
     const rendering = lookupComponentExport("button", "Button").component!.rendering
     const alternatives = "alternatives" in rendering ? rendering.alternatives : []
-    const otherwise = alternatives.find((item) => "otherwise" in item)!.rendering
-    const host = otherwise.nodes.find((node) => node.id === otherwise.rootNodeId)!
-    const spinnerEdge = host.children.find((child) => child.nodeId === "spinner")!
-
-    expect(spinnerEdge.when).toEqual({ source: "state", name: "isLoading", truthiness: "truthy" })
-    expect(otherwise.nodes.find((node) => node.id === "spinner")!.host).toEqual({ kind: "cross-family-export", familyId: "spinner", exportName: "Spinner" })
+    const loading = alternatives.filter((item) => item.when && "all" in item.when && item.when.all.some((condition) => "source" in condition && condition.name === "isLoading" && "equals" in condition && condition.equals === true))
+    expect(loading).toHaveLength(2)
+    for (const { rendering: tree } of loading) {
+      expect(tree.nodes.find((node) => node.id === "spinner")!.host).toEqual({ kind: "cross-family-export", familyId: "spinner", exportName: "Spinner" })
+    }
+    for (const alternative of alternatives.filter((item) => !loading.includes(item))) {
+      expect(alternative.rendering.nodes.some((node) => node.id === "spinner")).toBe(false)
+    }
   })
 
   test("states that the caller owns the loading state and Button runs no async work", () => {
