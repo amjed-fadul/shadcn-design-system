@@ -3,7 +3,7 @@
   "id": "select",
   "source": {
     "canonicalPath": "src/components/ui/select.tsx",
-    "canonicalBlobSha": "09748f73848930cd63c83bc2c87dd780f946d4bc",
+    "canonicalBlobSha": "b6f65df131f80af7f79ffaac78fcc468caebd7f8",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/select.tsx",
     "upstreamBlobSha": "f576bf455da400681c62e9f5a80a95315ee52172"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/select.tsx@09748f73848930cd63c83bc2c87dd780f946d4bc"
+      "source": "src/components/ui/select.tsx@b6f65df131f80af7f79ffaac78fcc468caebd7f8"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -1296,6 +1296,23 @@
             ]
           },
           {
+            "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -1400,7 +1417,56 @@
           ],
           "portalBoundaries": []
         },
-        "accessibility": []
+        "accessibility": [
+          {
+            "feature": "combobox semantics",
+            "owner": "component",
+            "mechanism": "Radix renders the trigger as a button with role=\"combobox\", aria-expanded, and aria-autocomplete=\"none\"; opening, arrow-key navigation, typeahead, and Escape are owned by Radix Select and are not altered by Field composition",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "field label association",
+            "owner": "author",
+            "mechanism": "inside Field, give SelectTrigger an id and set FieldLabel htmlFor to that id so the label names the combobox; use aria-label or aria-labelledby on SelectTrigger when there is no visible FieldLabel",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "field description and error association",
+            "owner": "author",
+            "mechanism": "set aria-describedby on SelectTrigger (not on the Select root, which renders no DOM element) to the ids of the FieldDescription and FieldError elements",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "invalid state",
+            "owner": "author",
+            "mechanism": "set aria-invalid on SelectTrigger (not on the Select root); the trigger renders the destructive border and ring from aria-invalid, matching Input, and Field data-invalid colours the label and error text",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "required state",
+            "owner": "component",
+            "mechanism": "Select required renders aria-required=\"true\" on the trigger and required on the hidden native select rendered when the Select is inside a form; do not also set aria-required on SelectTrigger",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "disabled state",
+            "owner": "component",
+            "mechanism": "Select disabled or SelectTrigger disabled renders the disabled attribute and data-disabled on the trigger; set data-disabled=\"true\" on Field as well to dim FieldLabel",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ]
       }
     },
     {

@@ -29,6 +29,16 @@
           "shadcn.field.docs"
         ]
       }
+    },
+    {
+      "statement": "Use Form when a set of controls submits together: Form renders a native <form>, so a <Button type=\"submit\"> and Enter in a form control submit it and the browser applies native validation. Use Form instead of building submission from a Button onClick, which would lose native submit, Enter-key, and validation behavior.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.form-element",
+          "whatwg.html.implicit-submission"
+        ]
+      }
     }
   ],
   "howToUse": [
@@ -47,6 +57,83 @@
         "kind": "source-derived",
         "referenceIds": [
           "shadcn.field.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Select is a supported Field control: render FieldLabel, Select, then optional FieldDescription and FieldError as siblings inside Field, with the id, aria-describedby, and aria-invalid on SelectTrigger.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs",
+          "shadcn.select.docs",
+          "radix.select.docs"
+        ]
+      }
+    },
+    {
+      "statement": "InputGroup is a supported Field control: render InputGroup as a direct child of Field between FieldLabel and the optional FieldDescription and FieldError, with FieldLabel htmlFor, aria-describedby, and aria-invalid on the InputGroupInput or InputGroupTextarea inside it; an inline InputGroupButton, such as Show/Hide password, does not change those relationships.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs",
+          "shadcn.input-group.docs"
+        ]
+      }
+    },
+    {
+      "statement": "Field does not inject ids or ARIA: connect FieldDescription and FieldError to the control by giving them ids and listing those ids in the control's aria-describedby.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.field.docs"
+        ]
+      }
+    },
+    {
+      "statement": "FieldError stays the field-specific validation message tied to its control through aria-describedby. Use <Status> for form-level process or result messages such as Saving… or Saved that are not tied to a single field, and do not nest one live region inside the other.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.status-role",
+          "w3c.aria.alert-role"
+        ]
+      }
+    },
+    {
+      "statement": "Wrap the controls in <Form onSubmit={...}> with a <Button type=\"submit\">. Form forwards standard form props such as onSubmit, action, method, noValidate, and autoComplete and adds no custom submit props; call event.preventDefault() in onSubmit when the application handles the submit itself.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.form-element"
+        ]
+      }
+    },
+    {
+      "statement": "Enter submits through the browser's native implicit submission, not through Form code; whether Enter submits a particular form (for example one with no submit button and several text fields) is the browser's decision. The inline InputGroupButton, such as Show/Hide password, defaults to type=\"button\" so it does not submit the Form.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.implicit-submission"
+        ]
+      }
+    },
+    {
+      "statement": "Native constraint validation applies inside Form: required, type=\"email\", pattern, min, and max keep the submit event from firing while a control is invalid. Set noValidate only when the application intentionally replaces native validation. Application-specific validation, error focus, async submission, and server requests stay with the caller; Form manages none of them.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.constraint-validation"
+        ]
+      }
+    },
+    {
+      "statement": "Inside a Form, Field, Input, InputGroup, and Select keep their label and aria-describedby relationships; give each control a name so it appears in the submitted data, including name on Select. Put form-level progress or result text in a sibling <Status>, keep it mounted, and change its children; Form does not announce results.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.form-element",
+          "w3c.aria.status-role"
         ]
       }
     }

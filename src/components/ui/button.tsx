@@ -3,6 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { Spinner } from "@/components/ui/spinner"
 
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -41,16 +42,26 @@ const buttonVariants = cva(
   }
 )
 
-const Button = React.forwardRef<HTMLButtonElement,
-  React.ComponentPropsWithoutRef<"button"> & VariantProps<typeof buttonVariants> & { asChild?: boolean }
->(({
+type ButtonProps = React.ComponentPropsWithoutRef<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+    /** Caller-controlled busy state; ignored when asChild is true. */
+    loading?: boolean
+  }
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   className,
   variant = "default",
   size = "default",
   asChild = false,
+  loading = false,
+  disabled,
+  children,
+  "aria-busy": ariaBusy,
   ...props
 }, ref) => {
   const Comp = asChild ? Slot.Root : "button"
+  const isLoading = loading && !asChild
 
   return (
     <Comp
@@ -58,9 +69,17 @@ const Button = React.forwardRef<HTMLButtonElement,
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        isLoading && "disabled:opacity-70 [&>[data-icon=inline-start]:not([data-slot=spinner])]:hidden data-[size^=icon]:[&>svg:not([data-slot=spinner])]:hidden"
+      )}
       {...props}
-    />
+      disabled={disabled || isLoading}
+      aria-busy={isLoading || ariaBusy}
+    >
+      {isLoading && <Spinner data-icon="inline-start" role={undefined} aria-label={undefined} aria-hidden="true" />}
+      <Slot.Slottable>{children}</Slot.Slottable>
+    </Comp>
   )
 })
 Button.displayName = "Button"

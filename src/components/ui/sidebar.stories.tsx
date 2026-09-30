@@ -20,6 +20,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 const meta = {
   title: "Components/Sidebar",
@@ -215,5 +216,192 @@ export const KeyboardFocus: Story = {
       })
       await expect(observation.boxShadow).not.toBe(observation.before)
     }
+  },
+}
+
+// Navigation items are real anchors composed with SidebarMenuButton asChild.
+// The design system owns no routing, so these stories only prove native
+// semantics; play functions observe activation without leaving Storybook.
+function NavigationSidebar({ collapsible = "none", open = true, dir, children }: { collapsible?: "none" | "icon"; open?: boolean; dir?: "ltr" | "rtl"; children: React.ReactNode }) {
+  return (
+    <TooltipProvider>
+      <div dir={dir} style={{ position: "relative", width: 320, height: 240, overflow: "hidden", transform: "translateZ(0)" }}>
+        <SidebarProvider defaultOpen={open}>
+          <Sidebar collapsible={collapsible} dir={dir} role="navigation" aria-label="Application navigation">
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+                <SidebarMenu>{children}</SidebarMenu>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+        </SidebarProvider>
+      </div>
+    </TooltipProvider>
+  )
+}
+
+// Records whether the browser would still perform its default navigation, then
+// cancels it so the play function never navigates the Storybook iframe away.
+async function activateWithoutLeaving(activate: () => Promise<unknown>) {
+  let nativeDefaultIntact: boolean | undefined
+  const observe = (event: Event) => {
+    nativeDefaultIntact = !event.defaultPrevented
+    event.preventDefault()
+  }
+  document.addEventListener("click", observe)
+  try {
+    await activate()
+  } finally {
+    document.removeEventListener("click", observe)
+  }
+  return nativeDefaultIntact
+}
+
+export const NavigationItem: Story = {
+  parameters: { docs: { description: { story: "A navigation item is a native anchor. Compose it with `SidebarMenuButton asChild` and author the `href` on the anchor; the design system does not own routing." } } },
+  render: () => (
+    <NavigationSidebar>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild>
+          <a href="/clients">Clients</a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </NavigationSidebar>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const link = canvas.getByRole("link", { name: "Clients" })
+
+    await expect(link.tagName).toBe("A")
+    await expect(link).toHaveAttribute("href", "/clients")
+    await expect(link).toHaveAttribute("data-slot", "sidebar-menu-button")
+    await expect(link).not.toHaveAttribute("aria-current")
+    await expect(canvasElement.querySelectorAll("a button, button a")).toHaveLength(0)
+    await expect(canvas.queryByRole("button", { name: "Clients" })).toBeNull()
+
+    // Keyboard: Enter on a focused link is the native activation path.
+    link.focus()
+    const intact = await activateWithoutLeaving(() => userEvent.keyboard("{Enter}"))
+    await expect(intact).toBe(true)
+  },
+}
+
+export const CurrentPage: Story = {
+  parameters: { docs: { description: { story: "`isActive` is visual (`data-active`). The authored anchor owns `aria-current=\"page\"`, and only the current-page link carries it." } } },
+  render: () => (
+    <NavigationSidebar>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive>
+          <a href="/follow-ups" aria-current="page">Follow-ups</a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild>
+          <a href="/clients">Clients</a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild>
+          <a href="/settings">Settings</a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </NavigationSidebar>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const current = canvas.getByRole("link", { name: "Follow-ups" })
+
+    await expect(current).toHaveAttribute("aria-current", "page")
+    await expect(current).toHaveAttribute("data-active", "true")
+    await expect(canvas.getByRole("link", { name: "Clients" })).not.toHaveAttribute("aria-current")
+    await expect(canvas.getByRole("link", { name: "Settings" })).toHaveAttribute("data-active", "false")
+    await expect(canvasElement.querySelectorAll('[aria-current="page"]')).toHaveLength(1)
+    await expect(canvas.getAllByRole("link")).toHaveLength(3)
+  },
+}
+
+export const ActionItem: Story = {
+  parameters: { docs: { description: { story: "A non-navigation item stays a Button and never receives link or current-page semantics. Use it for actions such as opening a menu or running a command." } } },
+  render: () => (
+    <NavigationSidebar>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive>
+          <a href="/follow-ups" aria-current="page">Follow-ups</a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton type="button" aria-haspopup="menu">Open command menu</SidebarMenuButton>
+      </SidebarMenuItem>
+    </NavigationSidebar>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const action = canvas.getByRole("button", { name: "Open command menu" })
+
+    await expect(action.tagName).toBe("BUTTON")
+    await expect(action).not.toHaveAttribute("href")
+    await expect(action).not.toHaveAttribute("aria-current")
+    await expect(canvas.queryByRole("link", { name: "Open command menu" })).toBeNull()
+    await expect(canvas.getByRole("link", { name: "Follow-ups" })).toHaveAttribute("aria-current", "page")
+  },
+}
+
+export const NavigationCollapsed: Story = {
+  parameters: { docs: { description: { story: "In the existing icon presentation the anchors keep their link role, `href`, accessible name, and keyboard focus. The `tooltip` prop is unchanged." } } },
+  render: () => (
+    <NavigationSidebar collapsible="icon" open={false}>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive tooltip="Follow-ups">
+          <a href="/follow-ups" aria-current="page"><span aria-hidden>★</span><span>Follow-ups</span></a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild tooltip="Clients">
+          <a href="/clients"><span aria-hidden>●</span><span>Clients</span></a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </NavigationSidebar>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const sidebar = canvasElement.querySelector('[data-slot="sidebar"]')
+
+    await expect(sidebar).toHaveAttribute("data-state", "collapsed")
+    const link = canvas.getByRole("link", { name: /Clients/ })
+    await expect(link).toHaveAttribute("href", "/clients")
+    await expect(canvas.getByRole("link", { name: /Follow-ups/ })).toHaveAttribute("aria-current", "page")
+    link.focus()
+    await expect(link).toHaveFocus()
+    // Focus opens the collapsed-item tooltip in a portal outside any landmark;
+    // dismiss it so the accessibility gate audits only the sidebar.
+    await userEvent.keyboard("{Escape}")
+    await waitFor(() => expect(document.querySelector('[data-slot="tooltip-content"]')).toBeNull())
+  },
+}
+
+export const NavigationRtl: Story = {
+  parameters: { docs: { description: { story: "Navigation semantics are identical in RTL: native links, `href`, and `aria-current` do not change with direction." } } },
+  render: () => (
+    <NavigationSidebar dir="rtl">
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive>
+          <a href="/follow-ups" aria-current="page">Follow-ups</a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild>
+          <a href="/clients">Clients</a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </NavigationSidebar>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(getComputedStyle(canvasElement.querySelector("[dir='rtl']")!).direction).toBe("rtl")
+    await expect(canvas.getByRole("link", { name: "Follow-ups" })).toHaveAttribute("aria-current", "page")
+    await expect(canvas.getByRole("link", { name: "Clients" })).toHaveAttribute("href", "/clients")
+    await expect(canvas.getAllByRole("link")).toHaveLength(2)
   },
 }

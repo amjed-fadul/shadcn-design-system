@@ -12,6 +12,7 @@ const readJson = <T>(path: string) => JSON.parse(readFileSync(join(root, path), 
 const manifest = readJson<ComponentContractSet>("contracts/components/component-contract-set.json")
 const familyPaths = new Map(manifest.familyFiles.map((path) => [path.split("/").at(-1)!.replace(".json", ""), path]))
 const interfaces = manifest.interfaceFiles.map((path) => readJson<InheritedInterfaceContract>(path))
+const alertFamily = readJson<ComponentFamilyContract>(familyPaths.get("alert")!)
 const sourceBackedFamilies = ["alert-dialog", "avatar", "collapsible", "command", "drawer", "popover", "radio-group", "toggle-group"]
   .map((familyId) => readJson<ComponentFamilyContract>(familyPaths.get(familyId)!))
 
@@ -31,6 +32,17 @@ describe("canonical source-backed composition and conditional authority", () => 
     expect(authorityErrors(mutated)).toEqual(expect.arrayContaining([
       "Component AlertDialog composition does not match source evidence.",
       "Component ToggleGroup conditional API does not match source evidence.",
+    ]))
+  }, 120_000)
+
+  test("rejects a missing source-declared inherited prop omission", () => {
+    const mutated = structuredClone(alertFamily)
+    delete mutated.exports.find((entry) => entry.name === "Status")!.component!.inheritedPropOmissions
+
+    expect(reconcileCanonicalComponentSources(root, { contractSet: manifest, families: [mutated], interfaces })).toEqual(expect.arrayContaining([
+      "Component Status inherited prop omissions do not match source evidence.",
+      "Component Status: Source inherited prop omission aria-live is missing from the contract.",
+      "Component Status: Source inherited prop omission role is missing from the contract.",
     ]))
   }, 120_000)
 })

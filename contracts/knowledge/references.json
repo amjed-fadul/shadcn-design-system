@@ -338,6 +338,14 @@
       "accessedOn": "2026-09-02"
     },
     {
+      "id": "radix.composition.docs",
+      "kind": "official-documentation",
+      "title": "Composition - Radix Primitives",
+      "locator": "https://www.radix-ui.com/primitives/docs/guides/composition",
+      "locatorHint": "Composition; asChild; Composing with your own React components; Composing with a router link",
+      "accessedOn": "2026-09-30"
+    },
+    {
       "id": "w3c.button.apg",
       "kind": "official-standard",
       "title": "Button Pattern | WAI-ARIA Authoring Practices Guide",
@@ -352,6 +360,70 @@
       "locator": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
       "locatorHint": "About This Pattern; Keyboard Interaction; Notes; WAI-ARIA Roles, States, and Properties",
       "accessedOn": "2026-09-02"
+    },
+    {
+      "id": "w3c.aria.alert-role",
+      "kind": "official-standard",
+      "title": "Accessible Rich Internet Applications (WAI-ARIA) 1.2: alert role",
+      "locator": "https://www.w3.org/TR/wai-aria-1.2/#alert",
+      "locatorHint": "alert; implicit aria-live assertive; implicit aria-atomic true",
+      "accessedOn": "2026-09-30"
+    },
+    {
+      "id": "w3c.aria.status-role",
+      "kind": "official-standard",
+      "title": "Accessible Rich Internet Applications (WAI-ARIA) 1.2: status role",
+      "locator": "https://www.w3.org/TR/wai-aria-1.2/#status",
+      "locatorHint": "status; implicit aria-live polite; implicit aria-atomic true",
+      "accessedOn": "2026-09-30"
+    },
+    {
+      "id": "whatwg.html.autofill",
+      "kind": "official-standard",
+      "title": "HTML Standard: Autofill",
+      "locator": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill",
+      "locatorHint": "Autofill; The autocomplete attribute; autofill field names and hints",
+      "accessedOn": "2026-09-29"
+    },
+    {
+      "id": "whatwg.html.form-element",
+      "kind": "official-standard",
+      "title": "HTML Standard: The form element",
+      "locator": "https://html.spec.whatwg.org/multipage/forms.html#the-form-element",
+      "locatorHint": "The form element; action, method, novalidate, autocomplete content attributes",
+      "accessedOn": "2026-09-30"
+    },
+    {
+      "id": "whatwg.html.implicit-submission",
+      "kind": "official-standard",
+      "title": "HTML Standard: Implicit submission",
+      "locator": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#implicit-submission",
+      "locatorHint": "Implicit submission; default button; fields that block implicit submission",
+      "accessedOn": "2026-09-30"
+    },
+    {
+      "id": "whatwg.html.constraint-validation",
+      "kind": "official-standard",
+      "title": "HTML Standard: Constraint validation",
+      "locator": "https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constraint-validation",
+      "locatorHint": "Constraint validation; interactively validating the constraints; the novalidate attribute",
+      "accessedOn": "2026-09-30"
+    },
+    {
+      "id": "w3c.aria.aria-current",
+      "kind": "official-standard",
+      "title": "Accessible Rich Internet Applications (WAI-ARIA) 1.2: aria-current",
+      "locator": "https://www.w3.org/TR/wai-aria-1.2/#aria-current",
+      "locatorHint": "aria-current; value page; represents the current page within a set of pages",
+      "accessedOn": "2026-09-30"
+    },
+    {
+      "id": "whatwg.html.the-a-element",
+      "kind": "official-standard",
+      "title": "HTML Standard: The a element",
+      "locator": "https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element",
+      "locatorHint": "The a element; href attribute; hyperlink semantics; interactive content",
+      "accessedOn": "2026-09-30"
     },
     {
       "id": "canonical.button.source",

@@ -106,8 +106,9 @@ export type RenderFlowBranch = EvidenceRef & (
 )
 export type RenderingFlow = { collections: DerivedCollection[]; branches: RenderFlowBranch[] }
 export type InheritedPropDefault = EvidenceRef & { propName: string; value: string | number | boolean | null }
+export type InheritedPropOmission = EvidenceRef & { propName: string }
 export type AccessibilityFact = EvidenceRef & { feature: string; owner: "native" | "author" | "component"; mechanism: string }
-export type ComponentDefinition = { localProps: LocalPropContract[]; inherits: string[]; slots: SlotContract[]; inheritedPropDefaults: InheritedPropDefault[]; composition: CompositionContract; stateChannels: StateChannel[]; conditionalApi: ConditionalApiCase[]; events: EventContract[]; tokenDependencies: TokenDependency[]; context?: ContextFact[]; rendering: RenderingFact; renderingFlow?: RenderingFlow; accessibility: AccessibilityFact[] }
+export type ComponentDefinition = { localProps: LocalPropContract[]; inherits: string[]; inheritedPropOmissions?: InheritedPropOmission[]; slots: SlotContract[]; inheritedPropDefaults: InheritedPropDefault[]; composition: CompositionContract; stateChannels: StateChannel[]; conditionalApi: ConditionalApiCase[]; events: EventContract[]; tokenDependencies: TokenDependency[]; context?: ContextFact[]; rendering: RenderingFact; renderingFlow?: RenderingFlow; accessibility: AccessibilityFact[] }
 export type EffectivePublicProp = { name: string; availability: "available"; required: boolean; type: StructuredPropType } | { name: string; availability: "unavailable" }
 export type EffectiveComponentApiShape = { props: EffectivePublicProp[]; events: EventContract[] }
 export type PublicExportContract = EvidenceRef & { name: string; kind: ComponentExportKind; authorableJsx: boolean; component?: ComponentDefinition }

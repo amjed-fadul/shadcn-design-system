@@ -19,7 +19,7 @@ export function extractButtonRenderingEvidence(sourcePath: string, exportName: s
       if (ts.isStringLiteral(whenFalse)) defaultHost = whenFalse.text
     }
     if (ts.isJsxSpreadAttribute(node) && ts.isIdentifier(node.expression) && node.expression.text === "props") forwardsProps = true
-    if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && node.name.text.startsWith("data-")) {
+    if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && node.name.text.startsWith("data-") && ts.isJsxOpeningElement(node.parent.parent) && node.parent.parent.tagName.getText(file) === "Comp") {
       if (node.initializer && ts.isStringLiteral(node.initializer)) dataAttributes.push({ name: node.name.text, value: node.initializer.text })
       else if (node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression && ts.isIdentifier(node.initializer.expression)) dataAttributes.push({ name: node.name.text, sourceProp: node.initializer.expression.text })
     }

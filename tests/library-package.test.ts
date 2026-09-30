@@ -29,11 +29,11 @@ const contractedExportNames = () => {
 }
 
 describe("published library entrypoint", () => {
-  test("exposes all 205 contracted public exports including Switch", async () => {
+  test("exposes all 207 contracted public exports including Switch", async () => {
     const library = await import("../src/package/index")
     const names = contractedExportNames()
     expect(Object.keys(library).sort()).toEqual(names.sort())
-    expect(names).toHaveLength(205)
+    expect(names).toHaveLength(207)
     expect(Object.hasOwn(library, "Switch")).toBe(true)
     expect(Object.hasOwn(library, "SidebarNormalAppProvider")).toBe(false)
     const sidebar = readJson("contracts/components/families/sidebar.json")

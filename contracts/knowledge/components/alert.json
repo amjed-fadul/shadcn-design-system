@@ -8,7 +8,8 @@
   "guidanceStatus": {
     "whatItIs": "available",
     "whenToUse": "available",
-    "options": "available"
+    "options": "available",
+    "howToUse": "available"
   },
   "whatItIs": {
     "statement": "Displays a persistent callout for information that needs the user's attention.",
@@ -28,6 +29,16 @@
           "shadcn.alert.docs"
         ]
       }
+    },
+    {
+      "statement": "Use <Status> for changing process or result text that assistive technology should announce without moving focus, such as Saving…, Saved, Loading results…, or Logging in…. It is a polite live region and can be visible or visually hidden.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.status-role",
+          "w3c.aria.alert-role"
+        ]
+      }
     }
   ],
   "options": [
@@ -37,6 +48,48 @@
         "kind": "source-derived",
         "referenceIds": [
           "shadcn.alert.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "A default <Status> renders role=\"status\" with aria-live=\"polite\", so updates are announced politely. Keep it mounted and change its children as the process moves, for example Logging in… and then Saved; a live region inserted together with its first message may not be announced by every assistive technology, and rendering identical text again is not guaranteed to be announced again. Changing variant on a mounted Status changes its role and aria-live, and announcement of that change is not guaranteed; for a failure that should be announced, keep a sibling <Status variant=\"error\"> mounted and empty. An empty visible Status still occupies layout.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.status-role"
+        ]
+      }
+    },
+    {
+      "statement": "Use <Status variant=\"error\"> for an important failure such as Login failed or Save failed. It renders role=\"alert\" with aria-live=\"assertive\" and can interrupt speech, so it is not for routine loading or success messages. Non-urgent validation summaries and non-urgent results such as Saved stay on the default polite <Status>; do not use error for per-keystroke validation.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.alert-role"
+        ]
+      }
+    },
+    {
+      "statement": "Set visuallyHidden on <Status> when the product needs the announcement but no visible text; the message stays in the accessibility tree through the sr-only utility. The caller controls the message text and updates the children when its own async operation changes state; Status does not manage async work.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.status-role",
+          "w3c.aria.alert-role"
+        ]
+      }
+    },
+    {
+      "statement": "Status announces changing process or result text. Alert is visible callout content that always renders role=\"alert\"; FieldError is field-specific validation text that the author ties to its control; Spinner is a loading indicator whose default role=\"status\" is its own live region; Button loading marks only the Button itself busy and announces no result. Do not nest one of these live regions inside another; a Spinner inside Status needs aria-hidden=\"true\" with its role and aria-label removed.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.status-role",
+          "w3c.aria.alert-role",
+          "shadcn.alert.docs",
+          "shadcn.spinner.docs"
         ]
       }
     }

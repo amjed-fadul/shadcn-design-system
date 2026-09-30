@@ -37,12 +37,13 @@ describe("Button component contract", () => {
     const variants = extractCvaVariantLiterals(sourcePath, "buttonVariants")
     const defaults = extractFunctionPropDefaults(sourcePath, "Button")
     expect(component.inherits).toEqual(["html.button"])
-    expect(component.localProps.map((prop) => prop.name)).toEqual(["variant", "size", "asChild"])
+    expect(component.localProps.map((prop) => prop.name)).toEqual(["variant", "size", "asChild", "loading"])
     expect(component.localProps[0].type).toEqual({ kind: "enum", values: variants.variants.variant })
     expect(component.localProps[1].type).toEqual({ kind: "enum", values: variants.variants.size })
     expect(component.localProps[0].default).toBe(variants.defaults.variant)
     expect(component.localProps[1].default).toBe(variants.defaults.size)
     expect(component.localProps[2].default).toBe(defaults.get("asChild"))
+    expect(component.localProps[3]).toMatchObject({ name: "loading", required: false, type: { kind: "boolean" }, default: false })
     const rendering = extractButtonRenderingEvidence(sourcePath, "Button")
     expect(component.slots[0]).toMatchObject({ propName: rendering.conditionProp, default: rendering.asChildDefault, replacesHost: rendering.whenTrue === "Slot.Root" && rendering.whenFalse === rendering.defaultHost, forwardsProps: rendering.forwardsProps, childCardinality: { min: 0, max: 1 }, childRequires: ["multiple children require a Radix Slottable that resolves to one React element"], refForwarding: "unresolved" })
     expect(component.rendering.alternatives.map(({ when, otherwise }) => ({ when, otherwise }))).toEqual([
@@ -55,8 +56,10 @@ describe("Button component contract", () => {
     for (const branch of [slotBranch, defaultBranch]) {
       expect(branch.rootNodeId).toBe("host")
       expect(branch.publicPropsTargetNodeId).toBe("host")
-      expect(branch.nodes).toHaveLength(1)
-      expect(branch.nodes[0].dataAttributes.map(({ name, value, prop }) => ({ name, value, sourceProp: prop }))).toEqual(rendering.dataAttributes)
+      expect(branch.nodes.map((node) => node.id)).toEqual(["host", "spinner", "slottable"])
+      expect(branch.nodes[0].children.map((child) => [child.nodeId, child.when])).toEqual([["spinner", { source: "state", name: "isLoading", truthiness: "truthy" }], ["slottable", undefined]])
+      expect(branch.nodes[1].host).toEqual({ kind: "cross-family-export", familyId: "spinner", exportName: "Spinner" })
+      expect((branch.nodes[0].dataAttributes as Array<{ name: string; value?: string; prop?: string }>).map(({ name, value, prop }) => ({ name, value, sourceProp: prop }))).toEqual(rendering.dataAttributes)
     }
     expect(extractDataSlotLiterals(sourcePath)).toContain("button")
   })
@@ -82,7 +85,7 @@ describe("Button component contract", () => {
     expect(normalize(dependencies.filter((dependency) => !hasRecipeCondition(dependency, "variant") && !hasRecipeCondition(dependency, "size")))).toEqual(normalize(analyzeTailwindTokenDependencies(baseClasses)))
     for (const [variant, classNames] of Object.entries(variantClasses.variant)) expect(normalize(dependencies.filter((dependency) => hasRecipeCondition(dependency, "variant", variant)))).toEqual(normalize(analyzeTailwindTokenDependencies(classNames)))
     for (const [size, classNames] of Object.entries(variantClasses.size)) expect(normalize(dependencies.filter((dependency) => hasRecipeCondition(dependency, "size", size)))).toEqual(normalize(analyzeTailwindTokenDependencies(classNames)))
-    const authority = { interfaceIds: new Set([htmlButton.id]), interfacePropNames: new Map([[htmlButton.id, new Set(htmlButton.props.map((prop) => prop.name))]]), interfaceContracts: new Map([[htmlButton.id, htmlButton as InheritedInterfaceContract]]), tokenIds: new Set(tokenContract.tokens.map((token) => token.id)), derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)), capabilityIds: new Set<string>(), sourceIdentity: { canonicalPath: button.source.canonicalPath, canonicalBlobSha: readCanonicalSourceBlobSha(sourcePath) } }
+    const authority = { interfaceIds: new Set([htmlButton.id]), interfacePropNames: new Map([[htmlButton.id, new Set(htmlButton.props.map((prop) => prop.name))]]), interfaceContracts: new Map([[htmlButton.id, htmlButton as InheritedInterfaceContract]]), tokenIds: new Set(tokenContract.tokens.map((token) => token.id)), derivedTokenRuleIds: new Set(tokenContract.derivedRules.map((rule) => rule.id)), capabilityIds: new Set<string>(), componentExportIds: new Set(["spinner.Spinner"]), sourceIdentity: { canonicalPath: button.source.canonicalPath, canonicalBlobSha: readCanonicalSourceBlobSha(sourcePath) } }
     expect(validateInheritedInterfaceInvariants(htmlButton as InheritedInterfaceContract)).toEqual([])
     expect(validateComponentFamilyInvariants(button as ComponentFamilyContract, authority)).toEqual([])
   })

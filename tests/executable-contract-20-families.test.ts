@@ -143,7 +143,7 @@ describe("Phase 5 executable validator coverage across all 38 canonical families
     const hardConstraints = Object.values(contract.exports).flatMap((entry) => entry.component?.composition.hardConstraints ?? [])
 
     expect([...projectedFamilies].sort()).toEqual([...familyIds].sort())
-    expect(authorable).toHaveLength(199)
+    expect(authorable).toHaveLength(201)
     expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
     for (const entry of authorable) {

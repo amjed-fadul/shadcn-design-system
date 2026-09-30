@@ -3,7 +3,7 @@
   "id": "field",
   "source": {
     "canonicalPath": "src/components/ui/field.tsx",
-    "canonicalBlobSha": "f0db18f183eb62676e0a8198430889886408e3d0",
+    "canonicalBlobSha": "93e0f2b2e0bbb68ba2eda5560238e322ce8bc291",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/field.tsx",
     "upstreamBlobSha": "c927c173514fa52c6a073757bea01fef08dbb5b6"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/field.tsx@f0db18f183eb62676e0a8198430889886408e3d0"
+      "source": "src/components/ui/field.tsx@93e0f2b2e0bbb68ba2eda5560238e322ce8bc291"
     },
     "tokens": {
       "kind": "token-contract",
@@ -19,6 +19,118 @@
     }
   },
   "exports": [
+    {
+      "name": "Form",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.form"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "html.form"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "form",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "native form semantics",
+            "owner": "native",
+            "mechanism": "root renders a native <form> element and adds no role; the browser exposes it as a form landmark only when the author names it with aria-label or aria-labelledby, so do not add role=\"form\", and name a form only when it is a meaningful landmark on the page",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "submit behavior",
+            "owner": "native",
+            "mechanism": "submitting is native browser form submission: a Button with type=\"submit\" inside the Form submits it, and the browser dispatches a submit event that reaches the onSubmit prop. Form adds no submit handler of its own; the caller's onSubmit decides what submitting does and calls event.preventDefault() when the application handles the submit itself. A native <button> (including Button) inside a form with no type attribute is a submit button by default, so give every non-submit Button type=\"button\"; InputGroupButton already defaults to type=\"button\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "Enter key behavior",
+            "owner": "native",
+            "mechanism": "pressing Enter in a form control such as a text or password Input submits the Form through the browser's implicit submission; Form adds no key handling. Whether Enter submits in a given form (for example one without a submit button and with several text fields) is decided by the browser, not by Form",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "native validation",
+            "owner": "native",
+            "mechanism": "the browser checks native constraints such as required, type=\"email\", pattern, min and max before submitting; while a control is invalid the submit event does not fire, so onSubmit is not called, and the browser reports the first invalid control. Set noValidate to skip this check when the author intentionally validates elsewhere. Application-specific validation (server checks, cross-field rules, async checks) is caller-owned",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "forwarded form props",
+            "owner": "native",
+            "mechanism": "standard form attributes pass through to the <form> element and are not duplicated as Form props: onSubmit, action, method, noValidate, autoComplete, encType, target, name and id",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "form controls and Field",
+            "owner": "native",
+            "mechanism": "controls inside the form belong to it: Field, FieldLabel, FieldDescription and FieldError relationships (htmlFor, aria-describedby, aria-invalid) are unchanged inside a Form, and a control needs a name to appear in the submitted data. Select contributes to the form data only when name is set on Select; its trigger stays a combobox and Radix renders a hidden native select for form participation",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "result and async ownership",
+            "owner": "author",
+            "mechanism": "Form does not manage validation state, focus invalid fields, perform server requests, run or track async work, or announce results. Show field errors with FieldError and aria-invalid, and put form-level progress or result text in a <Status> that is a sibling of the Form's controls (inside or beside the Form, never nested in another live region); the caller controls when that text changes",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    },
     {
       "name": "FieldSet",
       "kind": "component",
@@ -448,6 +560,38 @@
             "evidenceRefs": [
               "source"
             ]
+          },
+          {
+            "feature": "group semantics",
+            "owner": "component",
+            "mechanism": "root renders role=\"group\" without an accessible name; name the surrounding FieldSet with FieldLegend when several Fields belong together",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "supported controls",
+            "owner": "author",
+            "mechanism": "Field controls include Input, Textarea, Select (via SelectTrigger), and InputGroup (via InputGroupInput or InputGroupTextarea); this is a set of examples, not an exhaustive list. The control is followed by optional FieldDescription and FieldError; Field renders plain layout and does not inject ids or ARIA into its children",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "control relationships",
+            "owner": "author",
+            "mechanism": "the author wires each relationship on the control element: id plus FieldLabel htmlFor for the name, aria-describedby with FieldDescription and FieldError ids for description and error, aria-invalid for invalid state, and required/disabled through the control's own props",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "invalid state",
+            "owner": "author",
+            "mechanism": "data-invalid on Field styles the label and error text only; expose invalid state to assistive technology with aria-invalid on the control itself",
+            "evidenceRefs": [
+              "source"
+            ]
           }
         ],
         "inheritedPropDefaults": [
@@ -854,7 +998,16 @@
           ],
           "portalBoundaries": []
         },
-        "accessibility": [],
+        "accessibility": [
+          {
+            "feature": "description association",
+            "owner": "author",
+            "mechanism": "give FieldDescription an id and list it in the control's aria-describedby; it is not linked to the control automatically",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
         "inheritedPropDefaults": []
       }
     },
@@ -1164,6 +1317,14 @@
             "feature": "validation announcement",
             "owner": "component",
             "mechanism": "rendered error container uses role=\"alert\"",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "error association",
+            "owner": "author",
+            "mechanism": "give FieldError an id and list it in the control's aria-describedby together with any FieldDescription id; FieldError renders role=\"alert\" and nothing when it has no content, so omit its id from aria-describedby while no error is shown",
             "evidenceRefs": [
               "source"
             ]

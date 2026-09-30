@@ -1,19 +1,108 @@
 {
   "schemaVersion": 1,
   "id": "sidebar-knowledge",
-  "subject": { "kind": "component", "id": "sidebar" },
+  "subject": {
+    "kind": "component",
+    "id": "sidebar"
+  },
   "guidanceStatus": {
     "whatItIs": "available",
+    "whenNotToUse": "available",
+    "howToUse": "available",
     "options": "available"
   },
   "whatItIs": {
     "statement": "A composable, themeable, and customizable sidebar.",
-    "basis": { "kind": "source-derived", "referenceIds": ["shadcn.sidebar.docs"] }
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "shadcn.sidebar.docs"
+      ]
+    }
   },
+  "whenNotToUse": [
+    {
+      "statement": "Do not implement navigation with a button-backed SidebarMenuButton whose onClick assigns the location or calls a navigation function. A navigation item must be a native link so it keeps its href, link role, Enter activation, modified-click and open-in-new-tab behaviour.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.the-a-element",
+          "shadcn.sidebar.docs"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "For a sidebar item that navigates to another page or view (a navigation item), compose SidebarMenuButton with a native anchor through asChild: <SidebarMenuButton asChild><a href=\"/follow-ups\">Follow-ups</a></SidebarMenuButton>. The anchor is the menu button itself, so do not nest a Button or a second link inside it. Its href is the destination and its text content is the accessible name; Enter activation, modified click, middle click, and open in new tab remain native browser behaviour.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.sidebar.docs",
+          "whatwg.html.the-a-element",
+          "radix.composition.docs"
+        ]
+      }
+    },
+    {
+      "statement": "To show which navigation item is the current page, set isActive on that SidebarMenuButton for the visual state and put aria-current=\"page\" on the authored anchor: <SidebarMenuButton asChild isActive><a href=\"/follow-ups\" aria-current=\"page\">Follow-ups</a></SidebarMenuButton>. isActive only sets the data-active styling and never adds aria-current, so the anchor owns current-page semantics. Mark exactly the one link for the page being shown, and never put aria-current on an action button. If a router link component sets aria-current itself, such as a NavLink, let the router own it rather than authoring it twice.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "w3c.aria.aria-current",
+          "radix.composition.docs"
+        ]
+      }
+    },
+    {
+      "statement": "For a sidebar item that performs an action instead of navigating, such as expanding a section, opening an account menu, or running a command, use SidebarMenuButton without asChild: it renders a native button. Do not turn action items into anchors and do not give them href or aria-current. Navigation items are anchors; action items are buttons.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.sidebar.docs",
+          "whatwg.html.the-a-element"
+        ]
+      }
+    },
+    {
+      "statement": "SidebarMenuButton does not own application routing and performs no client-side navigation. A plain anchor with href navigates natively. A framework router link component can be passed as the asChild child when it renders an anchor and forwards its props and ref, and the router then owns navigation.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "radix.composition.docs",
+          "shadcn.sidebar.docs"
+        ]
+      }
+    },
+    {
+      "statement": "The disabled attribute applies to button items only. On an anchor, aria-disabled only adds inert, dimmed styling (pointer-events-none and reduced opacity); it does not stop keyboard activation of an anchor that has an href. The design system adds no disabled-link behaviour and intercepts no link activation, so for a destination that is unavailable do not render the link, or render a non-navigating placeholder instead of an anchor with href.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "whatwg.html.the-a-element"
+        ]
+      }
+    },
+    {
+      "statement": "In the icon-collapsed presentation, an anchor menu button keeps its link role, href, aria-current, keyboard focus, and accessible name from its content, so keep the label text inside the anchor. The tooltip prop adds a tooltip for the collapsed item without changing that name, and requires a TooltipProvider ancestor.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.sidebar.docs",
+          "whatwg.html.the-a-element"
+        ]
+      }
+    }
+  ],
   "options": [
     {
       "statement": "Use the collapsible icon mode when the sidebar should collapse to icons.",
-      "basis": { "kind": "source-derived", "referenceIds": ["shadcn.sidebar.docs"] }
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "shadcn.sidebar.docs"
+        ]
+      }
     }
   ]
 }

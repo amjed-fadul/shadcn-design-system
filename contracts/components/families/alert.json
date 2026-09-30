@@ -3,7 +3,7 @@
   "id": "alert",
   "source": {
     "canonicalPath": "src/components/ui/alert.tsx",
-    "canonicalBlobSha": "f11877d3297cd43bd0ad1cbc06a146ad6351881f",
+    "canonicalBlobSha": "f4cb93d17e626fce3e397cc7f9af15b066c2a698",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/alert.tsx",
     "upstreamBlobSha": "e9aa02f381ef6e588cfb57696f76703c0f7c4ceb"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/alert.tsx@f11877d3297cd43bd0ad1cbc06a146ad6351881f"
+      "source": "src/components/ui/alert.tsx@f4cb93d17e626fce3e397cc7f9af15b066c2a698"
     },
     "tokens": {
       "kind": "token-contract",
@@ -435,6 +435,197 @@
           "portalBoundaries": []
         },
         "accessibility": [],
+        "inheritedPropDefaults": []
+      }
+    },
+    {
+      "name": "Status",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "variant",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "error"
+              ]
+            },
+            "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "visuallyHidden",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [
+          "html.div"
+        ],
+        "inheritedPropOmissions": [
+          {
+            "propName": "aria-live",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "propName": "role",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "color.destructive",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "error"
+            }
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "div"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "status",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-variant",
+                  "source": "prop",
+                  "prop": "variant",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "polite status semantics",
+            "owner": "component",
+            "mechanism": "root renders role=\"status\" and aria-live=\"polite\" when variant is \"default\" (the default); use it for routine progress and results such as Saving…, Saved, and Loading results…",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "error alert semantics",
+            "owner": "component",
+            "mechanism": "root renders role=\"alert\" and aria-live=\"assertive\" when variant is \"error\"; use it for important failures such as Login failed or Save failed, not for routine loading or success messages; do not use it for per-keystroke validation or for non-urgent validation summaries",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "role ownership",
+            "owner": "component",
+            "mechanism": "role and aria-live are owned by Status and cannot be overridden through props; choose the variant instead. Other div props still pass through, including aria-atomic, hidden, aria-hidden and style; do not set hidden or aria-hidden on a Status that must be announced",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "visually hidden mode",
+            "owner": "component",
+            "mechanism": "visuallyHidden adds the governed sr-only utility to the live region itself, so the message is clipped from view but stays in the accessibility tree (not display: none, hidden, or aria-hidden); no extra wrapper or second element is rendered, and the role and aria-live semantics are unchanged",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "dynamic updates",
+            "owner": "author",
+            "mechanism": "keep Status mounted and change its children when the message changes; a live region that is inserted into the page together with its first message may not be announced by every assistive technology. Status does not guarantee that identical text is announced again: an update that leaves the text unchanged causes no DOM change, so vary the wording (for example include a count or time) when a repeat must be heard. Whether and when a live-region change is spoken is decided by the browser and assistive technology. Changing variant on a mounted Status changes its role and aria-live together with the text, and announcement of that role change is not guaranteed; for a failure that should be announced, keep a sibling <Status variant=\"error\"> mounted and empty and put the failure text there. An empty visible Status still occupies layout (including a flex or grid gap), so wrap it or reserve its space; visuallyHidden takes no layout space",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "message ownership",
+            "owner": "author",
+            "mechanism": "the caller controls the message text and when it changes; Status does not start, track, or finish async work, and it does not read Button loading, Spinner, or form state",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "nested live regions",
+            "owner": "author",
+            "mechanism": "do not nest Status inside Alert, FieldError, or another live region, and do not place Alert, FieldError, or another Status inside Status, because nested live regions can announce the same text twice. A Spinner inside Status keeps its own role=\"status\", so give it aria-hidden=\"true\" and remove its role and aria-label, as Button loading does",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
         "inheritedPropDefaults": []
       }
     },

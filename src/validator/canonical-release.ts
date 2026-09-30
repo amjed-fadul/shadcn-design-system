@@ -1,4 +1,4 @@
-import executableReleaseArtifact from "../../provenance/releases/shadcn-radix-release-006.json"
+import executableReleaseArtifact from "../../provenance/releases/shadcn-radix-release-007.json"
 
 import { loadComponentContracts } from "../contracts/components/canonical-loader"
 import { getTokenContract } from "../contracts/tokens/contract"
@@ -14,7 +14,7 @@ const approvedSource: ExecutableContractSource = {
 const approvedProjection = projectExecutableContract(approvedSource)
 const executableRelease = loadExecutableRelease(executableReleaseArtifact, {
   expectedProjection: approvedProjection,
-  expectedReleaseId: "shadcn-radix-release-006",
+  expectedReleaseId: "shadcn-radix-release-007",
   requirePackageIdentity: true,
 })
 

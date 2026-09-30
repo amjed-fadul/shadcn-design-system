@@ -4,7 +4,7 @@ import { resolve } from "node:path"
 
 import ts from "typescript"
 
-import type { LocalPropContract, SourceExpressionIdentity, StructuredPropType } from "./types"
+import type { InheritedPropOmission, LocalPropContract, SourceExpressionIdentity, StructuredPropType } from "./types"
 
 export type ComponentPropSourceFact = {
   name: string
@@ -14,7 +14,7 @@ export type ComponentPropSourceFact = {
 }
 
 export type ComponentPropSourceUnresolved = SourceExpressionIdentity & { reason: string }
-export type ComponentPropSourceAnalysis = { props: ComponentPropSourceFact[]; localPropNames: string[]; unresolved: ComponentPropSourceUnresolved[] }
+export type ComponentPropSourceAnalysis = { props: ComponentPropSourceFact[]; localPropNames: string[]; inheritedPropOmissionNames: string[]; unresolved: ComponentPropSourceUnresolved[] }
 export type ComponentPropSourceAnalyzerConfig = Readonly<{
   compilerOptions: ts.CompilerOptions
   rootNames?: readonly string[]
@@ -245,6 +245,29 @@ function sourceLocalPropTypeNodes(typeNode: ts.TypeNode | undefined, checker: ts
   return values
 }
 
+function sourceInheritedPropOmissionNames(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, seen = new Set<ts.Node>()): Set<string> {
+  const names = new Set<string>()
+  if (!typeNode || seen.has(typeNode)) return names
+  seen.add(typeNode)
+  if (ts.isParenthesizedTypeNode(typeNode)) return sourceInheritedPropOmissionNames(typeNode.type, checker, seen)
+  if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
+    for (const member of typeNode.types) for (const name of sourceInheritedPropOmissionNames(member, checker, new Set(seen))) names.add(name)
+    return names
+  }
+  if (!ts.isTypeReferenceNode(typeNode)) return names
+  if (rightmostTypeName(typeNode.typeName) === "Omit") {
+    for (const name of stringTypeKeys(typeNode.typeArguments?.[1])) names.add(name)
+    for (const name of sourceInheritedPropOmissionNames(typeNode.typeArguments?.[0], checker, new Set(seen))) names.add(name)
+    return names
+  }
+  const symbol = aliasedSymbol(checker, checker.getSymbolAtLocation(typeNode.typeName))
+  for (const declaration of symbol?.declarations ?? []) {
+    if (!ts.isTypeAliasDeclaration(declaration)) continue
+    for (const name of sourceInheritedPropOmissionNames(declaration.type, checker, new Set(seen))) names.add(name)
+  }
+  return names
+}
+
 function unsafeAuthorityNode(typeNode: ts.TypeNode | undefined, checker: ts.TypeChecker, seen = new Set<ts.Node>()): ts.Node | undefined {
   if (!typeNode || seen.has(typeNode)) return undefined
   seen.add(typeNode)
@@ -409,14 +432,14 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
     const program = programFor(sourcePath)
     const checker = program.getTypeChecker()
     const source = program.getSourceFile(sourcePath)
-    if (!source) return { props: [], localPropNames: [], unresolved: [{ sourcePath, start: 0, end: 0, expressionKind: "SourceFile", sourceText: exportName, reason: "Component source file is not in the TypeScript program." }] }
+    if (!source) return { props: [], localPropNames: [], inheritedPropOmissionNames: [], unresolved: [{ sourcePath, start: 0, end: 0, expressionKind: "SourceFile", sourceText: exportName, reason: "Component source file is not in the TypeScript program." }] }
     const functionLike = sourceFunction(source, exportName)
-    if (!functionLike) return { props: [], localPropNames: [], unresolved: [sourceIdentity(source, `Component function ${exportName} was not found.`)] }
+    if (!functionLike) return { props: [], localPropNames: [], inheritedPropOmissionNames: [], unresolved: [sourceIdentity(source, `Component function ${exportName} was not found.`)] }
     const parameter = functionLike.parameters[0]
-    if (!parameter) return { props: [], localPropNames: [], unresolved: [sourceIdentity(functionLike, "Component has no props parameter.")] }
+    if (!parameter) return { props: [], localPropNames: [], inheritedPropOmissionNames: [], unresolved: [sourceIdentity(functionLike, "Component has no props parameter.")] }
     const propsType = checker.getTypeAtLocation(parameter)
-    if (propsType.flags & ts.TypeFlags.Any) return { props: [], localPropNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, "Component props type is any.")] }
-    if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) return { props: [], localPropNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, "Component props type cannot be resolved.")] }
+    if (propsType.flags & ts.TypeFlags.Any) return { props: [], localPropNames: [], inheritedPropOmissionNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, "Component props type is any.")] }
+    if (propsType.flags & (ts.TypeFlags.Unknown | ts.TypeFlags.Never)) return { props: [], localPropNames: [], inheritedPropOmissionNames: [], unresolved: [sourceIdentity(parameter.type ?? parameter, "Component props type cannot be resolved.")] }
 
     const typeNode = propsTypeNode(functionLike)
     const authoredTypes = sourceLocalPropTypeNodes(typeNode, checker)
@@ -431,7 +454,7 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
         }
       }
     }
-    if (unsafeNode) return { props: [], localPropNames: [], unresolved: [sourceIdentity(unsafeNode, "Component props type contains unsafe any or unknown authority.")] }
+    if (unsafeNode) return { props: [], localPropNames: [], inheritedPropOmissionNames: [], unresolved: [sourceIdentity(unsafeNode, "Component props type contains unsafe any or unknown authority.")] }
     const defaults = delegatedDefaults(functionLike, checker, new Set())
     for (const [name, value] of cvaDefaults(functionLike, source)) defaults.set(name, value)
     for (const [name, value] of directDefaults(functionLike)) defaults.set(name, value)
@@ -451,7 +474,13 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
         ...(value !== undefined ? { default: value } : {}),
       }
     }).sort((left, right) => left.name.localeCompare(right.name))
-    return { props, localPropNames: [...sourceLocalPropNames(typeNode, checker)].sort(), unresolved: [] }
+    const publicPropNames = new Set(props.map((prop) => prop.name))
+    return {
+      props,
+      localPropNames: [...sourceLocalPropNames(typeNode, checker)].sort(),
+      inheritedPropOmissionNames: [...sourceInheritedPropOmissionNames(typeNode, checker)].filter((name) => !publicPropNames.has(name)).sort(),
+      unresolved: [],
+    }
   }
 
   return {
@@ -472,6 +501,15 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
         if (contractHasDefault !== sourceHasDefault || contract.default !== fact.default) errors.push(`Local prop ${name} default does not match source evidence.`)
       }
       for (const name of expected.keys()) if (!source.has(name)) errors.push(`Contract local prop ${name} is absent from source evidence.`)
+      return errors
+    },
+    compareComponentInheritedPropOmissions(contracted: InheritedPropOmission[], analysis: ComponentPropSourceAnalysis, inheritedPropNames: ReadonlySet<string>): string[] {
+      const errors = analysis.unresolved.map((finding) => `Unresolved component prop source: ${finding.reason}`)
+      if (analysis.unresolved.length) return errors
+      const source = new Set(analysis.inheritedPropOmissionNames.filter((name) => inheritedPropNames.has(name)))
+      const expected = new Set(contracted.map((omission) => omission.propName))
+      for (const name of source) if (!expected.has(name)) errors.push(`Source inherited prop omission ${name} is missing from the contract.`)
+      for (const name of expected) if (!source.has(name)) errors.push(`Contract inherited prop omission ${name} is absent from source evidence.`)
       return errors
     },
   }

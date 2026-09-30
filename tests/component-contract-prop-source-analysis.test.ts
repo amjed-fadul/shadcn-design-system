@@ -84,6 +84,18 @@ describe("general composed component prop source analysis", () => {
     ])
   })
 
+  test("reconciles inherited prop omissions from an intrinsic ComponentProps source", () => {
+    const analysis = analyzer.analyzeComponentPropSource(sourcePath("alert"), "Status")
+    const contracted = family("alert").exports.find((entry) => entry.name === "Status")!.component!.inheritedPropOmissions!
+    const inherited = new Set(["aria-live", "role"])
+
+    expect(analysis.inheritedPropOmissionNames).toEqual(["aria-live", "role"])
+    expect(analyzer.compareComponentInheritedPropOmissions(contracted, analysis, inherited)).toEqual([])
+    expect(analyzer.compareComponentInheritedPropOmissions(contracted.slice(1), analysis, inherited)).toContain(
+      "Source inherited prop omission aria-live is missing from the contract.",
+    )
+  })
+
   test("resolves same-file CVA defaults and forwardRef generic intersections", () => {
     const alert = analyzer.analyzeComponentPropSource(sourcePath("alert"), "Alert")
     const dialog = analyzer.analyzeComponentPropSource(sourcePath("dialog"), "DialogContent")

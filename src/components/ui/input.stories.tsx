@@ -42,3 +42,16 @@ export const Invalid: Story = {
     />
   ),
 }
+
+export const AutocompleteHints: Story = {
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => (
+    <div className="flex max-w-sm flex-col gap-3">
+      <Input aria-label="Email address" autoComplete="email" type="email" />
+      <Input aria-label="Username" autoComplete="username" type="text" />
+      <Input aria-label="Password" autoComplete="current-password" type="password" />
+    </div>
+  ),
+}
