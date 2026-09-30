@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "release": {
     "id": "shadcn-radix-release-007",
-    "payloadSha256": "213ab8c2fc5bf83917903c17fb5812608571f2103d14dd2554dd99b22227d410"
+    "payloadSha256": "a43c3f3237f72a8db6e904640c47c66b88d2ae230d14e8418c4906096e7d294d"
   },
   "package": {
     "name": "@adc/shadcn-design-system",
@@ -25,8 +25,8 @@
   },
   "tarball": {
     "filename": "adc-shadcn-design-system-0.0.0-release.7.tgz",
-    "sha256": "03834a0f5c7b5dd3840486a530ca59551864b54c9cd5505e24d7cd577c557170",
-    "integrity": "sha512-woWyJirKypagR8L/KYJ05BvoFo16zd6jC+arVk9NZiVwqLvD2dBQbTiSLnrvwKCrJ3qPgZiBHX8H/nW+2DgODg=="
+    "sha256": "269c862f86183cfecb59f3d1e2708aa2cfc085352d116d842ed15f6f3a3d6c02",
+    "integrity": "sha512-ljs4KA0HV0XM4Uh4JlG4q/LNHKanvd/s1cbhOWmeOEW7o0IGSJpQhqCEP0Rxix6L0n0ENcNFuh/2W49PkDpiQQ=="
   },
   "files": [
     {
@@ -47,7 +47,7 @@
     {
       "path": "dist-library/release.js",
       "size": 11191961,
-      "sha256": "614af820ac8b62f291ada117fb776cc0a9d91d554ac230f2d8d04406bd8e3a16"
+      "sha256": "dee0d8e94d10a7ee71d5ec4d65129fe9ad5571bc9acea06e3da46e28823ba15c"
     },
     {
       "path": "dist-library/styles.css",
