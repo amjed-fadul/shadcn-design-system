@@ -3,7 +3,7 @@
   "id": "button",
   "source": {
     "canonicalPath": "src/components/ui/button.tsx",
-    "canonicalBlobSha": "00e816b21d3adf8847620c4aa36c7fca66bdb5f8",
+    "canonicalBlobSha": "97407ba52c52577d041f2cddad645d9c347434a9",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
     "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/button.tsx@00e816b21d3adf8847620c4aa36c7fca66bdb5f8"
+      "source": "src/components/ui/button.tsx@97407ba52c52577d041f2cddad645d9c347434a9"
     },
     "interface": {
       "kind": "inherited-interface",

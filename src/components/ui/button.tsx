@@ -74,7 +74,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
         isLoading && "disabled:opacity-70 [&>[data-icon=inline-start]:not([data-slot=spinner])]:hidden data-[size^=icon]:[&>svg:not([data-slot=spinner])]:hidden"
       )}
       {...props}
-      disabled={disabled || isLoading}
+      disabled={isLoading ? true : disabled}
       aria-busy={isLoading || ariaBusy}
     >
       {isLoading ? (

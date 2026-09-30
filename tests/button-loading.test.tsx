@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { Mail } from "lucide-react"
+import { forwardRef } from "react"
 import { userEvent, within } from "storybook/test"
 import { describe, expect, test, vi } from "vitest"
 
@@ -11,6 +12,10 @@ import { render } from "./studio-test-utils"
 const buttonOf = (container: HTMLElement) => container.querySelector<HTMLButtonElement>("button")!
 const hasAccessibleName = (container: HTMLElement, name: string) =>
   within(container).queryByRole("button", { name }) === buttonOf(container)
+
+const DefaultDisabledButton = forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<"button">>(
+  ({ disabled = true, ...props }, ref) => <button ref={ref} disabled={disabled} {...props} />
+)
 
 describe("Button loading", () => {
   test("renders the governed Spinner before the label", () => {
@@ -133,6 +138,14 @@ describe("Button loading", () => {
 })
 
 describe("Button without loading", () => {
+  test.each([undefined, false, true])("preserves a slotted child's default disabled state when loading is %s", (loading) => {
+    const container = render(<Button asChild loading={loading}><DefaultDisabledButton>Save</DefaultDisabledButton></Button>)
+
+    expect(buttonOf(container).disabled).toBe(true)
+    expect(buttonOf(container).hasAttribute("aria-busy")).toBe(false)
+    expect(buttonOf(container).querySelector("[data-slot='spinner']")).toBeNull()
+  })
+
   test.each([undefined, false])("preserves native inner HTML when loading is %s", (loading) => {
     const container = render(<Button loading={loading} dangerouslySetInnerHTML={{ __html: "<span>Save</span>" }} />)
 
