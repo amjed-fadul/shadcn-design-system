@@ -57,11 +57,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   loading = false,
   disabled,
   children,
+  dangerouslySetInnerHTML,
   "aria-busy": ariaBusy,
   ...props
 }, ref) => {
   const Comp = asChild ? Slot.Root : "button"
   const isLoading = loading && !asChild
+  const hasRawHtml = Boolean(dangerouslySetInnerHTML)
+  const loadingLabel = hasRawHtml ? <span dangerouslySetInnerHTML={dangerouslySetInnerHTML} /> : children
 
   return (
     <Comp
@@ -74,13 +77,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
         isLoading && "disabled:opacity-70 [&>[data-icon=inline-start]:not([data-slot=spinner])]:hidden data-[size^=icon]:[&>svg:not([data-slot=spinner])]:hidden"
       )}
       {...props}
+      dangerouslySetInnerHTML={isLoading ? undefined : dangerouslySetInnerHTML}
       disabled={isLoading ? true : disabled}
       aria-busy={isLoading || ariaBusy}
     >
       {isLoading ? (
         <>
           <Spinner data-icon="inline-start" role={undefined} aria-label={undefined} aria-hidden="true" />
-          <Slot.Slottable>{children}</Slot.Slottable>
+          <Slot.Slottable>{loadingLabel}</Slot.Slottable>
         </>
       ) : children}
     </Comp>

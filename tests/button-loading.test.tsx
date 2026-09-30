@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
 import { Mail } from "lucide-react"
-import { forwardRef } from "react"
+import { act, forwardRef } from "react"
+import { createRoot } from "react-dom/client"
 import { userEvent, within } from "storybook/test"
 import { describe, expect, test, vi } from "vitest"
 
@@ -134,6 +135,24 @@ describe("Button loading", () => {
 
     expect(hasAccessibleName(container, "تسجيل الدخول")).toBe(true)
     expect(button.disabled).toBe(true)
+  })
+})
+
+describe("Button raw HTML loading", () => {
+  test("preserves its raw HTML label through a loading transition", () => {
+    const container = document.createElement("div")
+    const root = createRoot(container)
+    try {
+      for (const loading of [false, true, false]) {
+        act(() => root.render(<Button loading={loading} dangerouslySetInnerHTML={{ __html: "<span>Save</span>" }} />))
+        expect(hasAccessibleName(container, "Save")).toBe(true)
+        expect(buttonOf(container).textContent).toBe("Save")
+        expect(buttonOf(container).disabled).toBe(loading)
+        expect(buttonOf(container).querySelector("[data-slot='spinner']") !== null).toBe(loading)
+      }
+    } finally {
+      act(() => root.unmount())
+    }
   })
 })
 

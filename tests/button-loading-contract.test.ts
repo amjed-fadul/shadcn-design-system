@@ -19,7 +19,7 @@ describe("Button loading contract", () => {
     const rendering = lookupComponentExport("button", "Button").component!.rendering
     const alternatives = "alternatives" in rendering ? rendering.alternatives : []
     const loading = alternatives.filter((item) => item.when && "all" in item.when && item.when.all.some((condition) => "source" in condition && condition.name === "isLoading" && "equals" in condition && condition.equals === true))
-    expect(loading).toHaveLength(2)
+    expect(loading).toHaveLength(4)
     for (const { rendering: tree } of loading) {
       expect(tree.nodes.find((node) => node.id === "spinner")!.host).toEqual({ kind: "cross-family-export", familyId: "spinner", exportName: "Spinner" })
     }
