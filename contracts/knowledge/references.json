@@ -430,10 +430,10 @@
       "kind": "canonical-source",
       "title": "Canonical Button source",
       "locator": "src/components/ui/button.tsx#Button",
-      "locatorHint": "Button export; buttonVariants helper",
-      "accessedOn": "2026-09-02",
-      "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
-      "contentHash": "1ed156ee0d92a5cf614ce9c3268c1d3adf5f8ecc"
+      "locatorHint": "Button export; buttonVariants helper; loading, Spinner, aria-busy, and disabled behavior",
+      "accessedOn": "2026-09-30",
+      "sourceRevision": "b69369f804e8e14c19053dd09e1e2175d2a16ab2",
+      "contentHash": "dc40fa9f5653328ce290e943b68ce694b3a611a9"
     },
     {
       "id": "canonical.dialog.source",
