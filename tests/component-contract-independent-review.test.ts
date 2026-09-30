@@ -378,18 +378,28 @@ function independentRenderBranchExpressions(functionLike: ts.FunctionLikeDeclara
   walkComponent(functionLike.body, (node) => {
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) declarations.set(node.name.text, node.initializer)
   })
-  const nestedCondition = (expression: ts.Expression): AnyRecord | undefined => {
+  const nestedCondition = (expression: ts.Expression, predicate?: AnyRecord): AnyRecord | undefined => {
     const visited = new Set<string>()
     let found: AnyRecord | undefined
     const visit = (node: ts.Node): void => {
-      if (found) return
+      if (found || ts.isJsxAttributes(node)) return
+      if (ts.isConditionalExpression(node)) {
+        const condition = independentRenderCondition(node.condition, bindings, "boolean")
+        const atoms = predicate?.all ?? (predicate ? [predicate] : [])
+        const matches = (candidate: AnyRecord) => atoms.some((atom: AnyRecord) => JSON.stringify(normalizedPredicate(atom)) === JSON.stringify(normalizedPredicate(candidate)))
+        const inverse = condition && negateIndependentRenderCondition(condition)
+        if (condition && matches(condition)) visit(node.whenTrue)
+        else if (inverse && matches(inverse)) visit(node.whenFalse)
+        else found = condition
+        return
+      }
       if (ts.isIdentifier(node) && declarations.has(node.text)) {
         const initializer = declarations.get(node.text)!
         const isRootAlias = node === expression
         const isJsxTag = ts.isJsxOpeningElement(node.parent) || ts.isJsxSelfClosingElement(node.parent)
         const isJsxAlias = ts.isJsxExpression(node.parent)
         if ((isRootAlias || isJsxTag) && ts.isConditionalExpression(initializer)) {
-          found = independentRenderCondition(initializer.condition, bindings, "boolean")
+          visit(initializer)
           return
         }
         if ((isRootAlias || isJsxAlias) && !visited.has(node.text)) {
@@ -433,7 +443,27 @@ function independentRenderBranchExpressions(functionLike: ts.FunctionLikeDeclara
       )
     } else results.push({ predicate: branch.predicate ?? nested, expression: branch.expression })
   }
-  const renderedResults = results.filter(({ expression }) => unwrapReturnedExpression(expression).kind !== ts.SyntaxKind.NullKeyword)
+  // Refine each selected host through conditional JSX children and their aliases.
+  // Attribute ternaries do not create render branches, and unselected arms must
+  // not contribute conditions (e.g. raw HTML only matters while loading).
+  const refine = (branch: { predicate: AnyRecord; expression: ts.Expression }): typeof results => {
+    const condition = nestedCondition(branch.expression, branch.predicate)
+    const inverse = condition && negateIndependentRenderCondition(condition)
+    if (!condition || !inverse) return [branch]
+    return [condition, inverse].flatMap((atom) => {
+      const predicate = combineIndependentRenderConditions(branch.predicate, atom)
+      return predicate ? refine({ ...branch, predicate }) : []
+    })
+  }
+  const refinedResults = results.flatMap((branch) => {
+    if (!branch.predicate.otherwise) return refine(branch)
+    const first = nestedCondition(branch.expression)
+    const inverse = first && negateIndependentRenderCondition(first)
+    if (!inverse) return [branch]
+    const explicit = { ...branch, predicate: inverse }
+    return nestedCondition(branch.expression, inverse) ? refine(explicit) : [branch]
+  })
+  const renderedResults = refinedResults.filter(({ expression }) => unwrapReturnedExpression(expression).kind !== ts.SyntaxKind.NullKeyword)
   const onlyPredicate = renderedResults[0]?.predicate
   const opaqueSurvivor = renderedResults.length === 1 && onlyPredicate?.source === "state" && opaqueStateBindings.has(onlyPredicate.name)
   return renderedResults.length === 1 && (onlyPredicate.otherwise || opaqueSurvivor) ? [] : renderedResults
@@ -3001,6 +3031,32 @@ describe("Phase 3 Task 10 independent review", () => {
       { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: true }] },
       { all: [{ propName: "enabled", truthiness: "truthy" }, { propName: "asChild", equals: false }] },
     ])
+  })
+
+  test("independently discovers all six Button render branches and their loading children", () => {
+    const { sourceFile } = sourceFacts(join(root, "src/components/ui/button.tsx"))
+    const facts = componentSourceFacts(sourceFile, declarationFor(sourceFile, "Button")!)
+    const host = (asChild: boolean) => ({ propName: "asChild", equals: asChild })
+    const state = (name: string, equals: boolean) => ({ source: "state", name, equals })
+
+    expect(facts.renderAlternativePredicates).toEqual([
+      { all: [host(true), state("isLoading", true), state("hasRawHtml", true)] },
+      { all: [host(true), state("isLoading", true), state("hasRawHtml", false)] },
+      { all: [host(true), state("isLoading", false)] },
+      { all: [host(false), state("isLoading", true), state("hasRawHtml", true)] },
+      { all: [host(false), state("isLoading", true), state("hasRawHtml", false)] },
+      { all: [host(false), state("isLoading", false)] },
+    ])
+    const tags = (node: IndependentRenderNode): string[] => [node.resolvedTag ?? node.tag, ...node.children.flatMap(({ node: child }) => tags(child))]
+    expect(facts.renderBranches.map(({ tree }) => tree && tags(tree))).toEqual([
+      ["Slot.Root", "Fragment", "Spinner", "Slot.Slottable", "span"],
+      ["Slot.Root", "Fragment", "Spinner", "Slot.Slottable"],
+      ["Slot.Root"],
+      ["button", "Fragment", "Spinner", "Slot.Slottable", "span"],
+      ["button", "Fragment", "Spinner", "Slot.Slottable"],
+      ["button"],
+    ])
+    expect(facts.renderUnresolved).toEqual([])
   })
 
   test("independently resolves the pinned aliased Toggle CVA recipe with conditions and provenance", () => {
