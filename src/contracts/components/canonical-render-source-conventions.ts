@@ -2,6 +2,7 @@ import ts from "typescript"
 
 import type { RenderSourceAnalysisConventions } from "./render-source-analysis"
 import seedComponents from "../../../provenance/seed-components.json"
+import { isCanonicalLucideSvgExport } from "./canonical-lucide-source-authority"
 
 function canonicalRenderName(name: string) {
   return name.replace(/primitive/gi, "").replace(/[^a-z0-9]/gi, "").replace(/^radix/i, "").toLowerCase()
@@ -55,8 +56,8 @@ export const canonicalRenderSourceAnalysisConventions: RenderSourceAnalysisConve
     return canonicalModuleSpecifier !== undefined && extensionless(moduleSpecifier) === canonicalModuleSpecifier
   },
   matchesInheritedInterface(sourceTag, interfaceId, normalizeRenderName, importBinding) {
-    if (sourceTag === "Loader2" && interfaceId === "html.svg") {
-      return importBinding?.moduleSpecifier === "lucide-react" && importBinding.importedName === "Loader2"
+    if (interfaceId === "html.svg" && importBinding?.moduleSpecifier === "lucide-react") {
+      return isCanonicalLucideSvgExport(importBinding.importedName)
     }
     if (interfaceId.startsWith("html.")) return sourceTag === interfaceId.slice("html.".length)
     const primitiveInterfaceMatch = matchesCanonicalPrimitiveInterface(sourceTag, interfaceId)

@@ -3,7 +3,7 @@
   "id": "drawer",
   "source": {
     "canonicalPath": "src/components/ui/drawer.tsx",
-    "canonicalBlobSha": "629fb9a98d658839e30d6cb186c5e9c307f65430",
+    "canonicalBlobSha": "ffca975f07d80adae6035c8b3c55244ebe262bad",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/new-york-v4/ui/drawer.tsx",
     "upstreamBlobSha": "4e416683964bdef2c52c5dcd597ab0cb8f4c015b"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/drawer.tsx@629fb9a98d658839e30d6cb186c5e9c307f65430"
+      "source": "src/components/ui/drawer.tsx@ffca975f07d80adae6035c8b3c55244ebe262bad"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -442,7 +442,21 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "color.background",
+            "tokenId": "color.popover",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.popover-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "shadow.md",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -999,7 +1013,14 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "font-weight.semibold",
+            "tokenId": "font-size.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
             "evidenceRefs": [
               "source",
               "tokens"

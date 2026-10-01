@@ -25,9 +25,16 @@ const textRect = async locator => locator.evaluate(node => {
   return { left, right }
 })
 const overlap = (a, b) => Math.min(a.right, b.right) > Math.max(a.left, b.left) && Math.min(a.bottom, b.bottom) > Math.max(a.top, b.top)
+let activeTheme = "light"
 async function open(kind, dir, side) {
   const query = new URLSearchParams({ kind, dir, ...(side && { side }) })
   await page.goto(`http://127.0.0.1:${address.port}/tests/fixtures/overlay-rtl.html?${query}`)
+  await page.evaluate(theme => document.documentElement.classList.toggle("dark", theme === "dark"), activeTheme)
+  await page.locator('[data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="alert-dialog-content"], [data-slot="select-content"], [data-slot="dropdown-menu-content"]').first().waitFor({ state: "visible" })
+  await page.evaluate(async () => {
+    await new Promise(requestAnimationFrame)
+    await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => undefined)))
+  })
 }
 function near(actual, expected, label) { assert.ok(Math.abs(actual - expected) <= 2, `${label}: ${actual} != ${expected}`) }
 function closeAtEnd(content, close, dir, label) {
@@ -36,7 +43,8 @@ function closeAtEnd(content, close, dir, label) {
 }
 
 try {
-  for (const dir of ["ltr", "rtl"]) {
+  for (const theme of ["light", "dark"]) for (const dir of ["ltr", "rtl"]) {
+    activeTheme = theme
     await open("dialog", dir)
     const content = page.locator('[data-slot="dialog-content"]')
     const close = content.locator('[data-slot="dialog-close"]')
@@ -57,7 +65,13 @@ try {
     const search = command.locator('[data-slot="command-input-wrapper"] > svg')
     const input = command.locator('[data-slot="command-input"]')
     await command.waitFor()
-    closeAtEnd(await rect(command), await rect(commandClose), dir, `Command Dialog ${dir}`)
+    const commandRect = await rect(command)
+    const commandCloseRect = await rect(commandClose)
+    near(dir === "ltr" ? commandRect.right - commandCloseRect.right : commandCloseRect.left - commandRect.left, 4, `Command Dialog ${theme}/${dir} close inset`)
+    assert.equal(overlap(await rect(input), commandCloseRect), false, `Command Dialog ${theme}/${dir} input/close overlap`)
+    const inputRowRect = await rect(command.locator('[data-slot="command-input-wrapper"]'))
+    assert.ok(commandCloseRect.bottom <= inputRowRect.bottom, `Command Dialog ${theme}/${dir} close stays inside search row`)
+    assert.equal(overlap(await rect(command.locator('[data-slot="command-item"]').first()), commandCloseRect), false, `Command Dialog ${theme}/${dir} first item/close overlap`)
     const searchRect = await rect(search)
     const closeRect = await rect(commandClose)
     assert.equal(overlap(searchRect, closeRect), false, `Command Dialog ${dir} search/close overlap`)
@@ -108,7 +122,7 @@ try {
     else assert.ok(shortcut.left < (action.left + action.right) / 2)
   }
   assert.deepEqual(errors, [], "Browser runtime errors")
-  console.log("Chromium overlay RTL geometry and interaction checks passed (Dialog, Command Dialog, Sheet, Alert Dialog, Select, Dropdown Menu; LTR and RTL).")
+  console.log("Chromium overlay RTL geometry and interaction checks passed (Dialog, Command Dialog, Sheet, Alert Dialog, Select, Dropdown Menu; Light/Dark × LTR/RTL).")
 } finally {
   await browser.close()
   await server.close()

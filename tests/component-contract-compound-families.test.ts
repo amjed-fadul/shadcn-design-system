@@ -176,7 +176,7 @@ describe("compound and overlay Phase 3 Task 5 component contracts", () => {
     const dropdown = analyzeComponentTokenDependencies(sourcePath("dropdown-menu"))
     expect(dropdown).toEqual(expect.arrayContaining([
       expect.objectContaining({ tokenId: "letter-spacing.widest" }),
-      expect.objectContaining({ tokenId: "shadow.lg" }),
+      expect.objectContaining({ tokenId: "shadow.sm" }),
     ]))
     for (const id of task5Families) {
       const analysis = analyzeComponentTokenSource(sourcePath(id))

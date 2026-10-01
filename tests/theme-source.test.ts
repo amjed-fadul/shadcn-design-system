@@ -9,7 +9,7 @@ describe("canonical shadcn theme source", () => {
     expect(css).toContain(".dark")
     expect(css).toContain("--background: oklch(1 0 0)")
     expect(css).toContain("--primary: oklch(0.488 0.243 264.376)")
-    expect(css).toContain("--radius: 0.625rem")
+    expect(css).toContain("--radius: 0.5rem")
     expect(css).toContain("--background: oklch(0.145 0 0)")
     expect(css).toContain("--primary: oklch(0.707 0.165 254.624)")
   })

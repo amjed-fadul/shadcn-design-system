@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { expect, screen, userEvent, within } from "storybook/test"
+import { expect, screen, userEvent, within, waitFor } from "storybook/test"
 
 import {
   Tooltip,
@@ -30,10 +30,10 @@ export const Default: Story = {
     const canvas = within(canvasElement)
     const trigger = canvas.getByRole("button", { name: "More information" })
 
-    await expect(screen.queryByRole("tooltip", { name: "Additional details" })).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole("tooltip", { name: "Additional details" })).not.toBeInTheDocument())
     await userEvent.hover(trigger)
     const tooltip = await screen.findByRole("tooltip", { name: "Additional details" })
-    await expect(tooltip).toBeVisible()
+    await waitFor(() => expect(tooltip).toBeVisible())
 
     // Portaled content sits outside Storybook's preview-root landmark. This
     // fixture-level host keeps the open tooltip inside a named page region.

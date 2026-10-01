@@ -3,7 +3,7 @@
   "id": "checkbox",
   "source": {
     "canonicalPath": "src/components/ui/checkbox.tsx",
-    "canonicalBlobSha": "8f27ed4f7788845a88fd6961e684b9806f944387",
+    "canonicalBlobSha": "7465ce64b9f8ccad4f4622e1bdfbe324a807d81c",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/checkbox.tsx",
     "upstreamBlobSha": "a17fa1e2fd4517f1abc5f812cb923f44e02f7ef7"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/checkbox.tsx@8f27ed4f7788845a88fd6961e684b9806f944387"
+      "source": "src/components/ui/checkbox.tsx@7465ce64b9f8ccad4f4622e1bdfbe324a807d81c"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -69,6 +69,13 @@
             ]
           },
           {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.input",
             "evidenceRefs": [
               "source",
@@ -77,6 +84,13 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -110,6 +124,23 @@
               ],
               "propName": "state",
               "equals": "checked"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
             },
             "evidenceRefs": [
               "source",

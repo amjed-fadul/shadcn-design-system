@@ -38,7 +38,7 @@ function memorySource(mutator?: (artifacts: Map<string, unknown>) => void): Comp
 }
 
 describe("component contract loader and derived index", () => {
-  test("loads exactly the canonical 38 families and every manifest interface", () => {
+  test("loads exactly the canonical 41 families and every manifest interface", () => {
     const loaded = loadComponentContracts()
 
     expect(["candidate", "approved"]).toContain(loaded.contractSet.status)

@@ -3,7 +3,7 @@
   "id": "accordion",
   "source": {
     "canonicalPath": "src/components/ui/accordion.tsx",
-    "canonicalBlobSha": "c02677242e0b1dc17285c0554868e0553a530666",
+    "canonicalBlobSha": "ffc7759b74b69539f5e2e86ff45fb3ab28a94b46",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/accordion.tsx",
     "upstreamBlobSha": "2ba94b62680f33f1d36b9092866578695cf5f633"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/accordion.tsx@c02677242e0b1dc17285c0554868e0553a530666"
+      "source": "src/components/ui/accordion.tsx@ffc7759b74b69539f5e2e86ff45fb3ab28a94b46"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -205,8 +205,26 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 3
+              "multiplier": 9
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -227,7 +245,21 @@
             ]
           },
           {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -360,6 +392,17 @@
             "viaDerivedRule": {
               "id": "spacing.multiplier",
               "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",

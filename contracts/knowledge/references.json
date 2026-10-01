@@ -454,6 +454,46 @@
       "accessedOn": "2026-09-02",
       "sourceRevision": "ba7578c7bbc04bf7a9449462707d98657f708cbf",
       "contentHash": "a18203c391b82e6c74cb9965e3ad850cd4543b25"
+    },
+    {
+      "id": "canonical.icon.source",
+      "kind": "canonical-source",
+      "title": "Canonical Icon source",
+      "locator": "src/components/ui/icon.tsx#Icon",
+      "locatorHint": "Finite iconRegistry; Icon props, naming semantics, sizes, RTL policy, and placement",
+      "accessedOn": "2026-10-01",
+      "sourceRevision": "release-008-working-tree",
+      "contentHash": "0c9843ed6806b924490cc593017b118601f2b8ca"
+    },
+    {
+      "id": "canonical.image.source",
+      "kind": "canonical-source",
+      "title": "Canonical Image source",
+      "locator": "src/components/ui/image.tsx#Image",
+      "locatorHint": "Closed Image props, native alt semantics, intrinsic dimension validation, layout and fit variants",
+      "accessedOn": "2026-10-01",
+      "sourceRevision": "release-008-working-tree",
+      "contentHash": "e1dbcd1b5d3e703cae7ed4eeb46cc8944b096817"
+    },
+    {
+      "id": "canonical.toggle-group.source",
+      "kind": "canonical-source",
+      "title": "Canonical Toggle Group source",
+      "locator": "src/components/ui/toggle-group.tsx#ToggleGroupItem",
+      "locatorHint": "ToggleGroupItem imported recipe, selected semantic colors, hover persistence, and focus offset",
+      "accessedOn": "2026-10-01",
+      "sourceRevision": "release-008-working-tree",
+      "contentHash": "3c487ae79c5cd2e41aa22a5b07524160a45c19cd"
+    },
+    {
+      "id": "canonical.link.source",
+      "kind": "canonical-source",
+      "title": "Canonical Link source",
+      "locator": "src/components/ui/link.tsx#Link",
+      "locatorHint": "Closed native Link props, destination and content guards, explicit new-tab behavior, inline styling and keyboard focus",
+      "accessedOn": "2026-10-01",
+      "sourceRevision": "release-008-working-tree",
+      "contentHash": "cc20e597bc92b1a1f435b17ab15655c644213d51"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "id": "avatar",
   "source": {
     "canonicalPath": "src/components/ui/avatar.tsx",
-    "canonicalBlobSha": "f108f352aa17e1fc30defdf5a63835e4a743dee0",
+    "canonicalBlobSha": "f80d14cd7c88e4dc9ca7d82caaff99ae650b8b3c",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/avatar.tsx",
     "upstreamBlobSha": "5521146b8a3e525170852d5aa328aed6a7d69ac5"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/avatar.tsx@f108f352aa17e1fc30defdf5a63835e4a743dee0"
+      "source": "src/components/ui/avatar.tsx@f80d14cd7c88e4dc9ca7d82caaff99ae650b8b3c"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -111,7 +111,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 10
+              "multiplier": 9
             },
             "when": {
               "subject": "data",
@@ -683,7 +683,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 10
+              "multiplier": 9
             },
             "when": {
               "subject": "data",

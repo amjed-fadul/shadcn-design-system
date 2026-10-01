@@ -47,12 +47,13 @@
   ],
   "howToUse": [
     {
-      "statement": "For a link-shaped navigation control, use the buttonVariants helper with a plain link element instead of Button.",
+      "statement": "Use Link for ordinary inline text navigation. For navigation that needs the visual treatment of a button, use the buttonVariants helper with a native link element instead of Button.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [
           "shadcn.button.docs",
-          "canonical.button.source"
+          "canonical.button.source",
+          "canonical.link.source"
         ]
       }
     },

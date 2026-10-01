@@ -28,9 +28,12 @@ const expectedFamilyIds = [
   "dropdown-menu",
   "empty",
   "field",
+  "icon",
+  "image",
   "input-group",
   "input",
   "label",
+  "link",
   "pagination",
   "popover",
   "progress",
@@ -53,7 +56,7 @@ const expectedFamilyIds = [
 ] as const
 
 describe("Storybook contract coverage", () => {
-  test("preserves the exact 38-family source and story manifests", () => {
+  test("preserves 41 family stories and the bounded product-system integration matrix", () => {
     const directoryEntries = readdirSync(storyDirectory)
     const actualComponentFiles = directoryEntries
       .filter(
@@ -67,11 +70,9 @@ describe("Storybook contract coverage", () => {
     const expectedComponentFiles = expectedFamilyIds
       .map((familyId) => `${familyId}.tsx`)
       .sort()
-    const expectedStoryFiles = expectedFamilyIds
-      .map((familyId) => `${familyId}.stories.tsx`)
-      .sort()
+    const expectedStoryFiles = [...expectedFamilyIds.map((familyId) => `${familyId}.stories.tsx`), "product-system.stories.tsx"].sort()
 
-    expect(expectedFamilyIds).toHaveLength(38)
+    expect(expectedFamilyIds).toHaveLength(41)
     expect(actualComponentFiles).toEqual(expectedComponentFiles)
     expect(actualStoryFiles).toEqual(expectedStoryFiles)
   })

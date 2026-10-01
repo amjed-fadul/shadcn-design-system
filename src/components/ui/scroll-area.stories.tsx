@@ -61,7 +61,7 @@ export const ScrollableList: Story = {
     const reference = document.createElement("span")
     reference.hidden = true
     reference.style.boxShadow =
-      "0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)"
+      "inset 0 0 0 2px var(--ring)"
     canvasElement.append(reference)
     const ring = getComputedStyle(reference).boxShadow
     reference.remove()

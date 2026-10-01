@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "id": "image",
+  "source": {
+    "canonicalPath": "src/components/ui/image.tsx",
+    "canonicalBlobSha": "e1dbcd1b5d3e703cae7ed4eeb46cc8944b096817",
+    "implementationKind": "repo-native"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/image.tsx@e1dbcd1b5d3e703cae7ed4eeb46cc8944b096817"
+    },
+    "runtime": {
+      "kind": "runtime-test",
+      "source": "tests/image-runtime.test.tsx"
+    }
+  },
+  "exports": [
+    {
+      "name": "Image",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "src",
+            "required": true,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "alt",
+            "required": true,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "width",
+            "required": true,
+            "type": {
+              "kind": "number"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "height",
+            "required": true,
+            "type": {
+              "kind": "number"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "layout",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "fill",
+                "intrinsic"
+              ]
+            },
+            "default": "intrinsic",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "fit",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "contain",
+                "cover"
+              ]
+            },
+            "default": "contain",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "loading",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "eager",
+                "lazy"
+              ]
+            },
+            "default": "eager",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "events": [],
+        "tokenDependencies": [],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "img"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "image",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source",
+                "runtime"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "native image naming",
+            "owner": "author",
+            "mechanism": "alt is required. Supply meaningful alternative text or exactly alt=\"\" for a decorative image; missing, non-string and whitespace-only alt are rejected at runtime. Native img semantics own the image role.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "intrinsic dimension stability",
+            "owner": "author",
+            "mechanism": "width and height are required positive integer intrinsic pixel dimensions, enforced at runtime and forwarded to img. Intrinsic layout preserves aspect ratio within the parent; fill requires a parent with definite width and height.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "keyboard and action semantics",
+            "owner": "component",
+            "mechanism": "Image is noninteractive and exposes no role, tabIndex or action handlers. Compose it inside a named action when needed. Images remain unmirrored in RTL.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "conditionalApi": []
+      }
+    }
+  ],
+  "unresolved": []
+}

@@ -269,7 +269,7 @@ describe("component contract adversarial mutations", { timeout: 60000 }, () => {
       const family = artifacts.get("contracts/components/families/dialog.json") as ComponentFamilyContract
       const content = component(family, "DialogContent")
       const footer = component(family, "DialogFooter")
-      const dependency = content.tokenDependencies.find((item) => item.tokenId === "shadow.lg")!
+      const dependency = content.tokenDependencies.find((item) => item.tokenId === "shadow.md")!
       content.tokenDependencies = content.tokenDependencies.filter((item) => item !== dependency)
       footer.tokenDependencies.push(dependency)
     }],

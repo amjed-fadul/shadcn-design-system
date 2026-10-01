@@ -3,7 +3,7 @@
   "id": "toggle-group",
   "source": {
     "canonicalPath": "src/components/ui/toggle-group.tsx",
-    "canonicalBlobSha": "40ea41426039357364408eb60c53635830f2acc4",
+    "canonicalBlobSha": "3c487ae79c5cd2e41aa22a5b07524160a45c19cd",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/toggle-group.tsx",
     "upstreamBlobSha": "7d892c5b6faf6e98f6e3231ae0ab1e7d40238abb"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/toggle-group.tsx@40ea41426039357364408eb60c53635830f2acc4"
+      "source": "src/components/ui/toggle-group.tsx@3c487ae79c5cd2e41aa22a5b07524160a45c19cd"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -603,7 +603,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1
+              "multiplier": 2
             },
             "evidenceRefs": [
               "source",
@@ -611,7 +611,7 @@
             ]
           },
           {
-            "tokenId": "radius.lg",
+            "tokenId": "radius.md",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -653,6 +653,13 @@
             ]
           },
           {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.destructive",
             "when": {
               "subject": "aria",
@@ -671,6 +678,23 @@
           },
           {
             "tokenId": "color.muted",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "on"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
             "when": {
               "subject": "data",
               "path": [
@@ -912,14 +936,14 @@
               "id": "spacing.multiplier",
               "multiplier": 3.5
             },
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
           },
           {
             "tokenId": "spacing.unit",
@@ -1003,6 +1027,40 @@
                   "equals": "inline-start"
                 }
               ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "on"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.primary-foreground",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "on"
             },
             "evidenceRefs": [
               "source",

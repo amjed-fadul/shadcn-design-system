@@ -3,7 +3,7 @@
   "id": "tooltip",
   "source": {
     "canonicalPath": "src/components/ui/tooltip.tsx",
-    "canonicalBlobSha": "b7f3aeed533efe5e5a7f4c7edd19c739de34cbe0",
+    "canonicalBlobSha": "534affd04cd41cc2d501e542d982d3907ca9fd6f",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/tooltip.tsx",
     "upstreamBlobSha": "5dbba467c3adeb802a19b01dbfd967a9d5c10d41"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/tooltip.tsx@b7f3aeed533efe5e5a7f4c7edd19c739de34cbe0"
+      "source": "src/components/ui/tooltip.tsx@534affd04cd41cc2d501e542d982d3907ca9fd6f"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -250,7 +250,7 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "radius.md",
+            "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -300,7 +300,7 @@
             ]
           },
           {
-            "tokenId": "shadow.md",
+            "tokenId": "shadow.sm",
             "evidenceRefs": [
               "source",
               "tokens"

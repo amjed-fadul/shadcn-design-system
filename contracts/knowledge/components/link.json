@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "link-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "link"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "whenNotToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A governed native text link with permanent underline, semantic primary color, inherited typography and inline wrapping.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "canonical.link.source"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Link for navigation embedded in prose, descriptions or ordinary text. Use Button for actions; existing Breadcrumb, Pagination and Sidebar navigation components continue to own their respective structures.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.link.source"
+        ]
+      }
+    }
+  ],
+  "whenNotToUse": [
+    {
+      "statement": "Do not use Link to trigger an action or represent a disabled action. Link requires a real destination and meaningful content; application routing, current-page state and navigation interception remain consumer-owned.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.link.source"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Supply href and meaningful children, for example <Link href=\"/docs\">Documentation</Link>. Internal paths, external URLs, hash destinations, mailto and tel destinations all use native anchor behavior without origin or scheme detection.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.link.source"
+        ]
+      }
+    },
+    {
+      "statement": "Required children provide the native accessible name. The runtime rejects plainly empty arrays, null, booleans and whitespace-only strings; opaque child elements remain the author’s responsibility for meaningful accessible naming. Required href must be a non-empty string at runtime. These runtime refinements exceed the structural string and ReactNode authoring types.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.link.source"
+        ]
+      }
+    },
+    {
+      "statement": "Use newTab=true only when deliberately opening a new tab. Link owns target=_blank and rel=noopener; include a phrase such as “opens in a new tab” in child content when helpful. An external destination alone does not imply newTab.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.link.source"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "The closed API consists of href, children and newTab=false. There is no className, style, role, ref, asChild, disabled, target, rel, extra metadata or event-handler passthrough.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.link.source"
+        ]
+      }
+    },
+    {
+      "statement": "Link remains inline and inherits the surrounding font, text size, wrapping and reading direction in light, dark and RTL contexts. Its permanent underline identifies navigation; keyboard focus uses the semantic ring and background offset.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.link.source"
+        ]
+      }
+    }
+  ]
+}

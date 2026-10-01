@@ -3,7 +3,7 @@
   "id": "card",
   "source": {
     "canonicalPath": "src/components/ui/card.tsx",
-    "canonicalBlobSha": "eba8433e5f48f2bba4a4a45866c6fb505470274c",
+    "canonicalBlobSha": "af588ca536e03d0c94d7612d4166771e5bfa9b84",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/card.tsx",
     "upstreamBlobSha": "2ba46512ffc3dd65f008c04d53399189d390fb79"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/card.tsx@eba8433e5f48f2bba4a4a45866c6fb505470274c"
+      "source": "src/components/ui/card.tsx@af588ca536e03d0c94d7612d4166771e5bfa9b84"
     },
     "tokens": {
       "kind": "token-contract",
@@ -58,7 +58,7 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "radius.xl",
+            "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -281,7 +281,7 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "font-size.sm",
+            "tokenId": "font-size.xs",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -444,7 +444,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",

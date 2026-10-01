@@ -3,11 +3,11 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 function Card({ className, size = "default", ...props }: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
-  return <div data-slot="card" data-size={size} className={cn("group/card flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground", className)} {...props} />
+  return <div data-slot="card" data-size={size} className={cn("group/card flex flex-col overflow-hidden rounded-lg border bg-card text-card-foreground", className)} {...props} />
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-header" className={cn("grid gap-1.5 p-4 group-data-[size=sm]/card:p-3", className)} {...props} />
+  return <div data-slot="card-header" className={cn("grid gap-1 p-4 group-data-[size=sm]/card:p-3", className)} {...props} />
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
@@ -15,7 +15,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-description" className={cn("text-sm text-muted-foreground", className)} {...props} />
+  return <div data-slot="card-description" className={cn("text-xs text-muted-foreground", className)} {...props} />
 }
 
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {

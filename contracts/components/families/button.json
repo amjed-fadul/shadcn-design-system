@@ -3,7 +3,7 @@
   "id": "button",
   "source": {
     "canonicalPath": "src/components/ui/button.tsx",
-    "canonicalBlobSha": "4b3582fd35b612de7440a7a841a5a54db782aa8d",
+    "canonicalBlobSha": "48410f81e17267faa24d3ecd46b90d442e2a34ec",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/button.tsx",
     "upstreamBlobSha": "374f63faac54b8527ff989cbaa80c69afe51ba1f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/button.tsx@4b3582fd35b612de7440a7a841a5a54db782aa8d"
+      "source": "src/components/ui/button.tsx@48410f81e17267faa24d3ecd46b90d442e2a34ec"
     },
     "interface": {
       "kind": "inherited-interface",
@@ -149,6 +149,13 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -311,6 +318,17 @@
           },
           {
             "tokenId": "color.secondary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "secondary"
+            }
+          },
+          {
+            "tokenId": "color.muted",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -494,7 +512,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 2
             },
             "evidenceRefs": [
               "source",
@@ -509,7 +527,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2.5
+              "multiplier": 3
             },
             "evidenceRefs": [
               "source",
@@ -734,14 +752,14 @@
               "id": "spacing.multiplier",
               "multiplier": 3
             },
-            "when": {
-              "propName": "size",
-              "equals": "xs"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            }
           },
           {
             "tokenId": "spacing.unit",
@@ -899,14 +917,14 @@
               "id": "spacing.multiplier",
               "multiplier": 3.5
             },
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
           },
           {
             "tokenId": "spacing.unit",
@@ -927,7 +945,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 2
             },
             "evidenceRefs": [
               "source",
@@ -942,7 +960,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2.5
+              "multiplier": 3
             },
             "evidenceRefs": [
               "source",
@@ -1083,14 +1101,14 @@
               "id": "spacing.multiplier",
               "multiplier": 3
             },
-            "when": {
-              "propName": "size",
-              "equals": "icon-xs"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "icon-xs"
+            }
           },
           {
             "tokenId": "spacing.unit",
@@ -1910,7 +1928,7 @@
           {
             "feature": "loading label wording",
             "owner": "author",
-            "mechanism": "keep the action label unchanged while loading, so Log in stays Log in rather than becoming Loading\u2026 or Logging in\u2026; aria-busy conveys the busy state. Loading does not announce completion or failure, so report the result with a caller-provided Status (or Status variant=\"error\" for an important failure) from the alert family",
+            "mechanism": "keep the action label unchanged while loading, so Log in stays Log in rather than becoming Loading… or Logging in…; aria-busy conveys the busy state. Loading does not announce completion or failure, so report the result with a caller-provided Status (or Status variant=\"error\" for an important failure) from the alert family",
             "evidenceRefs": [
               "source"
             ]

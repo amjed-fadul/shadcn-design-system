@@ -3,7 +3,7 @@
   "id": "input-group",
   "source": {
     "canonicalPath": "src/components/ui/input-group.tsx",
-    "canonicalBlobSha": "3385579339d52098b7bdd3ab176782b5cbd207f5",
+    "canonicalBlobSha": "bceadc38cbcf5bb11b20d7a028c4dc1f383bec17",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/input-group.tsx",
     "upstreamBlobSha": "9126487bf0c03a6aa1edce0e2b54b938722478ae"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/input-group.tsx@3385579339d52098b7bdd3ab176782b5cbd207f5"
+      "source": "src/components/ui/input-group.tsx@bceadc38cbcf5bb11b20d7a028c4dc1f383bec17"
     },
     "tokens": {
       "kind": "token-contract",
@@ -79,6 +79,13 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -584,14 +591,14 @@
               "id": "spacing.multiplier",
               "multiplier": 3.5
             },
-            "when": {
-              "propName": "size",
-              "equals": "xs"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "xs"
+            }
           },
           {
             "tokenId": "spacing.unit",

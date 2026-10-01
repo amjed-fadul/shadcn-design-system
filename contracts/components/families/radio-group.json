@@ -3,7 +3,7 @@
   "id": "radio-group",
   "source": {
     "canonicalPath": "src/components/ui/radio-group.tsx",
-    "canonicalBlobSha": "df5bb739f5d64d58fa602b37b4b735a7f9c20df2",
+    "canonicalBlobSha": "ebe86293d5c95c5d4f269dea4ca8d67f0c5600c5",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/radio-group.tsx",
     "upstreamBlobSha": "f99bd66182dda0ea6a4ba134a04e2ae6ae3c192d"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/radio-group.tsx@df5bb739f5d64d58fa602b37b4b735a7f9c20df2"
+      "source": "src/components/ui/radio-group.tsx@ebe86293d5c95c5d4f269dea4ca8d67f0c5600c5"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -227,6 +227,13 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"

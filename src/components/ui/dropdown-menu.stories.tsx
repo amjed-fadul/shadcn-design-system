@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, userEvent, within, waitFor } from "storybook/test"
 
 import {
   DropdownMenuCheckboxItem,
@@ -54,6 +54,6 @@ export const Default: Story = {
     await expect(menu.getByRole("menuitem", { name: "Delete account" })).toBeVisible()
 
     await userEvent.click(profile)
-    await expect(menu.queryByRole("menu")).not.toBeInTheDocument()
+    await waitFor(() => expect(menu.queryByRole("menu")).not.toBeInTheDocument())
   },
 }

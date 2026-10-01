@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, userEvent, within, waitFor } from "storybook/test"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -55,7 +55,7 @@ export const Default: Story = {
       within(sheet).getByText("Manage your profile and notification preferences.")
     ).toBeVisible()
     await userEvent.click(within(sheet).getByRole("button", { name: "Close settings" }))
-    await expect(body.queryByRole("dialog", { name: "Settings" })).not.toBeInTheDocument()
+    await waitFor(() => expect(body.queryByRole("dialog", { name: "Settings" })).not.toBeInTheDocument())
   },
 }
 

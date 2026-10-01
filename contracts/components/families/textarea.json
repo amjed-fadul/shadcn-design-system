@@ -1,1 +1,189 @@
-{"schemaVersion":1,"id":"textarea","source":{"canonicalPath":"src/components/ui/textarea.tsx","canonicalBlobSha":"fbba18bddf871f5658d6081edfb11fa4c0ac48f7","implementationKind":"semantic-token-normalized-derivative","upstreamPath":"apps/v4/registry/bases/radix/ui/textarea.tsx","upstreamBlobSha":"d7e09d7fcfdd19daa5b6910f915c5705d2ec8f6a"},"evidence":{"source":{"kind":"canonical-source","source":"src/components/ui/textarea.tsx@fbba18bddf871f5658d6081edfb11fa4c0ac48f7"},"tokens":{"kind":"token-contract","source":"shadcn-radix-token-contract-002"}},"exports":[{"name":"Textarea","kind":"component","authorableJsx":true,"evidenceRefs":["source"],"component":{"localProps":[],"inherits":["html.textarea"],"slots":[],"composition":{"requires":[],"provides":[],"hardConstraints":[]},"stateChannels":[],"conditionalApi":[],"events":[],"tokenDependencies":[{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":16},"evidenceRefs":["source","tokens"]},{"tokenId":"radius.md","evidenceRefs":["source","tokens"]},{"tokenId":"color.input","evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2.5},"evidenceRefs":["source","tokens"]},{"tokenId":"spacing.unit","viaDerivedRule":{"id":"spacing.multiplier","multiplier":2},"evidenceRefs":["source","tokens"]},{"tokenId":"font-size.sm","evidenceRefs":["source","tokens"]},{"tokenId":"color.muted-foreground","evidenceRefs":["source","tokens"]},{"tokenId":"color.ring","evidenceRefs":["source","tokens"]}],"rendering":{"rootNodeId":"host","publicPropsTargetNodeId":"host","nodes":[{"id":"host","host":{"kind":"intrinsic","tag":"textarea"},"receivesPublicProps":true,"dataAttributes":[{"name":"data-slot","source":"literal","value":"textarea","evidenceRefs":["source"]}],"children":[],"evidenceRefs":["source"]}],"portalBoundaries":[]},"accessibility":[{"feature":"native host semantics","owner":"native","mechanism":"textarea","evidenceRefs":["source"]},{"feature":"accessible name","owner":"author","mechanism":"author-provided labeling","evidenceRefs":["source"]}],"inheritedPropDefaults":[]}}],"unresolved":[]}
+{
+  "schemaVersion": 1,
+  "id": "textarea",
+  "source": {
+    "canonicalPath": "src/components/ui/textarea.tsx",
+    "canonicalBlobSha": "900e45b68b59d7d4cf8818b272a7bab7e93d4b1a",
+    "implementationKind": "semantic-token-normalized-derivative",
+    "upstreamPath": "apps/v4/registry/bases/radix/ui/textarea.tsx",
+    "upstreamBlobSha": "d7e09d7fcfdd19daa5b6910f915c5705d2ec8f6a"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/textarea.tsx@900e45b68b59d7d4cf8818b272a7bab7e93d4b1a"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-002"
+    }
+  },
+  "exports": [
+    {
+      "name": "Textarea",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [],
+        "inherits": [
+          "html.textarea"
+        ],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 16
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.input",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.destructive",
+            "when": {
+              "subject": "aria",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "invalid",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "textarea"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "textarea",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "native host semantics",
+            "owner": "native",
+            "mechanism": "textarea",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "feature": "accessible name",
+            "owner": "author",
+            "mechanism": "author-provided labeling",
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    }
+  ],
+  "unresolved": []
+}

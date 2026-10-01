@@ -30,9 +30,12 @@ const familyIds = [
   "dropdown-menu",
   "empty",
   "field",
+  "icon",
+  "image",
   "input-group",
   "input",
   "label",
+  "link",
   "pagination",
   "popover",
   "progress",
@@ -96,6 +99,17 @@ function bareNode(entry: ExecutableExport, childrenOverride?: AuthoredNode[], pr
   }
   for (const [propName, value] of selected) props[propName] ??= literal(value)
   Object.assign(props, propsOverride)
+  for (const conditional of componentContract.conditionalApi) {
+    const value = props[conditional.when.propName]
+    const applies = "equals" in conditional.when
+      ? value?.kind === "literal" && value.value === conditional.when.equals
+      : conditional.when.presence === "present" ? value !== undefined : value === undefined
+    if (!applies) continue
+    for (const prop of conditional.shape.props) {
+      if (prop.availability === "unavailable") delete props[prop.name]
+      else if (prop.required && prop.name !== "children") props[prop.name] ??= authoredValueForType(prop.type)
+    }
+  }
 
   const children = childrenOverride ?? (
     componentContract.props.some((prop) => prop.availability === "available" && prop.required && prop.name === "children")
@@ -135,7 +149,7 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
-describe("Phase 5 executable validator coverage across all 38 canonical families", () => {
+describe("Phase 5 executable validator coverage across all 41 canonical families", () => {
   test("projects and resolves every authorable canonical export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
     const authorable = Object.values(contract.exports).filter((entry) => entry.authorableJsx && entry.kind === "component")
@@ -143,7 +157,7 @@ describe("Phase 5 executable validator coverage across all 38 canonical families
     const hardConstraints = Object.values(contract.exports).flatMap((entry) => entry.component?.composition.hardConstraints ?? [])
 
     expect([...projectedFamilies].sort()).toEqual([...familyIds].sort())
-    expect(authorable).toHaveLength(201)
+    expect(authorable).toHaveLength(204)
     expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
     for (const entry of authorable) {

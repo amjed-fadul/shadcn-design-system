@@ -7,7 +7,7 @@
   "sources": {
     "canonicalTheme": {
       "path": "src/index.css",
-      "blobSha": "f0402b08be0c2ea80831805928d87977e5543e8d"
+      "blobSha": "17d37561de0d55557ccc9f7256d3b4551556e767"
     },
     "shadcnNeutral": {
       "repository": "shadcn-ui/ui",
@@ -73,5 +73,19 @@
       "minimumRatio": 4.5,
       "test": "tests/token-contract-brand-contrast.test.ts"
     }
+  },
+  "visualSystemLayer": {
+    "release": "shadcn-radix-release-009",
+    "decision": "Product-agnostic density and visual hierarchy, per Release 009 brief; existing token identities retained.",
+    "tokens": [
+      "radius.base",
+      "radius.sm",
+      "radius.md",
+      "radius.lg",
+      "radius.xl",
+      "radius.2xl",
+      "radius.3xl",
+      "radius.4xl"
+    ]
   }
 }

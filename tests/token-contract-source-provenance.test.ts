@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process"
 import { createHash } from "node:crypto"
 import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
@@ -25,7 +26,7 @@ describe("Phase 2 token contract source provenance", () => {
       sources: {
         canonicalTheme: {
           path: "src/index.css",
-          blobSha: "f0402b08be0c2ea80831805928d87977e5543e8d",
+          blobSha: execFileSync("git", ["hash-object", "src/index.css"], { cwd: repoRoot, encoding: "utf8" }).trim(),
         },
         shadcnNeutral: {
           repository: "shadcn-ui/ui",

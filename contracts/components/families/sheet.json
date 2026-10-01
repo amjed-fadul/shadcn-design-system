@@ -3,7 +3,7 @@
   "id": "sheet",
   "source": {
     "canonicalPath": "src/components/ui/sheet.tsx",
-    "canonicalBlobSha": "5f6704339667e8e2a6a10b1a0769c96801a2b8c1",
+    "canonicalBlobSha": "08a660e2c34d9612272b2a9610589024f565fed0",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sheet.tsx",
     "upstreamBlobSha": "28f34f894ea37e24b46056fd040bc46ae8b5902e"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sheet.tsx@5f6704339667e8e2a6a10b1a0769c96801a2b8c1"
+      "source": "src/components/ui/sheet.tsx@08a660e2c34d9612272b2a9610589024f565fed0"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -287,25 +287,21 @@
             ]
           },
           {
-            "tokenId": "color.background",
+            "tokenId": "color.popover",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 6
-            },
+            "tokenId": "color.popover-foreground",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "shadow.lg",
+            "tokenId": "shadow.md",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -695,6 +691,17 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {
@@ -788,7 +795,7 @@
             ]
           },
           {
-            "tokenId": "font-weight.semibold",
+            "tokenId": "font-weight.medium",
             "evidenceRefs": [
               "source",
               "tokens"

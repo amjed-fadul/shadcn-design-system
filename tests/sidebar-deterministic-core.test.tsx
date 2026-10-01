@@ -50,7 +50,7 @@ describe("Sidebar deterministic core", () => {
     for (const slot of slots) {
       const classes = container.querySelector(`[data-slot="${slot}"]`)?.classList
       expect(classes?.contains(slot === "sidebar-container" ? "transition-[left,right,width,transform]" : "transition-[width]")).toBe(true)
-      expect(classes?.contains("duration-200")).toBe(true)
+      expect(classes?.contains("duration-300")).toBe(true)
       expect(classes?.contains("ease-out")).toBe(true)
     }
 

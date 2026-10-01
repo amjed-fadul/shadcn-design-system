@@ -119,6 +119,8 @@ async function expectTheme(mode: TokenMode, canvasElement: HTMLElement) {
   const foreground = getContractedColor("color.foreground", mode)
   const cardBackground = getContractedColor("color.card", mode)
   const cardForeground = getContractedColor("color.card-foreground", mode)
+  const popoverBackground = getContractedColor("color.popover", mode)
+  const popoverForeground = getContractedColor("color.popover-foreground", mode)
   const primary = getContractedColor("color.primary", mode)
   const primaryForeground = getContractedColor("color.primary-foreground", mode)
   const muted = getContractedColor("color.muted", mode)
@@ -129,6 +131,8 @@ async function expectTheme(mode: TokenMode, canvasElement: HTMLElement) {
     foreground,
     cardBackground,
     cardForeground,
+    popoverBackground,
+    popoverForeground,
     primary,
     primaryForeground,
     muted,
@@ -163,15 +167,15 @@ async function expectTheme(mode: TokenMode, canvasElement: HTMLElement) {
     })
   })
   await expect(getComputedStyle(tabList).backgroundColor).toBe(resolveColor(muted.value))
-  await expect(getComputedStyle(activeTab).backgroundColor).toBe(
-    resolveColor(background.value)
-  )
+  const resolvedBackground = resolveColor(background.value)
+  await waitFor(() => expect(getComputedStyle(activeTab).backgroundColor).toBe(resolvedBackground))
   await expect(dialog.parentElement).toBe(document.body)
-  await expect(getComputedStyle(dialog)).toMatchObject({
-    backgroundColor: resolveColor(background.value),
+  const expectedOverlayPaint = {
+    backgroundColor: resolveColor(popoverBackground.value),
     borderColor: resolveColor(border.value),
-    color: resolveColor(foreground.value),
-  })
+    color: resolveColor(popoverForeground.value),
+  }
+  await waitFor(() => expect(getComputedStyle(dialog)).toMatchObject(expectedOverlayPaint))
 
   await userEvent.click(canvas.getByRole("tab", { name: "Details" }))
   await expect(canvas.getByRole("tab", { name: "Details" })).toHaveAttribute(

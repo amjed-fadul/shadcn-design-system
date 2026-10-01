@@ -95,17 +95,17 @@ export const LineVariant: Story = {
     }
     const noVisibleShadow = /^(?:none|rgba\(0, 0, 0, 0\) 0px 0px 0px 0px(?:, rgba\(0, 0, 0, 0\) 0px 0px 0px 0px)*)$/
 
-    // Preserve the default treatment; line mode keeps the pinned rounded-md
-    // trigger, but must replace the active fill/shadow with a real indicator.
-    await expect(appearance(defaultTab)).toMatchObject({ background: "oklch(1 0 0)", radius: "8px", padding: "0px 12px", fontSize: "14px" })
-    await expect(getComputedStyle(defaultTab).boxShadow).not.toMatch(noVisibleShadow)
+    // Release 009 mode switching uses a neutral fill without elevation;
+    // line navigation uses a square trigger and a real 2px indicator.
+    await expect(appearance(defaultTab)).toMatchObject({ background: "oklch(1 0 0)", radius: "6px", padding: "0px 12px", fontSize: "14px" })
+    await expect(getComputedStyle(defaultTab).boxShadow).toMatch(noVisibleShadow)
     await expect(getComputedStyle(defaultTab, "::after").opacity).toBe("0")
     await expect(getComputedStyle(defaultTab.closest('[data-slot="tabs"]')!).gap).toBe("normal")
     await expect(getComputedStyle(overview.closest('[data-slot="tabs"]')!).gap).toBe("8px")
     await expect(getComputedStyle(line.getByRole("tablist"))).toMatchObject({ backgroundColor: "rgba(0, 0, 0, 0)", gap: "4px", borderBottomWidth: "1px" })
     await expect(appearance(overview)).toMatchObject({
-      background: "rgba(0, 0, 0, 0)", shadow: expect.stringMatching(noVisibleShadow), radius: "8px",
-      indicator: { content: '""', position: "absolute", height: "2px", bottom: "-5px", left: "0px", right: "0px", background: "oklch(0.145 0 0)", opacity: "1" },
+      background: "rgba(0, 0, 0, 0)", shadow: expect.stringMatching(noVisibleShadow), radius: "0px",
+      indicator: { content: '""', position: "absolute", height: "2px", bottom: "-1px", left: "0px", right: "0px", background: "oklch(0.145 0 0)", opacity: "1" },
     })
     await expect(getComputedStyle(activity, "::after").opacity).toBe("0")
     await expect(line.getByRole("tabpanel").getBoundingClientRect().top).toBeGreaterThan(overview.getBoundingClientRect().bottom + 5)

@@ -170,7 +170,7 @@ describe("release.5 Drawer", () => {
 
     expect(family.source.canonicalBlobSha).toBe(blobSha)
     expect(family.source.canonicalBlobSha).toBe(
-      "629fb9a98d658839e30d6cb186c5e9c307f65430"
+      "ffca975f07d80adae6035c8b3c55244ebe262bad"
     )
     expect(family.source.upstreamPath).toBe(
       "apps/v4/registry/new-york-v4/ui/drawer.tsx"

@@ -215,7 +215,7 @@ describe("stateful Phase 3 Task 4 component contracts", () => {
     expect(compareComponentTokenDependencies!(join(root, "src/components/ui/scroll-area.tsx"), scrollArea)).not.toEqual([])
 
     const invented = structuredClone(dependencies("checkbox"))
-    invented.push({ tokenId: "color.background", evidenceRefs: ["source", "tokens"] })
+    invented.push({ tokenId: "color.card", evidenceRefs: ["source", "tokens"] })
     expect(compareComponentTokenDependencies!(join(root, "src/components/ui/checkbox.tsx"), invented)).not.toEqual([])
   })
   test("registers exactly the five approved Task 4 family contract files", () => {

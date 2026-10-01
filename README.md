@@ -4,6 +4,14 @@ Canonical governed shadcn design system for Agentic Design Canvas product work.
 
 This repository is separate from Canvas. The official shadcn repository is upstream/reference only; Canvas will eventually consume immutable contracted releases from this repository.
 
+## Active producer: Release 009 candidate
+
+Release 009 (`0.0.0-release.9`) refines product UI density and hierarchy over the exact accepted Release 008 candidate. Release 008's Icon, Image, Link and Toggle Group semantics remain preserved. Historical release records remain immutable. The Release 008 sections below document that baseline; the active canonical validator and candidate commands now target Release 009.
+
+Geist Variable, the existing 4px spacing scale and 82 token identities remain. Central radius is 8px (chips 4px, controls 6px, containers 8px, larger surfaces 12px); normal controls are 32px, navigation 28px, tables 32px. Canvas/background, subtle/muted, raised/card and overlay/popover define surface roles. Borders carry normal grouping, floating menus use subtle elevation, and modal surfaces use restrained elevation. Solid 2px keyboard focus uses a 2px background offset; scrolling viewports use an inset ring to avoid clipping. Reduced motion is respected across state and structural animation.
+
+Storybook `System/Product UI` includes six product-agnostic integration examples and four family validation stories. Theme and reading-direction controls cover light/dark and LTR/RTL without duplicating every story. See [Release 009 plan](docs/RELEASE-009-PLAN.md) and [Release 009 verification](docs/RELEASE-009-VERIFICATION.md).
+
 ## Bootstrap baseline
 
 - shadcn style: `radix-nova`
@@ -25,13 +33,13 @@ npm run build:library
 npm run test:library
 ```
 
-The private package version is `0.0.0-release.2`. The separate `dist-library/`
+The private package version is `0.0.0-release.8`. The separate `dist-library/`
 output contains ES modules, compiled CSS with embedded fonts, TypeScript
 declarations, and bundled dependency notices. The existing app and Storybook
 builds remain available. The public API has exactly three entrypoints:
 
 ```tsx
-import { Button, Card, Tabs, Dialog } from "@adc/shadcn-design-system"
+import { Button, Card, Tabs, Dialog, Icon, Image, Link } from "@adc/shadcn-design-system"
 import "@adc/shadcn-design-system/styles.css"
 import {
   getExecutableRelease,
@@ -40,11 +48,30 @@ import {
 } from "@adc/shadcn-design-system/release"
 ```
 
-The root exports all 107 approved component, helper, and hook exports. The
+The root exports all 210 approved component, helper, and hook exports. The
+41 component families include the governed Icon, Image and Link primitives. The
 release entrypoint returns complete, deeply frozen contract and release data;
 it needs no filesystem, Git, or contract validator at runtime. It is separate
 from the component entrypoint so ordinary component imports do not load that
 data. Declarations resolve without the repository's `@/` alias.
+
+The new primitives keep their authoring APIs closed:
+
+```tsx
+<Icon name="search" size="default" />
+<Icon name="check-circle" decorative={false} label="Saved" />
+<Image src="/product.png" alt="Product overview" width={640} height={360} />
+<Link href="/docs">Read the documentation</Link>
+```
+
+Icon offers 20 identities, three sizes, governed semantic color and optional inline placement. Logical
+start/end arrows and chevrons follow RTL; physical directions remain fixed.
+Image requires intrinsic pixel dimensions and explicit alt text (empty for a
+decorative image), with bounded layout, fit and loading options. Link preserves
+native anchor destinations, with optional explicit `newTab`. See
+[Icon](docs/RELEASE-008-ICON.md), [Image](docs/RELEASE-008-IMAGE.md),
+[Toggle Group](docs/RELEASE-008-TOGGLE-GROUP.md) and
+[Link](docs/RELEASE-008-LINK.md) for decisions and contracts.
 
 Import the stylesheet once at the application entrypoint. Consumers do not
 need Tailwind to compile the design system. The stylesheet includes the
@@ -72,9 +99,9 @@ React Server Component support is not established.
 
 The build checks component/release reconciliation, frozen implementation inputs,
 resolved dependency CSS/fonts, and actual build dependency coverage before reporting
-success. The accepted release001 artifact remains immutable. Release002 adds the bounded
-Canvas portal-container API; its exact artifact and verification evidence are
-recorded in docs/CANVAS-PORTAL-RELEASE-002.md.
+success. Releases 001–007 remain immutable. Release 008 adds Icon, Image and Link
+and strengthens Toggle Group selection using semantic tokens. The historical
+Release 002 portal-container evidence remains in docs/CANVAS-PORTAL-RELEASE-002.md.
 
 ## Release and candidate identity (Task 6.2)
 
@@ -83,12 +110,12 @@ Use Node `22.18.0` and npm `10.9.3` for all commands. With Volta:
 ```sh
 volta run --node 22.18.0 --npm 10.9.3 npm run release:generate
 volta run --node 22.18.0 --npm 10.9.3 npm run build:library
-volta run --node 22.18.0 --npm 10.9.3 npm run candidate:generate -- --output /tmp/release-002-candidate
+volta run --node 22.18.0 --npm 10.9.3 npm run candidate:generate -- --output /tmp/release-008-candidate
 ```
 
-`release:generate` is an explicit reconciliation operation: it updates the same
-active release-002, but aborts if the executable projection changes. Use it only when
-reconciling reviewed source/build changes. `candidate:generate` verifies frozen
+`release:generate` reconciles reviewed source and contract changes into the active
+Release 008 artifact only. It checks the frozen historical artifacts before and
+after generation; it never regenerates Releases 001–007. `candidate:generate` verifies frozen
 release inputs, builds into a fresh temporary output directory, runs `npm pack
 --ignore-scripts`, and writes the tarball plus `distribution-manifest.json` to a
 new external directory. It refuses to overwrite candidate evidence.
@@ -117,8 +144,8 @@ file. Verification requires those retained expectations:
 ```sh
 volta run --node 22.18.0 --npm 10.9.3 npm run release:verify -- --release-sha256 "$REVIEWED_RELEASE_SHA256"
 volta run --node 22.18.0 --npm 10.9.3 npm run candidate:verify -- \
-  --manifest /tmp/release-002-candidate/distribution-manifest.json \
-  --tarball /tmp/release-002-candidate/adc-shadcn-design-system-0.0.0-release.2.tgz \
+  --manifest /tmp/release-008-candidate/distribution-manifest.json \
+  --tarball /tmp/release-008-candidate/adc-shadcn-design-system-0.0.0-release.8.tgz \
   --manifest-sha256 "$RETAINED_MANIFEST_SHA256"
 volta run --node 22.18.0 --npm 10.9.3 npm run test:identity
 ```

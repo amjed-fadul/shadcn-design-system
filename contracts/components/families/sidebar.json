@@ -3,7 +3,7 @@
   "id": "sidebar",
   "source": {
     "canonicalPath": "src/components/ui/sidebar.tsx",
-    "canonicalBlobSha": "30877f7508ba49fe48992ca744f53a3903ed4482",
+    "canonicalBlobSha": "e7710240125fda99d4ad7fdd33a40b5cf55d5ed4",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
     "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sidebar.tsx@30877f7508ba49fe48992ca744f53a3903ed4482"
+      "source": "src/components/ui/sidebar.tsx@e7710240125fda99d4ad7fdd33a40b5cf55d5ed4"
     },
     "tokens": {
       "kind": "token-contract",
@@ -472,14 +472,14 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
             "sourceContext": {
               "applicability": [
                 "group-data-[collapsible=offcanvas]"
               ]
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 0
             },
             "evidenceRefs": [
               "source",
@@ -1438,15 +1438,15 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -4
+            },
             "sourceContext": {
               "applicability": [
                 "group-data-[side=left]"
               ]
             },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": -4
-            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1454,15 +1454,15 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
             "sourceContext": {
               "applicability": [
                 "group-data-[side=right]"
               ]
             },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 0
-            },
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1470,16 +1470,16 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
             "sourceContext": {
               "applicability": [],
               "target": {
                 "kind": "pseudo-element",
                 "name": "after"
               }
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 0
             },
             "evidenceRefs": [
               "source",
@@ -1519,14 +1519,14 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "sourceContext": {
               "applicability": [
                 "[[data-side=left][data-collapsible=offcanvas]_&]"
               ]
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": -2
             },
             "evidenceRefs": [
               "source",
@@ -1535,14 +1535,14 @@
           },
           {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "sourceContext": {
               "applicability": [
                 "[[data-side=right][data-collapsible=offcanvas]_&]"
               ]
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": -2
             },
             "evidenceRefs": [
               "source",
@@ -1559,42 +1559,42 @@
                 "truthiness": "falsy"
               },
               "rendering": {
-          "rootNodeId": "sidebarrail-0-0",
-          "publicPropsTargetNodeId": "sidebarrail-0-0",
-          "nodes": [
-            {
-              "id": "sidebarrail-0-0",
-              "host": {
-                "kind": "intrinsic",
-                "tag": "button"
-              },
-              "receivesPublicProps": true,
-              "dataAttributes": [
-                {
-                  "name": "data-sidebar",
-                  "source": "literal",
-                  "value": "rail",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                },
-                {
-                  "name": "data-slot",
-                  "source": "literal",
-                  "value": "sidebar-rail",
-                  "evidenceRefs": [
-                    "source"
-                  ]
-                }
-              ],
-              "derivedSpreads": [],
-              "children": [],
-              "evidenceRefs": [
-                "source"
-              ]
-            }
-          ],
-          "portalBoundaries": []
+                "rootNodeId": "sidebarrail-0-0",
+                "publicPropsTargetNodeId": "sidebarrail-0-0",
+                "nodes": [
+                  {
+                    "id": "sidebarrail-0-0",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "button"
+                    },
+                    "receivesPublicProps": true,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "rail",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-rail",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  }
+                ],
+                "portalBoundaries": []
               },
               "evidenceRefs": [
                 "source"
@@ -2023,7 +2023,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -2216,7 +2216,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 8
+              "multiplier": 6
             },
             "evidenceRefs": [
               "source",
@@ -2427,17 +2427,24 @@
             ]
           },
           {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "sourceContext": {
               "applicability": [],
               "target": {
                 "kind": "pseudo-element",
                 "name": "after"
               }
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": -2
             },
             "evidenceRefs": [
               "source",
@@ -2873,13 +2880,6 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "radius.md",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -2891,10 +2891,17 @@
             ]
           },
           {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -2909,7 +2916,21 @@
             ]
           },
           {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -2927,10 +2948,15 @@
             ]
           },
           {
-            "tokenId": "color.sidebar-accent",
-            "when": {
-              "propName": "variant",
-              "equals": "default"
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[collapsible=icon]"
+              ]
             },
             "evidenceRefs": [
               "source",
@@ -2938,15 +2964,26 @@
             ]
           },
           {
-            "tokenId": "color.sidebar-accent-foreground",
-            "when": {
-              "propName": "variant",
-              "equals": "default"
-            },
+            "tokenId": "color.sidebar-accent",
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "color.sidebar-accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
           },
           {
             "tokenId": "color.sidebar-accent",
@@ -2999,52 +3036,62 @@
             ]
           },
           {
-            "tokenId": "color.sidebar-border",
+            "tokenId": "color.sidebar-accent-foreground",
             "when": {
-              "propName": "variant",
-              "equals": "outline"
+              "all": [
+                {
+                  "propName": "variant",
+                  "equals": "default"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "self"
+                    }
+                  ],
+                  "propName": "active",
+                  "equals": true
+                }
+              ]
             },
             "evidenceRefs": [
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "color.sidebar-border",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
           },
           {
             "tokenId": "color.sidebar-accent",
-            "when": {
-              "propName": "variant",
-              "equals": "outline"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
           },
           {
             "tokenId": "color.sidebar-accent-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
             "when": {
               "propName": "variant",
               "equals": "outline"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 8
-            },
-            "when": {
-              "propName": "size",
-              "equals": "default"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
+            }
           },
           {
             "tokenId": "spacing.unit",
@@ -3052,51 +3099,66 @@
               "id": "spacing.multiplier",
               "multiplier": 7
             },
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
-          },
-          {
-            "tokenId": "font-size.xs",
+            ],
             "when": {
               "propName": "size",
-              "equals": "sm"
-            },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
+              "equals": "default"
+            }
           },
           {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 12
-            },
-            "when": {
-              "propName": "size",
-              "equals": "lg"
+              "multiplier": 6
             },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "font-size.xs",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 9
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
           },
           {
             "tokenId": "font-size.sm",
-            "when": {
-              "propName": "size",
-              "equals": "lg"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
           }
         ],
         "rendering": {
@@ -3688,7 +3750,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 0.5
             },
             "evidenceRefs": [
               "source",
@@ -3699,7 +3761,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 5
+              "multiplier": 6
             },
             "evidenceRefs": [
               "source",
@@ -3721,17 +3783,24 @@
             ]
           },
           {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": -2
+            },
             "sourceContext": {
               "applicability": [],
               "target": {
                 "kind": "pseudo-element",
                 "name": "after"
               }
-            },
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": -2
             },
             "evidenceRefs": [
               "source",
@@ -4410,6 +4479,17 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
               "multiplier": 2
             },
             "evidenceRefs": [
@@ -4428,7 +4508,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -4443,7 +4523,21 @@
             ]
           },
           {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -4482,6 +4576,23 @@
           },
           {
             "tokenId": "font-weight.medium",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "active",
+              "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-accent-foreground",
             "when": {
               "subject": "data",
               "path": [

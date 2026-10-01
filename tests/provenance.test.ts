@@ -9,6 +9,8 @@ type Provenance = {
   components: Record<string, { canonicalPath: string; canonicalBlobSha: string; implementationKind: string }>
 }
 
+const nativeFamilyIds = ["icon", "image", "link"] as const
+
 const provenance = JSON.parse(readFileSync(new URL("../provenance/seed-components.json", import.meta.url), "utf8")) as Provenance
 
 describe("canonical component provenance", () => {
@@ -25,7 +27,8 @@ describe("canonical component provenance", () => {
       expect(component.canonicalBlobSha).toBe(
         execFileSync("git", ["hash-object", component.canonicalPath], { encoding: "utf8" }).trim()
       )
-      expect(component.implementationKind).toBe(id === "collapsible" ? "upstream-wrapper" : "semantic-token-normalized-derivative")
+      expect(component.implementationKind).toBe(nativeFamilyIds.includes(id as typeof nativeFamilyIds[number])
+        ? "repo-native" : id === "collapsible" ? "upstream-wrapper" : "semantic-token-normalized-derivative")
     }
   })
 
@@ -37,7 +40,7 @@ describe("canonical component provenance", () => {
   })
 
   test("records deterministic Sidebar adaptation without ambient-app policy", () => {
-    expect(provenance.components.sidebar.canonicalBlobSha).toBe("30877f7508ba49fe48992ca744f53a3903ed4482")
+    expect(provenance.components.sidebar.canonicalBlobSha).toBe("e7710240125fda99d4ad7fdd33a40b5cf55d5ed4")
     expect(provenance.derivation.operations).toContain(
       "make Sidebar presentation and desktop/mobile state explicit, preserve sidebar.context, and move viewport detection, persistence, and keyboard shortcuts to an external normal-app recipe"
     )
