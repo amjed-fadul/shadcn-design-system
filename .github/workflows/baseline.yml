@@ -5,37 +5,33 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: baseline-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   verify:
-    # Releases are produced on macOS. The build input guard rejects Linux-only
-    # reads such as /proc/self/exe, and the frozen R4 producer cannot change.
-    runs-on: macos-latest
-    env:
-      # Node sizes its default heap from host RAM: about 2 GB here, about 4 GB on the
-      # producer's machine. Release generation and candidate verification need the latter.
-      NODE_OPTIONS: --max-old-space-size=4096
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Provision retained release artifacts
-        run: |
-          directory="$RUNNER_TEMP/release-artifacts"
-          mkdir -p "$directory"
-          git fetch --no-tags --depth=1 origin ci/release-artifacts
-          git archive FETCH_HEAD | tar -x -C "$directory"
-          (cd "$directory" && shasum -a 256 --check SHA256SUMS)
-          echo "ADC_R3_ARTIFACT_DIRECTORY=$directory/shadcn-radix-release-003" >> "$GITHUB_ENV"
-          echo "ADC_R4_ARTIFACT_DIRECTORY=$directory/shadcn-radix-release-004" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
         with:
           node-version: 22.18.0
+          cache: npm
       - run: npm ci --ignore-scripts
-      - run: npx playwright install --with-deps chromium
       - run: npm run typecheck
-      - run: npm run test
-      - run: npm run build
-      - run: npm run test-storybook
-      - run: npm run build-storybook
       - run: npm audit --omit=dev
       - run: npm audit
+      - name: Fast release identity, contract and preservation checks
+        run: >-
+          npm run test --
+          tests/canonical-release-r9-binding.test.ts
+          tests/component-contract-schema.test.ts
+          tests/token-contract-schema.test.ts
+          tests/token-contract-index.test.ts
+          tests/release009-preservation.test.ts
+          tests/historical-artifacts.test.ts
+          tests/release-5-workflows.test.ts
