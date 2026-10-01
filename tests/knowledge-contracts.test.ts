@@ -21,6 +21,7 @@ import release007Artifact from "../provenance/releases/shadcn-radix-release-007.
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const baseline = "f77976e"
+const release007FinalCommit = "74f06c7199f723ccc9b1dd7c3ae82d797558221f"
 
 const referenceSet: KnowledgeReferenceSet = {
   schemaVersion: 1,
@@ -261,6 +262,7 @@ describe("knowledge contract boundary", () => {
     const changedPaths = execFileSync("git", [
       "diff",
       baseline,
+      release007FinalCommit,
       "--name-only",
       "--",
       "contracts/components",
