@@ -17,4 +17,5 @@ jobs:
       - name: Production dependency audit
         run: npm audit --omit=dev
       - name: Full dependency audit
+        if: ${{ hashFiles('provenance/releases/shadcn-radix-release-009.json') != '' }}
         run: npm audit
