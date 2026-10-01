@@ -11,7 +11,7 @@ const releaseWideWorkflows = [
   "command-final-verify.yml",
   "drawer-final-verify.yml",
   "popover-final-verify.yml",
-  "baseline.yml",
+  "release-qualification.yml",
 ]
 
 const blockingCommands = [
@@ -76,6 +76,42 @@ describe("release-wide CI workflow gates", () => {
       const source = readFileSync(join(workflowRoot, workflow), "utf8")
       expect(validateReleaseWorkflowPolicy(source, packageScripts), workflow).toEqual([])
     }
+  })
+
+  test("keeps every-revision verification fast while preserving its check identity", () => {
+    const source = readFileSync(join(workflowRoot, "baseline.yml"), "utf8")
+    expect(source).toContain("name: Baseline verification")
+    expect(source).toContain("  pull_request:")
+    expect(source).toContain("  verify:")
+    expect(source).toContain("runs-on: ubuntu-latest")
+    expect(source).toContain("cache: npm")
+    expect(source).toContain("group: baseline-${{ github.event.pull_request.number || github.ref }}")
+    expect(source).toContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}")
+    for (const command of ["npm ci --ignore-scripts", "npm run typecheck", "npm audit --omit=dev", "npm audit"]) expect(source).toContain(command)
+    for (const file of ["canonical-release-r9-binding", "component-contract-schema", "token-contract-schema", "token-contract-index", "release009-preservation", "historical-artifacts", "release-5-workflows"]) expect(source).toContain(`tests/${file}.test.ts`)
+    for (const command of ["playwright install", "npm run build", "npm run test-storybook", "npm run build-storybook", "Provision retained release artifacts"]) expect(source).not.toContain(command)
+    expect(source).not.toMatch(/run:\s+npm run test\s*\n/)
+  })
+
+  test("qualifies only an explicit immutable revision with the complete macOS gate", () => {
+    const source = readFileSync(join(workflowRoot, "release-qualification.yml"), "utf8")
+    expect(source).toContain("name: Release qualification")
+    expect(source).toContain("  workflow_dispatch:")
+    expect(source).not.toMatch(/^\s+(push|pull_request):/m)
+    expect(source).toContain("required: true")
+    expect(source).toContain("ref: ${{ inputs.pr_head_sha }}")
+    expect(source).toContain('[[ "$PR_HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]')
+    expect(source).toContain('test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"')
+    expect(source).toContain("runs-on: macos-latest")
+    expect(source).toContain("NODE_OPTIONS: --max-old-space-size=4096")
+    expect(source).toContain("Provision retained release artifacts")
+    expect(source).toContain("shasum -a 256 --check SHA256SUMS")
+    expect(source).toContain("npm run release:verify -- --release-sha256")
+    expect(source).toContain("npm run candidate:generate -- --output")
+    expect(source).toContain("npm run candidate:verify -- --manifest")
+    expect(source).toContain("--manifest-sha256")
+    expect(source).toContain("git diff --exit-code")
+    expect(source).toContain("name: release-qualification-${{ inputs.pr_head_sha }}")
   })
 
   test("contains no diagnostic exception in any workflow", () => {
