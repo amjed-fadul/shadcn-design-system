@@ -46,7 +46,7 @@ export const Default: Story = {
 
     const menu = within(document.body)
     const profile = menu.getByRole("menuitem", { name: "Profile" })
-    await expect(profile).toBeVisible()
+    await waitFor(() => expect(profile).toBeVisible())
     await expect(menu.getByRole("menuitem", { name: "Billing" })).toBeVisible()
     await expect(
       menu.getByRole("menuitemcheckbox", { name: "Show archived" })

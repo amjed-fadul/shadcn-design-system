@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 
 import release009Artifact from "../provenance/releases/shadcn-radix-release-009.json"
+import { verifyImplementationManifest } from "../scripts/release-inputs"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import { getTokenContract } from "../src/contracts/tokens/contract"
 import { projectExecutableContract } from "../src/validator/projection"
@@ -23,6 +24,13 @@ function approvedProjection() {
 }
 
 describe("Release 009 active canonical binding", { timeout: 60000 }, () => {
+  test("binds the active Release 009 to the exact current implementation inputs", () => {
+    expect(() => verifyImplementationManifest(
+      resolve(import.meta.dirname, ".."),
+      release009Artifact.implementationInputs
+    )).not.toThrow()
+  })
+
   test("binds the Release 009 package and canonical projection to the active runtime validator", async () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, "../package.json"), "utf8"))
     const sourceText = readFileSync(canonicalReleasePath, "utf8")
