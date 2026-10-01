@@ -3,7 +3,7 @@
   "id": "slider",
   "source": {
     "canonicalPath": "src/components/ui/slider.tsx",
-    "canonicalBlobSha": "b14e60098990804b7665f451f1b88d99beedd265",
+    "canonicalBlobSha": "43f169e6dcac6053ddeb63318d85d4af15676c7d",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/slider.tsx",
     "upstreamBlobSha": "d94d3d8fca2e309caca599fca181720e8b6f2524"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/slider.tsx@b14e60098990804b7665f451f1b88d99beedd265"
+      "source": "src/components/ui/slider.tsx@43f169e6dcac6053ddeb63318d85d4af15676c7d"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -323,9 +323,9 @@
             ]
           },
           {
-      "feature": "accessible name",
-      "owner": "author",
-      "mechanism": "Provide exactly one of thumbAriaLabels or thumbAriaLabelledBy. The selected array must contain exactly one nonblank entry per generated Thumb; each array index names that Thumb. Supplying both, a mismatched length, or a blank entry throws. Omitting both delegates accessible-name behavior to Radix.",
+            "feature": "accessible name",
+            "owner": "author",
+            "mechanism": "Provide exactly one of thumbAriaLabels or thumbAriaLabelledBy. The selected array must contain exactly one nonblank entry per generated Thumb; each array index names that Thumb. Supplying both, a mismatched length, or a blank entry throws. Omitting both delegates accessible-name behavior to Radix.",
             "evidenceRefs": [
               "source"
             ]

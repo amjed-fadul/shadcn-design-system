@@ -49,6 +49,15 @@
           "shadcn.toggle-group.docs"
         ]
       }
+    },
+    {
+      "statement": "Selected group items use primary and primary-foreground colors, retain those colors on hover, and show a separated full-color focus ring during keyboard focus. Standalone Toggle retains its existing muted selected style.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.toggle-group.source"
+        ]
+      }
     }
   ],
   "options": [

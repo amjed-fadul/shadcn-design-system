@@ -1,7 +1,7 @@
 import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Eye, EyeOff } from "lucide-react"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, userEvent, within, waitFor } from "storybook/test"
 
 import { Status } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -190,10 +190,10 @@ export const WithSelect: Story = {
     await expect(trigger).toHaveFocus()
     await userEvent.keyboard("{ArrowDown}")
     const option = await within(document.body).findByRole("option", { name: "Team" })
-    await expect(option).toBeVisible()
+    await waitFor(() => expect(option).toBeVisible())
     await userEvent.keyboard("{ArrowDown}{Enter}")
     await expect(trigger).toHaveTextContent("Team")
-    await expect(trigger).toHaveFocus()
+    await waitFor(() => expect(trigger).toHaveFocus())
   },
 }
 

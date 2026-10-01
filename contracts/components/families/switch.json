@@ -3,7 +3,7 @@
   "id": "switch",
   "source": {
     "canonicalPath": "src/components/ui/switch.tsx",
-    "canonicalBlobSha": "28a7b31bae463034fd2743aa76643504ac3bee7e",
+    "canonicalBlobSha": "0fa699a9ac28dca593e4b3f9cea3988df00cff94",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/switch.tsx",
     "upstreamBlobSha": "8d43e624843da44ae2c3068fa244453282735ed8"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/switch.tsx@28a7b31bae463034fd2743aa76643504ac3bee7e"
+      "source": "src/components/ui/switch.tsx@0fa699a9ac28dca593e4b3f9cea3988df00cff94"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -179,6 +179,13 @@
             ]
           },
           {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.destructive",
             "when": {
               "subject": "aria",
@@ -243,13 +250,6 @@
               "id": "spacing.multiplier",
               "multiplier": 4
             },
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"

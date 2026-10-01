@@ -91,7 +91,7 @@ function Slider({
             : thumbAriaLabelledBy !== undefined
               ? { "aria-labelledby": thumbAriaLabelledBy[index] }
               : {})}
-          className="relative block size-3 shrink-0 select-none rounded-full border border-ring bg-background ring-ring/50 transition-[color,box-shadow] after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-none active:ring-3 disabled:pointer-events-none disabled:opacity-50"
+          className="relative block size-3 shrink-0 select-none rounded-full border border-ring bg-background ring-ring transition-[color,box-shadow] duration-150 after:absolute after:-inset-2 hover:ring-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:ring-2 disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

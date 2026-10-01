@@ -100,16 +100,15 @@ export const SizeComparison: Story = {
       }
     }
 
-    // Pinned Nova reduces the shared spacing from 4 to 3 units and the title
-    // from text-base to text-sm. Keep this derivative's default layout intact.
+    // Release 009 retains 16/12px padding and uses 4px internal gaps with 12px metadata.
     await expect({ default: styles("default"), sm: styles("sm") }).toEqual({
       default: {
-        headerPadding: "16px", headerGap: "6px", contentPadding: "0px 16px 16px",
-        footerPadding: "16px", titleFontSize: "16px", titleLineHeight: "24px", descriptionFontSize: "14px",
+        headerPadding: "16px", headerGap: "4px", contentPadding: "0px 16px 16px",
+        footerPadding: "16px", titleFontSize: "16px", titleLineHeight: "24px", descriptionFontSize: "12px",
       },
       sm: {
-        headerPadding: "12px", headerGap: "6px", contentPadding: "0px 12px 12px",
-        footerPadding: "12px", titleFontSize: "14px", titleLineHeight: "20px", descriptionFontSize: "14px",
+        headerPadding: "12px", headerGap: "4px", contentPadding: "0px 12px 12px",
+        footerPadding: "12px", titleFontSize: "14px", titleLineHeight: "20px", descriptionFontSize: "12px",
       },
     })
   },

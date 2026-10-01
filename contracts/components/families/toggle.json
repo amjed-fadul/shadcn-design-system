@@ -3,7 +3,7 @@
   "id": "toggle",
   "source": {
     "canonicalPath": "src/components/ui/toggle.tsx",
-    "canonicalBlobSha": "de5328f19e85f2c6079531add1ff056eb59295b1",
+    "canonicalBlobSha": "881c5ad04bb3be040eaa73ba8a4489165d9576a3",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/toggle.tsx",
     "upstreamBlobSha": "37c743fa89e480f2cd7b7801cf1ae12db619e834"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/toggle.tsx@de5328f19e85f2c6079531add1ff056eb59295b1"
+      "source": "src/components/ui/toggle.tsx@881c5ad04bb3be040eaa73ba8a4489165d9576a3"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -92,7 +92,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1
+              "multiplier": 2
             },
             "evidenceRefs": [
               "source",
@@ -100,7 +100,7 @@
             ]
           },
           {
-            "tokenId": "radius.lg",
+            "tokenId": "radius.md",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -142,6 +142,13 @@
             ]
           },
           {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.destructive",
             "when": {
               "subject": "aria",
@@ -160,6 +167,23 @@
           },
           {
             "tokenId": "color.muted",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "state",
+              "equals": "on"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.foreground",
             "when": {
               "subject": "data",
               "path": [
@@ -401,14 +425,14 @@
               "id": "spacing.multiplier",
               "multiplier": 3.5
             },
-            "when": {
-              "propName": "size",
-              "equals": "sm"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
           },
           {
             "tokenId": "spacing.unit",

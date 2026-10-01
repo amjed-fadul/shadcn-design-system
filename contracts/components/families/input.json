@@ -3,7 +3,7 @@
   "id": "input",
   "source": {
     "canonicalPath": "src/components/ui/input.tsx",
-    "canonicalBlobSha": "b136f1b9dd57c87fa67a09c4f7170702586cc325",
+    "canonicalBlobSha": "5b74f7f4369a9f917a3d8b5013ceec5e38aa3e25",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/input.tsx",
     "upstreamBlobSha": "d00c3b57fca65cbc6628e654be961fbefb01d86a"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/input.tsx@b136f1b9dd57c87fa67a09c4f7170702586cc325"
+      "source": "src/components/ui/input.tsx@5b74f7f4369a9f917a3d8b5013ceec5e38aa3e25"
     },
     "tokens": {
       "kind": "token-contract",
@@ -81,7 +81,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2.5
+              "multiplier": 3
             },
             "evidenceRefs": [
               "source",
@@ -147,6 +147,13 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"

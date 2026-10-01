@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "image-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "image"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A governed native img for logos, content images and deliberate decorative imagery, with required source, alternative text and intrinsic dimensions. The V1 API exposes no arbitrary CSS, DOM spread, source sets, interactions or fallback children.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "canonical.image.source"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Image for general imagery that should retain its natural proportions or fit a definite parent box. Use AvatarImage inside Avatar for profile imagery and AvatarFallback for its loading or error fallback.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.image.source"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Provide src, alt, width and height: <Image src=\"/landscape.png\" alt=\"Mountain landscape\" width={640} height={360} />. src must contain non-whitespace text. width and height describe the image intrinsic pixel dimensions and must be positive integers; the component enforces these refinements at runtime, while the authoring contract records their numeric shape.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.image.source"
+        ]
+      }
+    },
+    {
+      "statement": "Alternative text is required. Describe meaningful content, or deliberately use alt=\"\" when nearby content already conveys its meaning or the image is purely decorative. Missing, non-string or whitespace-only alt is rejected at runtime. Image retains native img semantics and does not accept a role override.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.image.source"
+        ]
+      }
+    },
+    {
+      "statement": "Intrinsic layout is the default: a block image with max-width:100% and automatic height preserves its intrinsic ratio when the parent constrains its width. layout=\"fill\" makes the image box occupy its parent and requires that parent to have definite width and height; intrinsic width and height remain required in fill layout.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.image.source"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "fit=\"contain\" is the default and preserves the entire image within a fill box. fit=\"cover\" crops to fill the box without distorting proportions. These options do not provide a rounding, aspect-ratio or arbitrary sizing API.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.image.source"
+        ]
+      }
+    },
+    {
+      "statement": "loading=\"eager\" is the default and uses native browser image loading. Use loading=\"lazy\" for suitable offscreen content; important visible imagery should remain eager. The component has no automatic loading or broken-image fallback behavior.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.image.source"
+        ]
+      }
+    },
+    {
+      "statement": "Image pixels and orientation stay unchanged in light and dark themes and RTL. Parent layout owns placement and surrounding colors. Interactive image composition belongs to a named Button or link; Image itself remains noninteractive.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.image.source"
+        ]
+      }
+    }
+  ]
+}

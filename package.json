@@ -1,7 +1,7 @@
 {
   "name": "@adc/shadcn-design-system",
   "private": true,
-  "version": "0.0.0-release.7",
+  "version": "0.0.0-release.9",
   "type": "module",
   "engines": {
     "node": "22.18.0"

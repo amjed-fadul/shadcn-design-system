@@ -3,7 +3,7 @@
   "id": "table",
   "source": {
     "canonicalPath": "src/components/ui/table.tsx",
-    "canonicalBlobSha": "0d8a7c8801cc49dc40196330b9f3aa05f0a1614a",
+    "canonicalBlobSha": "fa93eacd05d2f83f209d7eafc51395b93312a12b",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/table.tsx",
     "upstreamBlobSha": "2fc2f8b89907719013f9c4f08ee4c0d1b435c4bb"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/table.tsx@0d8a7c8801cc49dc40196330b9f3aa05f0a1614a"
+      "source": "src/components/ui/table.tsx@fa93eacd05d2f83f209d7eafc51395b93312a12b"
     },
     "tokens": {
       "kind": "token-contract",
@@ -192,7 +192,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 4
+              "multiplier": 3
             },
             "evidenceRefs": [
               "source",
@@ -200,7 +200,7 @@
             ]
           },
           {
-            "tokenId": "font-size.sm",
+            "tokenId": "font-size.xs",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -273,7 +273,29 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
               "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -410,7 +432,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 10
+              "multiplier": 8
             },
             "evidenceRefs": [
               "source",
@@ -553,6 +575,17 @@
         "conditionalApi": [],
         "events": [],
         "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
           {
             "tokenId": "color.muted",
             "evidenceRefs": [

@@ -3,7 +3,7 @@
   "id": "progress",
   "source": {
     "canonicalPath": "src/components/ui/progress.tsx",
-    "canonicalBlobSha": "01280a205238390f320a0bd6292510135cb021d9",
+    "canonicalBlobSha": "e43eac7ea965a431e622d45f391cbd82b85e88e5",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/progress.tsx",
     "upstreamBlobSha": "e53ba770fb79db26862ddaab7c51db2c0257af7d"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/progress.tsx@01280a205238390f320a0bd6292510135cb021d9"
+      "source": "src/components/ui/progress.tsx@e43eac7ea965a431e622d45f391cbd82b85e88e5"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -49,8 +49,15 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2
+              "multiplier": 1
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
             "evidenceRefs": [
               "source",
               "tokens"

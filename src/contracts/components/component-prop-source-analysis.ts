@@ -4,7 +4,7 @@ import { resolve } from "node:path"
 
 import ts from "typescript"
 
-import type { InheritedPropOmission, LocalPropContract, SourceExpressionIdentity, StructuredPropType } from "./types"
+import type { ConditionalApiCase, ConditionalPropRefinement, InheritedPropOmission, LocalPropContract, SourceExpressionIdentity, StructuredPropType } from "./types"
 
 export type ComponentPropSourceFact = {
   name: string
@@ -14,7 +14,7 @@ export type ComponentPropSourceFact = {
 }
 
 export type ComponentPropSourceUnresolved = SourceExpressionIdentity & { reason: string }
-export type ComponentPropSourceAnalysis = { props: ComponentPropSourceFact[]; localPropNames: string[]; inheritedPropOmissionNames: string[]; unresolved: ComponentPropSourceUnresolved[] }
+export type ComponentPropSourceAnalysis = { props: ComponentPropSourceFact[]; localPropNames: string[]; inheritedPropOmissionNames: string[]; conditionalApi?: ConditionalApiCase[]; unresolved: ComponentPropSourceUnresolved[] }
 export type ComponentPropSourceAnalyzerConfig = Readonly<{
   compilerOptions: ts.CompilerOptions
   rootNames?: readonly string[]
@@ -408,6 +408,40 @@ function comparableType(type: StructuredPropType): StructuredPropType {
   return type.kind === "enum" ? { kind: "enum", values: [...type.values].sort() } : type
 }
 
+function booleanUnionConditionalApi(checker: ts.TypeChecker, type: ts.Type, parameter: ts.ParameterDeclaration, props: ComponentPropSourceFact[], localNames: Set<string>): ConditionalApiCase[] {
+  if (!type.isUnion() || type.types.length !== 2) return []
+  const branchProperty = (branch: ts.Type, name: string) => {
+    const symbol = checker.getPropertyOfType(branch, name)
+    const valueType = symbol && checker.getTypeOfSymbolAtLocation(symbol, parameter)
+    return { symbol, valueType, members: valueType ? unionMembers(valueType).filter((member) => !(member.flags & ts.TypeFlags.Undefined)) : [] }
+  }
+  const discriminator = props.find((prop) => localNames.has(prop.name) && prop.type.kind === "boolean" && type.types.every((branch) => {
+    const { members } = branchProperty(branch, prop.name)
+    return members.length === 1 && Boolean(members[0].flags & ts.TypeFlags.BooleanLiteral)
+  }) && new Set(type.types.map((branch) => checker.typeToString(branchProperty(branch, prop.name).members[0]))).size === 2)
+  if (!discriminator) return []
+  return type.types.map((branch): ConditionalApiCase => {
+    const propRefinements: ConditionalPropRefinement[] = []
+    for (const prop of props) {
+      if (prop.name === discriminator.name || !localNames.has(prop.name)) continue
+      const { symbol, valueType, members } = branchProperty(branch, prop.name)
+      if (!symbol || !valueType || members.length === 0 || members.every((member) => Boolean(member.flags & ts.TypeFlags.Never))) {
+        propRefinements.push({ propName: prop.name, availability: "unavailable", evidenceRefs: ["source"] })
+        continue
+      }
+      const required = !Boolean(symbol.flags & ts.SymbolFlags.Optional)
+      const refined = structuredType(checker, valueType)
+      if (required !== prop.required || JSON.stringify(refined) !== JSON.stringify(prop.type)) {
+        propRefinements.push({ propName: prop.name, availability: "available", required, type: refined, evidenceRefs: ["source"] })
+      }
+    }
+    return {
+      when: { propName: discriminator.name, equals: checker.typeToString(branchProperty(branch, discriminator.name).members[0]) === "true" },
+      propRefinements, eventRefinements: [], stateChannels: [], evidenceRefs: ["source"],
+    }
+  }).sort((left, right) => Number("equals" in left.when && left.when.equals) - Number("equals" in right.when && right.when.equals))
+}
+
 export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAnalyzerConfig) {
   const sharedRootNames = config.rootNames?.map(normalizedPath).sort()
   const sharedRootSet = new Set(sharedRootNames)
@@ -475,9 +509,12 @@ export function createComponentPropSourceAnalyzer(config: ComponentPropSourceAna
       }
     }).sort((left, right) => left.name.localeCompare(right.name))
     const publicPropNames = new Set(props.map((prop) => prop.name))
+    const localPropNames = sourceLocalPropNames(typeNode, checker)
+    const conditionalApi = booleanUnionConditionalApi(checker, propsType, parameter, props, localPropNames)
     return {
       props,
-      localPropNames: [...sourceLocalPropNames(typeNode, checker)].sort(),
+      localPropNames: [...localPropNames].sort(),
+      ...(conditionalApi.length ? { conditionalApi } : {}),
       inheritedPropOmissionNames: [...sourceInheritedPropOmissionNames(typeNode, checker)].filter((name) => !publicPropNames.has(name)).sort(),
       unresolved: [],
     }

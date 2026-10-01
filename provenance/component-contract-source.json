@@ -5,8 +5,8 @@
   },
   "familySource": {
     "path": "provenance/seed-components.json",
-    "blobSha": "61c27ee1711802f9c40f2409c0468d17bba2b596",
-    "familyCount": 38,
+    "blobSha": "be7526bd87222332bcf1e6a748a3c46a9641508f",
+    "familyCount": 41,
     "familyIds": [
       "accordion",
       "alert",
@@ -24,9 +24,12 @@
       "dropdown-menu",
       "empty",
       "field",
+      "icon",
+      "image",
       "input",
       "input-group",
       "label",
+      "link",
       "pagination",
       "popover",
       "progress",
@@ -52,7 +55,7 @@
     "id": "shadcn-radix-token-contract-002",
     "status": "approved",
     "path": "contracts/tokens/token-contract.json",
-    "blobSha": "b24fd6e7ec267cc0ce9381b88566f3219e941b84"
+    "blobSha": "a067db0be8c6de436b4e1b4a20fa6b9e8c953292"
   },
   "packages": {
     "react": {
@@ -75,6 +78,11 @@
     },
     "vaul": {
       "version": "1.1.2"
+    },
+    "lucide-react": {
+      "version": "1.33.0",
+      "declarationPath": "node_modules/lucide-react/dist/lucide-react.d.ts",
+      "declarationSha256": "69ef61bf5cb44106d1553fac6d8b8b107d6304d509d0f3e4cb40137653f31374"
     }
   },
   "capabilityIds": [

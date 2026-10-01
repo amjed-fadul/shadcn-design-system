@@ -33,14 +33,14 @@ function Progress({
       value={value}
       max={max}
       className={cn(
-        "relative flex h-2 w-full items-center overflow-hidden rounded-full bg-primary/20",
+        "relative flex h-1 w-full items-center overflow-hidden rounded-full bg-muted",
         className
       )}
       {...props}
     >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className="h-full bg-primary transition-[width]"
+        className="h-full bg-primary transition-[width] duration-150"
         style={{ width: `${percentage}%` }}
       />
     </ProgressPrimitive.Root>

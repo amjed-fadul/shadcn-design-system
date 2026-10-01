@@ -4,6 +4,7 @@ import { tmpdir } from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { runnerImport } from "vite"
+import { assertHistoricalArtifacts } from "./historical-artifacts.mjs"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 process.chdir(root)
@@ -33,7 +34,7 @@ function toolchain() {
   return { node, npm, platform: process.platform, arch: process.arch, tools }
 }
 function packBuild() {
-  const stage = mkdtempSync(path.join(tmpdir(), "release-007-build-"))
+  const stage = mkdtempSync(path.join(tmpdir(), "release-009-build-"))
   try {
     // The full pinned declaration and contract graph exceeds Node's default
     // 4 GB heap during a fresh package build; keep the verifier reproducible.
@@ -47,10 +48,10 @@ function packBuild() {
   } finally { rmSync(stage, { recursive: true, force: true }) }
 }
 function candidateRelease(expectedSha256) {
-  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-007.json")
+  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-009.json")
   const raw = JSON.parse(readFileSync(releasePath, "utf8"))
   const expectedProjection = projectionApi.projectExecutableContract({ componentContracts: componentAuthority.loadComponentContracts(), tokenContract: tokenAuthority.getTokenContract() })
-  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-007", requirePackageIdentity: true })
+  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-009", requirePackageIdentity: true })
   if (expectedSha256 !== undefined && release.sha256 !== expectedSha256) throw new Error("RELEASE_ANCHOR_MISMATCH")
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(identity.packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
   identity.verifyImplementationManifest(root, release.implementationInputs)
@@ -62,8 +63,10 @@ function hash512(bytes) { return createHash("sha512").update(bytes).digest("base
 
 if (!["generate", "verify", "release-verify"].includes(command)) throw new Error("Use generate --output DIR, verify --manifest FILE --tarball FILE --manifest-sha256 DIGEST, or release-verify --release-sha256 DIGEST")
 const buildToolchain = toolchain()
+assertHistoricalArtifacts(root, "before-candidate-command")
 const release = candidateRelease(command === "release-verify" ? option("--release-sha256") : undefined)
 if (command === "release-verify") {
+  assertHistoricalArtifacts(root, "after-release-verification")
   console.log(`Verified release ${release.releaseId}: ${release.sha256}`)
 } else if (command === "generate") {
   const output = path.resolve(option("--output"))
@@ -78,6 +81,7 @@ if (command === "release-verify") {
   const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`)
   writeFileSync(tarballPath, packed.bytes, { flag: "wx" })
   writeFileSync(manifestPath, manifestBytes, { flag: "wx" })
+  assertHistoricalArtifacts(root, "after-candidate-generation")
   console.log(JSON.stringify({ candidateOnly: true, tarballPath, manifestPath, manifestSha256: identity.sha256(manifestBytes), releasePayloadSha256: release.sha256, tarballSha256: manifest.tarball.sha256, integrity: manifest.tarball.integrity, packedFileCount: manifest.files.length }, null, 2))
 } else {
   const manifestPath = path.resolve(option("--manifest"))
@@ -96,5 +100,6 @@ if (command === "release-verify") {
   if (!Buffer.from(tarballBytes).equals(rebuilt.bytes)) throw new Error("FRESH_TARBALL_BYTES_MISMATCH")
   distribution.verifyDistributionManifest({ manifestBytes, expectedManifestSha256, tarballBytes, tarballFilename: path.basename(tarballPath), release, toolchain: buildToolchain, expectedInventory: rebuilt.inventory })
   candidateRelease()
+  assertHistoricalArtifacts(root, "after-candidate-verification")
   console.log(`Verified existing candidate, external manifest and fresh build: ${release.releaseId}, ${rebuilt.inventory.length} packed files. No expectations refreshed.`)
 }

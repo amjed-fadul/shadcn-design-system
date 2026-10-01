@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contractSetId": "shadcn-radix-component-contracts-001",
-  "familyCount": 38,
+  "familyCount": 41,
   "families": [
     {"familyId":"accordion","components":["Accordion","AccordionContent","AccordionItem","AccordionTrigger"],"hooks":[],"helpers":[]},
     {"familyId":"alert","components":["Alert","AlertAction","AlertDescription","AlertTitle","Status"],"hooks":[],"helpers":["alertVariants"]},
@@ -19,9 +19,12 @@
     {"familyId":"dropdown-menu","components":["DropdownMenu","DropdownMenuCheckboxItem","DropdownMenuContent","DropdownMenuGroup","DropdownMenuItem","DropdownMenuLabel","DropdownMenuPortal","DropdownMenuRadioGroup","DropdownMenuRadioItem","DropdownMenuSeparator","DropdownMenuShortcut","DropdownMenuSub","DropdownMenuSubContent","DropdownMenuSubTrigger","DropdownMenuTrigger"],"hooks":[],"helpers":[]},
     {"familyId":"empty","components":["Empty","EmptyContent","EmptyDescription","EmptyHeader","EmptyMedia","EmptyTitle"],"hooks":[],"helpers":[]},
     {"familyId":"field","components":["Field","FieldContent","FieldDescription","FieldError","FieldGroup","FieldLabel","FieldLegend","FieldSeparator","FieldSet","FieldTitle","Form"],"hooks":[],"helpers":[]},
+    {"familyId":"icon","components":["Icon"],"hooks":[],"helpers":[]},
+    {"familyId":"image","components":["Image"],"hooks":[],"helpers":[]},
     {"familyId":"input","components":["Input"],"hooks":[],"helpers":[]},
     {"familyId":"input-group","components":["InputGroup","InputGroupAddon","InputGroupButton","InputGroupInput","InputGroupText","InputGroupTextarea"],"hooks":[],"helpers":[]},
     {"familyId":"label","components":["Label"],"hooks":[],"helpers":[]},
+    {"familyId":"link","components":["Link"],"hooks":[],"helpers":[]},
     {"familyId":"pagination","components":["Pagination","PaginationContent","PaginationEllipsis","PaginationItem","PaginationLink","PaginationNext","PaginationPrevious"],"hooks":[],"helpers":[]},
     {"familyId":"popover","components":["Popover","PopoverAnchor","PopoverContent","PopoverDescription","PopoverHeader","PopoverTitle","PopoverTrigger"],"hooks":[],"helpers":[]},
     {"familyId":"progress","components":["Progress"],"hooks":[],"helpers":[]},

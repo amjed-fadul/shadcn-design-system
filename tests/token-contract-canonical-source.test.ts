@@ -158,13 +158,13 @@ describe("canonical token contract", () => {
       value: { kind: "literal", value: root.get("--radius") },
     })
     const derived = new Map([
-      ["sm", "calc(var(--radius) * 0.6)"],
-      ["md", "calc(var(--radius) * 0.8)"],
+      ["sm", "calc(var(--radius) - 0.25rem)"],
+      ["md", "calc(var(--radius) - 0.125rem)"],
       ["lg", "var(--radius)"],
-      ["xl", "calc(var(--radius) * 1.4)"],
-      ["2xl", "calc(var(--radius) * 1.8)"],
-      ["3xl", "calc(var(--radius) * 2.2)"],
-      ["4xl", "calc(var(--radius) * 2.6)"],
+      ["xl", "calc(var(--radius) + 0.25rem)"],
+      ["2xl", "calc(var(--radius) + 0.5rem)"],
+      ["3xl", "calc(var(--radius) + 0.75rem)"],
+      ["4xl", "calc(var(--radius) + 1rem)"],
     ])
     for (const [name, expression] of derived) {
       const candidate = token(contract, `radius.${name}`)

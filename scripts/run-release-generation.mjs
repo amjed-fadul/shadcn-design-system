@@ -5,25 +5,11 @@ import { tmpdir } from "node:os"
 import path from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
 import { runnerImport } from "vite"
+import { assertHistoricalArtifacts } from "./historical-artifacts.mjs"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const releaseId = "shadcn-radix-release-007"
+const releaseId = "shadcn-radix-release-009"
 const releasePath = path.join(root, `provenance/releases/${releaseId}.json`)
-const preservedReleaseHashes = {
-  "001": "70795494166657dfcdc74a57626b5b9501621ffa8aaa11a17216a1cf72bbd6a9",
-  "002": "f63207dedd4d8e3c8656db50583660f5ab16174051c4ae847b3b6ddc1954f3ae",
-  "003": "2aa266790b3e74395750e0f6e703238f2e29192f46f4237094fae212263600eb",
-  "004": "bd90164eb8065a2e5c8a3209d9d831e85a8cf6b1134b44011e4921f57ab3d797",
-  "005": "a8f0be8d622a8e9f773af522564ec2398860cb7fe6ff49e4c057f65f81cbff88",
-  "006": "6fbdf4a98a7d0e5667e073857cd9beb3061b4d71b141dc38248008f37b8e7b43",
-}
-function assertHistoricalReleases() {
-  for (const [number, expected] of Object.entries(preservedReleaseHashes)) {
-    const historicalPath = path.join(root, `provenance/releases/shadcn-radix-release-${number}.json`)
-    const actual = createHash("sha256").update(readFileSync(historicalPath)).digest("hex")
-    if (actual !== expected) throw new Error(`HISTORICAL_RELEASE_CHANGED: ${number}`)
-  }
-}
 const r3Path = path.join(root, "provenance/releases/shadcn-radix-release-003.json")
 const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
 const r3TarballPath = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0-release.3.tgz")
@@ -65,17 +51,17 @@ function assertR3Artifact(identity, phase) {
 }
 
 if (!existsSync(r3Path)) throw new Error("Accepted R3 release record is required")
-assertHistoricalReleases()
+assertHistoricalArtifacts(root, "before-release-generation")
 const r3Before = await inspectR3Artifact("before")
 assertR3Artifact(r3Before, "before")
 const packageIdentity = inputs.packageIdentity(root)
-if (packageIdentity.version !== "0.0.0-release.7") throw new Error("R7 package version must be 0.0.0-release.7")
+if (packageIdentity.version !== "0.0.0-release.9") throw new Error("R9 package version must be 0.0.0-release.9")
 const release = releaseApi.createExecutableRelease({
   componentContracts: componentAuthority.loadComponentContracts(),
   tokenContract: tokenAuthority.getTokenContract(),
 }, releaseId, { packageIdentity, implementationInputs: inputs.createImplementationManifest(root, { generatedReleasePath: path.relative(root, releasePath) }) })
 writeFileSync(releasePath, `${JSON.stringify(release, null, 2)}\n`, "utf8")
-assertHistoricalReleases()
+assertHistoricalArtifacts(root, "after-release-generation")
 const r3After = await inspectR3Artifact("after")
 assertR3Artifact(r3After, "after")
 if (r3Before.tarballSha256 !== r3After.tarballSha256 || r3Before.payloadSha256 !== r3After.payloadSha256) throw new Error("R3_ARTIFACT_CHANGED_DURING_GENERATION")

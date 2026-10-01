@@ -3,7 +3,7 @@
   "id": "badge",
   "source": {
     "canonicalPath": "src/components/ui/badge.tsx",
-    "canonicalBlobSha": "5428b137d2d275b7cf801ced6e45f8b3a26e5ab9",
+    "canonicalBlobSha": "3cc274c57cc5fcd0d5c22d89814f34f3f7e194ae",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/badge.tsx",
     "upstreamBlobSha": "ccca32ca0046ed2b8da4057d4d7c6ef3dc307ffb"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/badge.tsx@5428b137d2d275b7cf801ced6e45f8b3a26e5ab9"
+      "source": "src/components/ui/badge.tsx@3cc274c57cc5fcd0d5c22d89814f34f3f7e194ae"
     },
     "tokens": {
       "kind": "token-contract",
@@ -156,6 +156,13 @@
             ]
           },
           {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
@@ -226,7 +233,7 @@
             ]
           },
           {
-            "tokenId": "color.primary",
+            "tokenId": "color.secondary",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -237,7 +244,18 @@
             }
           },
           {
-            "tokenId": "color.primary-foreground",
+            "tokenId": "color.secondary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "color.muted",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -270,6 +288,17 @@
             }
           },
           {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "secondary"
+            }
+          },
+          {
             "tokenId": "color.destructive",
             "evidenceRefs": [
               "source",
@@ -281,7 +310,7 @@
             }
           },
           {
-            "tokenId": "color.background",
+            "tokenId": "color.foreground",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -315,25 +344,25 @@
           },
           {
             "tokenId": "color.accent",
-            "when": {
-              "propName": "variant",
-              "equals": "outline"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
           },
           {
             "tokenId": "color.accent-foreground",
-            "when": {
-              "propName": "variant",
-              "equals": "outline"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "outline"
+            }
           },
           {
             "tokenId": "color.accent",

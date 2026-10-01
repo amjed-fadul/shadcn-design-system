@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "id": "link",
+  "source": {
+    "canonicalPath": "src/components/ui/link.tsx",
+    "canonicalBlobSha": "cc20e597bc92b1a1f435b17ab15655c644213d51",
+    "implementationKind": "repo-native"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/link.tsx@cc20e597bc92b1a1f435b17ab15655c644213d51"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-002"
+    },
+    "runtime": {
+      "kind": "runtime-test",
+      "source": "tests/link-runtime.test.tsx"
+    }
+  },
+  "exports": [
+    {
+      "name": "Link",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "href",
+            "required": true,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "children",
+            "required": true,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ReactNode"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "newTab",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": false,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "a"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "link",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source",
+                "runtime"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "native navigation semantics",
+            "owner": "component",
+            "mechanism": "A native anchor receives the required non-empty href. The browser owns keyboard focus and Enter activation; no role override, tabIndex, event interception or disabled semantics are exposed.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "accessible link name",
+            "owner": "author",
+            "mechanism": "Required children supply the native accessible name. Runtime rejects plainly empty content (empty arrays, null, booleans and whitespace-only strings); authors must supply a meaningful accessible name for opaque child elements.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "explicit new-tab behavior",
+            "owner": "component",
+            "mechanism": "newTab=false preserves normal native navigation. newTab=true writes target=_blank and rel=noopener; authors disclose the new tab in child content when helpful. No destination origin or scheme is inferred.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "visible link and keyboard focus",
+            "owner": "component",
+            "mechanism": "The anchor is permanently underlined with semantic primary text and a full semantic ring plus background offset on focus-visible. Font and inline wrapping inherit surrounding prose, including RTL.",
+            "evidenceRefs": [
+              "source",
+              "tokens",
+              "runtime"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": [],
+        "conditionalApi": []
+      }
+    }
+  ],
+  "unresolved": []
+}

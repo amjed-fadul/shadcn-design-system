@@ -3,7 +3,7 @@
   "id": "breadcrumb",
   "source": {
     "canonicalPath": "src/components/ui/breadcrumb.tsx",
-    "canonicalBlobSha": "b07813ec1988e702cf9eeb81da78409b2feb2c6b",
+    "canonicalBlobSha": "0fba6b36e2fbe4161cc1790a15d5298cf5b5f57f",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/breadcrumb.tsx",
     "upstreamBlobSha": "7bcdf3a21029aadfc411e63a34a748288355b1ee"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/breadcrumb.tsx@b07813ec1988e702cf9eeb81da78409b2feb2c6b"
+      "source": "src/components/ui/breadcrumb.tsx@0fba6b36e2fbe4161cc1790a15d5298cf5b5f57f"
     },
     "tokens": {
       "kind": "token-contract",
@@ -117,7 +117,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 2
             },
             "evidenceRefs": [
               "source",
@@ -292,7 +292,35 @@
         "events": [],
         "tokenDependencies": [
           {
+            "tokenId": "radius.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"

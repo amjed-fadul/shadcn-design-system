@@ -69,7 +69,7 @@ function sourceErrors(contract: TokenContract): string[] {
   if (background.value.kind !== "modes" || background.value.values.light !== root.get("--background") || background.value.values.dark !== dark.get("--background")) {
     errors.push("color.background no longer reconciles to canonical light/dark CSS.")
   }
-  if (radius.value.kind !== "derived" || radius.value.expression !== "calc(var(--radius) * 0.6)" || radius.value.dependencies.join(",") !== "radius.base") {
+  if (radius.value.kind !== "derived" || radius.value.expression !== "calc(var(--radius) - 0.25rem)" || radius.value.dependencies.join(",") !== "radius.base") {
     errors.push("radius.sm no longer reconciles to the canonical radius expression.")
   }
   if (fontSize.value.kind !== "typography-size" || fontSize.value.fontSize !== theme.get("--text-sm") || fontSize.value.lineHeight !== theme.get("--text-sm--line-height")) {
@@ -121,7 +121,7 @@ describe("Phase 2 token contract mutation resistance", () => {
     const contract = cloneContract()
     token(contract, "radius.sm").value = {
       kind: "derived",
-      expression: "calc(var(--radius) * 0.6)",
+      expression: "calc(var(--radius) - 0.25rem)",
       dependencies: ["radius.nonexistent"],
     }
 

@@ -85,13 +85,13 @@ type JsxDataAttribute = { name: string; value?: string; prop?: string; condition
 export type JsxDerivedSpread = { source: "prop" | "state"; name: string }
 export type JsxImportBinding = { importedName: string; localName: string; moduleSpecifier: string }
 export type JsxRenderRepetition = { kind: "map"; source: "prop" | "state"; name: string }
-export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; importBinding?: JsxImportBinding; resolvedHost?: { tag: string; kind: "intrinsic" | "component" | "member" | "unresolved"; importBinding?: JsxImportBinding }; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition; repetition?: JsxRenderRepetition }
+export type JsxRenderNode = { tag: string; kind: "intrinsic" | "component" | "member" | "fragment" | "unresolved"; importBinding?: JsxImportBinding; resolvedHost?: { tag: string; kind: "intrinsic" | "component" | "member" | "unresolved"; importBinding?: JsxImportBinding }; resolvedHosts?: JsxHost[]; portal: boolean; receivesPublicProps: boolean; dataAttributes: JsxDataAttribute[]; derivedSpreads: JsxDerivedSpread[]; children: Array<JsxRenderNode & { when?: JsxRenderCondition }>; when?: JsxRenderCondition; repetition?: JsxRenderRepetition }
 export type JsxRenderAlternative = ({ when: JsxRenderCondition; otherwise?: never } | { otherwise: true; when?: never }) & { root: JsxRenderNode }
 export type JsxSourceUnresolvedFinding = SourceExpressionIdentity & { reason: string }
 export type JsxRenderTree = { root?: JsxRenderNode; alternatives?: JsxRenderAlternative[]; absent?: true; unresolved: string[]; unresolvedFindings: JsxSourceUnresolvedFinding[] }
 type JsxHost = { tag: string; kind: Exclude<JsxRenderNode["kind"], "fragment">; importBinding?: JsxImportBinding }
 type JsxBranch<T> = { value: T; when?: JsxRenderCondition; otherwise?: true; otherwiseFor?: JsxRenderCondition }
-type JsxScope = { aliases: Map<string, JsxBranch<JsxRenderNode[]>[]>; dynamicChildren: Set<string>; hostAliases: Map<string, JsxBranch<JsxHost>[]>; derivedSpreads: Map<string, JsxDerivedSpread>; importBindings: Map<string, JsxImportBinding>; stateBindings: Set<string>; contextValues: ContextRenderSource["values"]; contextBindings: ContextRenderSource["bindings"]; contextActive: boolean }
+type JsxScope = { aliases: Map<string, JsxBranch<JsxRenderNode[]>[]>; dynamicChildren: Set<string>; hostAliases: Map<string, JsxBranch<JsxHost>[]>; registryHosts: Map<string, JsxHost[]>; closedPublicProps: boolean; derivedSpreads: Map<string, JsxDerivedSpread>; importBindings: Map<string, JsxImportBinding>; stateBindings: Set<string>; contextValues: ContextRenderSource["values"]; contextBindings: ContextRenderSource["bindings"]; contextActive: boolean }
 type JsxUnresolved = { messages: string[]; findings: JsxSourceUnresolvedFinding[] }
 
 function recordUnresolved(unresolved: JsxUnresolved, node: ts.Node, file: ts.SourceFile, reason: string) {
@@ -307,7 +307,9 @@ function isAriaAttributeBag(expression: ts.Expression): boolean {
 }
 
 function jsxAttributes(attributes: ts.JsxAttributes, file: ts.SourceFile, publicBindings: Set<string>, unresolved: JsxUnresolved, scope: JsxScope) {
-  let receivesPublicProps = false
+  let receivesPublicProps = scope.closedPublicProps && attributes.properties.some((attribute) => ts.isJsxAttribute(attribute)
+    && attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression
+    && ts.isIdentifier(attribute.initializer.expression) && publicBindings.has(attribute.initializer.expression.text))
   const dataAttributes: JsxRenderNode["dataAttributes"] = []
   const derivedSpreads: JsxDerivedSpread[] = []
   if (scope.contextActive) {
@@ -440,6 +442,87 @@ function aliasHostBranches(expression: ts.Expression, file: ts.SourceFile, unres
   }
   const host = directAliasHost(expression, file, scope)
   return host ? [branch(host)] : undefined
+}
+
+/** Resolve a finite private registry without authorizing an opaque dynamic host. */
+function finiteRegistryHosts(expression: ts.ElementAccessExpression, file: ts.SourceFile, scope: JsxScope): JsxHost[] | undefined {
+  if (!ts.isIdentifier(expression.expression) || !expression.argumentExpression || !ts.isIdentifier(expression.argumentExpression)) return undefined
+  const registryName = expression.expression.text
+  let declaration: ts.VariableDeclaration | undefined
+  // A nearer binding shadows a module registry, including parameters.
+  for (let ancestor: ts.Node | undefined = expression.parent; ancestor; ancestor = ancestor.parent) {
+    if (ts.isFunctionLike(ancestor) && ancestor.parameters.some((parameter) => ts.isIdentifier(parameter.name) && parameter.name.text === registryName)) return undefined
+    if (!ts.isBlock(ancestor) && !ts.isSourceFile(ancestor)) continue
+    const candidates = ancestor.statements.filter(ts.isVariableStatement).flatMap((statement) => statement.declarationList.declarations)
+      .filter((candidate) => ts.isIdentifier(candidate.name) && candidate.name.text === registryName)
+    if (candidates.length) {
+      if (candidates.length !== 1) return undefined
+      declaration = candidates[0]
+      break
+    }
+  }
+  if (!declaration?.initializer || !ts.isVariableDeclarationList(declaration.parent) || !(declaration.parent.flags & ts.NodeFlags.Const)) return undefined
+  const statement = declaration.parent.parent
+  // Module-private registries bind their imported values outside component
+  // scopes. Local/shadowed registries and exported mutable objects stay opaque.
+  if (!ts.isVariableStatement(statement) || !ts.isSourceFile(statement.parent) || statement.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) return undefined
+  let escaped = false
+  const registryUse = (node: ts.Node) => {
+    if (ts.isIdentifier(node) && node.text === registryName && !(ts.isVariableDeclaration(node.parent) && node.parent.name === node && node.getStart(file) === declaration!.name.getStart(file))) {
+      const parent = node.parent
+      if (ts.isTypeQueryNode(parent)) return
+      if (ts.isElementAccessExpression(parent) && parent.expression === node) {
+        // Additional reads can leak a retrieved component object for mutation.
+        // Prove this private registry is used only by the selected host lookup.
+        if (parent.getStart(file) !== expression.getStart(file) || parent.getEnd() !== expression.getEnd()) escaped = true
+        let target: ts.Node = parent
+        while (ts.isParenthesizedExpression(target.parent) || ts.isAsExpression(target.parent) || ts.isTypeAssertionExpression(target.parent) || ts.isNonNullExpression(target.parent)
+          || ts.isArrayLiteralExpression(target.parent) || ts.isObjectLiteralExpression(target.parent) || ts.isSpreadElement(target.parent) || ts.isSpreadAssignment(target.parent)
+          || ts.isPropertyAssignment(target.parent) && target.parent.initializer === target) target = target.parent
+        const owner = target.parent
+        if (ts.isBinaryExpression(owner) && owner.left === target && owner.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && owner.operatorToken.kind <= ts.SyntaxKind.LastAssignment) escaped = true
+        else if ((ts.isForOfStatement(owner) || ts.isForInStatement(owner)) && owner.initializer === target) escaped = true
+        else if (ts.isDeleteExpression(owner) || ts.isPrefixUnaryExpression(owner) || ts.isPostfixUnaryExpression(owner)) escaped = true
+      } else if (!(ts.isCallExpression(parent) && parent.arguments[0] === node && parent.expression.getText(file) === "Object.hasOwn")) escaped = true
+    }
+    ts.forEachChild(node, registryUse)
+  }
+  registryUse(file)
+  if (escaped) return undefined
+  const assertion = declaration.initializer
+  if (!ts.isAsExpression(assertion) || !ts.isTypeReferenceNode(assertion.type) || assertion.type.typeName.getText(file) !== "const" || !ts.isObjectLiteralExpression(assertion.expression)) return undefined
+  const hosts: JsxHost[] = []
+  const names = new Set<string>()
+  for (const member of assertion.expression.properties) {
+    if (!ts.isPropertyAssignment(member) || !ts.isIdentifier(member.initializer)) return undefined
+    const name = propertyName(member.name)
+    const binding = scope.importBindings.get(member.initializer.text)
+    if (!name || names.has(name) || !binding || binding.importedName === "*" || binding.importedName === "default") return undefined
+    names.add(name)
+    hosts.push({ tag: member.initializer.text, kind: "component", importBinding: binding })
+  }
+  return hosts.length ? hosts : undefined
+}
+
+function safeFiniteHostAlias(declaration: ts.VariableDeclaration, owner: SourceFunction): boolean {
+  if (!ts.isIdentifier(declaration.name) || !ts.isVariableDeclarationList(declaration.parent) || !(declaration.parent.flags & ts.NodeFlags.Const)) return false
+  const name = declaration.name.text
+  const hasName = (binding: ts.BindingName | undefined): boolean => Boolean(binding && (ts.isIdentifier(binding)
+    ? binding.text === name : binding.elements.some((element) => !ts.isOmittedExpression(element) && hasName(element.name))))
+  let count = 0
+  let escapes = false
+  const visit = (node: ts.Node) => {
+    if ((ts.isVariableDeclaration(node) || ts.isParameter(node) || ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) || ts.isClassDeclaration(node)) && hasName(node.name)) count++
+    if (ts.isIdentifier(node) && node.text === name) {
+      const parent = node.parent
+      const ownDeclaration = ts.isVariableDeclaration(parent) && parent.name === node && node.getStart() === declaration.name.getStart()
+      const jsxTag = (ts.isJsxOpeningElement(parent) || ts.isJsxSelfClosingElement(parent) || ts.isJsxClosingElement(parent)) && parent.tagName === node
+      if (!ownDeclaration && !jsxTag && !ts.isTypeQueryNode(parent)) escapes = true
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(owner)
+  return count === 1 && !escapes
 }
 
 function mappedJsxChildren(expression: ts.CallExpression, file: ts.SourceFile, unresolved: JsxUnresolved, publicBindings: Set<string>, scope: JsxScope): JsxRenderNode[] | undefined {
@@ -587,6 +670,7 @@ function jsxNodeBranches(node: ts.JsxElement | ts.JsxSelfClosingElement | ts.Jsx
       ...name,
       ...(importBinding ? { importBinding } : {}),
       ...(resolvedHost ? { resolvedHost } : {}),
+      ...(scope.registryHosts.has(name.tag) ? { resolvedHosts: scope.registryHosts.get(name.tag)! } : {}),
       portal: effectiveTag === "Portal" || effectiveTag.endsWith(".Portal") || effectiveTag.endsWith("Portal"),
       ...attributes,
       children: child.value,
@@ -610,6 +694,14 @@ function returnedJsx(functionDeclaration: SourceFunction, file: ts.SourceFile, p
   if (!functionDeclaration.body || !ts.isBlock(functionDeclaration.body)) return results
   for (const statement of functionDeclaration.body.statements) {
     if (ts.isIfStatement(statement)) {
+      // Imperative validation that throws cannot select a returned JSX branch.
+      let hasReturn = false
+      const visitReturn = (node: ts.Node) => {
+        if (ts.isReturnStatement(node)) hasReturn = true
+        else if (!ts.isFunctionLike(node)) ts.forEachChild(node, visitReturn)
+      }
+      visitReturn(statement)
+      if (!hasReturn) continue
       const condition = recognizedTruthinessCondition(statement.expression, publicBindings, stateBindings) ?? derivedCondition(statement.expression, publicBindings, stateBindings)
       if (!condition) {
         recordUnresolved(unresolved, statement.expression, file, `Unsupported return condition: ${statement.expression.getText(file)}`)
@@ -641,12 +733,15 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
     if (bindings && ts.isNamespaceImport(bindings)) importBindings.set(bindings.name.text, { importedName: "*", localName: bindings.name.text, moduleSpecifier })
     if (bindings && ts.isNamedImports(bindings)) for (const element of bindings.elements) importBindings.set(element.name.text, { importedName: element.propertyName?.text ?? element.name.text, localName: element.name.text, moduleSpecifier })
   }
-  const scope: JsxScope = { aliases: new Map(), dynamicChildren: new Set(), hostAliases: new Map(), derivedSpreads: new Map(), importBindings, stateBindings: new Set(), contextValues: contextSource.values, contextBindings: contextSource.bindings, contextActive: contextSource.context.length > 0 && contextSource.unresolved.length === 0 }
+  const parameter = functionDeclaration.parameters[0]
+  const closedPublicProps = Boolean(parameter && ts.isObjectBindingPattern(parameter.name) && !parameter.name.elements.some((element) => element.dotDotDotToken))
+  const scope: JsxScope = { aliases: new Map(), dynamicChildren: new Set(), hostAliases: new Map(), registryHosts: new Map(), closedPublicProps, derivedSpreads: new Map(), importBindings, stateBindings: new Set(), contextValues: contextSource.values, contextBindings: contextSource.bindings, contextActive: contextSource.context.length > 0 && contextSource.unresolved.length === 0 }
   const recognizedStateBinding = (declaration: ts.VariableDeclaration) => {
     if (!ts.isObjectBindingPattern(declaration.name) || !declaration.initializer || !conventions.isStateBinding?.(declaration.initializer)) return
     for (const element of declaration.name.elements) if (ts.isIdentifier(element.name)) scope.stateBindings.add(element.name.text)
   }
   const jsxHostAliases = new Set<string>()
+  const blockedRegistryAliases = new Set<string>()
   const collectHostAliases = (node: ts.Node) => {
     if ((ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) && ts.isIdentifier(node.tagName)) jsxHostAliases.add(node.tagName.text)
     if (!ts.isFunctionLike(node) || node === functionDeclaration) ts.forEachChild(node, collectHostAliases)
@@ -670,7 +765,18 @@ function aliases(functionDeclaration: SourceFunction, file: ts.SourceFile, publi
         scope.dynamicChildren.add(node.name.text)
         scope.stateBindings.add(node.name.text)
       }
-      else if (jsxHostAliases.has(node.name.text) && canBeHost(node.initializer)) {
+      else if (jsxHostAliases.has(node.name.text) && ts.isElementAccessExpression(node.initializer)) {
+        const hosts = safeFiniteHostAlias(node, functionDeclaration)
+          ? finiteRegistryHosts(node.initializer, file, scope) : undefined
+        if (hosts) scope.registryHosts.set(node.name.text, hosts)
+        else {
+          blockedRegistryAliases.add(node.name.text)
+          scope.registryHosts.delete(node.name.text)
+          scope.hostAliases.delete(node.name.text)
+          recordUnresolved(unresolved, node.initializer, file, `Unsupported finite JSX host registry: ${node.initializer.getText(file)}`)
+        }
+      }
+      else if (jsxHostAliases.has(node.name.text) && !blockedRegistryAliases.has(node.name.text) && canBeHost(node.initializer)) {
         const hosts = aliasHostBranches(node.initializer, file, unresolved, publicBindings, scope)
         if (hosts) scope.hostAliases.set(node.name.text, hosts)
       }
@@ -753,7 +859,8 @@ export type RenderSourceAnalysisConventions = Readonly<{
 
 function normalizedRenderName(name: string) { return name.replace(/[^a-z0-9]/gi, "").toLowerCase() }
 
-function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNode, conventions: RenderSourceAnalysisConventions) {
+function renderHostMatches(host: ContractRenderNode["host"], source: JsxRenderNode, conventions: RenderSourceAnalysisConventions): boolean {
+  if (source.resolvedHosts) return source.resolvedHosts.length > 0 && source.resolvedHosts.every((candidate) => renderHostMatches(host, { ...source, resolvedHosts: undefined, resolvedHost: candidate }, conventions))
   const resolved = source.resolvedHost ?? source
   const normalizeRenderName = conventions.normalizeRenderName ?? normalizedRenderName
   if (host.kind === "intrinsic") return resolved.kind === "intrinsic" && resolved.tag === host.tag

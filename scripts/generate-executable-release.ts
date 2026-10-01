@@ -6,8 +6,10 @@ import { getTokenContract } from "../src/contracts/tokens/contract"
 import { createExecutableRelease, EXECUTABLE_RELEASE_PATH } from "../src/validator/release"
 
 import { createImplementationManifest, packageIdentity } from "./release-inputs"
+import { assertHistoricalArtifacts } from "./historical-artifacts.mjs"
 
 const repositoryRoot = process.cwd()
+assertHistoricalArtifacts(repositoryRoot, "before-release-generation")
 const release = createExecutableRelease({
   componentContracts: loadComponentContracts(),
   tokenContract: getTokenContract(),
@@ -20,3 +22,4 @@ if (existsSync(releasePath)) {
 }
 mkdirSync(dirname(releasePath), { recursive: true })
 writeFileSync(releasePath, `${JSON.stringify(release, null, 2)}\n`, "utf8")
+assertHistoricalArtifacts(repositoryRoot, "after-release-generation")

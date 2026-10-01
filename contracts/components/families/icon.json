@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "id": "icon",
+  "source": {
+    "canonicalPath": "src/components/ui/icon.tsx",
+    "canonicalBlobSha": "0c9843ed6806b924490cc593017b118601f2b8ca",
+    "implementationKind": "repo-native"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/icon.tsx@0c9843ed6806b924490cc593017b118601f2b8ca"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-002"
+    },
+    "runtime": {
+      "kind": "runtime-test",
+      "source": "tests/icon-runtime.test.tsx"
+    }
+  },
+  "exports": [
+    {
+      "name": "Icon",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "name",
+            "required": true,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "alert-circle",
+                "arrow-end",
+                "arrow-left",
+                "arrow-right",
+                "arrow-start",
+                "check",
+                "check-circle",
+                "chevron-down",
+                "chevron-end",
+                "chevron-left",
+                "chevron-right",
+                "chevron-start",
+                "chevron-up",
+                "circle",
+                "info",
+                "loader",
+                "more-horizontal",
+                "panel-left",
+                "search",
+                "x"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "size",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "default",
+                "lg",
+                "sm"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ],
+            "default": "default"
+          },
+          {
+            "name": "color",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "destructive",
+                "foreground",
+                "inherit",
+                "muted-foreground",
+                "primary"
+              ]
+            },
+            "default": "inherit",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "decorative",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "evidenceRefs": [
+              "source"
+            ],
+            "default": true
+          },
+          {
+            "name": "label",
+            "required": false,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "placement",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "inline-end",
+                "inline-start"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [],
+        "slots": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [
+          {
+            "when": {
+              "propName": "decorative",
+              "equals": false
+            },
+            "propRefinements": [
+              {
+                "propName": "label",
+                "availability": "available",
+                "required": true,
+                "type": {
+                  "kind": "string"
+                },
+                "evidenceRefs": [
+                  "source"
+                ]
+              }
+            ],
+            "eventRefinements": [],
+            "stateChannels": [],
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "when": {
+              "propName": "decorative",
+              "equals": true
+            },
+            "propRefinements": [
+              {
+                "propName": "label",
+                "availability": "unavailable",
+                "evidenceRefs": [
+                  "source"
+                ]
+              }
+            ],
+            "eventRefinements": [],
+            "stateChannels": [],
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 3.5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "sm"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "default"
+            }
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 5
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "size",
+              "equals": "lg"
+            }
+          },
+          {
+            "tokenId": "color.foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "color",
+              "equals": "foreground"
+            }
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "color",
+              "equals": "primary"
+            }
+          },
+          {
+            "tokenId": "color.muted-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "color",
+              "equals": "muted-foreground"
+            }
+          },
+          {
+            "tokenId": "color.destructive",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "color",
+              "equals": "destructive"
+            }
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "host",
+          "publicPropsTargetNodeId": "host",
+          "nodes": [
+            {
+              "id": "host",
+              "host": {
+                "kind": "inherited-interface",
+                "interfaceId": "html.svg"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "icon",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-icon",
+                  "source": "prop",
+                  "prop": "placement",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [],
+              "evidenceRefs": [
+                "source",
+                "runtime"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "decorative semantics",
+            "owner": "component",
+            "mechanism": "Decorative is true by default: aria-hidden=true removes the SVG from the accessibility tree, and role and aria-label are omitted.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "meaningful accessible name",
+            "owner": "author",
+            "mechanism": "Use decorative=false with a non-empty label. Icon owns role=img and aria-label and rejects missing or whitespace-only labels at runtime.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "keyboard and action semantics",
+            "owner": "component",
+            "mechanism": "The SVG has focusable=false and is not interactive. Name an icon-only Button using Button aria-label, and keep its Icon decorative.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "direction policy",
+            "owner": "component",
+            "mechanism": "arrow-start, arrow-end, chevron-start and chevron-end rotate 180 degrees under RTL. Physical arrow-left, arrow-right, chevron-left, chevron-right, chevron-up and chevron-down do not mirror; panel-left is also physical.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          }
+        ],
+        "inheritedPropDefaults": []
+      }
+    }
+  ],
+  "unresolved": []
+}

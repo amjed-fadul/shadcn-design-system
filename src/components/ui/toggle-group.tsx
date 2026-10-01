@@ -87,6 +87,8 @@ function ToggleGroupItem({
           variant: resolvedVariant,
           size: resolvedSize,
         }),
+        "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary data-[state=on]:hover:text-primary-foreground",
+        "focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className
       )}
       {...props}

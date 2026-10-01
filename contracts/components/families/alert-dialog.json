@@ -3,7 +3,7 @@
   "id": "alert-dialog",
   "source": {
     "canonicalPath": "src/components/ui/alert-dialog.tsx",
-    "canonicalBlobSha": "113d17d9d1e0d1b2815f1e2f73900cf7066c09cc",
+    "canonicalBlobSha": "533bb1c8d69c2ce7c948cb30d42571e3b4e78522",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/alert-dialog.tsx",
     "upstreamBlobSha": "9726776cda43f26e624e88a3dc54ec22eaefdcb3"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/alert-dialog.tsx@113d17d9d1e0d1b2815f1e2f73900cf7066c09cc"
+      "source": "src/components/ui/alert-dialog.tsx@533bb1c8d69c2ce7c948cb30d42571e3b4e78522"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -334,7 +334,9 @@
               "kind": "typescript",
               "typeText": "ComponentProps<typeof AlertDialogPrimitive.Portal>[\"container\"]"
             },
-            "evidenceRefs": ["source"]
+            "evidenceRefs": [
+              "source"
+            ]
           },
           {
             "name": "size",
@@ -406,25 +408,21 @@
             ]
           },
           {
-            "tokenId": "color.background",
+            "tokenId": "color.popover",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 6
-            },
+            "tokenId": "color.popover-foreground",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "shadow.lg",
+            "tokenId": "shadow.md",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -544,7 +542,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 2
             },
             "evidenceRefs": [
               "source",
@@ -816,7 +814,7 @@
             ]
           },
           {
-            "tokenId": "font-weight.semibold",
+            "tokenId": "font-weight.medium",
             "evidenceRefs": [
               "source",
               "tokens"

@@ -3,7 +3,7 @@
   "id": "field",
   "source": {
     "canonicalPath": "src/components/ui/field.tsx",
-    "canonicalBlobSha": "93e0f2b2e0bbb68ba2eda5560238e322ce8bc291",
+    "canonicalBlobSha": "660e4074b16d36a02ef269c6a2cf4ad0a5ea7370",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/field.tsx",
     "upstreamBlobSha": "c927c173514fa52c6a073757bea01fef08dbb5b6"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/field.tsx@93e0f2b2e0bbb68ba2eda5560238e322ce8bc291"
+      "source": "src/components/ui/field.tsx@660e4074b16d36a02ef269c6a2cf4ad0a5ea7370"
     },
     "tokens": {
       "kind": "token-contract",
@@ -385,7 +385,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 5
+              "multiplier": 4
             },
             "evidenceRefs": [
               "source",
@@ -720,14 +720,7 @@
             ]
           },
           {
-            "tokenId": "color.primary",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "radius.lg",
+            "tokenId": "color.input",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -741,7 +734,21 @@
             ]
           },
           {
+            "tokenId": "radius.lg",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -923,7 +930,7 @@
         "events": [],
         "tokenDependencies": [
           {
-            "tokenId": "font-size.sm",
+            "tokenId": "font-size.xs",
             "evidenceRefs": [
               "source",
               "tokens"

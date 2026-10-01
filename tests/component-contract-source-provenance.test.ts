@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process"
+import { createHash } from "node:crypto"
 import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { join } from "node:path"
@@ -11,8 +12,8 @@ const provenancePath = join(repoRoot, "provenance/component-contract-source.json
 type SeedComponent = {
   canonicalPath: string
   canonicalBlobSha: string
-  upstreamPath: string
-  upstreamBlobSha: string
+  upstreamPath?: string
+  upstreamBlobSha?: string
   implementationKind: string
 }
 
@@ -39,7 +40,7 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
       familySource: {
         path: "provenance/seed-components.json",
         blobSha: gitBlobSha("provenance/seed-components.json"),
-        familyCount: 38,
+        familyCount: 41,
         familyIds: expectedFamilyIds,
       },
       tokenContract: {
@@ -56,11 +57,12 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
         "class-variance-authority": { version: "0.7.1" },
         cmdk: { version: "1.1.1" },
         vaul: { version: "1.1.2" },
+        "lucide-react": { version: "1.33.0" },
       },
     })
 
     expect(familyIds).toEqual(expectedFamilyIds)
-    expect(familyIds).toHaveLength(38)
+    expect(familyIds).toHaveLength(41)
     expect(provenance.familySource.familyIds).toEqual(familyIds)
     expect(provenance.familySource.blobSha).toBe(gitBlobSha(provenance.familySource.path))
 
@@ -78,6 +80,7 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
       "class-variance-authority": "0.7.1",
       cmdk: "1.1.1",
       vaul: "1.1.2",
+      "lucide-react": "1.33.0",
     }
     for (const [packageName, expectedVersion] of Object.entries(expectedPackages)) {
       const declaredVersion = packageJson.dependencies[packageName] ?? packageJson.devDependencies[packageName]
@@ -85,20 +88,33 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
       expect(packageLock.packages[`node_modules/${packageName}`].version).toBe(expectedVersion)
       expect(provenance.packages[packageName].version).toBe(expectedVersion)
     }
+    const lucideAuthority = provenance.packages["lucide-react"]
+    expect(lucideAuthority.declarationPath).toBe("node_modules/lucide-react/dist/lucide-react.d.ts")
+    expect(lucideAuthority.declarationSha256).toBe(createHash("sha256").update(readFileSync(join(repoRoot, lucideAuthority.declarationPath))).digest("hex"))
 
     for (const [id, component] of Object.entries(seed.components)) {
       const family = JSON.parse(readFileSync(join(repoRoot, `contracts/components/families/${id}.json`), "utf8"))
       expect(family.source).toMatchObject({
         canonicalPath: component.canonicalPath,
         canonicalBlobSha: component.canonicalBlobSha,
-        upstreamPath: component.upstreamPath,
-        upstreamBlobSha: component.upstreamBlobSha,
+        ...(component.implementationKind !== "repo-native" ? {
+          upstreamPath: component.upstreamPath,
+          upstreamBlobSha: component.upstreamBlobSha,
+        } : {}),
         implementationKind: component.implementationKind,
       })
       expect(existsSync(join(repoRoot, component.canonicalPath))).toBe(true)
       expect(component.canonicalBlobSha).toBe(gitBlobSha(component.canonicalPath))
-      expect(component.upstreamPath).not.toBe("")
-      expect(component.upstreamBlobSha).toMatch(/^[0-9a-f]{40}$/)
+      if (component.implementationKind === "repo-native") {
+        expect(["icon", "image", "link"]).toContain(id)
+        expect(component.upstreamPath).toBeUndefined()
+        expect(component.upstreamBlobSha).toBeUndefined()
+        expect(family.source.upstreamPath).toBeUndefined()
+        expect(family.source.upstreamBlobSha).toBeUndefined()
+      } else {
+        expect(component.upstreamPath).not.toBe("")
+        expect(component.upstreamBlobSha).toMatch(/^[0-9a-f]{40}$/)
+      }
       expect(component.implementationKind).not.toBe("")
     }
   })

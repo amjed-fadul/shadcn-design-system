@@ -3,7 +3,7 @@
   "id": "dropdown-menu",
   "source": {
     "canonicalPath": "src/components/ui/dropdown-menu.tsx",
-    "canonicalBlobSha": "df91c334480dc6d82f67319bdc3e44eea59c304b",
+    "canonicalBlobSha": "5e8d096c77663f54389ef60447761d29e80ed4ac",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dropdown-menu.tsx",
     "upstreamBlobSha": "01a12bdc321ee20bab46e48748b4d8ff94058b04"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dropdown-menu.tsx@df91c334480dc6d82f67319bdc3e44eea59c304b"
+      "source": "src/components/ui/dropdown-menu.tsx@5e8d096c77663f54389ef60447761d29e80ed4ac"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -167,7 +167,18 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -203,6 +214,17 @@
               ],
               "propName": "highlighted",
               "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 10
             },
             "evidenceRefs": [
               "source",
@@ -409,7 +431,7 @@
             ]
           },
           {
-            "tokenId": "radius.md",
+            "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -441,7 +463,7 @@
             ]
           },
           {
-            "tokenId": "shadow.md",
+            "tokenId": "shadow.sm",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -665,6 +687,17 @@
             ]
           },
           {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 4
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
             "tokenId": "radius.sm",
             "evidenceRefs": [
               "source",
@@ -675,7 +708,18 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -1155,7 +1199,18 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -1191,6 +1246,17 @@
               ],
               "propName": "highlighted",
               "equals": true
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 10
             },
             "evidenceRefs": [
               "source",
@@ -1385,7 +1451,7 @@
             ]
           },
           {
-            "tokenId": "color.muted",
+            "tokenId": "color.border",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1624,7 +1690,7 @@
             ]
           },
           {
-            "tokenId": "radius.md",
+            "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1656,7 +1722,7 @@
             ]
           },
           {
-            "tokenId": "shadow.lg",
+            "tokenId": "shadow.sm",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1772,7 +1838,18 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",

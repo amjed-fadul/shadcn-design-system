@@ -3,7 +3,7 @@
   "id": "select",
   "source": {
     "canonicalPath": "src/components/ui/select.tsx",
-    "canonicalBlobSha": "b6f65df131f80af7f79ffaac78fcc468caebd7f8",
+    "canonicalBlobSha": "8468421a2d19860a8fbd3b9f77df6a6aed4383a2",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/select.tsx",
     "upstreamBlobSha": "f576bf455da400681c62e9f5a80a95315ee52172"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/select.tsx@b6f65df131f80af7f79ffaac78fcc468caebd7f8"
+      "source": "src/components/ui/select.tsx@8468421a2d19860a8fbd3b9f77df6a6aed4383a2"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -186,7 +186,7 @@
             ]
           },
           {
-            "tokenId": "radius.md",
+            "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -207,7 +207,7 @@
             ]
           },
           {
-            "tokenId": "shadow.md",
+            "tokenId": "shadow.sm",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -505,7 +505,18 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 1.5
+              "multiplier": 7
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",
@@ -1124,7 +1135,7 @@
             ]
           },
           {
-            "tokenId": "color.muted",
+            "tokenId": "color.border",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -1274,7 +1285,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2.5
+              "multiplier": 3
             },
             "evidenceRefs": [
               "source",
@@ -1290,6 +1301,13 @@
           },
           {
             "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
             "evidenceRefs": [
               "source",
               "tokens"

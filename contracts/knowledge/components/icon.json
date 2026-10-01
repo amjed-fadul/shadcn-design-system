@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "icon-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "icon"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A governed, finite Lucide SVG icon with inherited color by default, bounded semantic color options, and no arbitrary SVG, className, style or children API.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "canonical.icon.source"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use Icon for decorative symbols alongside text, navigation indicators, and icon-only actions composed inside a named Button. Use Spinner for an animated loading indicator; Icon loader is static.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Choose a required name from the bounded Icon contract. size is sm (14px), default (16px), or lg (20px), derived from the spacing unit; default is 16px.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    },
+    {
+      "statement": "Icon is decorative by default and has aria-hidden=true. If its standalone meaning needs an accessible name, use <Icon name=\"info\" decorative={false} label=\"Information\" />. The label must contain non-whitespace text; meaningful icons render role=img.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    },
+    {
+      "statement": "An icon-only Button must have an action name, for example <Button size=\"icon\" aria-label=\"Search\"><Icon name=\"search\" /></Button>. Keep the Icon decorative to avoid duplicate announcements.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    },
+    {
+      "statement": "Use placement=\"inline-start\" or placement=\"inline-end\" within Button to write the governed data-icon marker for inline spacing and Button loading composition. Icon placement follows the order of its siblings; it does not move the icon automatically.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "Logical arrow-start, arrow-end, chevron-start and chevron-end mirror automatically in RTL. Physical left/right/up/down identities and panel-left remain fixed. Choose logical identities for reading-direction navigation.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    },
+    {
+      "statement": "color defaults to inherit, preserving surrounding text and interactive component foregrounds. Choose foreground, primary, muted-foreground or destructive to use existing light/dark semantic tokens. Explicit colors must contrast with their surrounding surface; use inherit inside colored Buttons. Do not communicate meaning by color alone: retain visible text or a meaningful label. Icon exposes no arbitrary color string, interactions or link semantics.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    }
+  ]
+}

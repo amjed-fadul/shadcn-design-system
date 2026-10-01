@@ -1,6 +1,7 @@
 import { withThemeByClassName } from "@storybook/addon-themes"
 import type { Decorator, Preview } from "@storybook/react-vite"
-import { createElement } from "react"
+import { Direction } from "radix-ui"
+import { createElement, useEffect } from "react"
 
 import "../src/index.css"
 
@@ -12,9 +13,22 @@ const withPreviewLandmark: Decorator = (Story, context) => {
   return createElement("main", { "aria-label": "Story preview" }, Story())
 }
 
+const withDirection: Decorator = (Story, context) => {
+  const dir = context.globals.direction === "rtl" ? "rtl" : "ltr"
+  function DirectionPreview() {
+    useEffect(() => { document.documentElement.dir = dir }, [])
+    return createElement(Direction.DirectionProvider, { dir }, createElement("div", { dir }, Story()))
+  }
+  return createElement(DirectionPreview)
+}
+
 const preview: Preview = {
+  globalTypes: {
+    direction: { description: "Reading direction", toolbar: { icon: "transfer", items: ["ltr", "rtl"] } },
+  },
   decorators: [
     withPreviewLandmark,
+    withDirection,
     withThemeByClassName({
       themes: {
         light: "",
@@ -25,6 +39,7 @@ const preview: Preview = {
   ],
   initialGlobals: {
     theme: "light",
+    direction: "ltr",
   },
   parameters: {
     a11y: {

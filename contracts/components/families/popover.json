@@ -3,7 +3,7 @@
   "id": "popover",
   "source": {
     "canonicalPath": "src/components/ui/popover.tsx",
-    "canonicalBlobSha": "1131a8154243aecccf705c4140596b32e3f2ac41",
+    "canonicalBlobSha": "1c99cde45d0fc9ee5b352c10ac3d1a3995f42098",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/popover.tsx",
     "upstreamBlobSha": "d8e539566cfafc43bb8b6441679b88e64e9387a2"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/popover.tsx@1131a8154243aecccf705c4140596b32e3f2ac41"
+      "source": "src/components/ui/popover.tsx@1c99cde45d0fc9ee5b352c10ac3d1a3995f42098"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -182,7 +182,9 @@
               "kind": "typescript",
               "typeText": "ComponentProps<typeof PopoverPrimitive.Portal>[\"container\"]"
             },
-            "evidenceRefs": ["source"]
+            "evidenceRefs": [
+              "source"
+            ]
           }
         ],
         "inherits": [
@@ -231,7 +233,7 @@
             ]
           },
           {
-            "tokenId": "radius.md",
+            "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -263,7 +265,7 @@
             ]
           },
           {
-            "tokenId": "shadow.md",
+            "tokenId": "shadow.sm",
             "evidenceRefs": [
               "source",
               "tokens"

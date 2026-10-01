@@ -3,7 +3,7 @@
   "id": "dialog",
   "source": {
     "canonicalPath": "src/components/ui/dialog.tsx",
-    "canonicalBlobSha": "ab779c4c1ea8d400831d904c81a0a889a894ac88",
+    "canonicalBlobSha": "c947ffc1aa9b769d2fd9cc01f4330b1ed02f1999",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/dialog.tsx",
     "upstreamBlobSha": "da9bc058324e4a676a1b9eedd86290a8d4f2213f"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/dialog.tsx@ab779c4c1ea8d400831d904c81a0a889a894ac88"
+      "source": "src/components/ui/dialog.tsx@c947ffc1aa9b769d2fd9cc01f4330b1ed02f1999"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -288,32 +288,21 @@
             ]
           },
           {
-            "tokenId": "color.background",
+            "tokenId": "color.popover",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 6
-            },
+            "tokenId": "color.popover-foreground",
             "evidenceRefs": [
               "source",
               "tokens"
             ]
           },
           {
-            "tokenId": "color.foreground",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "shadow.lg",
+            "tokenId": "shadow.md",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -755,6 +744,17 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {
@@ -1000,7 +1000,7 @@
             ]
           },
           {
-            "tokenId": "font-weight.semibold",
+            "tokenId": "font-weight.medium",
             "evidenceRefs": [
               "source",
               "tokens"

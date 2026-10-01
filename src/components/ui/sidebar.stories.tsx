@@ -157,7 +157,8 @@ export const Outline: Story = {
     const style = getComputedStyle(button)
 
     console.info("Sidebar outline", JSON.stringify({ boxShadow: style.boxShadow, borderColor: style.borderColor }))
-    await expect(style.boxShadow).toContain(`${style.borderColor} 0px 0px 0px 1px`)
+    await expect(style.boxShadow).toBe("none")
+    await expect(style.borderWidth).toBe("1px")
   },
 }
 
@@ -176,7 +177,7 @@ export const KeyboardFocus: Story = {
     // Resolve the semantic color independently of the component's Tailwind recipe.
     const reference = document.createElement("span")
     reference.hidden = true
-    reference.style.boxShadow = "0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent)"
+    reference.style.boxShadow = "0 0 0 4px var(--ring)"
     reference.style.borderColor = "var(--ring)"
     canvasElement.append(reference)
     const ring = getComputedStyle(reference).boxShadow

@@ -43,7 +43,7 @@ describe("Phase 2 Tailwind contract scope", () => {
     }])
   })
 
-  test("preserves every Task 3 definition, except brand-layer values, and its canonical font and radius precedence", () => {
+  test("preserves every Task 3 definition, except approved brand and Release 009 radius values, and its canonical font and radius precedence", () => {
     const contract = readContract()
     const task3Contract = JSON.parse(execFileSync("git", ["show", `${task3Base}:contracts/tokens/token-contract.json`], { encoding: "utf8" })) as TokenContract
     const brandTokenIds = new Set<string>(JSON.parse(readFileSync(new URL("../provenance/token-contract-source.json", import.meta.url), "utf8")).brandLayer.tokens)
@@ -51,9 +51,9 @@ describe("Phase 2 Tailwind contract scope", () => {
 
     expect(task3Contract.tokens).toHaveLength(41)
     // The owner brand layer changes only the values of its listed tokens; identity, category, source and binding stay fixed.
-    expect(contract.tokens.slice(0, 41)).toEqual(task3Contract.tokens.map((token) => brandTokenIds.has(token.id) ? { ...token, value: current.get(token.id)?.value } : token))
+    expect(contract.tokens.slice(0, 41)).toEqual(task3Contract.tokens.map((token) => (brandTokenIds.has(token.id) || token.category === "radius") ? { ...token, value: current.get(token.id)?.value } : token))
     for (const token of task3Contract.tokens.filter((candidate) => brandTokenIds.has(candidate.id))) expect(current.get(token.id)?.value).not.toEqual(token.value)
-    expect(contract.tokens.find((token) => token.id === "radius.sm")?.value).toEqual({ kind: "derived", expression: "calc(var(--radius) * 0.6)", dependencies: ["radius.base"] })
+    expect(contract.tokens.find((token) => token.id === "radius.sm")?.value).toEqual({ kind: "derived", expression: "calc(var(--radius) - 0.25rem)", dependencies: ["radius.base"] })
     expect(contract.tokens.find((token) => token.id === "font.sans")?.value).toEqual({ kind: "literal", value: '"Geist Variable", sans-serif' })
     expect(contract.tokens.find((token) => token.id === "font.heading")?.value).toEqual({ kind: "alias", tokenId: "font.sans" })
   })

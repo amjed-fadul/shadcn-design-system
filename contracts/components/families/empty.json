@@ -3,7 +3,7 @@
   "id": "empty",
   "source": {
     "canonicalPath": "src/components/ui/empty.tsx",
-    "canonicalBlobSha": "2163446242b185ce885d103395b4ec24f8d8e62c",
+    "canonicalBlobSha": "2a64faaee0be044e23de7b24449daf26e6675b3a",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/empty.tsx",
     "upstreamBlobSha": "6a49a9813c02e2ce2548402e1a63b05de550bace"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/empty.tsx@2163446242b185ce885d103395b4ec24f8d8e62c"
+      "source": "src/components/ui/empty.tsx@2a64faaee0be044e23de7b24449daf26e6675b3a"
     },
     "tokens": {
       "kind": "token-contract",
@@ -64,18 +64,7 @@
             ]
           },
           {
-            "tokenId": "radius.xl",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
-            "tokenId": "spacing.unit",
-            "viaDerivedRule": {
-              "id": "spacing.multiplier",
-              "multiplier": 6
-            },
+            "tokenId": "radius.lg",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -285,14 +274,14 @@
               "id": "spacing.multiplier",
               "multiplier": 4
             },
-            "when": {
-              "propName": "variant",
-              "equals": "icon"
-            },
             "evidenceRefs": [
               "source",
               "tokens"
-            ]
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "icon"
+            }
           }
         ],
         "rendering": {
@@ -366,7 +355,7 @@
             ]
           },
           {
-            "tokenId": "font-size.sm",
+            "tokenId": "font-size.base",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -541,7 +530,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2.5
+              "multiplier": 2
             },
             "evidenceRefs": [
               "source",

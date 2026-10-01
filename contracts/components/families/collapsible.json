@@ -3,7 +3,7 @@
   "id": "collapsible",
   "source": {
     "canonicalPath": "src/components/ui/collapsible.tsx",
-    "canonicalBlobSha": "d7e32ed4872189829129ac7d9b38012253bd0f41",
+    "canonicalBlobSha": "632f2e0efa0d7011b06861207f6569cbeb59bc04",
     "implementationKind": "upstream-wrapper",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/collapsible.tsx",
     "upstreamBlobSha": "2f7a4e7fc64a8874373c1584646a63f28cd63c47"
@@ -11,11 +11,15 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/collapsible.tsx@d7e32ed4872189829129ac7d9b38012253bd0f41"
+      "source": "src/components/ui/collapsible.tsx@632f2e0efa0d7011b06861207f6569cbeb59bc04"
     },
     "declaration": {
       "kind": "inherited-interface",
       "source": "radix.collapsible.root"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-002"
     }
   },
   "exports": [
@@ -120,7 +124,72 @@
         "stateChannels": [],
         "conditionalApi": [],
         "events": [],
-        "tokenDependencies": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 8
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.md",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "font-weight.medium",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.muted",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.ring",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
         "rendering": {
           "rootNodeId": "trigger",
           "publicPropsTargetNodeId": "trigger",
@@ -187,7 +256,15 @@
         "stateChannels": [],
         "conditionalApi": [],
         "events": [],
-        "tokenDependencies": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "font-size.sm",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
         "rendering": {
           "rootNodeId": "content",
           "publicPropsTargetNodeId": "content",

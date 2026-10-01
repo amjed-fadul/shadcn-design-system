@@ -3,7 +3,7 @@
   "id": "pagination",
   "source": {
     "canonicalPath": "src/components/ui/pagination.tsx",
-    "canonicalBlobSha": "b398b771b4c0773781e9257af243a4766afde781",
+    "canonicalBlobSha": "04bdac3ee1c99839a6c5c0578aa489798a514127",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/pagination.tsx",
     "upstreamBlobSha": "114877ed03a146a605393a49711baf660dd66acf"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/pagination.tsx@b398b771b4c0773781e9257af243a4766afde781"
+      "source": "src/components/ui/pagination.tsx@04bdac3ee1c99839a6c5c0578aa489798a514127"
     },
     "tokens": {
       "kind": "token-contract",
@@ -124,7 +124,7 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 0.5
+              "multiplier": 1
             },
             "evidenceRefs": [
               "source",

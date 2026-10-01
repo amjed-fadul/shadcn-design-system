@@ -244,6 +244,7 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
   const errors: string[] = []
   const propAnalyzer = canonicalComponentPropSourceAnalyzer(repositoryRoot)
   const sourceConditionalWhens = new Map<string, ConditionalApiCondition[]>()
+  const sourceConditionalApis = new Map<string, ConditionalApiCase[]>()
   for (const family of context.families) {
     const path = join(repositoryRoot, family.source.canonicalPath)
     let source: string
@@ -307,6 +308,10 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
         propAnalysis,
         new Set((entry.component.inheritedPropDefaults ?? []).map((defaultFact) => defaultFact.propName)),
       )
+      if (propAnalysis.conditionalApi?.length) {
+        sourceConditionalApis.set(`${family.id}\u0000${entry.name}`, propAnalysis.conditionalApi)
+        sourceConditionalWhens.set(`${family.id}\u0000${entry.name}`, [...(sourceConditionalWhens.get(`${family.id}\u0000${entry.name}`) ?? []), ...propAnalysis.conditionalApi.map((conditional) => conditional.when)])
+      }
       if (propErrors.some((error) => error.includes(" default "))) errors.push(`Component ${entry.name} local prop defaults do not match source evidence.`)
       if (propErrors.some((error) => !error.includes(" default "))) errors.push(`Component ${entry.name} local prop surface does not match source evidence.`)
       errors.push(...propErrors.map((error) => `Component ${entry.name}: ${error}`))
@@ -339,7 +344,10 @@ export function reconcileCanonicalComponentSources(repositoryRoot: string, conte
     if (!component) continue
     const expectedComposition = canonicalComponentCompositionAuthority[`${family.id}\u0000${entry.name}`] ?? noCapabilities
     if (!sameValue(component.composition, expectedComposition)) errors.push(`Component ${entry.name} composition does not match source evidence.`)
-    const expectedConditionalApi = canonicalComponentConditionalAuthority[`${family.id}\u0000${entry.name}`] ?? []
+    const expectedConditionalApi = [
+      ...(canonicalComponentConditionalAuthority[`${family.id}\u0000${entry.name}`] ?? []),
+      ...(sourceConditionalApis.get(`${family.id}\u0000${entry.name}`) ?? []),
+    ]
     if (!sameValue(component.conditionalApi, expectedConditionalApi)) {
       errors.push(`Component ${entry.name} conditional API does not match source evidence.`)
     }

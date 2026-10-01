@@ -38,6 +38,8 @@ type SourceFacts = {
   dataAttributes: Array<{ name: string; value?: unknown; expressionKind: string; expression?: string }>
   portalCount: number
   propSpreadCount: number
+  explicitPublicPropTargets: number
+  booleanConditionalApi: AnyRecord[]
   directUsesSlot: boolean
   returnCount: number
   conditionalSource: boolean
@@ -61,6 +63,7 @@ type IndependentRenderUnresolved = {
 type IndependentRenderNode = {
   tag: string
   resolvedTag?: string
+  resolvedHosts?: Array<{ tag: string; importBinding: { importedName: string; moduleSpecifier: string } }>
   importBinding?: { importedName: string; moduleSpecifier: string }
   portal: boolean
   receivesPublicProps: boolean
@@ -473,10 +476,81 @@ function renderAlternativePredicates(functionLike: ts.FunctionLikeDeclaration, o
   return independentRenderBranchExpressions(functionLike, opaqueStateBindings).map((branch) => branch.predicate)
 }
 
+function independentRegistryHosts(lookup: ts.ElementAccessExpression, sourceFile: ts.SourceFile, imports: Map<string, { importedName: string; moduleSpecifier: string }>): IndependentRenderNode["resolvedHosts"] {
+  if (!ts.isIdentifier(lookup.expression) || !lookup.argumentExpression || !ts.isIdentifier(lookup.argumentExpression)) return undefined
+  const name = lookup.expression.text
+  const binding = independentNearestLexicalBinding(lookup, name)
+  const declaration = binding?.declaration ?? sourceFile.statements.filter(ts.isVariableStatement).flatMap((statement) => statement.declarationList.declarations).find((declaration) => ts.isIdentifier(declaration.name) && declaration.name.text === name)
+  if (!declaration || !ts.isVariableDeclaration(declaration) || !ts.isVariableDeclarationList(declaration.parent) || !(declaration.parent.flags & ts.NodeFlags.Const)) return undefined
+  const statement = declaration.parent.parent
+  if (!ts.isVariableStatement(statement) || !ts.isSourceFile(statement.parent) || statement.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) return undefined
+  const initializer = declaration.initializer
+  if (!initializer || !ts.isAsExpression(initializer) || initializer.type.getText(sourceFile) !== "const" || !ts.isObjectLiteralExpression(initializer.expression)) return undefined
+  let escape = false
+  const scan = (node: ts.Node): void => {
+    if (ts.isIdentifier(node) && node.text === name && node !== declaration.name) {
+      const parent = node.parent
+      if (ts.isTypeQueryNode(parent)) return
+      if (ts.isElementAccessExpression(parent) && parent.expression === node) {
+        if (parent.getStart(sourceFile) !== lookup.getStart(sourceFile) || parent.end !== lookup.end) escape = true
+        let target: ts.Node = parent
+        while (ts.isParenthesizedExpression(target.parent) || ts.isAsExpression(target.parent) || ts.isTypeAssertionExpression(target.parent) || ts.isNonNullExpression(target.parent)
+          || ts.isArrayLiteralExpression(target.parent) || ts.isObjectLiteralExpression(target.parent) || ts.isSpreadElement(target.parent) || ts.isSpreadAssignment(target.parent)
+          || ts.isPropertyAssignment(target.parent) && target.parent.initializer === target) target = target.parent
+        const owner = target.parent
+        if (ts.isBinaryExpression(owner) && owner.left === target && owner.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && owner.operatorToken.kind <= ts.SyntaxKind.LastAssignment) escape = true
+        if ((ts.isForOfStatement(owner) || ts.isForInStatement(owner)) && owner.initializer === target) escape = true
+        if (ts.isDeleteExpression(owner) || ts.isPrefixUnaryExpression(owner) || ts.isPostfixUnaryExpression(owner)) escape = true
+      } else if (!(ts.isCallExpression(parent) && parent.arguments[0] === node && parent.expression.getText(sourceFile) === "Object.hasOwn")) escape = true
+    }
+    ts.forEachChild(node, scan)
+  }
+  scan(sourceFile)
+  if (escape) return undefined
+  const names = new Set<string>()
+  const hosts: NonNullable<IndependentRenderNode["resolvedHosts"]> = []
+  for (const entry of initializer.expression.properties) {
+    if (!ts.isPropertyAssignment(entry) || !ts.isIdentifier(entry.initializer)) return undefined
+    const identity = propertyName(entry.name)
+    const importBinding = imports.get(entry.initializer.text)
+    if (!identity || names.has(identity) || !importBinding || ["*", "default"].includes(importBinding.importedName)) return undefined
+    names.add(identity)
+    hosts.push({ tag: entry.initializer.text, importBinding })
+  }
+  return hosts.length ? hosts : undefined
+}
+
+function independentPrivateHostAlias(declaration: ts.VariableDeclaration, functionLike: ts.FunctionLikeDeclaration): boolean {
+  if (!ts.isIdentifier(declaration.name) || !ts.isVariableDeclarationList(declaration.parent) || !(declaration.parent.flags & ts.NodeFlags.Const)) return false
+  const name = declaration.name.text
+  let bindingCount = 0
+  let escaped = false
+  const visit = (node: ts.Node): void => {
+    if (ts.isVariableDeclaration(node) || ts.isParameter(node)) bindingCount += independentBindingNames(node.name).filter((binding) => binding === name).length
+    else if ((ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) || ts.isClassDeclaration(node)) && node.name?.text === name) bindingCount += 1
+    if (ts.isIdentifier(node) && node.text === name && node !== declaration.name) {
+      const parent = node.parent
+      const jsxTag = (ts.isJsxOpeningElement(parent) || ts.isJsxSelfClosingElement(parent) || ts.isJsxClosingElement(parent)) && parent.tagName === node
+      if (!jsxTag && !ts.isTypeQueryNode(parent)) escaped = true
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(functionLike)
+  return bindingCount === 1 && !escaped
+}
+
 function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sourceFile: ts.SourceFile, restBindings: Set<string>, opaqueStateBindings = new Set<string>()): IndependentRenderBranch[] {
   const declarations = new Map<string, ts.Expression>()
+  const constantHostAliases = new Set<string>()
+  const blockedRegistryAliases = new Set<string>()
   walkComponent(functionLike.body!, (node) => {
-    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) declarations.set(node.name.text, node.initializer)
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
+      declarations.set(node.name.text, node.initializer)
+      if (ts.isElementAccessExpression(unwrapReturnedExpression(node.initializer))) {
+        if (independentPrivateHostAlias(node, functionLike)) constantHostAliases.add(node.name.text)
+        else blockedRegistryAliases.add(node.name.text)
+      }
+    }
   })
   const imports = new Map<string, { importedName: string; moduleSpecifier: string }>()
   for (const statement of sourceFile.statements) {
@@ -545,9 +619,12 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
     const opening = ts.isJsxElement(selected) ? selected.openingElement : selected
     const tag = opening.tagName.getText(sourceFile)
     let resolvedTag: string | undefined
+    let resolvedHosts: IndependentRenderNode["resolvedHosts"]
     let importBinding = importForTag(opening.tagName)
-    if (ts.isIdentifier(opening.tagName) && declarations.has(opening.tagName.text)) {
+    if (ts.isIdentifier(opening.tagName) && blockedRegistryAliases.has(opening.tagName.text)) importBinding = undefined
+    else if (ts.isIdentifier(opening.tagName) && declarations.has(opening.tagName.text)) {
       const host = selectedExpression(declarations.get(opening.tagName.text)!, predicate)
+      if (ts.isElementAccessExpression(host) && constantHostAliases.has(opening.tagName.text)) resolvedHosts = independentRegistryHosts(host, sourceFile, imports)
       if (ts.isStringLiteral(host)) resolvedTag = host.text
       else if (ts.isIdentifier(host) || ts.isPropertyAccessExpression(host)) {
         resolvedTag = host.getText(sourceFile)
@@ -557,7 +634,7 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
       }
     }
     const dataAttributes: IndependentRenderNode["dataAttributes"] = []
-    let receivesPublicProps = false
+    let receivesPublicProps = Boolean(parameter && ts.isObjectBindingPattern(parameter.name) && !parameter.name.elements.some((entry) => entry.dotDotDotToken) && opening.attributes.properties.some((attribute) => ts.isJsxAttribute(attribute) && attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression && ts.isIdentifier(attribute.initializer.expression) && bindings.has(attribute.initializer.expression.text)))
     for (const attribute of opening.attributes.properties) {
       if (ts.isJsxSpreadAttribute(attribute)) {
         if (ts.isIdentifier(attribute.expression) && restBindings.has(attribute.expression.text)) receivesPublicProps = true
@@ -609,6 +686,7 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
       node: {
         tag,
         ...(resolvedTag ? { resolvedTag } : {}),
+        ...(resolvedHosts ? { resolvedHosts } : {}),
         ...(importBinding ? { importBinding } : {}),
         portal: effectiveTag === "Portal" || effectiveTag.endsWith(".Portal") || effectiveTag.endsWith("Portal"),
         receivesPublicProps,
@@ -637,7 +715,16 @@ function independentRenderBranches(functionLike: ts.FunctionLikeDeclaration, sou
     const rendered = renderNode(expression, predicate, when)
     return rendered ? [rendered] : []
   }
-  return independentRenderBranchExpressions(functionLike, opaqueStateBindings).map(({ predicate, expression }) => {
+  let expressions = independentRenderBranchExpressions(functionLike, opaqueStateBindings)
+  if (!expressions.length) {
+    expressions = returnExpressions(functionLike).filter((expression) => {
+      const opening = returnedRootOpening(expression)
+      if (!opening || !ts.isIdentifier(opening.tagName)) return false
+      const initializer = declarations.get(opening.tagName.text)
+      return initializer && ts.isElementAccessExpression(initializer)
+    }).map((expression) => ({ predicate: { otherwise: true }, expression }))
+  }
+  return expressions.map(({ predicate, expression }) => {
     const rendered = renderNode(expression, predicate)
     return { predicate, ...(rendered ? { tree: rendered.node } : {}) }
   })
@@ -874,6 +961,7 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
   const typeFacts = new Map<string, { typeText: string; values: string[] }>()
   let propSurfaceError: string | undefined
   const localPropFacts = new Map<string, IndependentLocalPropFact>()
+  let booleanConditionalApi: AnyRecord[] = []
   if (functionLike?.parameters[0]) {
     const parameter = functionLike.parameters[0]
     collectTypeFacts(parameter.type, sourceFile, typeFacts)
@@ -913,6 +1001,38 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
             })
           }
         }
+      }
+      if (propsType.isUnion() && propsType.types.length === 2) {
+        const branches = propsType.types
+        const branchType = (branch: ts.Type, name: string): ts.Type | undefined => {
+          const symbol = checker.getPropertyOfType(branch, name)
+          return symbol && checker.getTypeOfSymbolAtLocation(symbol, parameter)
+        }
+        const boolValue = (branch: ts.Type, name: string): boolean | undefined => {
+          const type = branchType(branch, name)
+          if (!type) return undefined
+          const members = independentNonUndefinedTypes(type)
+          if (members.length !== 1 || !(members[0].flags & ts.TypeFlags.BooleanLiteral)) return undefined
+          return checker.typeToString(members[0]) === "true"
+        }
+        const discriminator = [...localPropFacts].find(([name, fact]) => fact.type.kind === "boolean" && branches.every((branch) => boolValue(branch, name) !== undefined) && boolValue(branches[0], name) !== boolValue(branches[1], name))?.[0]
+        if (discriminator) booleanConditionalApi = branches.map((branch) => {
+          const propRefinements: AnyRecord[] = []
+          for (const [name, fact] of localPropFacts) {
+            if (name === discriminator) continue
+            const symbol = checker.getPropertyOfType(branch, name)
+            const type = branchType(branch, name)
+            const members = type ? independentNonUndefinedTypes(type).filter((member) => !(member.flags & ts.TypeFlags.Undefined)) : []
+            if (!symbol || !type || !members.length || members.every((member) => Boolean(member.flags & ts.TypeFlags.Never))) {
+              propRefinements.push({ propName: name, availability: "unavailable", evidenceRefs: ["source"] })
+              continue
+            }
+            const required = !(symbol.flags & ts.SymbolFlags.Optional)
+            const refined = independentStructuredType(checker, type, undefined)
+            if (required !== fact.required || JSON.stringify(refined) !== JSON.stringify(fact.type)) propRefinements.push({ propName: name, availability: "available", required, type: refined, evidenceRefs: ["source"] })
+          }
+          return { when: { propName: discriminator, equals: boolValue(branch, discriminator) }, propRefinements, eventRefinements: [], stateChannels: [], evidenceRefs: ["source"] }
+        }).sort((left, right) => Number(left.when.equals) - Number(right.when.equals))
       }
       for (const [name, value] of inheritedWrapperDefaults(functionLike, checker)) bindingDefaults.set(name, value)
     }
@@ -986,8 +1106,10 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
   }
   const dataAttributes: SourceFacts["dataAttributes"] = []
   let propSpreadCount = 0
+  let explicitPublicPropTargets = 0
   let directUsesSlot = false
   for (const node of jsx) {
+    if (restBindings.size === 0 && jsxAttributes(node).properties.some((attribute) => ts.isJsxAttribute(attribute) && attribute.initializer && ts.isJsxExpression(attribute.initializer) && attribute.initializer.expression && ts.isIdentifier(attribute.initializer.expression) && bindings.has(attribute.initializer.expression.text))) explicitPublicPropTargets++
     if (jsxTag(node).includes("Portal")) {
       // A Portal JSX element is a render boundary in the source, regardless of its package owner.
     }
@@ -1042,6 +1164,8 @@ function componentSourceFacts(sourceFile: ts.SourceFile, declaration: ts.Node): 
     dataAttributes,
     portalCount: jsx.filter((node) => jsxTag(node).includes("Portal")).length,
     propSpreadCount,
+    explicitPublicPropTargets,
+    booleanConditionalApi,
     directUsesSlot,
     returnCount: functionLike ? returnExpressions(functionLike).length : 0,
     conditionalSource: /\bif\s*\(|\?|&&/.test(bodyText),
@@ -1554,8 +1678,13 @@ function normalizedHostName(value: string): string {
 }
 
 function independentHostMatches(tag: string, host: AnyRecord, binding?: IndependentRenderNode["importBinding"]): boolean {
-  if (tag === "Loader2" && host?.kind === "inherited-interface" && host.interfaceId === "html.svg") {
-    return binding?.moduleSpecifier === "lucide-react" && binding.importedName === "Loader2"
+  if (host?.kind === "inherited-interface" && host.interfaceId === "html.svg" && binding?.moduleSpecifier === "lucide-react") {
+    const checker = componentProgramCache?.checker
+    const file = componentProgramCache?.program.getSourceFiles().find((file) => file.fileName.endsWith("/lucide-react/dist/lucide-react.d.ts"))
+    const module = file && checker?.getSymbolAtLocation(file)
+    const exported = module && checker?.getExportsOfModule(module).find((symbol) => symbol.name === binding.importedName)
+    const symbol = exported && checker && (exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported)
+    return Boolean(symbol?.declarations?.some((declaration) => ts.isVariableDeclaration(declaration) && declaration.type && ts.isTypeReferenceNode(declaration.type) && declaration.type.typeName.getText() === "react.ForwardRefExoticComponent" && /LucideProps.*SVGSVGElement/.test(declaration.type.getText())))
   }
   if (host?.kind === "unresolved") return true
   if (host?.kind === "fragment") return tag === "Fragment"
@@ -1612,7 +1741,8 @@ function independentRenderTreeMatches(source: IndependentRenderNode, rendering: 
     if (!contractNode || visited.has(nodeId)) return false
     visited.add(nodeId)
     const sourceHost = sourceNode.resolvedTag ?? sourceNode.tag
-    if (!independentHostMatches(sourceHost, contractNode.host, sourceNode.importBinding) || !independentImportMatches(sourceNode.importBinding, contractNode.host)) return false
+    const sourceHosts = sourceNode.resolvedHosts ?? [{ tag: sourceHost, importBinding: sourceNode.importBinding }]
+    if (!sourceHosts.length || !sourceHosts.every((candidate) => independentHostMatches(candidate.tag, contractNode.host, candidate.importBinding) && independentImportMatches(candidate.importBinding, contractNode.host))) return false
     if (sourceNode.portal !== portalIds.has(nodeId) || sourceNode.receivesPublicProps !== Boolean(contractNode.receivesPublicProps)) return false
     const contractAttributes = contractNode.dataAttributes ?? []
     if (sourceNode.dataAttributes.length !== contractAttributes.length) return false
@@ -1647,7 +1777,7 @@ function directTokenEvidence(text: string, tokenIds: Set<string>): Set<string> {
     const [category, name] = tokenId.split(".")
     let found = false
     if (category === "color") {
-      found = ["bg-", "text-", "border-", "ring-", "fill-", "stroke-", "outline-", "placeholder:text-"]
+      found = ["bg-", "text-", "border-", "ring-", "ring-offset-", "fill-", "stroke-", "outline-", "placeholder:text-"]
         .some((prefix) => hasClass(`${prefix}${name}`))
     } else if (tokenId === "font.heading") {
       found = hasClass("font-heading")
@@ -1838,7 +1968,7 @@ function independentTokenIdsForUtility(utility: string): Set<string> {
   const result = new Set<string>()
   for (const tokenId of approvedTokenIds) {
     const [category, name] = tokenId.split(".")
-    if (category === "color" && ["bg", "text", "border", "ring", "fill", "stroke", "outline"].some((prefix) => utility === `${prefix}-${name}`)) result.add(tokenId)
+    if (category === "color" && ["bg", "text", "border", "ring", "ring-offset", "fill", "stroke", "outline"].some((prefix) => utility === `${prefix}-${name}`)) result.add(tokenId)
     else if (tokenId === "font.heading" && utility === "font-heading") result.add(tokenId)
     else if (category === "font-size" && utility === `text-${name}`) result.add(tokenId)
     else if (category === "font-weight" && utility === `font-${name}`) result.add(tokenId)
@@ -2388,6 +2518,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
         errors.push(`${family.id}.${exported.name}: unresolved JSX render evidence differs from the canonical AST`)
       }
       if (source.propSurfaceError) errors.push(`${family.id}.${exported.name}: ${source.propSurfaceError}`)
+      if (source.booleanConditionalApi.length && JSON.stringify(source.booleanConditionalApi) !== JSON.stringify(exported.component.conditionalApi)) errors.push(`${family.id}.${exported.name}: boolean union conditional API differs from the canonical source type`)
       const variants = cvaFacts(sourceFile, source.sourceText, source.declaration)
       variants.localClassSources.push(...independentReferencedLocalRecipeSources(sourceFile, source.sourceText))
       const sourceProps = new Set([...source.bindings].filter((name) => !source.restBindings.has(name)).concat([...source.typeFacts.keys(), ...variants.variants.keys()]))
@@ -2569,7 +2700,7 @@ function directSourceErrors(families: AnyRecord[], interfaces: AnyRecord[]): str
           if (!linked) errors.push(`${family.id}.${exported.name}: repeated JSX child ${repeated.slot} is omitted from the contract render edges`)
         }
       }
-      if (source.propSpreadCount === 0) errors.push(`${family.id}.${exported.name}: public props spread is absent from source`)
+      if (source.propSpreadCount === 0 && source.explicitPublicPropTargets === 0) errors.push(`${family.id}.${exported.name}: public props target is absent from source`)
     }
     const recognizedUnresolved = new Set<string>()
     for (const exported of family.exports ?? []) {
@@ -2670,7 +2801,49 @@ declarationProgramCache = createDeclarationProgram(loadArtifacts().interfaces)
 componentProgramCache = createComponentProgram(loadArtifacts().families)
 
 describe("Phase 3 Task 10 independent review", () => {
-  test("matches the independent 38-family oracle to the manifest and physical artifacts", () => {
+  test("independently checks every finite Icon registry host and conditional naming branch", () => {
+    const artifacts = loadArtifacts()
+    const family = familyById(artifacts, "icon")
+    const component = exportByName(family, "Icon").component
+    const { sourceFile, sourceText } = sourceFacts(join(root, family.source.canonicalPath))
+    const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, "Icon")!)
+    expect(source.renderBranches[0].tree?.resolvedHosts).toHaveLength(20)
+    expect(independentRenderTreeMatches(source.renderBranches[0].tree!, component.rendering)).toBe(true)
+    expect(source.booleanConditionalApi).toEqual(component.conditionalApi)
+
+    const poisonedText = sourceText.replace("AlertCircle, ArrowLeft", "createLucideIcon, AlertCircle, ArrowLeft").replace("search: Search", "search: createLucideIcon")
+    const poisonedFile = ts.createSourceFile(sourceFile.fileName, poisonedText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+    const poisonedDeclaration = declarationFor(poisonedFile, "Icon")!
+    const poisonedFunction = functionLikeFor(poisonedDeclaration)!
+    const poisonedBranches = independentRenderBranches(poisonedFunction, poisonedFile, new Set())
+    expect(independentRenderTreeMatches(poisonedBranches[0].tree!, component.rendering)).toBe(false)
+
+    const missingLabel = clone(artifacts)
+    exportByName(familyById(missingLabel, "icon"), "Icon").component.conditionalApi[0].propRefinements[0].required = false
+    expect(directSourceErrors(missingLabel.families, missingLabel.interfaces)).toContain("icon.Icon: boolean union conditional API differs from the canonical source type")
+  })
+
+  test("independent finite registry proof rejects mutable aliases and destructuring writes", () => {
+    const family = familyById(loadArtifacts(), "icon")
+    const component = exportByName(family, "Icon").component
+    const { sourceFile, sourceText } = sourceFacts(join(root, family.source.canonicalPath))
+    const mutants = [
+      sourceText.replace("const Glyph = iconRegistry[name]", "let Glyph = iconRegistry[name]; Glyph = () => null"),
+      sourceText.replace("const iconVariants", '([iconRegistry["search"]] = [() => null]); const iconVariants'),
+      sourceText.replace("const iconVariants", '({ value: iconRegistry["search"] } = { value: () => null }); const iconVariants'),
+      sourceText.replace("const iconVariants", '({...iconRegistry["search"]} = { type: () => null }); const iconVariants'),
+      sourceText.replace("const Glyph = iconRegistry[name]", "const Glyph = iconRegistry[name]; { const Glyph = Search; return <Glyph />; }"),
+      sourceText.replace("const Glyph = iconRegistry[name]", "const Glyph = iconRegistry[name]; Glyph.render = () => null"),
+    ]
+    for (const text of mutants) {
+      const file = ts.createSourceFile(sourceFile.fileName, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+      const functionLike = functionLikeFor(declarationFor(file, "Icon")!)!
+      const branches = independentRenderBranches(functionLike, file, new Set())
+      expect(branches.some((branch) => branch.tree && independentRenderTreeMatches(branch.tree, component.rendering))).toBe(false)
+    }
+  })
+
+  test("matches the independent 41-family oracle to the manifest and physical artifacts", () => {
     const manifest = readJson(join(root, "contracts/components/component-contract-set.json"))
     const manifestIds = manifest.familyFiles.map((path: string) => path.split("/").at(-1)!.replace(/\.json$/, "")).sort()
     const physicalIds = loadArtifacts().families.map((family) => family.id).sort()
@@ -3083,6 +3256,33 @@ describe("Phase 3 Task 10 independent review", () => {
     component.tokenDependencies.find((dependency: AnyRecord) => dependency.tokenId === "color.input").when.equals = "default"
 
     expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining("toggle-group.ToggleGroupItem: imported recipe token fact differs"))
+  }, 60_000)
+
+  test("independent ring offset evidence recognizes only governed semantic colors", () => {
+    expect(directTokenEvidence("focus-visible:ring-offset-background", new Set(["color.background"]))).toEqual(new Set(["color.background"]))
+    expect(directTokenEvidence("ring-offset-unknown-brand", new Set(["color.background"]))).toEqual(new Set())
+    expect(independentImportedTokenDependencies([{ classNames: "focus-visible:ring-offset-background data-[state=on]:ring-offset-primary ring-offset-2 ring-offset-unknown-brand", sourcePath: "fixture.tsx" }], true)).toEqual([
+      { tokenId: "color.background" },
+      { tokenId: "color.primary", when: { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "on" } },
+    ])
+  })
+
+  test("independent ToggleGroup source graph retains the recipe and exact selected overrides", () => {
+    const { sourceFile } = sourceFacts(join(root, "src/components/ui/toggle-group.tsx"))
+    const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, "ToggleGroupItem")!)
+    const variants = cvaFacts(sourceFile, source.sourceText, source.declaration)
+    const facts = independentImportedTokenDependencies([...variants.classSources, ...variants.localClassSources], true)
+    const selected = { subject: "data", path: [{ kind: "self" }], propName: "state", equals: "on" }
+    expect(facts).toEqual(expect.arrayContaining([
+      { tokenId: "color.muted", when: selected },
+      { tokenId: "color.primary", when: selected },
+      { tokenId: "color.primary-foreground", when: selected },
+      { tokenId: "color.background" },
+    ]))
+    const artifacts = clone(loadArtifacts())
+    const component = exportByName(familyById(artifacts, "toggle-group"), "ToggleGroupItem").component
+    component.tokenDependencies = component.tokenDependencies.filter((fact: AnyRecord) => fact.tokenId !== "color.primary")
+    expect(directSourceErrors(artifacts.families, artifacts.interfaces)).toContainEqual(expect.stringContaining("toggle-group.ToggleGroupItem: conditional utility token fact differs"))
   }, 60_000)
 
   test("independent utility parser preserves exact data conditions and stacked conjunctions", () => {
@@ -3612,7 +3812,7 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(findUnreferencedEvidence()).toEqual([])
   })
 
-  test("audits the independently approved 38-family scope through direct AST and declaration access", () => {
+  test("audits the independently approved 41-family scope through direct AST and declaration access", () => {
     expect(independentAudit(loadArtifacts())).toEqual([])
   })
 

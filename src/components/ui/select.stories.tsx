@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { expect, userEvent, within } from "storybook/test"
+import { expect, userEvent, within, waitFor } from "storybook/test"
 
 import {
   Select,
@@ -36,8 +36,8 @@ export const Default: Story = {
     await userEvent.click(canvas.getByRole("combobox"))
 
     const option = within(document.body).getByRole("option", { name: "Team" })
-    await expect(option).toBeVisible()
+    await waitFor(() => expect(option).toBeVisible())
     await userEvent.click(option)
-    await expect(canvas.getByRole("combobox")).toHaveTextContent("Team")
+    await waitFor(() => expect(canvas.getByRole("combobox")).toHaveTextContent("Team"))
   },
 }
