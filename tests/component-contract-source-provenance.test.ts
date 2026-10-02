@@ -50,8 +50,8 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
         blobSha: gitBlobSha("contracts/tokens/token-contract.json"),
       },
       packages: {
-        react: { version: "18.3.1" },
-        "@types/react": { version: "18.3.3" },
+        react: { version: "19.3.0" },
+        "@types/react": { version: "19.3.0" },
         "radix-ui": { version: "1.6.7" },
         typescript: { version: "5.5.4" },
         "class-variance-authority": { version: "0.7.1" },
@@ -73,8 +73,8 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
     expect(provenance.tokenContract.blobSha).toBe(gitBlobSha(provenance.tokenContract.path))
 
     const expectedPackages = {
-      react: "18.3.1",
-      "@types/react": "18.3.3",
+      react: "19.3.0",
+      "@types/react": "19.3.0",
       "radix-ui": "1.6.7",
       typescript: "5.5.4",
       "class-variance-authority": "0.7.1",

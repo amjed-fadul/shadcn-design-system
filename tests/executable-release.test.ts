@@ -66,7 +66,7 @@ describe("immutable executable release", () => {
   test("loads the versioned canonical release artifact through the production entrypoint", () => {
     const release = getExecutableRelease()
 
-    expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-009.json")
+    expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-010.json")
     expect(release.releaseId).toBe(EXECUTABLE_RELEASE_ID)
     expect(release.componentContractSetId).toBe("shadcn-radix-component-contracts-001")
     expect(release.tokenContractId).toBe("shadcn-radix-token-contract-002")
@@ -102,7 +102,7 @@ describe("immutable executable release", () => {
       const releaseBytes = readFileSync(fileURLToPath(new URL(`../provenance/releases/shadcn-radix-release-${releaseNumber}.json`, import.meta.url)))
       expect(createHash("sha256").update(releaseBytes).digest("hex")).toBe(expected)
     }
-    expect(EXECUTABLE_RELEASE_ID).toBe("shadcn-radix-release-009")
+    expect(EXECUTABLE_RELEASE_ID).toBe("shadcn-radix-release-010")
   })
 
   test("derives the canonical release payload from the approved projection", () => {

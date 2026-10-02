@@ -2870,7 +2870,7 @@ describe("Phase 3 Task 10 independent review", () => {
     expect(sourceDeclarationContext(artifact)).toBeUndefined()
   })
 
-  test.each([["content", 274], ["overlay", 267], ["portal", 3]])("independently resolves Vaul %s props through its React default import", (member, count) => {
+  test.each([["content", 289], ["overlay", 282], ["portal", 3]])("independently resolves Vaul %s props through its React default import", (member, count) => {
     const context = sourceDeclarationContext(interfaceById(loadArtifacts(), `vaul.drawer.${member}`))!
     expect(context.checker.getPropertiesOfType(context.propsType)).toHaveLength(count as number)
   })

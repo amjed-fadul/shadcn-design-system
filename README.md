@@ -4,7 +4,11 @@ Canonical governed shadcn design system for Agentic Design Canvas product work.
 
 This repository is separate from Canvas. The official shadcn repository is upstream/reference only; Canvas will eventually consume immutable contracted releases from this repository.
 
-## Active producer: Release 009 candidate
+## Active producer: Release 010 candidate
+
+Release 010 (`0.0.0-release.10`) widens the React peer range to `^18.3.1 || ^19.0.0` so Canvas can run React 19. Components, tokens, knowledge and visual decisions are unchanged from Release 009. The 75 inherited interfaces that resolve React DOM props were regenerated from `@types/react` 19.3.0 (React 19 adds `popover`, `inert`, `onToggle`, `onScrollEnd` and transition events, and removes `onResize`). See [Release 010](docs/RELEASE-010.md). The Release 009 sections below describe the visual system it carries forward.
+
+## Release 009
 
 Release 009 (`0.0.0-release.9`) refines product UI density and hierarchy over the exact accepted Release 008 candidate. Release 008's Icon, Image, Link and Toggle Group semantics remain preserved. Historical release records remain immutable. The Release 008 sections below document that baseline; the active canonical validator and candidate commands now target Release 009.
 

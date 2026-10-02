@@ -65,8 +65,8 @@ describe("Button component contract", () => {
     const declarationPath = join(root, htmlButton.source.declarationPath)
     expect(existsSync(declarationPath)).toBe(true)
     expect(createHash("sha256").update(readFileSync(declarationPath)).digest("hex")).toBe(htmlButton.source.declarationSha256)
-    expect(JSON.parse(readFileSync(join(root, "node_modules/@types/react/package.json"), "utf8")).version).toBe("18.3.3")
-    expect(htmlButton.source.version).toBe("18.3.3")
+    expect(JSON.parse(readFileSync(join(root, "node_modules/@types/react/package.json"), "utf8")).version).toBe("19.3.0")
+    expect(htmlButton.source.version).toBe("19.3.0")
     const analyzed = analyzeIntrinsicReactInterface("button")
     expect(htmlButton.props.map((prop) => [prop.name, prop.required, prop.typeText])).toEqual(analyzed.map((prop) => [prop.name, prop.required, prop.typeText]))
     const dependencies = button.exports.find((item) => item.name === "Button")!.component!.tokenDependencies

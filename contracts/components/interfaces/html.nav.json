@@ -4,15 +4,15 @@
   "source": {
     "kind": "react-intrinsic",
     "package": "@types/react",
-    "version": "18.3.3",
+    "version": "19.3.0",
     "declarationPath": "node_modules/@types/react/index.d.ts",
-    "declarationSha256": "8ca4709dbd22a34bcc1ebf93e1877645bdb02ebd3f3d9a211a299a8db2ee4ba1",
+    "declarationSha256": "045c1b395851aa71ef76393398466330fe1eeebc113c8085eefc6d84abea3a88",
     "symbol": "React.JSX.IntrinsicElements[\"nav\"]"
   },
   "evidence": {
     "declaration": {
       "kind": "inherited-interface",
-      "source": "node_modules/@types/react/index.d.ts@8ca4709dbd22a34bcc1ebf93e1877645bdb02ebd3f3d9a211a299a8db2ee4ba1"
+      "source": "node_modules/@types/react/index.d.ts@045c1b395851aa71ef76393398466330fe1eeebc113c8085eefc6d84abea3a88"
     }
   },
   "props": [
@@ -1028,9 +1028,39 @@
       "name": "autoCapitalize",
       "required": false,
       "type": {
-        "kind": "string"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": "none"
+          },
+          {
+            "kind": "literal",
+            "value": "off"
+          },
+          {
+            "kind": "literal",
+            "value": "on"
+          },
+          {
+            "kind": "literal",
+            "value": "sentences"
+          },
+          {
+            "kind": "literal",
+            "value": "words"
+          },
+          {
+            "kind": "literal",
+            "value": "characters"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "string & {}"
+          }
+        ]
       },
-      "typeText": "string",
+      "typeText": "\"none\" | \"off\" | \"on\" | \"sentences\" | \"words\" | \"characters\" | (string & {})",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1081,6 +1111,10 @@
             "kind": "number"
           },
           {
+            "kind": "typescript",
+            "typeText": "bigint"
+          },
+          {
             "kind": "literal",
             "value": false
           },
@@ -1090,7 +1124,7 @@
           },
           {
             "kind": "typescript",
-            "typeText": "ReactElement<any, string | JSXElementConstructor<any>>"
+            "typeText": "ReactElement<unknown, string | JSXElementConstructor<any>>"
           },
           {
             "kind": "typescript",
@@ -1099,6 +1133,10 @@
           {
             "kind": "typescript",
             "typeText": "ReactPortal"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Promise<AwaitedReactNode>"
           }
         ]
       },
@@ -1288,6 +1326,37 @@
       ]
     },
     {
+      "name": "enterKeyHint",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "enter",
+          "done",
+          "go",
+          "next",
+          "previous",
+          "search",
+          "send"
+        ]
+      },
+      "typeText": "\"enter\" | \"done\" | \"go\" | \"next\" | \"previous\" | \"search\" | \"send\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "exportparts",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "hidden",
       "required": false,
       "type": {
@@ -1305,6 +1374,17 @@
         "kind": "string"
       },
       "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "inert",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1329,15 +1409,15 @@
         "values": [
           "none",
           "text",
+          "search",
           "tel",
           "url",
           "email",
           "numeric",
-          "decimal",
-          "search"
+          "decimal"
         ]
       },
-      "typeText": "\"none\" | \"text\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\" | \"search\"",
+      "typeText": "\"none\" | \"text\" | \"search\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1578,9 +1658,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "InputEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "InputEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1590,9 +1670,21 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "InputEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "InputEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onBeforeToggle",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "ToggleEventHandler<HTMLElement>"
+      },
+      "typeText": "ToggleEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1674,9 +1766,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "ChangeEventHandler<HTMLElement, Element>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "ChangeEventHandler<HTMLElement, Element>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1686,9 +1778,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "ChangeEventHandler<HTMLElement, Element>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "ChangeEventHandler<HTMLElement, Element>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2250,9 +2342,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "InputEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "InputEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2262,9 +2354,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "InputEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "InputEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2274,9 +2366,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "ReactEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "ReactEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2286,9 +2378,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "ReactEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "ReactEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2946,30 +3038,6 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
-      },
-      "typeText": "FormEventHandler<HTMLElement>",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
-      "name": "onResetCapture",
-      "required": false,
-      "type": {
-        "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
-      },
-      "typeText": "FormEventHandler<HTMLElement>",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
-      "name": "onResize",
-      "required": false,
-      "type": {
-        "kind": "typescript",
         "typeText": "ReactEventHandler<HTMLElement>"
       },
       "typeText": "ReactEventHandler<HTMLElement>",
@@ -2978,7 +3046,7 @@
       ]
     },
     {
-      "name": "onResizeCapture",
+      "name": "onResetCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -3003,6 +3071,30 @@
     },
     {
       "name": "onScrollCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "UIEventHandler<HTMLElement>"
+      },
+      "typeText": "UIEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScrollEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "UIEventHandler<HTMLElement>"
+      },
+      "typeText": "UIEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScrollEndCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -3114,9 +3206,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "SubmitEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "SubmitEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3126,9 +3218,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "FormEventHandler<HTMLElement>"
+        "typeText": "SubmitEventHandler<HTMLElement>"
       },
-      "typeText": "FormEventHandler<HTMLElement>",
+      "typeText": "SubmitEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3177,6 +3269,18 @@
         "typeText": "ReactEventHandler<HTMLElement>"
       },
       "typeText": "ReactEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onToggle",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "ToggleEventHandler<HTMLElement>"
+      },
+      "typeText": "ToggleEventHandler<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3278,6 +3382,30 @@
       ]
     },
     {
+      "name": "onTransitionCancel",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "TransitionEventHandler<HTMLElement>"
+      },
+      "typeText": "TransitionEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionCancelCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "TransitionEventHandler<HTMLElement>"
+      },
+      "typeText": "TransitionEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "onTransitionEnd",
       "required": false,
       "type": {
@@ -3291,6 +3419,54 @@
     },
     {
       "name": "onTransitionEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "TransitionEventHandler<HTMLElement>"
+      },
+      "typeText": "TransitionEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionRun",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "TransitionEventHandler<HTMLElement>"
+      },
+      "typeText": "TransitionEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionRunCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "TransitionEventHandler<HTMLElement>"
+      },
+      "typeText": "TransitionEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "TransitionEventHandler<HTMLElement>"
+      },
+      "typeText": "TransitionEventHandler<HTMLElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionStartCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -3374,6 +3550,61 @@
       ]
     },
     {
+      "name": "part",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popover",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "",
+          "auto",
+          "manual",
+          "hint"
+        ]
+      },
+      "typeText": "\"\" | \"auto\" | \"manual\" | \"hint\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popoverTarget",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popoverTargetAction",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "toggle",
+          "show",
+          "hide"
+        ]
+      },
+      "typeText": "\"toggle\" | \"show\" | \"hide\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "prefix",
       "required": false,
       "type": {
@@ -3413,11 +3644,8 @@
         "kind": "union",
         "members": [
           {
-            "kind": "string"
-          },
-          {
             "kind": "typescript",
-            "typeText": "(instance: HTMLElement) => void | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
+            "typeText": "(instance: HTMLElement) => void | (() => VoidOrUndefinedOnly) | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
           },
           {
             "kind": "typescript",
@@ -3425,7 +3653,7 @@
           }
         ]
       },
-      "typeText": "LegacyRef<HTMLElement>",
+      "typeText": "Ref<HTMLElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3511,6 +3739,10 @@
           {
             "kind": "literal",
             "value": "dialog"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "string & {}"
           },
           {
             "kind": "literal",
@@ -3755,10 +3987,6 @@
           {
             "kind": "literal",
             "value": "treeitem"
-          },
-          {
-            "kind": "typescript",
-            "typeText": "string & {}"
           }
         ]
       },

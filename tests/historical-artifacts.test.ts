@@ -10,14 +10,18 @@ const temporary: string[] = []
 afterEach(() => { for (const directory of temporary.splice(0)) rmSync(directory, { recursive: true, force: true }) })
 
 describe("frozen release artifact guard", () => {
-  test("checks every retained Release 001–008 record and available distribution manifest", () => {
-    expect(Object.keys(HISTORICAL_ARTIFACT_SHA256)).toHaveLength(13)
+  test("checks every retained Release 001–009 record and available distribution manifest", () => {
+    expect(Object.keys(HISTORICAL_ARTIFACT_SHA256)).toHaveLength(15)
     expect(HISTORICAL_ARTIFACT_SHA256["provenance/releases/shadcn-radix-release-007.json"])
       .toBe("366a2dd45490a28689effc10a8c58b68d090d8d0d86895c7e6269c9bbd2ae45c")
     expect(HISTORICAL_ARTIFACT_SHA256["provenance/distributions/shadcn-radix-release-007.distribution.json"])
       .toBe("3631a7f0cf0edf62951e71a5c7b52a2971c629fd5fa72ec5178179b99f8d1168")
     expect(HISTORICAL_ARTIFACT_SHA256["provenance/releases/shadcn-radix-release-008.json"])
       .toBe("890a1a25be20039270c0222524813786044137ff0b90b1843fb9ac0a527015db")
+    expect(HISTORICAL_ARTIFACT_SHA256["provenance/releases/shadcn-radix-release-009.json"])
+      .toBe("2df8a6b086af5b4d90c1bda2a9bb9a3304b18d20f3ef9871d5e5b640f85cd0d4")
+    expect(HISTORICAL_ARTIFACT_SHA256["provenance/distributions/shadcn-radix-release-009.distribution.json"])
+      .toBe("79fbbc7657d68c4a3a5d5cf9db0ebf684617be78bb792036f8b89827d698e87f")
     assertHistoricalArtifacts(root, "test")
   })
 

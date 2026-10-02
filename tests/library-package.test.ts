@@ -196,7 +196,7 @@ describe("immutable Release 003 package artifact verification", () => {
       if (name === "index.js") expect(text).not.toContain("shadcn-radix-release-003")
     }
     const manifest = readJson("package.json")
-    expect(manifest.peerDependencies).toEqual({ react: "18.3.1", "react-dom": "18.3.1" })
+    expect(manifest.peerDependencies).toEqual({ react: "^18.3.1 || ^19.0.0", "react-dom": "^18.3.1 || ^19.0.0" })
     expect(manifest.dependencies.react).toBeUndefined()
     expect(manifest.dependencies["react-dom"]).toBeUndefined()
   })

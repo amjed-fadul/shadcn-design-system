@@ -29,6 +29,10 @@
             "kind": "number"
           },
           {
+            "kind": "typescript",
+            "typeText": "bigint"
+          },
+          {
             "kind": "literal",
             "value": false
           },
@@ -38,7 +42,7 @@
           },
           {
             "kind": "typescript",
-            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+            "typeText": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>>"
           },
           {
             "kind": "typescript",
@@ -47,6 +51,10 @@
           {
             "kind": "typescript",
             "typeText": "React.ReactPortal"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode>>"
           }
         ]
       },
