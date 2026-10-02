@@ -149,6 +149,7 @@ export function assertReachedInputs(root: string, inputs: readonly Implementatio
       continue
     }
     if (generatedDirectories.some(directory => absolute.startsWith(`${path.resolve(directory)}${path.sep}`))) continue
+    if (/^\/(proc|sys|dev|usr|etc|lib|lib64|bin)\//.test(absolute)) continue // Linux OS files (Node reads /proc/self/exe, native tools read /usr/bin/ldd); never build inputs
     const file = normalized(root, absolute)
     if (file.startsWith("node_modules/")) continue // dependency identities are pinned by the lockfile
     if (file === selfOutputPath) continue // the exact generated payload is independently checked before/after build
@@ -168,7 +169,7 @@ export function verifyRepositoryRelease(root: string, expectedReleaseSha256?: st
   // also mandatory in library-data.ts, before Vite emits packaged release data.
   const release = loadExecutableRelease(raw, { expectedProjection: raw.projection, requirePackageIdentity: true })
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
-  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.9" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
+  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.10" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
   verifyImplementationManifest(root, release.implementationInputs)
   return release
 }

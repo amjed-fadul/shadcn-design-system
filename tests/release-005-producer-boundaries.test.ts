@@ -59,7 +59,7 @@ describe("Release 005 producer boundaries", () => {
     const effective = projected("spinner", "Spinner").component!
     const rendering = spinner.rendering
 
-    expect(svg?.source).toMatchObject({ kind: "react-intrinsic", package: "@types/react", version: "18.3.3", symbol: 'React.JSX.IntrinsicElements["svg"]' })
+    expect(svg?.source).toMatchObject({ kind: "react-intrinsic", package: "@types/react", version: "19.3.0", symbol: 'React.JSX.IntrinsicElements["svg"]' })
     expect(spinner.inherits).toContain("html.svg")
     expect(svg?.props.map((prop) => prop.name)).toEqual(expect.arrayContaining(["viewBox", "onClick", "role", "aria-label", "ref"]))
     expect(effective.props).toEqual(expect.arrayContaining([

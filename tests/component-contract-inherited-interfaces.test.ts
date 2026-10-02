@@ -23,7 +23,7 @@ function evidenceRefs(value: unknown): string[] {
 describe("inherited-interface declaration authority", { timeout: 60000 }, () => {
   test("resolves React intrinsic props without traversing a package export path", () => {
     const analyzed = analyzePackageComponentInterface(contract("html.div").source)
-    expect(analyzed.props).toHaveLength(265)
+    expect(analyzed.props).toHaveLength(280)
     expect(analyzed.props.find(({ name }) => name === "hidden")).toEqual({
       name: "hidden", required: false, type: { kind: "boolean" }, typeText: "boolean", evidenceRefs: ["declaration"],
     })
@@ -35,7 +35,7 @@ describe("inherited-interface declaration authority", { timeout: 60000 }, () => 
     ["radix.separator.root", "decorative", "boolean"],
   ])("resolves the exported type-only declaration for %s", (id, name, kind) => {
     const analyzed = analyzePackageComponentInterface(contract(id).source)
-    expect(analyzed.props).toHaveLength(267)
+    expect(analyzed.props).toHaveLength(282)
     expect(analyzed.props.find((prop) => prop.name === name)?.type).toEqual({ kind })
     expect(analyzed.props.find((prop) => prop.name === "asChild")?.type).toEqual({ kind: "boolean" })
     expect(analyzed.props.some((prop) => prop.name === "ref")).toBe(false)
@@ -57,8 +57,8 @@ describe("inherited-interface declaration authority", { timeout: 60000 }, () => 
   })
 
   test.each([
-    ["vaul.drawer.content", 274, "onEscapeKeyDown"],
-    ["vaul.drawer.overlay", 267, "forceMount"],
+    ["vaul.drawer.content", 289, "onEscapeKeyDown"],
+    ["vaul.drawer.overlay", 282, "forceMount"],
     ["vaul.drawer.portal", 3, "container"],
   ] as const)("resolves React default-import declarations for %s", (id, count, propName) => {
     const analyzed = analyzePackageComponentInterface(contract(id).source)
@@ -103,7 +103,7 @@ describe("inherited-interface declaration authority", { timeout: 60000 }, () => 
 
   test("enumerates the complete prop array when only the event boundary is selected", () => {
     const analyzed = analyzePackageComponentInterface(contract("cmdk.command.root").source, { events: ["onValueChange"] })
-    expect(analyzed.props).toHaveLength(273)
+    expect(analyzed.props).toHaveLength(288)
     expect(analyzed.props.some(({ name }) => name === "onValueChange")).toBe(false)
     expect(analyzed.events).toEqual([{
       propName: "onValueChange", required: false, payload: { kind: "string" }, payloadTypeText: "string", evidenceRefs: ["declaration"],

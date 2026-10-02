@@ -85,12 +85,12 @@
         "kind": "enum",
         "values": [
           "none",
-          "inline",
           "list",
+          "inline",
           "both"
         ]
       },
-      "typeText": "\"none\" | \"inline\" | \"list\" | \"both\"",
+      "typeText": "\"none\" | \"list\" | \"inline\" | \"both\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -476,19 +476,19 @@
           },
           {
             "kind": "literal",
+            "value": "grid"
+          },
+          {
+            "kind": "literal",
             "value": "listbox"
           },
           {
             "kind": "literal",
             "value": "tree"
-          },
-          {
-            "kind": "literal",
-            "value": "grid"
           }
         ]
       },
-      "typeText": "boolean | \"dialog\" | \"menu\" | \"true\" | \"false\" | \"listbox\" | \"tree\" | \"grid\"",
+      "typeText": "boolean | \"dialog\" | \"menu\" | \"true\" | \"false\" | \"grid\" | \"listbox\" | \"tree\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1039,9 +1039,39 @@
       "name": "autoCapitalize",
       "required": false,
       "type": {
-        "kind": "string"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": "off"
+          },
+          {
+            "kind": "literal",
+            "value": "none"
+          },
+          {
+            "kind": "literal",
+            "value": "on"
+          },
+          {
+            "kind": "literal",
+            "value": "sentences"
+          },
+          {
+            "kind": "literal",
+            "value": "words"
+          },
+          {
+            "kind": "literal",
+            "value": "characters"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "string & {}"
+          }
+        ]
       },
-      "typeText": "string",
+      "typeText": "\"off\" | \"none\" | \"on\" | \"sentences\" | \"words\" | \"characters\" | (string & {})",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1092,6 +1122,10 @@
             "kind": "number"
           },
           {
+            "kind": "typescript",
+            "typeText": "bigint"
+          },
+          {
             "kind": "literal",
             "value": false
           },
@@ -1101,7 +1135,7 @@
           },
           {
             "kind": "typescript",
-            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+            "typeText": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>>"
           },
           {
             "kind": "typescript",
@@ -1110,6 +1144,10 @@
           {
             "kind": "typescript",
             "typeText": "React.ReactPortal"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode>>"
           }
         ]
       },
@@ -1299,6 +1337,37 @@
       ]
     },
     {
+      "name": "enterKeyHint",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "search",
+          "enter",
+          "done",
+          "go",
+          "next",
+          "previous",
+          "send"
+        ]
+      },
+      "typeText": "\"search\" | \"enter\" | \"done\" | \"go\" | \"next\" | \"previous\" | \"send\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "exportparts",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "hidden",
       "required": false,
       "type": {
@@ -1316,6 +1385,17 @@
         "kind": "string"
       },
       "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "inert",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1589,9 +1669,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.InputEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.InputEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1601,9 +1681,21 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.InputEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.InputEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onBeforeToggle",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ToggleEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.ToggleEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1685,9 +1777,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.ChangeEventHandler<HTMLParagraphElement, Element>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.ChangeEventHandler<HTMLParagraphElement, Element>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1697,9 +1789,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.ChangeEventHandler<HTMLParagraphElement, Element>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.ChangeEventHandler<HTMLParagraphElement, Element>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2261,9 +2353,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.InputEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.InputEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2273,9 +2365,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.InputEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.InputEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2285,9 +2377,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.ReactEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.ReactEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2297,9 +2389,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.ReactEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.ReactEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -2957,30 +3049,6 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
-      },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
-      "name": "onResetCapture",
-      "required": false,
-      "type": {
-        "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
-      },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
-      "name": "onResize",
-      "required": false,
-      "type": {
-        "kind": "typescript",
         "typeText": "React.ReactEventHandler<HTMLParagraphElement>"
       },
       "typeText": "React.ReactEventHandler<HTMLParagraphElement>",
@@ -2989,7 +3057,7 @@
       ]
     },
     {
-      "name": "onResizeCapture",
+      "name": "onResetCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -3014,6 +3082,30 @@
     },
     {
       "name": "onScrollCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.UIEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.UIEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScrollEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.UIEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.UIEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScrollEndCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -3125,9 +3217,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.SubmitEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.SubmitEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3137,9 +3229,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLParagraphElement>"
+        "typeText": "React.SubmitEventHandler<HTMLParagraphElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLParagraphElement>",
+      "typeText": "React.SubmitEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3188,6 +3280,18 @@
         "typeText": "React.ReactEventHandler<HTMLParagraphElement>"
       },
       "typeText": "React.ReactEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onToggle",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ToggleEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.ToggleEventHandler<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3289,6 +3393,30 @@
       ]
     },
     {
+      "name": "onTransitionCancel",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionCancelCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "onTransitionEnd",
       "required": false,
       "type": {
@@ -3302,6 +3430,54 @@
     },
     {
       "name": "onTransitionEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionRun",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionRunCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLParagraphElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLParagraphElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionStartCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -3385,6 +3561,61 @@
       ]
     },
     {
+      "name": "part",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popover",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "",
+          "auto",
+          "manual",
+          "hint"
+        ]
+      },
+      "typeText": "\"\" | \"auto\" | \"manual\" | \"hint\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popoverTarget",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popoverTargetAction",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "toggle",
+          "show",
+          "hide"
+        ]
+      },
+      "typeText": "\"toggle\" | \"show\" | \"hide\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "prefix",
       "required": false,
       "type": {
@@ -3424,11 +3655,8 @@
         "kind": "union",
         "members": [
           {
-            "kind": "string"
-          },
-          {
             "kind": "typescript",
-            "typeText": "(instance: HTMLParagraphElement) => void | React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
+            "typeText": "(instance: HTMLParagraphElement) => void | (() => void | { [UNDEFINED_VOID_ONLY]: never; }) | React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
           },
           {
             "kind": "typescript",
@@ -3436,7 +3664,7 @@
           }
         ]
       },
-      "typeText": "React.LegacyRef<HTMLParagraphElement>",
+      "typeText": "React.Ref<HTMLParagraphElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -3552,20 +3780,8 @@
             "value": "none"
           },
           {
-            "kind": "literal",
-            "value": "list"
-          },
-          {
-            "kind": "literal",
-            "value": "listbox"
-          },
-          {
-            "kind": "literal",
-            "value": "tree"
-          },
-          {
-            "kind": "literal",
-            "value": "grid"
+            "kind": "typescript",
+            "typeText": "string & {}"
           },
           {
             "kind": "literal",
@@ -3625,6 +3841,10 @@
           },
           {
             "kind": "literal",
+            "value": "grid"
+          },
+          {
+            "kind": "literal",
             "value": "gridcell"
           },
           {
@@ -3634,6 +3854,14 @@
           {
             "kind": "literal",
             "value": "heading"
+          },
+          {
+            "kind": "literal",
+            "value": "list"
+          },
+          {
+            "kind": "literal",
+            "value": "listbox"
           },
           {
             "kind": "literal",
@@ -3761,15 +3989,15 @@
           },
           {
             "kind": "literal",
+            "value": "tree"
+          },
+          {
+            "kind": "literal",
             "value": "treegrid"
           },
           {
             "kind": "literal",
             "value": "treeitem"
-          },
-          {
-            "kind": "typescript",
-            "typeText": "string & {}"
           }
         ]
       },

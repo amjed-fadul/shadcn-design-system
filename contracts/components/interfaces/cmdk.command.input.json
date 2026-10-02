@@ -1061,9 +1061,39 @@
       "name": "autoCapitalize",
       "required": false,
       "type": {
-        "kind": "string"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "literal",
+            "value": "none"
+          },
+          {
+            "kind": "literal",
+            "value": "off"
+          },
+          {
+            "kind": "literal",
+            "value": "on"
+          },
+          {
+            "kind": "literal",
+            "value": "sentences"
+          },
+          {
+            "kind": "literal",
+            "value": "words"
+          },
+          {
+            "kind": "literal",
+            "value": "characters"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "string & {}"
+          }
+        ]
       },
-      "typeText": "string",
+      "typeText": "\"none\" | \"off\" | \"on\" | \"sentences\" | \"words\" | \"characters\" | (string & {})",
       "evidenceRefs": [
         "declaration"
       ]
@@ -1084,11 +1114,7 @@
           },
           {
             "kind": "literal",
-            "value": "tel"
-          },
-          {
-            "kind": "literal",
-            "value": "email"
+            "value": "on"
           },
           {
             "kind": "typescript",
@@ -1096,7 +1122,11 @@
           },
           {
             "kind": "literal",
-            "value": "on"
+            "value": "tel"
+          },
+          {
+            "kind": "literal",
+            "value": "email"
           },
           {
             "kind": "literal",
@@ -4639,6 +4669,10 @@
             "kind": "number"
           },
           {
+            "kind": "typescript",
+            "typeText": "bigint"
+          },
+          {
             "kind": "literal",
             "value": false
           },
@@ -4648,7 +4682,7 @@
           },
           {
             "kind": "typescript",
-            "typeText": "React.ReactElement<any, string | React.JSXElementConstructor<any>>"
+            "typeText": "React.ReactElement<unknown, string | React.JSXElementConstructor<any>>"
           },
           {
             "kind": "typescript",
@@ -4657,6 +4691,10 @@
           {
             "kind": "typescript",
             "typeText": "React.ReactPortal"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode>>"
           }
         ]
       },
@@ -4862,16 +4900,27 @@
       "type": {
         "kind": "enum",
         "values": [
-          "search",
           "enter",
           "done",
           "go",
           "next",
           "previous",
+          "search",
           "send"
         ]
       },
-      "typeText": "\"search\" | \"enter\" | \"done\" | \"go\" | \"next\" | \"previous\" | \"send\"",
+      "typeText": "\"enter\" | \"done\" | \"go\" | \"next\" | \"previous\" | \"search\" | \"send\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "exportparts",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
       "evidenceRefs": [
         "declaration"
       ]
@@ -4891,9 +4940,18 @@
       "name": "formAction",
       "required": false,
       "type": {
-        "kind": "string"
+        "kind": "union",
+        "members": [
+          {
+            "kind": "string"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "(formData: FormData) => void | Promise<void>"
+          }
+        ]
       },
-      "typeText": "string",
+      "typeText": "string | ((formData: FormData) => void | Promise<void>)",
       "evidenceRefs": [
         "declaration"
       ]
@@ -4984,6 +5042,17 @@
       ]
     },
     {
+      "name": "inert",
+      "required": false,
+      "type": {
+        "kind": "boolean"
+      },
+      "typeText": "boolean",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "inlist",
       "required": false,
       "type": {
@@ -5003,15 +5072,15 @@
         "values": [
           "none",
           "text",
+          "search",
           "tel",
           "url",
           "email",
           "numeric",
-          "decimal",
-          "search"
+          "decimal"
         ]
       },
-      "typeText": "\"none\" | \"text\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\" | \"search\"",
+      "typeText": "\"none\" | \"text\" | \"search\" | \"tel\" | \"url\" | \"email\" | \"numeric\" | \"decimal\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -5345,9 +5414,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.InputEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.InputEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -5357,9 +5426,21 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.InputEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.InputEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onBeforeToggle",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ToggleEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.ToggleEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -5441,9 +5522,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.ChangeEventHandler<HTMLInputElement, Element>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.ChangeEventHandler<HTMLInputElement, Element>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -6005,9 +6086,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.InputEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.InputEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -6017,9 +6098,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.InputEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.InputEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -6029,9 +6110,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.ReactEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.ReactEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -6041,9 +6122,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.ReactEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.ReactEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -6701,30 +6782,6 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
-      },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
-      "name": "onResetCapture",
-      "required": false,
-      "type": {
-        "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
-      },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
-      "evidenceRefs": [
-        "declaration"
-      ]
-    },
-    {
-      "name": "onResize",
-      "required": false,
-      "type": {
-        "kind": "typescript",
         "typeText": "React.ReactEventHandler<HTMLInputElement>"
       },
       "typeText": "React.ReactEventHandler<HTMLInputElement>",
@@ -6733,7 +6790,7 @@
       ]
     },
     {
-      "name": "onResizeCapture",
+      "name": "onResetCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -6758,6 +6815,30 @@
     },
     {
       "name": "onScrollCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.UIEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.UIEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScrollEnd",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.UIEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.UIEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onScrollEndCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -6869,9 +6950,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.SubmitEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.SubmitEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -6881,9 +6962,9 @@
       "required": false,
       "type": {
         "kind": "typescript",
-        "typeText": "React.FormEventHandler<HTMLInputElement>"
+        "typeText": "React.SubmitEventHandler<HTMLInputElement>"
       },
-      "typeText": "React.FormEventHandler<HTMLInputElement>",
+      "typeText": "React.SubmitEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -6932,6 +7013,18 @@
         "typeText": "React.ReactEventHandler<HTMLInputElement>"
       },
       "typeText": "React.ReactEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onToggle",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.ToggleEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.ToggleEventHandler<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -7033,6 +7126,30 @@
       ]
     },
     {
+      "name": "onTransitionCancel",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionCancelCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "onTransitionEnd",
       "required": false,
       "type": {
@@ -7046,6 +7163,54 @@
     },
     {
       "name": "onTransitionEndCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionRun",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionRunCapture",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionStart",
+      "required": false,
+      "type": {
+        "kind": "typescript",
+        "typeText": "React.TransitionEventHandler<HTMLInputElement>"
+      },
+      "typeText": "React.TransitionEventHandler<HTMLInputElement>",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "onTransitionStartCapture",
       "required": false,
       "type": {
         "kind": "typescript",
@@ -7129,6 +7294,17 @@
       ]
     },
     {
+      "name": "part",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
       "name": "pattern",
       "required": false,
       "type": {
@@ -7146,6 +7322,50 @@
         "kind": "string"
       },
       "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popover",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "",
+          "auto",
+          "manual",
+          "hint"
+        ]
+      },
+      "typeText": "\"\" | \"auto\" | \"manual\" | \"hint\"",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popoverTarget",
+      "required": false,
+      "type": {
+        "kind": "string"
+      },
+      "typeText": "string",
+      "evidenceRefs": [
+        "declaration"
+      ]
+    },
+    {
+      "name": "popoverTargetAction",
+      "required": false,
+      "type": {
+        "kind": "enum",
+        "values": [
+          "toggle",
+          "show",
+          "hide"
+        ]
+      },
+      "typeText": "\"toggle\" | \"show\" | \"hide\"",
       "evidenceRefs": [
         "declaration"
       ]
@@ -7201,11 +7421,8 @@
         "kind": "union",
         "members": [
           {
-            "kind": "string"
-          },
-          {
             "kind": "typescript",
-            "typeText": "(instance: HTMLInputElement) => void | React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
+            "typeText": "(instance: HTMLInputElement) => void | (() => void | { [UNDEFINED_VOID_ONLY]: never; }) | React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]"
           },
           {
             "kind": "typescript",
@@ -7213,7 +7430,7 @@
           }
         ]
       },
-      "typeText": "React.LegacyRef<HTMLInputElement>",
+      "typeText": "React.Ref<HTMLInputElement>",
       "evidenceRefs": [
         "declaration"
       ]
@@ -7310,6 +7527,10 @@
           {
             "kind": "literal",
             "value": "dialog"
+          },
+          {
+            "kind": "typescript",
+            "typeText": "string & {}"
           },
           {
             "kind": "literal",
@@ -7554,10 +7775,6 @@
           {
             "kind": "literal",
             "value": "treeitem"
-          },
-          {
-            "kind": "typescript",
-            "typeText": "string & {}"
           }
         ]
       },

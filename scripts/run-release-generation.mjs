@@ -8,7 +8,7 @@ import { runnerImport } from "vite"
 import { assertHistoricalArtifacts } from "./historical-artifacts.mjs"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const releaseId = "shadcn-radix-release-009"
+const releaseId = "shadcn-radix-release-010"
 const releasePath = path.join(root, `provenance/releases/${releaseId}.json`)
 const r3Path = path.join(root, "provenance/releases/shadcn-radix-release-003.json")
 const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
@@ -55,7 +55,7 @@ assertHistoricalArtifacts(root, "before-release-generation")
 const r3Before = await inspectR3Artifact("before")
 assertR3Artifact(r3Before, "before")
 const packageIdentity = inputs.packageIdentity(root)
-if (packageIdentity.version !== "0.0.0-release.9") throw new Error("R9 package version must be 0.0.0-release.9")
+if (packageIdentity.version !== "0.0.0-release.10") throw new Error("R10 package version must be 0.0.0-release.10")
 const release = releaseApi.createExecutableRelease({
   componentContracts: componentAuthority.loadComponentContracts(),
   tokenContract: tokenAuthority.getTokenContract(),
