@@ -35,6 +35,7 @@ describe("chart model", () => {
     ["donut without valueKey", { type: "donut", series: undefined }, /valueKey/],
     ["donut with series", { type: "donut", valueKey: "thisYear" }, /series/],
     ["stacked donut", { type: "donut", series: undefined, valueKey: "thisYear", layout: "stacked" }, /layout/],
+    ["stacked lines", { type: "line", layout: "stacked" }, /layout applies only to area and bar/],
     ["curve on bars", { curve: "step" }, /curve/],
     ["orientation on lines", { type: "line", orientation: "horizontal" }, /orientation/],
     ["no series on bars", { series: [] }, /series/],

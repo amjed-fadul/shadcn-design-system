@@ -53,7 +53,7 @@
   ],
   "options": [
     {
-      "statement": "valueFormat is number (default), currency (requires an ISO 4217 currency such as USD), percent (values are fractions, 0.124 is 12.4%) or compact (42K); axis ticks always use the compact form. layout stacks area, bar and line series; orientation=horizontal lays bars sideways; curve is monotone (default), linear or step. xAxis, yAxis and grid default to true; legend defaults to on for 2 or more series. animation=auto animates once and respects reduced motion; animation=off renders immediately.",
+      "statement": "valueFormat is number (default), currency (requires an ISO 4217 currency such as USD), percent (values are fractions, 0.124 is 12.4%) or compact (42K); axis ticks always use the compact form. layout stacks area and bar series (lines never stack); orientation=horizontal lays bars sideways; curve is monotone (default), linear or step. xAxis, yAxis and grid default to true; legend defaults to on for 2 or more series. animation=auto animates once and respects reduced motion; animation=off renders immediately.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [

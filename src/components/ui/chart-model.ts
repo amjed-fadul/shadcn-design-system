@@ -124,7 +124,6 @@ export function createChartModel(input: ChartModelInput, locale?: string): Chart
   if (partToWhole) {
     if (input.series !== undefined) fail("Chart series applies to area, bar and line charts; donut and radial charts use valueKey.")
     if (!input.valueKey) fail("Donut and radial charts need a valueKey.")
-    if (input.layout !== undefined) fail("Chart layout applies to area, bar and line charts.")
   } else {
     if (input.valueKey !== undefined) fail("Chart valueKey applies only to donut and radial charts.")
     if (!input.series || input.series.length === 0) fail("Area, bar and line charts need at least one series.")
@@ -132,6 +131,8 @@ export function createChartModel(input: ChartModelInput, locale?: string): Chart
     const keys = input.series.map((entry) => entry.key)
     if (new Set(keys).size !== keys.length) fail("Chart series keys must not contain duplicates.")
   }
+  // Stacked lines read as independent trends, so only areas and bars stack.
+  if (input.layout !== undefined && input.type !== "area" && input.type !== "bar") fail("Chart layout applies only to area and bar charts.")
   if (input.curve !== undefined && input.type !== "area" && input.type !== "line") fail("Chart curve applies only to area and line charts.")
   if (input.orientation !== undefined && input.type !== "bar") fail("Chart orientation applies only to bar charts.")
   if (input.valueFormat === "currency" && !input.currency) fail("Chart valueFormat \"currency\" needs a currency code.")
