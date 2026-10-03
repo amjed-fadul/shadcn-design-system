@@ -182,7 +182,8 @@ describe("release package input identity", () => {
       expect(live.length).toBeGreaterThan(0)
       expect(Math.max(...live)).toBeLessThan(6144 * 0.75)
     }
-  }, 130_000)
+    // Each real build takes about 100 s on a quiet machine since the charts entry; leave room for load.
+  }, 240_000)
   test("excludes release and output identities without overlooking authority data", () => {
     const { directory, put } = fixture()
     for (const file of ["provenance/releases/shadcn-radix-release-004.json", "dist-library/index.js", "candidate.tgz", "distribution-manifest.json"]) put(file, "{}")
@@ -299,7 +300,8 @@ describe("release package input identity", () => {
     } catch (error) {
       expect(String((error as { stderr?: string }).stderr)).toMatch(/R3_ARTIFACT_MISMATCH.*before/)
     }
-  }, 30_000)
+    // About 24 s on a quiet machine; leave room for load.
+  }, 90_000)
   test("candidate verification rejects fresh tarball byte drift even when inventory is unchanged", async () => {
     const directory = mkdtempSync(path.join(tmpdir(), "r4-tarball-drift-")); temporary.push(directory)
     const sourceManifest = JSON.parse(readFileSync(r4DistributionManifest, "utf8"))
