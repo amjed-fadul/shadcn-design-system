@@ -46,6 +46,16 @@ async function waitForReady(canvasElement: HTMLElement) {
   await waitFor(() => expect(canvasElement.querySelector('[data-slot="chart-plot"]')?.getAttribute("data-chart-state")).toBe("ready"), { timeout: 3000 })
 }
 
+// Ready means drawn: once the chart reports ready, no mark moves by a visible amount.
+async function expectSettledAtReady(canvasElement: HTMLElement) {
+  const coordinates = () => [...canvasElement.querySelectorAll(".recharts-rectangle, .recharts-curve, .recharts-sector")].flatMap((mark) => (mark.getAttribute("d") ?? "").match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [])
+  const atReady = coordinates()
+  await new Promise((resolve) => setTimeout(resolve, 600))
+  const later = coordinates()
+  await expect(later).toHaveLength(atReady.length)
+  await expect(Math.max(0, ...later.map((value, index) => Math.abs(value - atReady[index])))).toBeLessThan(0.01)
+}
+
 // Every axis and centre label must sit inside its chart surface: the surface clips overflow.
 async function expectNoClippedText(canvasElement: HTMLElement) {
   for (const surface of canvasElement.querySelectorAll("svg.recharts-surface")) {
@@ -60,6 +70,7 @@ async function expectNoClippedText(canvasElement: HTMLElement) {
 
 const checkChart: Story["play"] = async ({ canvasElement }) => {
   await waitForReady(canvasElement)
+  await expectSettledAtReady(canvasElement)
   const figure = canvasElement.querySelector('figure[data-slot="chart"]')!
   await expect(figure.getAttribute("aria-label")).toBeTruthy()
   const description = canvasElement.ownerDocument.getElementById(figure.getAttribute("aria-describedby")!)!

@@ -107,6 +107,20 @@ describe("Chart", () => {
     expect(plot().getAttribute("data-chart-state")).toBe("ready")
   })
 
+  test("draws again, and only then signals ready, when the data changes", () => {
+    vi.useFakeTimers()
+    render(barProps)
+    resize(600)
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
+    render({ ...barProps, data: revenue.map((row) => ({ ...row, thisYear: row.thisYear * 2 })) })
+    expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
+    render({ ...barProps, data: revenue.map((row) => ({ ...row, thisYear: row.thisYear * 2 })) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
+  })
+
   test("shows an explicit empty state and still signals ready", () => {
     render({ ...barProps, data: [], animation: "auto" })
     resize(600)

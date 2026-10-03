@@ -40,6 +40,9 @@ type ChartOptions = { xAxis: boolean; yAxis: boolean; grid: boolean; legend: boo
 // Series colours come only from the governed chart tokens, in slot order: the model
 // assigns var(--chart-1) to var(--chart-5) and marks use those values directly.
 const ANIMATION_MS = 400
+// Frames of unchanged marks that count as finished, and the most frames to wait for them.
+const SETTLED_FRAMES = 2
+const MAX_SETTLE_FRAMES = 180
 const RATIOS: Record<ChartAspectRatio, number> = { "16/9": 16 / 9, "4/3": 4 / 3, "1/1": 1, "2/1": 2 }
 const AXIS_TICK = { className: "text-xs", fill: "var(--muted-foreground)" }
 // Label room comes from the longest label at the 12px tick size (a generous 0.63em per
@@ -83,6 +86,11 @@ function valueExtent(model: ChartModel): [number, number] {
   return [Math.min(0, ...totals), Math.max(0, ...totals)]
 }
 
+function markGeometry(plot: HTMLElement | null): string {
+  if (!plot) return ""
+  return [...plot.querySelectorAll(".recharts-rectangle, .recharts-curve, .recharts-sector")].map((mark) => mark.getAttribute("d")).join("|")
+}
+
 function prefersReducedMotion(): boolean {
   return typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
 }
@@ -124,15 +132,13 @@ function ChartLegendContent({ model }: { model: ChartModel }) {
   )
 }
 
-function ChartPlot({ model, options, width, height, animate, onDrawn }: { model: ChartModel; options: ChartOptions; width: number; height: number; animate: boolean; onDrawn: () => void }) {
+type ChartPlotProps = { model: ChartModel; options: ChartOptions; width: number; height: number; animate: boolean; signature: string }
+
+function ChartPlotContent({ model, options, width, height, animate }: ChartPlotProps) {
   const gradientPrefix = React.useId().replace(/:/g, "")
-  const remaining = React.useRef(0)
-  remaining.current = model.series.length
-  const handleAnimationEnd = () => {
-    remaining.current -= 1
-    if (remaining.current <= 0) onDrawn()
-  }
-  const animation = { isAnimationActive: animate, animationDuration: ANIMATION_MS, onAnimationEnd: handleAnimationEnd }
+  // Every mark starts at once and runs for ANIMATION_MS, so the frame knows when drawing ends.
+  // Recharts' onAnimationEnd also fires on effect cleanup, so it is not a finished signal.
+  const animation = { isAnimationActive: animate, animationBegin: 0, animationDuration: ANIMATION_MS }
   const tooltip = <Tooltip cursor={model.type === "bar" ? { fill: "var(--muted)" } : { stroke: "var(--border)" }} content={<ChartTooltipContent model={model} />} />
   const stacked = model.layout === "stacked"
   const horizontal = model.type === "bar" && model.orientation === "horizontal"
@@ -239,10 +245,18 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
   )
 }
 
+// Recharts starts a new animation whenever a mark re-renders, so the plot renders again only
+// when what it draws changes.
+const ChartPlot = React.memo(ChartPlotContent, (previous, next) => previous.signature === next.signature && previous.animate === next.animate)
+
 function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptions }) {
   const plotRef = React.useRef<HTMLDivElement>(null)
   const [width, setWidth] = React.useState(0)
-  const [drawn, setDrawn] = React.useState(false)
+  // Ready belongs to what was drawn: any change to the plot size, type, options, series or
+  // data starts a new drawing, so a screenshot never captures a chart mid-animation.
+  const signature = JSON.stringify([width, options, model.type, model.layout, model.orientation, model.curve, model.valueFormat, model.size, model.series, model.table])
+  const [drawnSignature, setDrawnSignature] = React.useState<string | null>(null)
+  const drawn = drawnSignature === signature
   const animate = options.animation === "auto" && !model.empty && !prefersReducedMotion()
 
   React.useEffect(() => {
@@ -256,14 +270,33 @@ function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptio
   React.useEffect(() => {
     if (width <= 0 || drawn) return
     if (!animate) {
-      setDrawn(true)
+      setDrawnSignature(signature)
       return
     }
-    // Recharts reports onAnimationEnd per series; the timer is the backstop when a
-    // series has nothing to animate, so headless capture never waits forever.
-    const timer = setTimeout(() => setDrawn(true), ANIMATION_MS + 150)
-    return () => clearTimeout(timer)
-  }, [width, animate, drawn])
+    // Recharts lays marks out a render after mount and animates them by time from there, so
+    // after ANIMATION_MS the frame watches the marks and reports ready once they draw the
+    // same on consecutive frames. The frame cap keeps a chart from waiting forever.
+    let frame = 0
+    let frames = 0
+    let settled = 0
+    let previous = markGeometry(plotRef.current)
+    const watch = () => {
+      const current = markGeometry(plotRef.current)
+      settled = current === previous ? settled + 1 : 0
+      previous = current
+      frames += 1
+      if (settled >= SETTLED_FRAMES || frames >= MAX_SETTLE_FRAMES) setDrawnSignature(signature)
+      else frame = requestAnimationFrame(watch)
+    }
+    const timer = setTimeout(() => {
+      previous = markGeometry(plotRef.current)
+      frame = requestAnimationFrame(watch)
+    }, ANIMATION_MS)
+    return () => {
+      clearTimeout(timer)
+      cancelAnimationFrame(frame)
+    }
+  }, [width, animate, drawn, signature])
 
   const state = width <= 0 ? "measuring" : drawn ? "ready" : "drawing"
   const height = model.size.kind === "height" ? model.size.height : Math.round(width / RATIOS[model.size.aspectRatio])
@@ -272,7 +305,7 @@ function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptio
   let content: React.ReactNode
   if (width <= 0) content = <div data-slot="chart-skeleton" aria-hidden className="size-full rounded-lg bg-muted" />
   else if (model.empty) content = <div data-slot="chart-empty" className="flex size-full items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">No data</div>
-  else content = <ChartPlot model={model} options={options} width={width} height={height} animate={animate} onDrawn={() => setDrawn(true)} />
+  else content = <ChartPlot model={model} options={options} width={width} height={height} animate={animate} signature={signature} />
 
   return (
     <div className="flex w-full flex-col gap-3">

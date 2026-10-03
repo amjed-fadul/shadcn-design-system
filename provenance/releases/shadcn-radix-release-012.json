@@ -92,8 +92,8 @@
     },
     {
       "path": "contracts/components/families/chart.json",
-      "gitBlob": "6cb5ddd87cc57c4c512c833a515c785fb0743609",
-      "sha256": "5cad2c79a3ac7cc40433563038051cc2918169404c4d37982950c6473792fbdd"
+      "gitBlob": "5f78922cb49b44526c7689459b8d117f5423e0d2",
+      "sha256": "a5cd521c5cfa2647bb34927e0664507b4b7b5858b1047ae92178c66bc72d4c43"
     },
     {
       "path": "contracts/components/families/checkbox.json",
@@ -1147,13 +1147,13 @@
     },
     {
       "path": "provenance/component-contract-source.json",
-      "gitBlob": "4158190e904fc79ad3930ec6cd8602c70892d317",
-      "sha256": "2b2609fe5f5d9a3f40ac09927bc736ad11ca001f5f3264f696f0017a02e4cff6"
+      "gitBlob": "c3936e08c0037f0205250c11cbec3cb8c9d8fbc3",
+      "sha256": "b9a1fe03cad9bb6d525022bd609e37f5ad8d38e1a27c15288343cc65fccc3c36"
     },
     {
       "path": "provenance/seed-components.json",
-      "gitBlob": "e7d8913bd9efa073224192ad604186e73971553b",
-      "sha256": "61f4ad0de1b8cb978ff5ae1d30a2097eac66737bc13b49559d295780980938cb"
+      "gitBlob": "7e10ac33841438ee20d3c93e9a5b3931624b813c",
+      "sha256": "04406d5f16e3b7fee3d317a59a1c113859b5b8272777a980badd1c6fbe650910"
     },
     {
       "path": "provenance/token-contract-source.json",
@@ -1317,18 +1317,18 @@
     },
     {
       "path": "src/components/ui/chart-model.ts",
-      "gitBlob": "102c9a39a15fc1ceeb559fa5e679964e76c1efec",
-      "sha256": "f2fc972d14552c368cca20ede698ca7d4a0f60dcc45e74a37903f31d989977df"
+      "gitBlob": "532ac0c03ba7c59cadff0dd0c70ed82913148133",
+      "sha256": "952824eca7f0205d0756e85c65f117b05b52f87f04d4f3da6897922f93edca77"
     },
     {
       "path": "src/components/ui/chart.stories.tsx",
-      "gitBlob": "5ced529107f9059aa2ae62734b11ffd7bb472bf5",
-      "sha256": "9104523617482766fdc0549dc5bef667116d6ff98b8ea5a40352b8b95d992773"
+      "gitBlob": "6bff5b6b1f178799deaaee1cef50e03195aa2237",
+      "sha256": "eab53dab9e3eb1cfa9f0e0fa617fda110d70cc460c6db49191e64ffe3af25a29"
     },
     {
       "path": "src/components/ui/chart.tsx",
-      "gitBlob": "72026f981f1cff981267ab0e42a1912a2c742506",
-      "sha256": "57f61463e2dced46589d3b2e5d38d1fa0c1217728529e50af91f8ce6b6f72d98"
+      "gitBlob": "7d6b14eee0c231bc898a53c3504126838d484d42",
+      "sha256": "800accff4dbccd8751783428135dc843bc62df99daab0c3fb91e93598a0187b7"
     },
     {
       "path": "src/components/ui/checkbox.stories.tsx",
@@ -530005,5 +530005,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "4bbc59499bea9930693e758d11938565d7b395781fcf46a07f5703fa004af3b0"
+  "sha256": "3e3e79d87b22003ce0a4cd34b1554922dd38d2e2457005affe1cfee4ca338873"
 }
