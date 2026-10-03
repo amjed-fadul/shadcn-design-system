@@ -336,7 +336,7 @@ describe("release package input identity", () => {
     expect(loadExecutableRelease(release, { expectedProjection: release.projection, expectedReleaseId: "shadcn-radix-release-004", requirePackageIdentity: true })).toEqual(release)
     expect(release.packageIdentity.name).toBe("@adc/shadcn-design-system")
     expect(release.packageIdentity.version).toBe("0.0.0-release.4")
-    expect(Object.keys(release.packageIdentity.publicEntrypoints).sort()).toEqual([".", "./release", "./styles.css"])
+    expect(Object.keys(release.packageIdentity.publicEntrypoints).sort()).toEqual([".", "./charts", "./release", "./styles.css"])
     expect(release.projection.exports["sidebar\0SidebarProvider"].component.composition.provides).toEqual(["sidebar.context"])
     expect(release.projection.exports["sidebar\0Sidebar"].component.composition.requires).toEqual(["sidebar.context"])
     const inputPaths = release.implementationInputs.map((entry: { path: string }) => entry.path)

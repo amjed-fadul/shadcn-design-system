@@ -7,6 +7,6 @@
     "rootDir": ".",
     "outDir": "./dist-library/types"
   },
-  "include": ["src/package/index.ts", "src/package/release.ts", "src/package/virtual-data.d.ts"],
+  "include": ["src/package/index.ts", "src/package/charts.ts", "src/package/release.ts", "src/package/virtual-data.d.ts"],
   "exclude": ["tests", ".storybook", "src/**/*.stories.tsx"]
 }
