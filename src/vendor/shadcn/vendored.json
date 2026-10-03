@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "reason": "The design system only uses the shadcn package's tailwind.css stylesheet; it never runs the shadcn CLI. Vendoring the stylesheet removes the CLI's dev-only dependency tree, which carried GHSA-vfj7-8cjw-p6xm (braces, no patched version), as Canvas did in its PR #45.",
+  "package": {
+    "name": "shadcn",
+    "version": "4.19.0",
+    "license": "MIT",
+    "author": {
+      "name": "shadcn",
+      "url": "https://twitter.com/shadcn"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/shadcn-ui/ui.git",
+      "directory": "packages/shadcn"
+    },
+    "integrity": "sha512-EQF6R+CUXTsEP2BpyhxrUEAFesrtFD1POvVOf5jM+wkgtA4kG1EW1+1Wlmi9LqiprSL681JJXBcS0u8WkVVVyQ=="
+  },
+  "files": [
+    {
+      "path": "src/vendor/shadcn/tailwind.css",
+      "source": "dist/tailwind.css",
+      "sha256": "bc7d83425702955b4cb67cb14ede9d603f9d912376d57a2d81d661094d2a782a"
+    },
+    {
+      "path": "src/vendor/shadcn/LICENSE.md",
+      "source": "LICENSE.md",
+      "sha256": "1564074e13439397221ffd522e2e504d56561994a23d371aa5e3ad43e4f5423f"
+    }
+  ]
+}

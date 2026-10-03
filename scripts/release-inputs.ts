@@ -71,6 +71,8 @@ export function discoverImplementationInputs(root: string, options: ReleaseInput
   // Tailwind's library CSS pass observes UI source, including story files;
   // bind every observed byte even when stories are excluded from declarations.
   walk("src/components/ui")
+  // Vendored upstream files (stylesheet, licence and their origin record) since Release 011.
+  walk("src/vendor")
   if (existsSync(path.join(root, "provenance"))) for (const entry of readdirSync(path.join(root, "provenance"), { withFileTypes: true })) if (!entry.isDirectory()) add(`provenance/${entry.name}`)
   const readConfig = (file: string): ts.ParsedCommandLine => {
     const host: ts.ParseConfigFileHost = { ...ts.sys, readFile(file) { add(file); return ts.sys.readFile(file) }, onUnRecoverableConfigFileDiagnostic(diagnostic) { throw new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")) } }

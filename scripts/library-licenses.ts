@@ -12,10 +12,21 @@ export function libraryLicenseNotices(root: string, moduleIds: readonly string[]
     const name = segments.slice(0, segments[0].startsWith("@") ? 2 : 1).join("/")
     directories.add(path.join(id.slice(0, offset).replace(/^\0/, ""), "node_modules", name))
   }
-  for (const name of ["tailwindcss", "shadcn", "tw-animate-css", "@fontsource-variable/geist"]) {
+  for (const name of ["tailwindcss", "tw-animate-css", "@fontsource-variable/geist"]) {
     directories.add(path.join(root, "node_modules", name))
   }
-  const notices = [...directories].map((directory) => {
+  // Vendored upstream files keep their package's original notice (Release 011: the shadcn stylesheet).
+  const vendored = ["src/vendor/shadcn/vendored.json"].map((record) => {
+    const { package: metadata, files } = JSON.parse(readFileSync(path.join(root, record), "utf8")) as {
+      package: { name: string; version: string; license: string; author?: unknown; repository?: unknown }
+      files: Array<{ path: string }>
+    }
+    const licenses = files.map((file) => file.path).filter((file) => /^(LICEN[CS]E(?:\.|$)|COPYING|CopyrightNotice)/i.test(path.basename(file))).sort()
+    if (!licenses.length || !metadata.license) throw new Error(`Vendored source has no license notice: ${metadata.name}`)
+    const attribution = JSON.stringify({ license: metadata.license, author: metadata.author, repository: metadata.repository }, null, 2)
+    return { name: `${metadata.name}@${metadata.version}`, text: [attribution, ...licenses.map((file) => readFileSync(path.join(root, file), "utf8"))].join("\n\n") }
+  })
+  const notices = [...vendored, ...[...directories].map((directory) => {
     const metadata = JSON.parse(readFileSync(path.join(directory, "package.json"), "utf8"))
     const entries = readdirSync(directory)
     const files = entries.filter((name) => /^(LICEN[CS]E(?:\.|$)|COPYING|CopyrightNotice)/i.test(name)).sort()
@@ -25,6 +36,6 @@ export function libraryLicenseNotices(root: string, moduleIds: readonly string[]
     if (!files.length || !metadata.license) throw new Error(`Bundled dependency has no license notice: ${metadata.name}`)
     const attribution = JSON.stringify({ license: metadata.license, author: metadata.author, repository: metadata.repository }, null, 2)
     return { name: `${metadata.name}@${metadata.version}`, text: [attribution, ...files.map((file) => readFileSync(path.join(directory, file), "utf8"))].join("\n\n") }
-  }).sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0)
+  })].sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0)
   return notices.map(({ name, text }) => `${name}\n${"=".repeat(name.length)}\n${text}`).join("\n\n")
 }

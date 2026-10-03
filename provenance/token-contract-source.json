@@ -7,7 +7,7 @@
   "sources": {
     "canonicalTheme": {
       "path": "src/index.css",
-      "blobSha": "a3f9531864eb56bc1e55746a31032fd8fcbdf2ac"
+      "blobSha": "292413e4bf94ddf6ec4422474b730e47d1e0af5f"
     },
     "shadcnNeutral": {
       "repository": "shadcn-ui/ui",
