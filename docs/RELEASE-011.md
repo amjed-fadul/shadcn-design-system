@@ -11,8 +11,12 @@ The design and rulings are in
 is in [CANVAS-RELEASE-011](CANVAS-RELEASE-011.md). The chart component family is the separate
 [Release 012 draft spec](superpowers/specs/2026-10-03-release-012-chart-family-proposal.md).
 
-**Status: candidate.** The owner approved token contract `-003` on 2026-10-03 after reviewing light
-and dark renders. The release itself awaits owner acceptance.
+**Status: accepted; merge waits for macOS release qualification.**
+- **Token contract:** the owner approved token contract `-003` on 2026-10-03, after reviewing light
+  and dark renders.
+- **Candidate:** the owner accepted the Release 011 candidate the same day. The accepted candidate is
+  tarball `1b76e05e…` (payload `915ee7ab…`).
+- **Before merge:** the manual macOS `release-qualification` workflow must pass.
 
 ## Changes
 
@@ -63,29 +67,45 @@ and dark renders. The release itself awaits owner acceptance.
   - **Effect:** the Release 010 commit itself runs out of memory at 6144 MB on this Mac, and two
     Release 010 baseline tests failed the same way. At 12 GB the build completes with a 4.8 GB
     maximum RSS.
-  - **Later:** releasing the producer state before Vite runs would lower the peak.
+  - **Later:** a follow-up session traced the retained state. The component loader keeps 23
+    TypeScript programs (about 2.8 GB) alive through the Vite bundle. The owner scheduled that fix
+    for Release 012.
+- **Vendored shadcn stylesheet:** the repo only imports `shadcn/tailwind.css` and never runs the
+  shadcn CLI.
+  - **What moved:** the stylesheet and its MIT licence were copied byte for byte into
+    `src/vendor/shadcn/`. `vendored.json` records their origin (shadcn@4.19.0, lockfile integrity and
+    file SHA-256s).
+  - **Dependency removed:** the `shadcn` dev dependency is gone: 234 lockfile entries, with no other
+    version changes. Its tree carried GHSA-vfj7-8cjw-p6xm (`braces`, high severity, no patched
+    version), which had turned the full `npm audit` red. The full audit now finds 0 vulnerabilities.
+  - **Effect on outputs:** none. The compiled stylesheet, JS bundle, licence notices and type
+    declarations are byte-identical. Release inputs walk `src/vendor`.
 - **Identity:** package `0.0.0-release.11` and release `shadcn-radix-release-011`. The Release 010
   record and manifest are frozen in `scripts/historical-artifacts.mjs`. CI targets the r11 binding.
 
 ## Not included
 
 - **Container and breakpoint tokens:** the token contract's Phase 2 scope invariant excludes the
-  `container` and `breakpoint` namespaces. Custom properties cannot drive media queries. Lifting the
-  exclusion is an owner decision.
-- **The chart component family:** Release 012.
+  `container` and `breakpoint` namespaces. On 2026-10-03 the owner decided to keep them excluded:
+  - Canvas pages are fixed at 1440×900, and responsive layouts are not in V1, so the tokens would
+    drive nothing yet;
+  - custom properties cannot drive media queries anyway.
+
+  Revisit when Canvas gets responsive pages.
+- **The chart component family:** Release 012. The owner approved its spec on 2026-10-03.
 
 ## Candidate
 
 | Identity | SHA-256 |
 | --- | --- |
-| Release payload | `e207a258a32bd862c676c586e3d334ac721785cf03d5ce4b8681339b07ad98a6` |
-| Release record file `provenance/releases/shadcn-radix-release-011.json` | `92e5cd7cf635b19b6bbbeeb9a8710da1572cd839ca7730baa53bcdd08a3487f7` |
-| Distribution manifest | `d75c50c9d0d38c9ff158d1d130c4458f6e2167e5b0e9874e64a7e5acac207552` |
-| Tarball `adc-shadcn-design-system-0.0.0-release.11.tgz` | `240e8f09351f71cc8795a59560b0f5e6b2cc3a76dcf14f6ebdda4135d24b6a58` |
+| Release payload | `915ee7ab6345f7f550f599beea432c143b18c9c45dce264e1a2376bb2670f2e6` |
+| Release record file `provenance/releases/shadcn-radix-release-011.json` | `fd3afb47e710fa18f4007ad759134018ce4114ec0b5bfd5acb64bbcad4d35773` |
+| Distribution manifest | `9190ce39c049cc6016fdd976d6a2bb405ce74119bfda4847b4d7548a3f6577ea` |
+| Tarball `adc-shadcn-design-system-0.0.0-release.11.tgz` | `1b76e05e538fde70c4cb399f8e9e5c7d0b6cf93b6f94068e793aa4b6e96bae63` |
 
-- **Integrity:** `sha512-X7lsA+7mXqnNbzosKgNmYzMsrMCrrZVk5GXs8nyAa9bLFk6ZK8QthzQrJqiOL6DBrcvHg1VJZkcJOF0fGLcPZA==`.
-- **Packing:** 56 packed files, from 364 implementation inputs (the same paths as Release 010).
-- **Producer commit:** `c5942c47b69bd004b55b1c54d3821bcf955a780f`.
+- **Integrity:** `sha512-hkKxDkuPT5ylF6zIjRlFFmpTgw0AURCCeOFT8crTAMVt75sVgpWS4izDOMUMIO5WYwYPeUnK93VOReeeIEtkCA==`.
+- **Packing:** 56 packed files, from 365 implementation inputs.
+- **Producer commit:** `20b0e162b41343da34b3349c0e4c669753939489`.
 - **Toolchain:** Node 22.18.0, npm 10.9.3, darwin arm64, Vite 7.3.6, TypeScript 5.5.4, Rollup 4.63.1,
   esbuild 0.28.2.
 - **Determinism:** release generation ran twice with byte-identical output. Historical Releases
@@ -94,17 +114,49 @@ and dark renders. The release itself awaits owner acceptance.
   `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-011-candidate/`. Its manifest
   is also committed as `provenance/distributions/shadcn-radix-release-011.distribution.json`. The
   tarball is not committed; Canvas vendors it.
-- **Superseded candidates:** two earlier candidates were never accepted, and their artifacts are kept
-  aside.
-  - Payload `fc2d8b84…` (tarball `82cf2471…`) omitted the `radius.full` facts. Its artifacts are in
+- **Superseded candidates:** three earlier candidates were never accepted. Their artifacts are kept
+  aside under `~/.artifacts/shadcn-design-system/`.
+  - Payload `fc2d8b84…` (tarball `82cf2471…`) omitted the `radius.full` facts. Artifacts:
     `shadcn-radix-release-011-superseded-fc2d8b84/`.
   - Payload `a671bdfa…` was built before the heap fix; its tarball build ran out of memory.
+  - Payload `e207a258…` (tarball `240e8f09…`) still depended on the shadcn CLI package. Artifacts:
+    `shadcn-radix-release-011-superseded-e207a258/`. Against the final candidate, only
+    `dist-library/release.js` and the packed `package.json` differ; the other 54 packed files are
+    identical.
 - **Packed stylesheet:** it emits every new variable in both modes (`--success`, `--warning`,
   `--info` and their foregrounds, the new `--chart-1..5`, `--radius-full` and `--leading-display`).
 
 ## Verification
 
-@@VERIFICATION@@
+All commands ran with Node 22.18.0 and npm 10.9.3.
+
+- **Release generation:** ran twice per regeneration, with byte-identical output. Historical Releases
+  001–010 were checked before and after each run.
+- **`release:verify`:** accepted payload `915ee7ab…`.
+- **`candidate:verify`:** rebuilt the package from producer inputs. All 56 packed files matched the
+  retained candidate byte for byte, and no expectations were refreshed.
+- **`npm run typecheck`:** passed.
+- **`npm run build`:** passed.
+- **Unit suite at the PR head (clean worktree):** @@UNIT@@
+- **Storybook:** `vitest --project=storybook` passed 43 files and 230 tests. That is Release 009's
+  224 plus 6 new stories, with the axe gate at `error`, so the new colours pass rendered contrast
+  checks in light and dark. `build-storybook` passed.
+- **Owner review:** the owner reviewed light and dark renders of every new token and option, and
+  approved token contract `-003` on 2026-10-03.
+- **Release 010 baseline (clean worktree, unmodified):** 1,550 of 1,554 tests passed. All 4 failures
+  were in `package-identity`:
+  - two real builds ran out of memory (fixed in this release by the 8 GB build heap);
+  - one timed out;
+  - one candidate-verification child process errored.
+- **Timing-sensitive tests:**
+  - `provenance.test.ts` spawns `git hash-object` 41 times. At about 0.17 s per spawn it can exceed
+    Vitest's 5 s default when the machine is loaded; it passes with a longer timeout.
+  - Under a load spike (load average 45 on 8 cores), nine `component-contract-independent-review`
+    tests also exceeded 5 s. That file passes all 89 tests when re-run.
+- **`npm audit`:** full and production audits find 0 vulnerabilities after the shadcn stylesheet
+  was vendored. Before that, GHSA-vfj7-8cjw-p6xm (`braces`, published after main's last green run)
+  failed the full audit for both Release 010 and this branch.
+- **CI:** @@CI@@
 
 ## Build location
 

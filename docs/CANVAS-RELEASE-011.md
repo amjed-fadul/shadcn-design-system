@@ -6,14 +6,17 @@ and `line-height.display` under token contract `shadcn-radix-token-contract-003`
 Badge, Alert, Icon and Avatar. Every existing default renders as before. Releases 001–010 remain
 byte-for-byte unchanged.
 
-**Status: candidate.** The owner approved token contract `-003` on 2026-10-03 after reviewing light
-and dark renders. The release itself awaits owner acceptance; Canvas should adopt it only after that.
+**Status: accepted by the owner on 2026-10-03.**
+- Token contract `-003` was approved after light and dark render review.
+- The accepted candidate is tarball `1b76e05e…`.
+- Merge waits for the manual macOS release-qualification run. Canvas can vendor the exact tarball
+  below.
 
 ## Exact distribution
 
 **Identities**
 
-- Producer source commit: `c5942c47b69bd004b55b1c54d3821bcf955a780f`
+- Producer source commit: `20b0e162b41343da34b3349c0e4c669753939489`
 - Package: `@adc/shadcn-design-system@0.0.0-release.11`
 - Release: `shadcn-radix-release-011`
 - Token contract: `shadcn-radix-token-contract-003` (`approved`)
@@ -21,18 +24,18 @@ and dark renders. The release itself awaits owner acceptance; Canvas should adop
 
 **Hashes**
 
-- Release payload SHA-256: `e207a258a32bd862c676c586e3d334ac721785cf03d5ce4b8681339b07ad98a6`
-- Release JSON SHA-256: `92e5cd7cf635b19b6bbbeeb9a8710da1572cd839ca7730baa53bcdd08a3487f7`
-- Candidate tarball SHA-256: `240e8f09351f71cc8795a59560b0f5e6b2cc3a76dcf14f6ebdda4135d24b6a58`
+- Release payload SHA-256: `915ee7ab6345f7f550f599beea432c143b18c9c45dce264e1a2376bb2670f2e6`
+- Release JSON SHA-256: `fd3afb47e710fa18f4007ad759134018ce4114ec0b5bfd5acb64bbcad4d35773`
+- Candidate tarball SHA-256: `1b76e05e538fde70c4cb399f8e9e5c7d0b6cf93b6f94068e793aa4b6e96bae63`
 - Candidate tarball integrity:
-  `sha512-X7lsA+7mXqnNbzosKgNmYzMsrMCrrZVk5GXs8nyAa9bLFk6ZK8QthzQrJqiOL6DBrcvHg1VJZkcJOF0fGLcPZA==`
-- Distribution manifest SHA-256: `d75c50c9d0d38c9ff158d1d130c4458f6e2167e5b0e9874e64a7e5acac207552`
+  `sha512-hkKxDkuPT5ylF6zIjRlFFmpTgw0AURCCeOFT8crTAMVt75sVgpWS4izDOMUMIO5WYwYPeUnK93VOReeeIEtkCA==`
+- Distribution manifest SHA-256: `9190ce39c049cc6016fdd976d6a2bb405ce74119bfda4847b4d7548a3f6577ea`
   (also committed as `provenance/distributions/shadcn-radix-release-011.distribution.json`)
 
 **Candidate**
 
 - External candidate: `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-011-candidate/`
-- Packed files: 56; executable implementation inputs: 364.
+- Packed files: 56; executable implementation inputs: 365.
 - Contract inventory: 90 tokens, 41 component families, 210 public exports. The family and export
   counts are unchanged from Release 010.
 - Peers: `react` and `react-dom` `^18.3.1 || ^19.0.0`, unchanged.
@@ -130,7 +133,7 @@ Pinned at the producer commit by the release record's implementation inputs (blo
 | `contracts/components/families/alert.json` | `71be35bbfe6097031f674c298732601f7d3bb4da` | `07855c4daca0b447f122eca38e32da1a990c23ba97e0cc58fc4def2c7f599483` |
 | `contracts/components/families/avatar.json` | `2688a18e9764907a0697e218e1da7f4389ae6b5b` | `75202a9bda3c91f055eac4a0e9263a16af073dfef0db60b8a06e48dc4d6eb4eb` |
 | `contracts/components/families/icon.json` | `e95b2f7ca04e5e506437205a9995878285a66f6b` | `310b287a59e6be58da084a5bc94edd9deba264fc0babfcc426ea4dd6dc374ed0` |
-| `src/index.css` (canonical theme) | `a3f9531864eb56bc1e55746a31032fd8fcbdf2ac` | `3128e8eb5e3de3b3e41f98958083efe978571e6da13ac9fdab245416a205fb62` |
+| `src/index.css` (canonical theme) | `292413e4bf94ddf6ec4422474b730e47d1e0af5f` | `67673a8641b7be929009282ac0d8a174c90db742cf57c78ea3820af4e40b06c3` |
 | `src/components/ui/badge.tsx` | `5146fddeeba3b7da829a09ff34d61e255db57c9b` | `a75de0a1e69efe5d5dfc6d2f3e4344a045c8c48df7305bb12664e0dd9d816052` |
 | `src/components/ui/alert.tsx` | `326810157ee3ed1bf9bc4574a3b0881453bf115f` | `9ccbfeb560178aa2bb00cd4edb332e345ff4f8ade81e04dc8ab703017d9296e0` |
 | `src/components/ui/avatar.tsx` | `cedc3758d9bfda30ca639c4779d7e5996ccc621a` | `52d425de02821453c1b428350caabf59ad55a114dc1a0c8f5037f9fdd91cfd5b` |
@@ -169,7 +172,7 @@ the authorable-set count and roster tests (Trap 1) should not change. What does 
 
 ## Not included
 
-- **Container and breakpoint tokens:** the token contract excludes the `container` and `breakpoint`
-  namespaces by a Phase 2 scope invariant. Lifting it is an owner decision.
-- **Chart family:** drafted for Release 012 (Recharts behind a closed API); it needs owner approval of
-  the spec.
+- **Container and breakpoint tokens:** kept excluded by owner decision (2026-10-03). Canvas pages are
+  fixed at 1440×900 and responsive layouts are not in V1. Revisit when Canvas gets responsive pages.
+- **Chart family:** Release 012. The owner approved the spec on 2026-10-03: Recharts 3.8.1 behind a
+  closed API, in a lazily loaded `/charts` entrypoint.

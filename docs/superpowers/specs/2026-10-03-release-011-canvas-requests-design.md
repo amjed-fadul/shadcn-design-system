@@ -99,7 +99,8 @@ Defaults are unchanged, so every existing usage renders as before.
 ## Out of scope
 
 - The governed chart family (Release 012 proposal).
-- Container and breakpoint tokens (owner decision above).
+- Container and breakpoint tokens. The owner confirmed on 2026-10-03 to keep them excluded until
+  Canvas gets responsive pages; Canvas pages are fixed at 1440×900 in V1.
 - A display-size typography scale beyond the single display leading.
 - Canvas adoption. Canvas adopts Release 011 later, in its own repository, through its governed
   component addition checklist and presentation-policy mapping.

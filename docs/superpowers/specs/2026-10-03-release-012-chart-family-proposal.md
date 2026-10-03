@@ -1,8 +1,11 @@
 # Release 012: governed chart family (draft spec)
 
-**Status:** Draft spec.
-- **Decided:** on 2026-10-03 the owner chose to wrap Recharts and set six requirements, recorded below.
-- **Pending:** this spec needs owner approval before implementation starts. Nothing here is implemented.
+**Status:** Approved spec, not yet implemented.
+- **Decided:** on 2026-10-03 the owner chose to wrap Recharts, set six requirements, and approved this
+  closed API, the `/charts` entrypoint and folding the build-memory fix into Release 012.
+- **Recharts version:** 3.8.1, after the changelog check below.
+- **Sequencing:** implementation starts after Canvas adopts Release 011 and reruns the visual-gap
+  test. That rerun decides whether Release 012 is charts only or charts plus other gaps.
 
 **Request:** amjed-fadul/shadcn-design-system#19, item 2 (chart component).
 **Depends on:** Release 011, whose owner-approved coloured `--chart-1..5` palette this family uses.
@@ -69,12 +72,23 @@ declarations.
   Recharts and its dependencies are bundled only into that entry's chunk, so the root `.` entrypoint
   and its bundle are unchanged. Canvas lazy-loads the entry, for example with
   `React.lazy(() => import("@adc/shadcn-design-system/charts"))`, only on pages that contain a chart.
-- **Pinned version.** Recharts is pinned exactly at `3.8.0`, the version upstream shadcn pins. It is
-  recorded in `package-lock.json`, component-contract provenance and the bundled licence notices.
-- **Audit gate.** The release gate requires a clean `npm audit` (production and full). `react-is` is
-  bundled, so consumers get no new peer dependency.
-- **Owner decision:** whether a later Recharts 3.x (3.10.1 is current) is preferable to upstream
-  parity.
+- **Pinned version.** Recharts is pinned exactly at `3.8.1`. It is recorded in `package-lock.json`,
+  component-contract provenance and the bundled licence notices.
+- **Audit gate.** The release gate requires a clean `npm audit` (production and full); 3.8.1 audits
+  clean. `react-is` is bundled, so consumers get no new peer dependency.
+
+**Recharts version check (2026-10-03).** Upstream shadcn's main still pins 3.8.0. The release notes for
+3.8.1 through 3.10.1 point to 3.8.1: it stays on upstream's 3.8 line, and its patch fixes things this
+spec would hit:
+
+| Version | Relevant to this spec | Decision |
+| --- | --- | --- |
+| 3.8.1 (patch) | **Keyboard navigation and tooltip fixes for Pie charts** (#7140), arrow-key navigation restored after zoom (#7086), legend `aria-label` from formatted values (#7109), no Tooltip crash on sparse payloads (#7149), no ResizeObserver memory leak on ref update (#7161). | **Adopt.** The donut keyboard requirement and Canvas frame re-renders depend on these. |
+| 3.9.0 | Animation overhaul with new animation props; stacked bars render when every value is 0 (#7199). | Skip. It changes the animation API that the draw-finished signal builds on, and diverges from upstream. The all-zero stacked bar is covered by an explicit empty state, tested in the chart suite. |
+| 3.9.1–3.9.2 | Legend icon `aria-label` omits empty values (#7501); other fixes in Sankey and ticks. | Skip. The legend is our own content, so its labels are under our control. |
+| 3.10.0–3.10.1 | Legend `position` and `offset` replace `align` and `verticalAlign`; fixes in Pie labels, tooltip lookup and `barGap`. | Skip. It is an API change upstream's chart component doesn't use yet. |
+
+Revisit when upstream shadcn moves its pin.
 
 ### Components (requirement 2)
 
@@ -186,11 +200,15 @@ screenshots compare each one, side by side, with the matching shadcn official ex
   render analysis stays closed.
 - **Release identity:** package `0.0.0-release.12`; component and export counts rise by one family.
 
-## Decisions still open for the owner
+## Owner decisions (2026-10-03)
 
-1. **API:** approve the props above, or adjust them (for example, add `scatter`, or drop `radial`).
-2. **Recharts version:** 3.8.0 for upstream parity, or a later 3.x.
-3. **Entrypoint:** confirm the separate `/charts` entrypoint as the lazy-loading mechanism.
+1. **API:** approved as specified: closed, Canvas-friendly, no function props and no raw Recharts
+   props.
+2. **Recharts version:** follow upstream's 3.8 line. The changelog check above selects 3.8.1.
+3. **Entrypoint:** a separate `/charts` entrypoint, so pages without charts don't pay the bundle
+   cost.
+4. **Build memory:** the producer build-memory fix (peak heap) ships inside Release 012, avoiding a
+   release with no visible change.
 
-After approval, implementation follows the Release 008 Icon process: tests first, strict source
-audits, contracts, knowledge, Storybook stories, the gallery and browser evidence.
+Implementation follows the Release 008 Icon process: tests first, strict source audits, contracts,
+knowledge, Storybook stories, the gallery and browser evidence.
