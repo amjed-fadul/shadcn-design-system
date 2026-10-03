@@ -64,6 +64,8 @@ async function readR3ArchiveIdentity(tarball = r3Tarball) {
 
 const sha512 = (bytes: Buffer) => `sha512-${createHash("sha512").update(bytes).digest("base64")}`
 const runFile = promisify(execFile)
+// Live heap in MB after each full collection reported by node --trace-gc.
+const liveHeapAfterFullCollections = (trace: string) => [...trace.matchAll(/Mark-Compact(?: \(reduce\))? [\d.]+ \([\d.]+\) -> ([\d.]+) \(/g)].map(match => Number(match[1]))
 
 describe("release package input identity", () => {
   test("discovers imports and sorts normalized paths deterministically with byte identities", () => {
@@ -168,11 +170,17 @@ describe("release package input identity", () => {
     mkdirSync(path.join(directory, "provenance/releases"), { recursive: true })
     writeFileSync(path.join(directory, "provenance/releases/shadcn-radix-release-011.json"), JSON.stringify(raw))
     try {
-      // Same heap as scripts/package-candidate.mjs, so the build reaches the input guard instead of running out of memory.
-      await runFile(process.execPath, ["--max-old-space-size=8192", "scripts/build-library.mjs"], { cwd: directory, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
+      // Same 6 GB heap as scripts/package-candidate.mjs. The guard runs after Vite and declaration emit, so the whole build must fit.
+      await runFile(process.execPath, ["--max-old-space-size=6144", "--trace-gc", "scripts/build-library.mjs"], { cwd: directory, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
       throw new Error("Build unexpectedly accepted the omitted input")
     } catch (error) {
-      expect(String((error as { stderr?: string }).stderr)).toMatch(/UNBOUND_INPUT: unlisted-build-data.json/)
+      const { stdout, stderr } = error as { stdout?: string; stderr?: string }
+      expect(String(stderr)).toMatch(/UNBOUND_INPUT: unlisted-build-data.json/)
+      // The producer's contract graph (about 3 GB of TypeScript programs) must be released before Vite loads the
+      // contracts again; holding both peaks near 6 GB live. Keep a quarter of the heap as headroom.
+      const live = liveHeapAfterFullCollections(String(stdout))
+      expect(live.length).toBeGreaterThan(0)
+      expect(Math.max(...live)).toBeLessThan(6144 * 0.75)
     }
   }, 130_000)
   test("excludes release and output identities without overlooking authority data", () => {
