@@ -83,6 +83,9 @@ const checkChart: Story["play"] = async ({ canvasElement }) => {
   canvasElement.querySelector<HTMLElement>('[tabindex="0"]')!.focus()
   await userEvent.keyboard("{ArrowRight}")
   await waitFor(() => expect(canvasElement.querySelector('[data-slot="chart-tooltip"]')?.textContent).toBeTruthy())
+  // Escape dismisses the tooltip.
+  await userEvent.keyboard("{Escape}")
+  await waitFor(() => expect(getComputedStyle(canvasElement.querySelector(".recharts-tooltip-wrapper")!).visibility).toBe("hidden"))
 }
 
 export const Bar: Story = { play: checkChart }

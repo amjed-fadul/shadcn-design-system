@@ -533,7 +533,7 @@
       "locatorHint": "Closed Chart props, createChartModel validation and formats, ChartFrame sizing and draw state, Recharts plot defaults, legend and description",
       "accessedOn": "2026-10-03",
       "sourceRevision": "release-012-working-tree",
-      "contentHash": "7d6b14eee0c231bc898a53c3504126838d484d42"
+      "contentHash": "09d45e9c531ced931862b66ba297176a1dfb46dc"
     }
   ]
 }

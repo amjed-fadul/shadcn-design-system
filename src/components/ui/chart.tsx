@@ -44,7 +44,7 @@ const ANIMATION_MS = 400
 const SETTLED_FRAMES = 2
 const MAX_SETTLE_FRAMES = 180
 const RATIOS: Record<ChartAspectRatio, number> = { "16/9": 16 / 9, "4/3": 4 / 3, "1/1": 1, "2/1": 2 }
-const AXIS_TICK = { className: "text-xs", fill: "var(--muted-foreground)" }
+const AXIS_TICK = { className: "text-xs tabular-nums", fill: "var(--muted-foreground)" }
 // Label room comes from the longest label at the 12px tick size (a generous 0.63em per
 // glyph), so it is deterministic in headless capture and never waits for the web font.
 // Recharts offsets each tick label by its tick size (6) and tick margin (8) even with
@@ -68,7 +68,7 @@ function edgeRoom(labels: readonly string[]): number {
   return Math.max(EDGE_PX, Math.ceil(labelWidth(labels) / 2) + TICK_SLACK_PX)
 }
 
-// The value ticks are chosen here with Recharts' nice steps (1, 2, 2.5 or 5 times a power
+// The value ticks are chosen here at nice steps (1, 2, 2.5 or 5 times a power
 // of ten), so the axis is sized from exactly the labels it draws.
 function valueTicks(model: ChartModel): number[] {
   const [min, max] = valueExtent(model)
@@ -162,12 +162,14 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
   const last = model.series.length - 1
 
   if (model.type === "bar") {
+    // In a stack, a card-coloured stroke leaves a 2px surface gap between segments.
     return (
       <BarChart {...chart} layout={horizontal ? "vertical" : "horizontal"}>
         {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Bar
             key={series.key} dataKey={series.key} name={series.label} fill={series.color}
+            stroke={stacked ? "var(--card)" : undefined} strokeWidth={stacked ? 2 : undefined}
             stackId={stacked ? "stack" : undefined} {...animation}
             radius={stacked && index !== last ? 0 : horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
           />

@@ -36,6 +36,8 @@ describe("chart model", () => {
     ["donut with series", { type: "donut", valueKey: "thisYear" }, /series/],
     ["stacked donut", { type: "donut", series: undefined, valueKey: "thisYear", layout: "stacked" }, /layout/],
     ["stacked lines", { type: "line", layout: "stacked" }, /layout applies only to area and bar/],
+    ["repeated donut parts", { type: "donut", series: undefined, valueKey: "thisYear", data: [{ month: "Jan", thisYear: 1 }, { month: "Jan", thisYear: 2 }] }, /categories must not repeat/],
+    ["negative donut part", { type: "donut", series: undefined, valueKey: "thisYear", data: [{ month: "Jan", thisYear: 5 }, { month: "Feb", thisYear: -1 }] }, /must not be negative/],
     ["curve on bars", { curve: "step" }, /curve/],
     ["orientation on lines", { type: "line", orientation: "horizontal" }, /orientation/],
     ["no series on bars", { series: [] }, /series/],

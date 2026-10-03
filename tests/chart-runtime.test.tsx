@@ -137,6 +137,15 @@ describe("Chart", () => {
     expect(container.innerHTML.match(/(?:#[0-9a-f]{3,8}\b|rgba?\(|hsla?\()[^"]{0,24}/gi) ?? []).toEqual([])
   })
 
+  test("separates stacked bar segments with a 2px surface gap", () => {
+    const strokes = () => [...container.querySelectorAll(".recharts-bar-rectangle path")].map((path) => [path.getAttribute("stroke"), path.getAttribute("stroke-width")])
+    render({ ...barProps, layout: "stacked", animation: "off" })
+    resize(600)
+    expect(new Set(strokes().map(String))).toEqual(new Set(["var(--card),2"]))
+    render({ ...barProps, animation: "off" })
+    expect(strokes().every(([stroke]) => stroke === null || stroke === "none")).toBe(true)
+  })
+
   test("colours donut parts with the governed chart tokens, in slot order", () => {
     render({ ...barProps, type: "donut", series: undefined, categoryKey: "plan", valueKey: "customers", data: [{ plan: "Free", customers: 600 }, { plan: "Pro", customers: 300 }, { plan: "Team", customers: 100 }], animation: "off" })
     resize(600)

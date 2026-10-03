@@ -33,7 +33,7 @@
   ],
   "howToUse": [
     {
-      "statement": "Import Chart from @adc/shadcn-design-system/charts, lazily, so pages without charts do not load the chart bundle. Pass type, a title (the accessible name), data as flat rows, categoryKey, and either series ({ key, label }, 1 to 5) for area, bar and line, or valueKey for donut and radial.",
+      "statement": "Import Chart from @adc/shadcn-design-system/charts, lazily, so pages without charts do not load the chart bundle. Pass type, a title (the accessible name), data as flat rows, categoryKey, and either series ({ key, label }, 1 to 5) for area, bar and line, or valueKey for donut and radial (one row per part, up to 5, with values of zero or more).",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [

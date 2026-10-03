@@ -147,7 +147,9 @@ export function createChartModel(input: ChartModelInput, locale?: string): Chart
     const valueKey = input.valueKey!
     if (data.length > 0 && data.every((datum) => !(valueKey in datum))) fail(`Chart valueKey "${valueKey}" is missing from every row.`)
     if (data.length > MAX_SERIES) fail(`Donut and radial charts support at most ${MAX_SERIES} parts; fold the rest into "Other".`)
+    if (new Set(categories).size !== categories.length) fail("Donut and radial categories must not repeat; each part is one row.")
     const values = data.map((datum) => numericValue(datum, valueKey))
+    if (values.some((value) => value !== null && value < 0)) fail("Donut and radial values must not be negative.")
     const total = values.reduce<number>((sum, value) => sum + (value ?? 0), 0)
     const empty = total === 0
     const share = new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 0 })
