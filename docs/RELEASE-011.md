@@ -137,8 +137,9 @@ All commands ran with Node 22.18.0 and npm 10.9.3.
   retained candidate byte for byte, and no expectations were refreshed.
 - **`npm run typecheck`:** passed.
 - **`npm run build`:** passed.
-- **Unit suite at the PR head (clean worktree):** @@UNIT@@
-- **Storybook:** `vitest --project=storybook` passed 43 files and 230 tests. That is Release 009's
+- **Unit suite at the PR head (clean worktree):** 122 files and 1,701 tests passed at `20b0e16`, run from a clean worktree with no timeouts. Earlier runs on the same code under heavy machine load are described under timing-sensitive tests below.
+- **Storybook:** `vitest --project=storybook` passed 43 files and 230 tests at `de38a97`. The later
+  vendoring leaves the compiled stylesheet byte-identical. The count is Release 009's
   224 plus 6 new stories, with the axe gate at `error`, so the new colours pass rendered contrast
   checks in light and dark. `build-storybook` passed.
 - **Owner review:** the owner reviewed light and dark renders of every new token and option, and
@@ -156,7 +157,7 @@ All commands ran with Node 22.18.0 and npm 10.9.3.
 - **`npm audit`:** full and production audits find 0 vulnerabilities after the shadcn stylesheet
   was vendored. Before that, GHSA-vfj7-8cjw-p6xm (`braces`, published after main's last green run)
   failed the full audit for both Release 010 and this branch.
-- **CI:** @@CI@@
+- **CI:** both PR checks pass at `57f07c4`: `verify` (typecheck, both audits and the fast release-identity, contract and preservation tests) and `audit`. The manual macOS `release-qualification` run is recorded on PR #20.
 
 ## Build location
 
