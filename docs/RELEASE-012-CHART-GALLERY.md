@@ -15,10 +15,10 @@ Evidence lives outside the repository, under `~/.artifacts/shadcn-design-system/
 
 | File | SHA-256 |
 | --- | --- |
-| `r12-vs-shadcn-light.png` | `1959443d002c5a66e12585f38b1843fb24ad83eedb7e000179031a798fb3eff7` |
-| `r12-vs-shadcn-dark.png` | `8498a7a074d0188f3b9b32b02574f7388cc95e732640bcba3c5f796eed1850fc` |
-| `r12-gallery-light.png` | `c03f5ab445951698c2268b32684cf9d4c8ba52f5a39091f61948de8878a9bbf4` |
-| `r12-gallery-dark.png` | `8e25eafb22318f277d930128daa48bc0e5bf6bd646cd9890c96d669c76434688` |
+| `r12-vs-shadcn-light.png` | `54aa2085ec287121e414a12886899e01c61feb991150871292be8429d2ffaf5b` |
+| `r12-vs-shadcn-dark.png` | `e59f21e652812f75797dd04d28be671104d08eeb3e5e15786278264e4ac1be1a` |
+| `r12-gallery-light.png` | `1327a9f8a8bf7e82bd4d22621b5769451ca11f46cad59996893572f063e05285` |
+| `r12-gallery-dark.png` | `87256c9555399afc5a7b9875e60c6bbe31b2600eb3cb3e9ee0950652720f0576` |
 
 The individual cards behind the sheets are in `cards/`.
 
@@ -37,7 +37,7 @@ The individual cards behind the sheets are in `cards/`.
 
 - Rounded data ends on bars: 4px, on the end away from the baseline only. Stacked bars round only the top segment.
 - A recessive dashed grid (`3 3`, half-opacity border colour), with no axis lines or tick marks.
-- Muted 12px axis labels.
+- Muted 12px axis labels, with tabular figures.
 - A gradient area fill that fades towards the baseline.
 - A 2px line stroke, plus an active dot on hover (r 4, ringed in the card colour).
 - The shadcn tooltip: popover surface, border, small shadow, square swatches, the label first and values right-aligned.
@@ -49,6 +49,8 @@ The individual cards behind the sheets are in `cards/`.
 - **Palette.** shadcn's current examples use a monochrome blue ramp. Release 012 uses the Release 011 coloured, colour-blind-checked `--chart-1` to `--chart-5` palette, in fixed slot order, as the owner asked.
 - **Value axis on by default.** Most shadcn examples hide the Y axis. Release 012 shows it because a chart without a scale can't be read. `yAxis={false}` matches shadcn's look.
 - **Legend on by default for two or more series.** A legend appears whenever there are two or more series (or parts), so identity never depends on colour alone. A single series has no legend; the title names it. shadcn only shows a legend in its "Legend" variants. `legend={false}` turns it off.
+- **Stack separation.** Stacked bar segments are separated by a 2px card-coloured gap; shadcn's
+  segments touch.
 - **Donut separation.** Parts are separated by a 2° gap with 4px rounded ends instead of a card-coloured stroke on touching wedges. The ring is slightly thinner (60–80% of the radius).
 - **Radial tracks.** Each radial bar sits on a muted full-circle track, and the legend names the parts. shadcn's Grid example uses polar grid lines instead.
 
@@ -56,7 +58,7 @@ The individual cards behind the sheets are in `cards/`.
 
 - **Clipped Y-axis labels.**
   - *Cause:* the value axis was sized from the data extent, not the ticks Recharts draws, and the budget ignored Recharts' 6px tick-size offset. Labels such as `$80K` lost their first glyph.
-  - *Fix:* the chart now chooses its own value ticks with Recharts' nice steps (1, 2, 2.5 or 5 × 10ⁿ) and passes them explicitly. Axis width comes from exactly those labels, and edge margins leave room wherever a label sits centred on the plot edge.
+  - *Fix:* the chart now chooses its own value ticks at nice steps (1, 2, 2.5 or 5 × 10ⁿ) and passes them explicitly. Axis width comes from exactly those labels, and edge margins leave room wherever a label sits centred on the plot edge.
   - *Pinned by:* `tests/chart-runtime.test.tsx` checks the ticks. Every chart story's play function now fails if any label inside a chart surface is clipped.
 - **Crowded gallery.** The meta decorator's `max-w-2xl` wrapped the gallery's own wider frame, which squeezed the plots to 179px and made Recharts drop every other month label. The gallery now opts into the wide frame through a `wide` story parameter.
 

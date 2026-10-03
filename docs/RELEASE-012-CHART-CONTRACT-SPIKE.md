@@ -35,9 +35,12 @@ unresolved findings, so this is not blocking.
 - **Draw signal:** `data-chart-state` on `[data-slot=chart-plot]` is recorded as a contract
   accessibility fact, backed by runtime-test evidence, because `stateChannels` only model controlled
   props.
-- **Validation:** runtime validation (`createChartModel`) and contract `composition.hardConstraints`
-  carry the conditional combinations: `valueKey` for donut and radial, `currency` with currency format,
-  and no `stacked` on donut. The analyzers only derive binary boolean unions.
+- **Validation:** runtime validation (`createChartModel`) carries the conditional combinations:
+  `valueKey` for donut and radial, `currency` with currency format, and `layout` only on area and
+  bar. The analyzers only derive conditional APIs from binary boolean unions. *Implementation
+  update:* `composition.hardConstraints` may only name capability ids, so it can't carry these
+  rules. They are runtime facts (a `ChartPropsError` names the broken rule), stated in the
+  knowledge entry and the Canvas handoff.
 - **Analyzers:** no extension is needed. That keeps the strict audit surface unchanged.
 
 **Cost if wrong:** low.
