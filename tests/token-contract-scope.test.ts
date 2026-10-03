@@ -16,22 +16,22 @@ function readContract(): TokenContract {
 }
 
 describe("Phase 2 Tailwind contract scope", () => {
-  test("has the exact 82-token category shape and one non-token-producing spacing rule", () => {
+  test("has the exact 90-token category shape and one non-token-producing spacing rule", () => {
     const contract = readContract()
     const counts = Object.fromEntries([...new Set(contract.tokens.map((token) => token.category))].map((category) => [category, contract.tokens.filter((token) => token.category === category).length]))
 
     expect(counts).toEqual({
-      color: 31,
-      radius: 8,
+      color: 37,
+      radius: 9,
       "font-family": 2,
       "font-size": 13,
       "font-weight": 9,
       "letter-spacing": 6,
-      "line-height": 5,
+      "line-height": 6,
       spacing: 1,
       shadow: 7,
     })
-    expect(contract.tokens).toHaveLength(82)
+    expect(contract.tokens).toHaveLength(90)
     expect(contract.derivedRules).toEqual([{
       id: "spacing.multiplier",
       category: "spacing",
@@ -43,15 +43,20 @@ describe("Phase 2 Tailwind contract scope", () => {
     }])
   })
 
-  test("preserves every Task 3 definition, except approved brand and Release 009 radius values, and its canonical font and radius precedence", () => {
+  test("preserves every Task 3 definition, except approved brand, Release 009 radius and Release 011 chart values, and its canonical font and radius precedence", () => {
     const contract = readContract()
     const task3Contract = JSON.parse(execFileSync("git", ["show", `${task3Base}:contracts/tokens/token-contract.json`], { encoding: "utf8" })) as TokenContract
-    const brandTokenIds = new Set<string>(JSON.parse(readFileSync(new URL("../provenance/token-contract-source.json", import.meta.url), "utf8")).brandLayer.tokens)
+    const provenance = JSON.parse(readFileSync(new URL("../provenance/token-contract-source.json", import.meta.url), "utf8"))
+    const brandTokenIds = new Set<string>(provenance.brandLayer.tokens)
+    const release011Changed = new Set<string>(provenance.release011Layer.changedTokens)
+    const release011Added = new Set<string>(provenance.release011Layer.addedTokens)
     const current = new Map(contract.tokens.map((token) => [token.id, token]))
 
     expect(task3Contract.tokens).toHaveLength(41)
-    // The owner brand layer changes only the values of its listed tokens; identity, category, source and binding stay fixed.
-    expect(contract.tokens.slice(0, 41)).toEqual(task3Contract.tokens.map((token) => (brandTokenIds.has(token.id) || token.category === "radius") ? { ...token, value: current.get(token.id)?.value } : token))
+    // Value layers change only the values of their listed tokens; identity, category, source and binding stay fixed.
+    // Release 011 adds tokens beside them; the Task 3 tokens keep their relative order.
+    expect(contract.tokens.filter((token) => token.sourceId === "canonical-theme" && !release011Added.has(token.id))).toEqual(task3Contract.tokens.map((token) => (brandTokenIds.has(token.id) || release011Changed.has(token.id) || token.category === "radius") ? { ...token, value: current.get(token.id)?.value } : token))
+    expect(contract.tokens.filter((token) => release011Added.has(token.id)).map((token) => token.sourceId)).toEqual(Array(8).fill("canonical-theme"))
     for (const token of task3Contract.tokens.filter((candidate) => brandTokenIds.has(candidate.id))) expect(current.get(token.id)?.value).not.toEqual(token.value)
     expect(contract.tokens.find((token) => token.id === "radius.sm")?.value).toEqual({ kind: "derived", expression: "calc(var(--radius) - 0.25rem)", dependencies: ["radius.base"] })
     expect(contract.tokens.find((token) => token.id === "font.sans")?.value).toEqual({ kind: "literal", value: '"Geist Variable", sans-serif' })

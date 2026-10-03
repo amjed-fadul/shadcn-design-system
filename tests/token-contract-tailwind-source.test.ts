@@ -89,8 +89,10 @@ describe("pinned Tailwind theme token source", () => {
       shadow: expectedIds("shadow"),
     }
     for (const [category, ids] of Object.entries(expectedByCategory) as Array<[keyof typeof names, string[]]>) {
-      expect(contract.tokens.filter((token) => token.category === category).map((token) => token.id)).toEqual(ids)
+      expect(contract.tokens.filter((token) => token.category === category && token.sourceId === "tailwind-theme").map((token) => token.id)).toEqual(ids)
     }
+    // Release 011's display leading is the only canonical-theme token in a Tailwind-sourced category.
+    expect(contract.tokens.filter((token) => token.sourceId === "canonical-theme" && !["color", "radius", "font-family"].includes(token.category)).map((token) => token.id)).toEqual(["line-height.display"])
     expect(contract.tokens.filter((token) => token.category === "spacing").map((token) => token.id)).toEqual(["spacing.unit"])
 
     for (const name of names["font-size"]) {

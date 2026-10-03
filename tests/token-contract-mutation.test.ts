@@ -239,7 +239,7 @@ describe("Phase 2 token contract mutation resistance", () => {
     const contract = cloneContract()
     mutate(contract)
 
-    expect(contract.tokens).toHaveLength(82)
+    expect(contract.tokens).toHaveLength(90)
     expectScopeRejection(contract, error)
   })
 
@@ -251,7 +251,7 @@ describe("Phase 2 token contract mutation resistance", () => {
       binding: { cssVariable: `--${namespace}`, tailwindThemeVariable: `--color-${namespace}`, tailwindExpression: `var(--${namespace})` },
     })
 
-    expect(contract.tokens).toHaveLength(82)
+    expect(contract.tokens).toHaveLength(90)
     expectScopeRejection(contract, `Token color.${namespace} uses excluded Phase 2 scope namespace ${namespace}.`)
   })
 
@@ -263,7 +263,7 @@ describe("Phase 2 token contract mutation resistance", () => {
       binding: { cssVariable: "--red-500", tailwindThemeVariable: "--color-red-500", tailwindExpression: "var(--red-500)" },
     })
 
-    expect(contract.tokens).toHaveLength(82)
+    expect(contract.tokens).toHaveLength(90)
     expectScopeRejection(contract, "Token color.red-500 uses excluded Phase 2 scope namespace primitive-color.")
   })
 
@@ -280,8 +280,8 @@ describe("Phase 2 token contract mutation resistance", () => {
     if (!category) throw new Error("Missing shadow index category")
     category.tokenIds[0] = "spacing.17"
 
-    expect(index.tokenCount).toBe(82)
-    expect(index.categories.flatMap((candidate) => candidate.tokenIds)).toHaveLength(82)
+    expect(index.tokenCount).toBe(90)
+    expect(index.categories.flatMap((candidate) => candidate.tokenIds)).toHaveLength(90)
     expect(index).not.toEqual(buildTokenIndex(cloneContract()))
   })
 
@@ -293,7 +293,7 @@ describe("Phase 2 token contract mutation resistance", () => {
     radius.tokenIds.splice(radius.tokenIds.indexOf("radius.sm"), 1)
     shadow.tokenIds.push("radius.sm")
 
-    expect(index.categories.flatMap((category) => category.tokenIds)).toHaveLength(82)
+    expect(index.categories.flatMap((category) => category.tokenIds)).toHaveLength(90)
     expect(index).not.toEqual(buildTokenIndex(cloneContract()))
   })
 
@@ -339,10 +339,10 @@ describe("Phase 2 token contract mutation resistance", () => {
     expect(() => { (tokens as TokenDefinition[]).pop() }).toThrow()
     expect(() => { (tokenIds as string[]).pop() }).toThrow()
 
-    expect(getTokenContract().status).toBe("approved")
+    expect(getTokenContract().status).toBe("candidate")
     expect(lookupToken("color.background")).toEqual(background)
-    expect(listTokens()).toHaveLength(82)
-    expect(listTokenIds()).toHaveLength(82)
+    expect(listTokens()).toHaveLength(90)
+    expect(listTokenIds()).toHaveLength(90)
   })
 
   test("keeps the query boundary exact-match only", () => {

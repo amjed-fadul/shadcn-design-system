@@ -80,7 +80,7 @@ export type DerivedTokenRule = {
 
 export type TokenContract = {
   schemaVersion: 1
-  id: "shadcn-radix-token-contract-002"
+  id: "shadcn-radix-token-contract-003"
   status: "candidate" | "approved"
   baselineSnapshotId: "shadcn-radix-bootstrap-000"
   sourceBaselineCommit: string

@@ -14,7 +14,7 @@ export const TOKEN_CATEGORY_ORDER = [
 
 export type TokenIndex = {
   schemaVersion: 1
-  contractId: "shadcn-radix-token-contract-002"
+  contractId: "shadcn-radix-token-contract-003"
   baselineSnapshotId: "shadcn-radix-bootstrap-000"
   tokenCount: number
   modes: ["light", "dark"]
