@@ -1,6 +1,7 @@
 # Release 011: Canvas visual-gap requests
 
-**Status:** Candidate. Token contract `-003` waits for owner approval.
+**Status:** Release 011 candidate generated. The owner approved token contract `-003` as shown on
+2026-10-03, after reviewing light and dark renders; the release awaits owner acceptance.
 **Date:** 2026-10-03
 **Request:** amjed-fadul/shadcn-design-system#19, from the Canvas visual-gap test
 (amjed-fadul/agentic-design-canvas PR #50, `docs/design-system-requests/2026-10-03-visual-gap-requests.md`).
