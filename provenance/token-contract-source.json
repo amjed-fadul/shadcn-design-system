@@ -91,7 +91,7 @@
   "release011Layer": {
     "release": "shadcn-radix-release-011",
     "sourceCommit": "c662cbd9f18bc714b6d0e82ae1dfd8f27ff2e489",
-    "decision": "Canvas visual-gap requests (amjed-fadul/shadcn-design-system#19). Status colours and a coloured chart palette are new owner-reviewed values; radius.full and line-height.display are new canonical theme tokens. Values are pending owner approval of token contract -003.",
+    "decision": "Canvas visual-gap requests (amjed-fadul/shadcn-design-system#19). Status colours and a coloured chart palette are new values; radius.full and line-height.display are new canonical theme tokens. The owner reviewed light and dark renders and approved token contract -003 as shown on 2026-10-03.",
     "addedTokens": [
       "color.success",
       "color.success-foreground",

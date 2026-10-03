@@ -169,7 +169,7 @@ export function verifyRepositoryRelease(root: string, expectedReleaseSha256?: st
   // also mandatory in library-data.ts, before Vite emits packaged release data.
   const release = loadExecutableRelease(raw, { expectedProjection: raw.projection, requirePackageIdentity: true })
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
-  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.10" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
+  if (release.packageIdentity!.name !== "@adc/shadcn-design-system" || release.packageIdentity!.version !== "0.0.0-release.11" || JSON.stringify(Object.keys(release.packageIdentity!.publicEntrypoints).sort()) !== JSON.stringify([".", "./release", "./styles.css"])) throw new Error("PACKAGE_RELEASE_MAPPING_MISMATCH")
   verifyImplementationManifest(root, release.implementationInputs)
   return release
 }

@@ -4,7 +4,20 @@ Canonical governed shadcn design system for Agentic Design Canvas product work.
 
 This repository is separate from Canvas. The official shadcn repository is upstream/reference only; Canvas will eventually consume immutable contracted releases from this repository.
 
-## Active producer: Release 010 candidate
+## Active producer: Release 011 candidate
+
+Release 011 (`0.0.0-release.11`) answers the Canvas visual-gap requests (#19) under the owner-approved token contract `shadcn-radix-token-contract-003` (90 tokens).
+
+- **New tokens:** `success`, `warning` and `info` colours, each with a `-foreground` pair, plus `radius.full` and `line-height.display`.
+- **Chart palette:** `chart-1` to `chart-5` are now coloured and colour-blind-checked.
+- **Badge:** adds a `primary` variant and `success`, `warning` and `info` variants.
+- **Alert:** adds `success`, `warning` and `info` variants.
+- **Icon:** adds 19 content identities and three status colours.
+- **Avatar:** adds `shape: "circle" | "rounded" | "square"`.
+
+Every existing default renders as before. See [Release 011](docs/RELEASE-011.md) and the [Canvas handoff](docs/CANVAS-RELEASE-011.md).
+
+## Release 010
 
 Release 010 (`0.0.0-release.10`) widens the React peer range to `^18.3.1 || ^19.0.0` so Canvas can run React 19. Components, tokens, knowledge and visual decisions are unchanged from Release 009. The 75 inherited interfaces that resolve React DOM props were regenerated from `@types/react` 19.3.0 (React 19 adds `popover`, `inert`, `onToggle`, `onScrollEnd` and transition events, and removes `onResize`). See [Release 010](docs/RELEASE-010.md). The Release 009 sections below describe the visual system it carries forward.
 
@@ -68,8 +81,9 @@ The new primitives keep their authoring APIs closed:
 <Link href="/docs">Read the documentation</Link>
 ```
 
-Icon offers 20 identities, three sizes, governed semantic color and optional inline placement. Logical
-start/end arrows and chevrons follow RTL; physical directions remain fixed.
+Icon offers 39 identities (20 interface glyphs plus 19 content glyphs since Release 011), three sizes,
+governed semantic color and optional inline placement. Logical start/end arrows and chevrons follow RTL;
+physical directions and content glyphs remain fixed.
 Image requires intrinsic pixel dimensions and explicit alt text (empty for a
 decorative image), with bounded layout, fit and loading options. Link preserves
 native anchor destinations, with optional explicit `newTab`. See

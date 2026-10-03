@@ -16,10 +16,10 @@ const outputFlag = process.argv.indexOf("--out-dir")
 const output = outputFlag < 0 ? path.join(root, "dist-library") : path.resolve(process.argv[outputFlag + 1])
 // Compiler IPC files are generated outputs. Use a fresh private scratch
 // directory so unrelated pre-existing temporary files cannot become inputs.
-const scratch = mkdtempSync(path.join(tmpdir(), "release-010-compiler-"))
+const scratch = mkdtempSync(path.join(tmpdir(), "release-011-compiler-"))
 const previousTmpdir = process.env.TMPDIR
 process.env.TMPDIR = scratch
-const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-010.json")
+const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-011.json")
 const selectedReleasePath = releasePath
 // Observe from the first producer module load, so reads made while those modules load are gated too.
 const observation = observeBuildReads()
@@ -37,7 +37,7 @@ const expectedProjection = projectionApi.projectExecutableContract({ componentCo
 const release = releaseApi.loadExecutableRelease(rawRelease, { expectedProjection, expectedReleaseId: rawRelease.releaseId, requirePackageIdentity: true })
 if (JSON.stringify(release.packageIdentity) !== JSON.stringify(identity.packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
 identity.verifyImplementationManifest(root, release.implementationInputs)
-const buildConfigScratch = mkdtempSync(path.join(tmpdir(), "release-010-config-"))
+const buildConfigScratch = mkdtempSync(path.join(tmpdir(), "release-011-config-"))
 const buildDataPath = path.join(buildConfigScratch, "library-data.ts")
 const buildConfigPath = path.join(buildConfigScratch, "vite.library.config.ts")
 writeFileSync(buildDataPath, [

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 
-import release010Artifact from "../provenance/releases/shadcn-radix-release-010.json"
+import release011Artifact from "../provenance/releases/shadcn-radix-release-011.json"
 import { verifyImplementationManifest } from "../scripts/release-inputs"
 import { loadComponentContracts } from "../src/contracts/components/canonical-loader"
 import { getTokenContract } from "../src/contracts/tokens/contract"
@@ -23,36 +23,36 @@ function approvedProjection() {
   })
 }
 
-describe("Release 010 active canonical binding", { timeout: 60000 }, () => {
-  test("binds the active Release 010 to the exact current implementation inputs", () => {
+describe("Release 011 active canonical binding", { timeout: 60000 }, () => {
+  test("binds the active Release 011 to the exact current implementation inputs", () => {
     expect(() => verifyImplementationManifest(
       resolve(import.meta.dirname, ".."),
-      release010Artifact.implementationInputs
+      release011Artifact.implementationInputs
     )).not.toThrow()
   })
 
-  test("binds the Release 010 package and canonical projection to the active runtime validator", async () => {
+  test("binds the Release 011 package and canonical projection to the active runtime validator", async () => {
     const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, "../package.json"), "utf8"))
     const sourceText = readFileSync(canonicalReleasePath, "utf8")
 
-    expect(packageJson.version).toBe("0.0.0-release.10")
-    expect(release010Artifact.projection).toEqual(approvedProjection())
-    expect(sourceText).toContain('provenance/releases/shadcn-radix-release-010.json')
+    expect(packageJson.version).toBe("0.0.0-release.11")
+    expect(release011Artifact.projection).toEqual(approvedProjection())
+    expect(sourceText).toContain('provenance/releases/shadcn-radix-release-011.json')
     expect(sourceText).not.toContain('provenance/releases/shadcn-radix-release-007.json')
 
     const canonical = await import("../src/validator/canonical-release")
-    expect(canonical.getExecutableRelease().releaseId).toBe("shadcn-radix-release-010")
+    expect(canonical.getExecutableRelease().releaseId).toBe("shadcn-radix-release-011")
   })
 
-  test("rejects a hash-valid tampered Release 010 projection against canonical source", () => {
-    const candidate = structuredClone(release010Artifact) as MutableRelease
+  test("rejects a hash-valid tampered Release 011 projection against canonical source", () => {
+    const candidate = structuredClone(release011Artifact) as MutableRelease
     candidate.projection = { ...candidate.projection, tokenIds: [...candidate.projection.tokenIds, "forged.token"] }
     const { sha256: _sha256, ...payload } = candidate
     candidate.sha256 = hashExecutableReleasePayload(payload)
 
     expect(() => loadExecutableRelease(candidate, {
       expectedProjection: approvedProjection(),
-      expectedReleaseId: "shadcn-radix-release-010",
+      expectedReleaseId: "shadcn-radix-release-011",
       requirePackageIdentity: true,
     })).toThrowError(/PROJECTION_MISMATCH/)
   })
