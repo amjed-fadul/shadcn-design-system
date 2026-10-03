@@ -206,6 +206,13 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "radius.full",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {

@@ -455,6 +455,13 @@
               "propName": "variant",
               "equals": "info"
             }
+          },
+          {
+            "tokenId": "radius.full",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {

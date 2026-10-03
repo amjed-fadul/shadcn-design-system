@@ -205,6 +205,27 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "radius.full",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {
@@ -287,6 +308,13 @@
                 "group-data-[shape=rounded]/avatar"
               ]
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -400,6 +428,13 @@
                 "group-data-[shape=rounded]/avatar"
               ]
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -581,6 +616,13 @@
                 "[&>svg]"
               ]
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -875,6 +917,13 @@
               "propName": "size",
               "equals": "sm"
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"
