@@ -13,7 +13,7 @@ and dark renders. The release itself awaits owner acceptance; Canvas should adop
 
 **Identities**
 
-- Producer source commit: `f55582a7d80d65a43bc71d728611d091b23ef422`
+- Producer source commit: `c5942c47b69bd004b55b1c54d3821bcf955a780f`
 - Package: `@adc/shadcn-design-system@0.0.0-release.11`
 - Release: `shadcn-radix-release-011`
 - Token contract: `shadcn-radix-token-contract-003` (`approved`)
@@ -21,12 +21,12 @@ and dark renders. The release itself awaits owner acceptance; Canvas should adop
 
 **Hashes**
 
-- Release payload SHA-256: `fc2d8b8493a75ddaeb7eed1305ebd3360903d62512791bc839df40499263c5d6`
-- Release JSON SHA-256: `af2744c4e0926436fa19d649afc103227155b8dc289accca1be78907a7b88e67`
-- Candidate tarball SHA-256: `82cf24711be4c6392837cc66c8d9c2eceb7841773e19223ff7c2af30f8a42a94`
+- Release payload SHA-256: `e207a258a32bd862c676c586e3d334ac721785cf03d5ce4b8681339b07ad98a6`
+- Release JSON SHA-256: `92e5cd7cf635b19b6bbbeeb9a8710da1572cd839ca7730baa53bcdd08a3487f7`
+- Candidate tarball SHA-256: `240e8f09351f71cc8795a59560b0f5e6b2cc3a76dcf14f6ebdda4135d24b6a58`
 - Candidate tarball integrity:
-  `sha512-2M+Uv17VzYjxl7+fqCFYE+seOmrU3J+rusuxOBam/0Ksie2bmt27blRyFSNw2lz5uPzjfajGXstYGe+/dIYxOA==`
-- Distribution manifest SHA-256: `ed3827ab6861637879823a3147c6c3e92aae41b24d5938cf41578dbb697e8a5f`
+  `sha512-X7lsA+7mXqnNbzosKgNmYzMsrMCrrZVk5GXs8nyAa9bLFk6ZK8QthzQrJqiOL6DBrcvHg1VJZkcJOF0fGLcPZA==`
+- Distribution manifest SHA-256: `d75c50c9d0d38c9ff158d1d130c4458f6e2167e5b0e9874e64a7e5acac207552`
   (also committed as `provenance/distributions/shadcn-radix-release-011.distribution.json`)
 
 **Candidate**
@@ -74,8 +74,9 @@ The contract tests prove these pairings in both modes, from the exact contract v
   Assign series in slot order and never reuse a status colour for a series.
 - **Display headlines:** `line-height.display` pairs with `font-size.5xl` to `font-size.9xl` for
   headlines that wrap to two lines. Single-line display text can keep the size's own line-height.
-- **Pills:** `radius.full` is the pill radius. It equals Tailwind's static `rounded-full`, which DS
-  components keep using; no component contract depends on the variable.
+- **Pills:** `radius.full` is the pill radius. Every DS `rounded-full` now compiles from it, and the
+  12 exports that use it record a `radius.full` dependency (Avatar parts, Badge, DrawerContent,
+  Progress, RadioGroupItem, ScrollBar, Slider and Switch). The value equals the old static utility.
 
 Canvas's build-time presentation-policy contrast matrix should re-check every tone and surface pair it
 declares.
@@ -125,9 +126,9 @@ Pinned at the producer commit by the release record's implementation inputs (blo
 | `contracts/tokens/token-contract.json` (`-003`, approved) | `d8af268581cb3923146bc2e2cce84b3060afddd1` | `59685d1025a216148d5bd00a97ec1fed20b14f8b7484931cd46f7c9f234b05eb` |
 | `contracts/tokens/index.json` | `7730eab20b73bbc93fb2aacfd5065ecda58f66b9` | `bba5ba917e41ce19b84f001569dea36ae661893170e21c2d9b39e26d41046517` |
 | `contracts/components/component-contract-set.json` | `1e25aab8ca67520c901739653d31d6b35c442119` | `c77cf8c76f47ca556a3ca8e63ae18e5c2d61641b04bde216475536b84f357107` |
-| `contracts/components/families/badge.json` | `61ec3d1d2d783acb724e3bdbb1946750a656ec6c` | `bcee435c8b17b62ce8e462c291b370b34d0632e6c4d71e89d6e9f56284162db7` |
+| `contracts/components/families/badge.json` | `f8167482874bdf2f03e2ac2a5adccfa876ab196d` | `775e0c41b475ec47ab12a62b97d505057b382f190258607a5561bc58bb6cc82f` |
 | `contracts/components/families/alert.json` | `71be35bbfe6097031f674c298732601f7d3bb4da` | `07855c4daca0b447f122eca38e32da1a990c23ba97e0cc58fc4def2c7f599483` |
-| `contracts/components/families/avatar.json` | `f4f599fa5cf1f18c89b8e8812bf91114bfeb020b` | `27484b2351042c5b92ce6fd6dd08c8334686497b117de15c371af4bd23b67d6c` |
+| `contracts/components/families/avatar.json` | `2688a18e9764907a0697e218e1da7f4389ae6b5b` | `75202a9bda3c91f055eac4a0e9263a16af073dfef0db60b8a06e48dc4d6eb4eb` |
 | `contracts/components/families/icon.json` | `e95b2f7ca04e5e506437205a9995878285a66f6b` | `310b287a59e6be58da084a5bc94edd9deba264fc0babfcc426ea4dd6dc374ed0` |
 | `src/index.css` (canonical theme) | `a3f9531864eb56bc1e55746a31032fd8fcbdf2ac` | `3128e8eb5e3de3b3e41f98958083efe978571e6da13ac9fdab245416a205fb62` |
 | `src/components/ui/badge.tsx` | `5146fddeeba3b7da829a09ff34d61e255db57c9b` | `a75de0a1e69efe5d5dfc6d2f3e4344a045c8c48df7305bb12664e0dd9d816052` |
@@ -135,8 +136,9 @@ Pinned at the producer commit by the release record's implementation inputs (blo
 | `src/components/ui/avatar.tsx` | `cedc3758d9bfda30ca639c4779d7e5996ccc621a` | `52d425de02821453c1b428350caabf59ad55a114dc1a0c8f5037f9fdd91cfd5b` |
 | `src/components/ui/icon.tsx` | `35e3b96847b5263c31dfa01befdde36a67a88d73` | `d8424b8e7d59c1f03f970a1aba00feaadcf0acc3acf446e0a061b36a55f07111` |
 
-Every other family contract changes only its token-evidence reference (`-002` → `-003`); its facts
-are unchanged.
+Six more families (drawer, progress, radio-group, scroll-area, slider and switch) gain only the
+`radius.full` dependency for `rounded-full`. Every other family contract changes only its
+token-evidence reference (`-002` → `-003`); its facts are unchanged.
 
 ## Canvas adoption checklist
 
