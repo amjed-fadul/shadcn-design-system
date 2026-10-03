@@ -34,7 +34,7 @@ function toolchain() {
   return { node, npm, platform: process.platform, arch: process.arch, tools }
 }
 function packBuild() {
-  const stage = mkdtempSync(path.join(tmpdir(), "release-011-build-"))
+  const stage = mkdtempSync(path.join(tmpdir(), "release-012-build-"))
   try {
     // Loading the pinned declaration and contract graph keeps the build's live
     // heap near 3.2 GB, too close to Node's default 4 GB for a reproducible
@@ -50,10 +50,10 @@ function packBuild() {
   } finally { rmSync(stage, { recursive: true, force: true }) }
 }
 function candidateRelease(expectedSha256) {
-  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-011.json")
+  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-012.json")
   const raw = JSON.parse(readFileSync(releasePath, "utf8"))
   const expectedProjection = projectionApi.projectExecutableContract({ componentContracts: componentAuthority.loadComponentContracts(), tokenContract: tokenAuthority.getTokenContract() })
-  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-011", requirePackageIdentity: true })
+  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-012", requirePackageIdentity: true })
   if (expectedSha256 !== undefined && release.sha256 !== expectedSha256) throw new Error("RELEASE_ANCHOR_MISMATCH")
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(identity.packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
   identity.verifyImplementationManifest(root, release.implementationInputs)

@@ -151,7 +151,7 @@ describe("release package input identity", () => {
   test.each(["vite.library.config.ts", "scripts/release-inputs.ts"])("a real producer build rejects an omitted runtime input read by %s", async injectionFile => {
     const directory = mkdtempSync(path.join(tmpdir(), "release-build-coverage-")); temporary.push(directory)
     // The active release: its contracts match the installed dependencies, so the build reaches the input guard.
-    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-011.json"), "utf8"))
+    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-012.json"), "utf8"))
     for (const entry of raw.implementationInputs) {
       if (entry.path.startsWith("node_modules/")) continue
       const destination = path.join(directory, entry.path)
@@ -163,12 +163,12 @@ describe("release package input identity", () => {
     writeFileSync(config, readFileSync(config, "utf8") + '\nreadFileSync(path.join(process.cwd(), "unlisted-build-data.json"), "utf8")\n')
     writeFileSync(path.join(directory, "unlisted-build-data.json"), "{}")
     mkdirSync(path.join(directory, "provenance/releases"), { recursive: true })
-    writeFileSync(path.join(directory, "provenance/releases/shadcn-radix-release-011.json"), JSON.stringify(raw))
+    writeFileSync(path.join(directory, "provenance/releases/shadcn-radix-release-012.json"), JSON.stringify(raw))
     raw.implementationInputs = createImplementationManifest(directory)
     const { sha256: _hash, ...payload } = raw
     raw.sha256 = hashExecutableReleasePayload(payload)
     mkdirSync(path.join(directory, "provenance/releases"), { recursive: true })
-    writeFileSync(path.join(directory, "provenance/releases/shadcn-radix-release-011.json"), JSON.stringify(raw))
+    writeFileSync(path.join(directory, "provenance/releases/shadcn-radix-release-012.json"), JSON.stringify(raw))
     try {
       // Same 6 GB heap as scripts/package-candidate.mjs. The guard runs after Vite and declaration emit, so the whole build must fit.
       await runFile(process.execPath, ["--max-old-space-size=6144", "--trace-gc", "scripts/build-library.mjs"], { cwd: directory, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
@@ -224,12 +224,12 @@ describe("release package input identity", () => {
     const { directory, put } = fixture()
     const currentPackage = packageIdentity(root)
     put("package.json", JSON.stringify({ name: currentPackage.name, version: currentPackage.version, exports: currentPackage.publicEntrypoints }))
-    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-011.json"), "utf8"))
+    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-012.json"), "utf8"))
     raw.packageIdentity = packageIdentity(directory)
-    for (const file of ["provenance/releases/shadcn-radix-release-011.json", "dist-library/index.js", "candidate.tgz", "distribution-manifest.json"]) {
+    for (const file of ["provenance/releases/shadcn-radix-release-012.json", "dist-library/index.js", "candidate.tgz", "distribution-manifest.json"]) {
       raw.implementationInputs = [{ path: file, gitBlob: "a".repeat(40), sha256: "b".repeat(64) }]
       const { sha256: _hash, ...payload } = raw; raw.sha256 = hashExecutableReleasePayload(payload)
-      put("provenance/releases/shadcn-radix-release-011.json", JSON.stringify(raw))
+      put("provenance/releases/shadcn-radix-release-012.json", JSON.stringify(raw))
       expect(() => verifyRepositoryRelease(directory)).toThrow(/Circular identity input/)
     }
   })
@@ -237,33 +237,33 @@ describe("release package input identity", () => {
     const { directory, put } = fixture()
     const currentPackage = packageIdentity(root)
     put("package.json", JSON.stringify({ name: currentPackage.name, version: currentPackage.version, exports: currentPackage.publicEntrypoints }))
-    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-011.json"), "utf8"))
+    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-012.json"), "utf8"))
     const expectedDigest = raw.sha256
     put("src/shared.ts", "export const value = 99")
     raw.packageIdentity = packageIdentity(directory); raw.implementationInputs = createImplementationManifest(directory)
     const { sha256: _hash, ...payload } = raw; raw.sha256 = hashExecutableReleasePayload(payload)
-    put("provenance/releases/shadcn-radix-release-011.json", JSON.stringify(raw))
+    put("provenance/releases/shadcn-radix-release-012.json", JSON.stringify(raw))
     expect(() => verifyRepositoryRelease(directory, expectedDigest)).toThrow(/RELEASE_ANCHOR/)
   })
-  test("allows immutable release history beside the active release-011", () => {
+  test("allows immutable release history beside the active release-012", () => {
     const { directory, put } = fixture()
     const currentPackage = packageIdentity(root)
     put("package.json", JSON.stringify({ name: currentPackage.name, version: currentPackage.version, exports: currentPackage.publicEntrypoints }))
-    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-011.json"), "utf8"))
+    const raw = JSON.parse(readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-012.json"), "utf8"))
     raw.packageIdentity = packageIdentity(directory); raw.implementationInputs = createImplementationManifest(directory)
     const { sha256: _hash, ...payload } = raw; raw.sha256 = hashExecutableReleasePayload(payload)
     put("provenance/releases/shadcn-radix-release-007.json", readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-007.json"), "utf8"))
     put("provenance/releases/shadcn-radix-release-009.json", readFileSync(path.join(root, "provenance/releases/shadcn-radix-release-009.json"), "utf8"))
-    put("provenance/releases/shadcn-radix-release-011.json", JSON.stringify(raw))
+    put("provenance/releases/shadcn-radix-release-012.json", JSON.stringify(raw))
     put("provenance/releases/shadcn-radix-release-006.json", "{}")
     put("provenance/releases/shadcn-radix-release-005.json", "{}")
     put("provenance/releases/shadcn-radix-release-004.json", "{}")
     put("provenance/releases/shadcn-radix-release-002.json", "{}")
     put("provenance/releases/shadcn-radix-release-001.json", "{}")
-    expect(verifyRepositoryRelease(directory).releaseId).toBe("shadcn-radix-release-011")
+    expect(verifyRepositoryRelease(directory).releaseId).toBe("shadcn-radix-release-012")
   })
   test("maps the approved package name, version and exact public entrypoints", () => {
-    expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.11", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
+    expect(packageIdentity(root)).toEqual({ name: "@adc/shadcn-design-system", version: "0.0.0-release.12", publicEntrypoints: JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")).exports })
   })
   test("preserves the accepted R3 tarball and extracted release payload across release generation", async () => {
     const r7ReleasePath = path.join(root, "provenance/releases/shadcn-radix-release-007.json")
