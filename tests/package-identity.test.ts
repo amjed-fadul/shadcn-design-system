@@ -168,7 +168,8 @@ describe("release package input identity", () => {
     mkdirSync(path.join(directory, "provenance/releases"), { recursive: true })
     writeFileSync(path.join(directory, "provenance/releases/shadcn-radix-release-011.json"), JSON.stringify(raw))
     try {
-      await runFile(process.execPath, ["scripts/build-library.mjs"], { cwd: directory, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
+      // Same heap as scripts/package-candidate.mjs, so the build reaches the input guard instead of running out of memory.
+      await runFile(process.execPath, ["--max-old-space-size=8192", "scripts/build-library.mjs"], { cwd: directory, encoding: "utf8", timeout: 120_000, maxBuffer: 16 * 1024 * 1024 })
       throw new Error("Build unexpectedly accepted the omitted input")
     } catch (error) {
       expect(String((error as { stderr?: string }).stderr)).toMatch(/UNBOUND_INPUT: unlisted-build-data.json/)
