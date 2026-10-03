@@ -1072,16 +1072,6 @@
       "sha256": "69ef61bf5cb44106d1553fac6d8b8b107d6304d509d0f3e4cb40137653f31374"
     },
     {
-      "path": "node_modules/shadcn/dist/tailwind.css",
-      "gitBlob": null,
-      "sha256": "bc7d83425702955b4cb67cb14ede9d603f9d912376d57a2d81d661094d2a782a"
-    },
-    {
-      "path": "node_modules/shadcn/package.json",
-      "gitBlob": null,
-      "sha256": "1059a7d83fea2b3a40622b3a235c6be0d78e6c378a5aba16e3f46c8696204521"
-    },
-    {
       "path": "node_modules/tailwindcss/dist/chunk-5JIJA4QV.mjs",
       "gitBlob": null,
       "sha256": "c24e6bf22af878f559ed55bf81c6023d0413abd0e7854286944088cb44473149"
@@ -1133,13 +1123,13 @@
     },
     {
       "path": "package-lock.json",
-      "gitBlob": "290705d37e1bde52b2f05ca38e24ecb7e55260a3",
-      "sha256": "7534c5b59f60802f64dcc9947686187a80d0211f5847ad3174fee4d26a77c717"
+      "gitBlob": "b3eebb57063c751697eee1fddd93258e5c01b3a3",
+      "sha256": "5fb55c2bfe571efac900af9c06674dd2c5c4ef382808d343f674a5e4c347c8d2"
     },
     {
       "path": "package.json",
-      "gitBlob": "e9dcaf3d2cb9ef4c9b4e8c2b03cbd5daa6ef626e",
-      "sha256": "812a36efac7a7a90a0b43363898141e8a726c5a3439521baac3bf9fcdc9f27e0"
+      "gitBlob": "262c6d505e552df3ce1aeee2a8555f185805a1ec",
+      "sha256": "63abbeecc488da7a9847ba0ee731cf2e2845dfec7c27e274996a58e4e9b814e3"
     },
     {
       "path": "provenance/baseline.json",
@@ -1158,8 +1148,8 @@
     },
     {
       "path": "provenance/token-contract-source.json",
-      "gitBlob": "b29a308c7f7cb40d16d9d72cc6aecb93754bc459",
-      "sha256": "1402f81b17a47cb7b37848dfd73b4ee2f4a542e9c6713670af9da6388275c1fe"
+      "gitBlob": "70e37b6a6a176e2ebcc0cf196944adbe86495232",
+      "sha256": "614da9e54ef523f8057dd20c8f7ef6f928d533c5728dd80393ab2c5e3792b219"
     },
     {
       "path": "provenance/token-source.json",
@@ -1218,8 +1208,8 @@
     },
     {
       "path": "scripts/library-licenses.ts",
-      "gitBlob": "b78fb52a4ea07552784c0a4312dc0c1627176d3e",
-      "sha256": "d08395f2e0034e566f154e5c748623c97a489f64b493db30f579e3366f70e5f8"
+      "gitBlob": "2e12f0803f2530b8836cabf56cf0611c0f5693b9",
+      "sha256": "38c3da8ab72b105c59996176eaa1fbec9d049569fa03e443b26c6fc166ee153e"
     },
     {
       "path": "scripts/package-candidate.mjs",
@@ -1228,8 +1218,8 @@
     },
     {
       "path": "scripts/release-inputs.ts",
-      "gitBlob": "21fcf869ddf75892f314677130c928cbef1fce69",
-      "sha256": "c7db2d5a3ef36abab0dbb70106dff75dd124ad9375dac85bdf9ca9463538c3c8"
+      "gitBlob": "056101cd1001ecbc2e1a304b3be56ca8279b040d",
+      "sha256": "15d54d9dcac6c0564171c5124e7804fa1612309c2b535d797cd5cd7ee0e42b8f"
     },
     {
       "path": "scripts/run-release-generation.mjs",
@@ -1768,8 +1758,8 @@
     },
     {
       "path": "src/index.css",
-      "gitBlob": "a3f9531864eb56bc1e55746a31032fd8fcbdf2ac",
-      "sha256": "3128e8eb5e3de3b3e41f98958083efe978571e6da13ac9fdab245416a205fb62"
+      "gitBlob": "292413e4bf94ddf6ec4422474b730e47d1e0af5f",
+      "sha256": "67673a8641b7be929009282ac0d8a174c90db742cf57c78ea3820af4e40b06c3"
     },
     {
       "path": "src/lib/utils.ts",
@@ -1820,6 +1810,21 @@
       "path": "src/validator/validate.ts",
       "gitBlob": "d7be378b0ad8af7778f0134eff0da81fa415297b",
       "sha256": "b316b5274aa43d68675e8a1c6fd890705f8375e76f46a12480bc52a6c1b36b39"
+    },
+    {
+      "path": "src/vendor/shadcn/LICENSE.md",
+      "gitBlob": "fad4d887a681dd49233e5ed01ee2c7a1513089a0",
+      "sha256": "1564074e13439397221ffd522e2e504d56561994a23d371aa5e3ad43e4f5423f"
+    },
+    {
+      "path": "src/vendor/shadcn/tailwind.css",
+      "gitBlob": "7807c58eb94de8b764b9b6b7b5d8cde6d012b17f",
+      "sha256": "bc7d83425702955b4cb67cb14ede9d603f9d912376d57a2d81d661094d2a782a"
+    },
+    {
+      "path": "src/vendor/shadcn/vendored.json",
+      "gitBlob": "23166fa228d6b30cb18820058021892297762b4a",
+      "sha256": "a9be640224ad521db7ece3e2072b1b8e400759d44fb12e28222e2b17abec0e2c"
     },
     {
       "path": "tsconfig.json",
@@ -529724,5 +529729,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "e207a258a32bd862c676c586e3d334ac721785cf03d5ce4b8681339b07ad98a6"
+  "sha256": "915ee7ab6345f7f550f599beea432c143b18c9c45dce264e1a2376bb2670f2e6"
 }
