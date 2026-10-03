@@ -1223,8 +1223,8 @@
     },
     {
       "path": "scripts/package-candidate.mjs",
-      "gitBlob": "ca61a59e15e0b3293a2f4775c0fc97f849320739",
-      "sha256": "b8888ad18462ca44674f39fbe8a0dfd210a65e480f2d91e4c9d931ec70132a72"
+      "gitBlob": "9874d6ac0e00c3cdbbdd26255972a6020500f6fb",
+      "sha256": "8298d7273a334048f3805df76cc246b3bc39fe6707c541ce6cbc4c3f1a670fdc"
     },
     {
       "path": "scripts/release-inputs.ts",
@@ -529724,5 +529724,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "a671bdfaf65a1842217c14e8cbcc0c4422afd4b1c7b7c46fb4cbbb182219a72d"
+  "sha256": "e207a258a32bd862c676c586e3d334ac721785cf03d5ce4b8681339b07ad98a6"
 }
