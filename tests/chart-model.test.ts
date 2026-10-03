@@ -57,6 +57,12 @@ describe("chart model", () => {
     expect(createChartModel({ ...base }, "en-US").format(42000.4)).toBe("42,000")
   })
 
+  test("formats axis ticks compactly so they fit the axis", () => {
+    expect(createChartModel({ ...base, valueFormat: "currency", currency: "USD" }, "en-US").formatTick(80000)).toBe("$80K")
+    expect(createChartModel({ ...base }, "en-US").formatTick(80000)).toBe("80K")
+    expect(createChartModel({ ...base, valueFormat: "percent" }, "en-US").formatTick(0.25)).toBe("25%")
+  })
+
   test("summarises range and extremes in one sentence", () => {
     const model = createChartModel({ ...base, valueFormat: "currency", currency: "USD", series: twoSeries }, "en-US")
     expect(model.summary).toBe("Revenue by month, Jan to Mar: 2026 from $42,000 to $55,000; 2025 from $30,000 to $37,000.")

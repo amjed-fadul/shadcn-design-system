@@ -46,6 +46,8 @@ export type ChartModel = {
   series: ChartModelSeries[]
   total?: number
   format: (value: number) => string
+  /** Compact variant for axis ticks, so labels fit a narrow axis. */
+  formatTick: (value: number) => string
   empty: boolean
   summary: string
   table: { columns: string[]; rows: string[][] }
@@ -67,12 +69,12 @@ function fail(message: string): never {
   throw new ChartPropsError(message)
 }
 
-function createFormatter(valueFormat: ChartValueFormat, currency: string | undefined, locale: string | undefined) {
+function createFormatter(valueFormat: ChartValueFormat, currency: string | undefined, locale: string | undefined, tick = false) {
   try {
     const options: Intl.NumberFormatOptions =
-      valueFormat === "currency" ? { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }
-        : valueFormat === "percent" ? { style: "percent", maximumFractionDigits: 1 }
-          : valueFormat === "compact" ? { notation: "compact", maximumFractionDigits: 1 }
+      valueFormat === "currency" ? { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: tick ? 1 : 0, ...(tick ? { notation: "compact" as const } : {}) }
+        : valueFormat === "percent" ? { style: "percent", maximumFractionDigits: tick ? 0 : 1 }
+          : valueFormat === "compact" || tick ? { notation: "compact", maximumFractionDigits: 1 }
             : { maximumFractionDigits: 0 }
     const formatter = new Intl.NumberFormat(locale, options)
     return (value: number) => formatter.format(value)
@@ -137,6 +139,7 @@ export function createChartModel(input: ChartModelInput, locale?: string): Chart
 
   const valueFormat = input.valueFormat ?? "number"
   const format = createFormatter(valueFormat, input.currency, locale)
+  const formatTick = createFormatter(valueFormat, input.currency, locale, true)
   const cell = (value: number | null) => (value === null ? "—" : format(value))
 
   if (partToWhole) {
@@ -152,7 +155,7 @@ export function createChartModel(input: ChartModelInput, locale?: string): Chart
       type: input.type, title: input.title, categoryKey: input.categoryKey, valueKey,
       layout: "grouped", orientation: "vertical", curve: "monotone", valueFormat, size, data,
       series: categories.map((category, index) => ({ key: category, label: category, color: color(index) })),
-      total, format, empty,
+      total, format, formatTick, empty,
       summary: empty ? `${input.title}: no data.` : `${input.title}, ${data.length} parts totalling ${format(total)}: ${parts.join(", ")}.`,
       table: { columns: [input.categoryKey, valueKey], rows: categories.map((category, index) => [category, cell(values[index])]) },
     }
@@ -173,7 +176,7 @@ export function createChartModel(input: ChartModelInput, locale?: string): Chart
     layout: input.layout ?? "grouped", orientation: input.orientation ?? "vertical", curve: input.curve ?? "monotone",
     valueFormat, size, data,
     series: series.map((entry, index) => ({ key: entry.key, label: entry.label, color: color(index) })),
-    format, empty,
+    format, formatTick, empty,
     summary: empty ? `${input.title}: no data.` : `${input.title}, ${categories[0]} to ${categories[categories.length - 1]}: ${clauses.join("; ")}.`,
     table: {
       columns: [input.categoryKey, ...series.map((entry) => entry.label)],

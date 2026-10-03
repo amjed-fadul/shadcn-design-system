@@ -1,6 +1,6 @@
 import * as React from "react"
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Label, Legend, Line, LineChart,
+  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Label, Line, LineChart,
   Pie, PieChart, RadialBar, RadialBarChart, Tooltip, XAxis, YAxis,
 } from "recharts"
 
@@ -41,6 +41,20 @@ const SERIES_CLASSES = ["text-chart-1", "text-chart-2", "text-chart-3", "text-ch
 const ANIMATION_MS = 400
 const RATIOS: Record<ChartAspectRatio, number> = { "16/9": 16 / 9, "4/3": 4 / 3, "1/1": 1, "2/1": 2 }
 const AXIS_TICK = { className: "fill-muted-foreground text-xs" }
+// Axis width from the longest label at the 12px tick size (about 0.6em per glyph), so it
+// is deterministic in headless capture and never depends on when the web font loads.
+const TICK_GLYPH_PX = 7.2
+const TICK_PADDING_PX = 12
+
+function axisWidth(labels: readonly string[]): number {
+  return Math.ceil(Math.max(1, ...labels.map((label) => label.length)) * TICK_GLYPH_PX) + TICK_PADDING_PX
+}
+
+function valueExtent(model: ChartModel): [number, number] {
+  const rows = model.data.map((datum) => model.series.map((series) => (typeof datum[series.key] === "number" ? (datum[series.key] as number) : 0)))
+  const totals = model.layout === "stacked" ? rows.map((row) => row.reduce((sum, value) => sum + value, 0)) : rows.flat()
+  return [Math.min(0, ...totals), Math.max(0, ...totals)]
+}
 
 function seriesClass(index: number): string {
   return SERIES_CLASSES[index]
@@ -76,7 +90,7 @@ function ChartTooltipContent({ active, payload, label, model }: { active?: boole
 
 function ChartLegendContent({ model }: { model: ChartModel }) {
   return (
-    <ul data-slot="chart-legend" className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs text-muted-foreground">
+    <ul data-slot="chart-legend" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
       {model.series.map((series, index) => (
         <li key={series.key} data-slot="chart-legend-item" className="flex items-center gap-1.5">
           <span aria-hidden className={cn("size-2.5 shrink-0 rounded-[2px] bg-current", seriesClass(index))} />
@@ -97,25 +111,24 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
   }
   const animation = { isAnimationActive: animate, animationDuration: ANIMATION_MS, onAnimationEnd: handleAnimationEnd }
   const tooltip = <Tooltip cursor={model.type === "bar" ? { className: "fill-muted" } : { className: "stroke-border" }} content={<ChartTooltipContent model={model} />} />
-  const legend = options.legend ? <Legend content={<ChartLegendContent model={model} />} /> : null
   const stacked = model.layout === "stacked"
   const horizontal = model.type === "bar" && model.orientation === "horizontal"
   const grid = options.grid ? <CartesianGrid className="text-border" stroke="currentColor" strokeDasharray="3 3" strokeOpacity={0.5} vertical={horizontal} horizontal={!horizontal} /> : null
   const categoryAxis = { dataKey: model.categoryKey, tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK }
-  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.format, width: 56 }
+  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.formatTick }
   const xAxis = horizontal
     ? <XAxis type="number" {...valueAxis} hide={!options.xAxis} />
     : <XAxis type="category" {...categoryAxis} hide={!options.xAxis} />
   const yAxis = horizontal
-    ? <YAxis type="category" {...categoryAxis} width={72} hide={!options.yAxis} />
-    : <YAxis type="number" {...valueAxis} hide={!options.yAxis} />
+    ? <YAxis type="category" {...categoryAxis} width={axisWidth(model.table.rows.map((row) => row[0]))} hide={!options.yAxis} />
+    : <YAxis type="number" {...valueAxis} width={axisWidth(valueExtent(model).map(model.formatTick))} hide={!options.yAxis} />
   const chart = { width, height, data: model.data as Record<string, unknown>[], accessibilityLayer: true, margin: { top: 8, right: 8, bottom: 0, left: 0 } }
   const last = model.series.length - 1
 
   if (model.type === "bar") {
     return (
       <BarChart {...chart} layout={horizontal ? "vertical" : "horizontal"}>
-        {grid}{xAxis}{yAxis}{tooltip}{legend}
+        {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Bar
             key={series.key} dataKey={series.key} name={series.label} className={seriesClass(index)} fill="currentColor"
@@ -137,7 +150,7 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
             </linearGradient>
           ))}
         </defs>
-        {grid}{xAxis}{yAxis}{tooltip}{legend}
+        {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Area
             key={series.key} dataKey={series.key} name={series.label} type={model.curve} className={seriesClass(index)}
@@ -151,7 +164,7 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
   if (model.type === "line") {
     return (
       <LineChart {...chart}>
-        {grid}{xAxis}{yAxis}{tooltip}{legend}
+        {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Line
             key={series.key} dataKey={series.key} name={series.label} type={model.curve} className={seriesClass(index)}
@@ -166,23 +179,21 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
   if (model.type === "donut") {
     return (
       <PieChart width={width} height={height} accessibilityLayer>
-        {tooltip}{legend}
+        {tooltip}
         <Pie
           data={model.data as Record<string, unknown>[]} dataKey={valueKey} nameKey={model.categoryKey}
-          innerRadius="60%" outerRadius="80%" paddingAngle={2} cornerRadius={4} className="stroke-card" strokeWidth={2} {...animation}
+          innerRadius="60%" outerRadius="80%" paddingAngle={2} cornerRadius={4} strokeWidth={2} rootTabIndex={-1} {...animation}
         >
-          {model.series.map((series, index) => <Cell key={series.key} className={seriesClass(index)} fill="currentColor" />)}
+          {model.series.map((series, index) => <Cell key={series.key} className={cn(seriesClass(index), "stroke-card")} fill="currentColor" />)}
           <Label
             position="center"
-            content={({ viewBox }) => {
-              const { cx = 0, cy = 0 } = (viewBox ?? {}) as { cx?: number; cy?: number }
-              return (
-                <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle">
-                  <tspan x={cx} dy={options.centerLabel ? "-0.4em" : 0} className="fill-foreground text-2xl font-semibold">{model.format(model.total ?? 0)}</tspan>
-                  {options.centerLabel ? <tspan x={cx} dy="1.6em" className="fill-muted-foreground text-xs">{options.centerLabel}</tspan> : null}
-                </text>
-              )
-            }}
+            content={() => (
+              // The legend renders outside the plot, so the pie centre is the plot centre.
+              <text x={width / 2} y={height / 2} textAnchor="middle" dominantBaseline="middle">
+                <tspan x={width / 2} dy={options.centerLabel ? "-0.4em" : 0} className="fill-foreground text-2xl font-semibold">{model.format(model.total ?? 0)}</tspan>
+                {options.centerLabel ? <tspan x={width / 2} dy="1.6em" className="fill-muted-foreground text-xs">{options.centerLabel}</tspan> : null}
+              </text>
+            )}
           />
         </Pie>
       </PieChart>
@@ -190,7 +201,7 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
   }
   return (
     <RadialBarChart width={width} height={height} data={model.data as Record<string, unknown>[]} innerRadius="30%" outerRadius="100%" accessibilityLayer>
-      {tooltip}{legend}
+      {tooltip}
       <RadialBar dataKey={valueKey} cornerRadius={4} background={{ className: "fill-muted" }} {...animation}>
         {model.series.map((series, index) => <Cell key={series.key} className={seriesClass(index)} fill="currentColor" />)}
       </RadialBar>
@@ -234,8 +245,11 @@ function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptio
   else content = <ChartPlot model={model} options={options} width={width} height={height} animate={animate} onDrawn={() => setDrawn(true)} />
 
   return (
-    <div ref={plotRef} data-slot="chart-plot" data-chart-state={state} className="relative w-full" style={style}>
-      {content}
+    <div className="flex w-full flex-col gap-3">
+      <div ref={plotRef} data-slot="chart-plot" data-chart-state={state} className="relative w-full" style={style}>
+        {content}
+      </div>
+      {options.legend && !model.empty ? <ChartLegendContent model={model} /> : null}
     </div>
   )
 }
