@@ -52,10 +52,10 @@
     ]
   },
   "tokenContract": {
-    "id": "shadcn-radix-token-contract-002",
-    "status": "approved",
+    "id": "shadcn-radix-token-contract-003",
+    "status": "candidate",
     "path": "contracts/tokens/token-contract.json",
-    "blobSha": "a067db0be8c6de436b4e1b4a20fa6b9e8c953292"
+    "blobSha": "85b6dcfc49d1b76ddf0a3b3a199160487a0efb86"
   },
   "packages": {
     "react": {

@@ -44,8 +44,8 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
         familyIds: expectedFamilyIds,
       },
       tokenContract: {
-        id: "shadcn-radix-token-contract-002",
-        status: "approved",
+        id: "shadcn-radix-token-contract-003",
+        status: "candidate",
         path: "contracts/tokens/token-contract.json",
         blobSha: gitBlobSha("contracts/tokens/token-contract.json"),
       },
@@ -66,9 +66,9 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
     expect(provenance.familySource.familyIds).toEqual(familyIds)
     expect(provenance.familySource.blobSha).toBe(gitBlobSha(provenance.familySource.path))
 
-    expect(tokenContract.id).toBe("shadcn-radix-token-contract-002")
-    expect(tokenContract.status).toBe("approved")
-    expect(tokenContract.tokens).toHaveLength(82)
+    expect(tokenContract.id).toBe("shadcn-radix-token-contract-003")
+    expect(tokenContract.status).toBe("candidate")
+    expect(tokenContract.tokens).toHaveLength(90)
     expect(tokenContract.derivedRules).toHaveLength(1)
     expect(provenance.tokenContract.blobSha).toBe(gitBlobSha(provenance.tokenContract.path))
 
