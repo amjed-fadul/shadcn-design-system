@@ -103,7 +103,7 @@ describe("immutable Release 003 package artifact verification", () => {
     expect(Object.isFrozen(library.getTokenContract().tokens[0].value)).toBe(true)
   })
 
-  test("packages built CSS with tokens, internal utilities, animations, and fonts", () => {
+  test("packages built CSS with tokens, internal utilities, animations, and fonts", async () => {
     const css = readFileSync(path.join(output, "styles.css"), "utf8")
     expect(css).not.toMatch(/@(?:import|source|theme|apply|custom-variant)\b/)
     expect(css).not.toMatch(/\/Users\/|node_modules|https?:\/\//)
@@ -120,7 +120,10 @@ describe("immutable Release 003 package artifact verification", () => {
     expect(css.match(/--color-(?:red|blue)-\d+:/)).toBeNull()
     expect(css).not.toContain("--font-serif:")
     expect(css).not.toContain("--breakpoint-3xl:")
-    const contract = readJson("contracts/tokens/token-contract.json") as TokenContract
+    // The archived R3 stylesheet must expose exactly the R3 token contract it shipped with; the active
+    // contract has since gained tokens (Release 011), which only later packages carry.
+    const library = await import(/* @vite-ignore */ path.join(output, "release.js"))
+    const contract = library.getTokenContract() as TokenContract
     const expected = contract.tokens.flatMap(({ binding }) => [
       binding.cssVariable,
       ...(binding.tailwindThemeVariable ? [binding.tailwindThemeVariable] : []),
