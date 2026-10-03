@@ -114,12 +114,20 @@ describe("Chart", () => {
     expect(plot().getAttribute("data-chart-state")).toBe("ready")
   })
 
-  test("colours series only through governed chart classes", () => {
+  test("colours series only with the governed chart tokens, in slot order", () => {
     render({ ...barProps, animation: "off" })
     resize(600)
-    const layers = [...container.querySelectorAll(".recharts-bar")]
-    expect(layers.map((layer) => [...layer.classList].find((name) => name.startsWith("text-chart-")))).toEqual(["text-chart-1", "text-chart-2"])
-    expect(container.innerHTML).not.toMatch(/#[0-9a-f]{6}/i)
+    const fills = [...container.querySelectorAll(".recharts-bar")].map((layer) => [...new Set([...layer.querySelectorAll("path")].map((path) => path.getAttribute("fill")))])
+    expect(fills).toEqual([["var(--chart-1)"], ["var(--chart-2)"]])
+    expect([...container.querySelectorAll('[data-slot="chart-legend-item"] span')].map((swatch) => (swatch as HTMLElement).style.background)).toEqual(["var(--chart-1)", "var(--chart-2)"])
+    expect(container.innerHTML.match(/(?:#[0-9a-f]{3,8}\b|rgba?\(|hsla?\()[^"]{0,24}/gi) ?? []).toEqual([])
+  })
+
+  test("colours donut parts with the governed chart tokens, in slot order", () => {
+    render({ ...barProps, type: "donut", series: undefined, categoryKey: "plan", valueKey: "customers", data: [{ plan: "Free", customers: 600 }, { plan: "Pro", customers: 300 }, { plan: "Team", customers: 100 }], animation: "off" })
+    resize(600)
+    expect([...container.querySelectorAll(".recharts-pie-sector path")].map((path) => path.getAttribute("fill"))).toEqual(["var(--chart-1)", "var(--chart-2)", "var(--chart-3)"])
+    expect(container.innerHTML.match(/(?:#[0-9a-f]{3,8}\b|rgba?\(|hsla?\()[^"]{0,24}/gi) ?? []).toEqual([])
   })
 
   test("shows a legend for two or more series by default and hides it for one", () => {
@@ -128,6 +136,15 @@ describe("Chart", () => {
     expect([...container.querySelectorAll('[data-slot="chart-legend-item"]')].map((item) => item.textContent)).toEqual(["2026", "2025"])
     render({ ...barProps, series: [{ key: "thisYear", label: "2026" }], animation: "off" })
     expect(container.querySelector('[data-slot="chart-legend"]')).toBeNull()
+  })
+
+  test("draws value ticks at nice steps it chose itself", () => {
+    render({ ...barProps, animation: "off" })
+    resize(600)
+    const ticks = () => [...container.querySelectorAll(".recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value")].map((tick) => tick.textContent?.toUpperCase())
+    expect(ticks()).toEqual(["0", "20K", "40K", "60K"])
+    render({ ...barProps, layout: "stacked", animation: "off" })
+    expect(ticks()).toEqual(["0", "25K", "50K", "75K", "100K"])
   })
 
   test("is a single keyboard stop", () => {

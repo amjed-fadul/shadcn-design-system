@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { ComponentProps } from "react"
 import { expect, userEvent, waitFor } from "storybook/test"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Chart, type ChartProps } from "@/components/ui/chart"
+import { Chart } from "@/components/ui/chart"
+
+type ChartProps = ComponentProps<typeof Chart>
 
 const revenue = [
   { month: "Jan", thisYear: 42000, lastYear: 30000 },
@@ -34,13 +37,25 @@ const meta = {
   component: Chart,
   args: { type: "bar", title: "Revenue by month", data: revenue, categoryKey: "month", series: yearSeries, valueFormat: "currency", currency: "USD", height: 260 },
   parameters: { controls: { include: ["type", "layout", "orientation", "curve", "valueFormat", "xAxis", "yAxis", "grid", "legend", "animation"] } },
-  decorators: [(Story) => <div className="w-full max-w-2xl"><Story /></div>],
+  decorators: [(Story, { parameters }) => <div className={parameters.wide ? "w-full max-w-5xl" : "w-full max-w-2xl"}><Story /></div>],
 } satisfies Meta<typeof Chart>
 export default meta
 type Story = StoryObj<typeof meta>
 
 async function waitForReady(canvasElement: HTMLElement) {
   await waitFor(() => expect(canvasElement.querySelector('[data-slot="chart-plot"]')?.getAttribute("data-chart-state")).toBe("ready"), { timeout: 3000 })
+}
+
+// Every axis and centre label must sit inside its chart surface: the surface clips overflow.
+async function expectNoClippedText(canvasElement: HTMLElement) {
+  for (const surface of canvasElement.querySelectorAll("svg.recharts-surface")) {
+    const bounds = surface.getBoundingClientRect()
+    const clipped = [...surface.querySelectorAll("text")].filter((text) => {
+      const box = text.getBoundingClientRect()
+      return box.left < bounds.left - 0.5 || box.right > bounds.right + 0.5 || box.top < bounds.top - 0.5 || box.bottom > bounds.bottom + 0.5
+    })
+    await expect(clipped.map((text) => text.textContent)).toEqual([])
+  }
 }
 
 const checkChart: Story["play"] = async ({ canvasElement }) => {
@@ -52,6 +67,7 @@ const checkChart: Story["play"] = async ({ canvasElement }) => {
   await expect(description.querySelectorAll("tbody tr").length).toBeGreaterThan(0)
   await expect(canvasElement.querySelectorAll('[tabindex="0"]').length).toBe(1)
   await expect(canvasElement.querySelector("svg.recharts-surface")).not.toBeNull()
+  await expectNoClippedText(canvasElement)
   // Keyboard: the chart is one tab stop, and arrow keys move the tooltip between data points.
   canvasElement.querySelector<HTMLElement>('[tabindex="0"]')!.focus()
   await userEvent.keyboard("{ArrowRight}")
@@ -97,8 +113,7 @@ const gallery: Array<{ name: string; description: string; props: ChartProps }> =
 ]
 
 export const Gallery: Story = {
-  parameters: { controls: { disable: true } },
-  decorators: [(Story) => <div className="w-full max-w-5xl"><Story /></div>],
+  parameters: { controls: { disable: true }, wide: true },
   render: () => (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {gallery.map((entry) => (
@@ -116,5 +131,6 @@ export const Gallery: Story = {
   ),
   play: async ({ canvasElement }) => {
     await waitFor(() => expect([...canvasElement.querySelectorAll('[data-slot="chart-plot"]')].every((plot) => plot.getAttribute("data-chart-state") === "ready")).toBe(true), { timeout: 3000 })
+    await expectNoClippedText(canvasElement)
   },
 }

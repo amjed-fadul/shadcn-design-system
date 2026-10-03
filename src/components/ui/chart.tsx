@@ -7,16 +7,18 @@ import {
 import { cn } from "@/lib/utils"
 import {
   createChartModel,
-  type ChartAspectRatio, type ChartCurve, type ChartDatum, type ChartLayout, type ChartModel,
-  type ChartOrientation, type ChartSeries, type ChartType, type ChartValueFormat,
+  type ChartAspectRatio, type ChartCurve, type ChartLayout, type ChartModel,
+  type ChartOrientation, type ChartType, type ChartValueFormat,
 } from "@/components/ui/chart-model"
 
+// Data and series are written out structurally, not through aliases, so the contract's
+// type text states the exact JSON shape an author supplies.
 type ChartProps = {
   type: ChartType
   title: string
-  data: readonly ChartDatum[]
+  data: ReadonlyArray<Readonly<Record<string, string | number | null>>>
   categoryKey: string
-  series?: readonly ChartSeries[]
+  series?: ReadonlyArray<Readonly<{ key: string; label: string }>>
   valueKey?: string
   layout?: ChartLayout
   orientation?: ChartOrientation
@@ -35,29 +37,50 @@ type ChartProps = {
 
 type ChartOptions = { xAxis: boolean; yAxis: boolean; grid: boolean; legend: boolean; animation: "auto" | "off"; centerLabel?: string }
 
-// Series colours come only from the governed chart tokens, in slot order. Marks use
-// currentColor so the colour is carried by these static, auditable classes.
-const SERIES_CLASSES = ["text-chart-1", "text-chart-2", "text-chart-3", "text-chart-4", "text-chart-5"] as const
+// Series colours come only from the governed chart tokens, in slot order: the model
+// assigns var(--chart-1) to var(--chart-5) and marks use those values directly.
 const ANIMATION_MS = 400
 const RATIOS: Record<ChartAspectRatio, number> = { "16/9": 16 / 9, "4/3": 4 / 3, "1/1": 1, "2/1": 2 }
-const AXIS_TICK = { className: "fill-muted-foreground text-xs" }
-// Axis width from the longest label at the 12px tick size (about 0.6em per glyph), so it
-// is deterministic in headless capture and never depends on when the web font loads.
-const TICK_GLYPH_PX = 7.2
-const TICK_PADDING_PX = 12
+const AXIS_TICK = { className: "text-xs", fill: "var(--muted-foreground)" }
+// Label room comes from the longest label at the 12px tick size (a generous 0.63em per
+// glyph), so it is deterministic in headless capture and never waits for the web font.
+// Recharts offsets each tick label by its tick size (6) and tick margin (8) even with
+// tick lines off.
+const TICK_GLYPH_PX = 7.6
+const TICK_OFFSET_PX = 6 + 8
+const TICK_SLACK_PX = 2
+const EDGE_PX = 8
+const VALUE_TICK_COUNT = 5
+
+function labelWidth(labels: readonly string[]): number {
+  return Math.ceil(Math.max(0, ...labels.map((label) => label.length)) * TICK_GLYPH_PX)
+}
 
 function axisWidth(labels: readonly string[]): number {
-  return Math.ceil(Math.max(1, ...labels.map((label) => label.length)) * TICK_GLYPH_PX) + TICK_PADDING_PX
+  return labelWidth(labels) + TICK_OFFSET_PX + TICK_SLACK_PX
+}
+
+// Room for a label centred on the plot edge, as the first and last ticks are.
+function edgeRoom(labels: readonly string[]): number {
+  return Math.max(EDGE_PX, Math.ceil(labelWidth(labels) / 2) + TICK_SLACK_PX)
+}
+
+// The value ticks are chosen here with Recharts' nice steps (1, 2, 2.5 or 5 times a power
+// of ten), so the axis is sized from exactly the labels it draws.
+function valueTicks(model: ChartModel): number[] {
+  const [min, max] = valueExtent(model)
+  const raw = (max - min || 1) / (VALUE_TICK_COUNT - 1)
+  const power = 10 ** Math.floor(Math.log10(raw))
+  const step = ([1, 2, 2.5, 5].find((nice) => raw <= nice * power) ?? 10) * power
+  const first = Math.floor(min / step)
+  const last = Math.max(Math.ceil(max / step), first + 1)
+  return Array.from({ length: last - first + 1 }, (_, index) => Number(((first + index) * step).toPrecision(12)))
 }
 
 function valueExtent(model: ChartModel): [number, number] {
   const rows = model.data.map((datum) => model.series.map((series) => (typeof datum[series.key] === "number" ? (datum[series.key] as number) : 0)))
   const totals = model.layout === "stacked" ? rows.map((row) => row.reduce((sum, value) => sum + value, 0)) : rows.flat()
   return [Math.min(0, ...totals), Math.max(0, ...totals)]
-}
-
-function seriesClass(index: number): string {
-  return SERIES_CLASSES[index]
 }
 
 function prefersReducedMotion(): boolean {
@@ -78,7 +101,7 @@ function ChartTooltipContent({ active, payload, label, model }: { active?: boole
         const value = typeof entry.value === "number" ? model.format(entry.value) : "—"
         return (
           <div key={key} className="flex items-center gap-2">
-            <span aria-hidden className={cn("size-2.5 shrink-0 rounded-[2px] bg-current", seriesClass(Math.max(index, 0)))} />
+            <span aria-hidden className="size-2.5 shrink-0 rounded-[2px]" style={{ background: model.series[Math.max(index, 0)]?.color }} />
             <span className="text-muted-foreground">{model.series[index]?.label ?? key}</span>
             <span className="ms-auto font-medium text-foreground tabular-nums">{value}</span>
           </div>
@@ -91,9 +114,9 @@ function ChartTooltipContent({ active, payload, label, model }: { active?: boole
 function ChartLegendContent({ model }: { model: ChartModel }) {
   return (
     <ul data-slot="chart-legend" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-      {model.series.map((series, index) => (
+      {model.series.map((series) => (
         <li key={series.key} data-slot="chart-legend-item" className="flex items-center gap-1.5">
-          <span aria-hidden className={cn("size-2.5 shrink-0 rounded-[2px] bg-current", seriesClass(index))} />
+          <span aria-hidden className="size-2.5 shrink-0 rounded-[2px]" style={{ background: series.color }} />
           {series.label}
         </li>
       ))}
@@ -110,19 +133,26 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
     if (remaining.current <= 0) onDrawn()
   }
   const animation = { isAnimationActive: animate, animationDuration: ANIMATION_MS, onAnimationEnd: handleAnimationEnd }
-  const tooltip = <Tooltip cursor={model.type === "bar" ? { className: "fill-muted" } : { className: "stroke-border" }} content={<ChartTooltipContent model={model} />} />
+  const tooltip = <Tooltip cursor={model.type === "bar" ? { fill: "var(--muted)" } : { stroke: "var(--border)" }} content={<ChartTooltipContent model={model} />} />
   const stacked = model.layout === "stacked"
   const horizontal = model.type === "bar" && model.orientation === "horizontal"
-  const grid = options.grid ? <CartesianGrid className="text-border" stroke="currentColor" strokeDasharray="3 3" strokeOpacity={0.5} vertical={horizontal} horizontal={!horizontal} /> : null
+  const grid = options.grid ? <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" strokeOpacity={0.5} vertical={horizontal} horizontal={!horizontal} /> : null
+  const ticks = valueTicks(model)
+  const valueLabels = ticks.map(model.formatTick)
+  const categoryLabels = model.table.rows.map((row) => row[0])
   const categoryAxis = { dataKey: model.categoryKey, tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK }
-  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.formatTick }
+  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.formatTick, ticks, domain: [ticks[0], ticks[ticks.length - 1]], interval: 0 as const }
   const xAxis = horizontal
     ? <XAxis type="number" {...valueAxis} hide={!options.xAxis} />
     : <XAxis type="category" {...categoryAxis} hide={!options.xAxis} />
   const yAxis = horizontal
-    ? <YAxis type="category" {...categoryAxis} width={axisWidth(model.table.rows.map((row) => row[0]))} hide={!options.yAxis} />
-    : <YAxis type="number" {...valueAxis} width={axisWidth(valueExtent(model).map(model.formatTick))} hide={!options.yAxis} />
-  const chart = { width, height, data: model.data as Record<string, unknown>[], accessibilityLayer: true, margin: { top: 8, right: 8, bottom: 0, left: 0 } }
+    ? <YAxis type="category" {...categoryAxis} width={axisWidth(categoryLabels)} hide={!options.yAxis} />
+    : <YAxis type="number" {...valueAxis} width={axisWidth(valueLabels)} hide={!options.yAxis} />
+  // Area and line charts put the first and last category on the plot edges; a horizontal
+  // bar chart puts its first and last value ticks there.
+  const edgeLabels = horizontal ? valueLabels : model.type === "bar" ? [] : categoryLabels
+  const margin = { top: EDGE_PX, right: edgeRoom(edgeLabels), bottom: options.xAxis ? 0 : EDGE_PX, left: options.yAxis ? 0 : edgeRoom(horizontal ? valueLabels.slice(0, 1) : edgeLabels) }
+  const chart = { width, height, data: model.data as Record<string, unknown>[], accessibilityLayer: true, margin }
   const last = model.series.length - 1
 
   if (model.type === "bar") {
@@ -131,7 +161,7 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
         {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Bar
-            key={series.key} dataKey={series.key} name={series.label} className={seriesClass(index)} fill="currentColor"
+            key={series.key} dataKey={series.key} name={series.label} fill={series.color}
             stackId={stacked ? "stack" : undefined} {...animation}
             radius={stacked && index !== last ? 0 : horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
           />
@@ -145,17 +175,17 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
         <defs>
           {model.series.map((series, index) => (
             <linearGradient key={series.key} id={`${gradientPrefix}-${index}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" className={seriesClass(index)} stopColor="currentColor" stopOpacity={0.4} />
-              <stop offset="95%" className={seriesClass(index)} stopColor="currentColor" stopOpacity={0.05} />
+              <stop offset="5%" stopColor={series.color} stopOpacity={0.4} />
+              <stop offset="95%" stopColor={series.color} stopOpacity={0.05} />
             </linearGradient>
           ))}
         </defs>
         {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Area
-            key={series.key} dataKey={series.key} name={series.label} type={model.curve} className={seriesClass(index)}
-            stroke="currentColor" strokeWidth={2} fill={`url(#${gradientPrefix}-${index})`} stackId={stacked ? "stack" : undefined}
-            activeDot={{ r: 4, strokeWidth: 2, className: cn(seriesClass(index), "fill-current stroke-card") }} {...animation}
+            key={series.key} dataKey={series.key} name={series.label} type={model.curve}
+            stroke={series.color} strokeWidth={2} fill={`url(#${gradientPrefix}-${index})`} stackId={stacked ? "stack" : undefined}
+            activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation}
           />
         ))}
       </AreaChart>
@@ -167,9 +197,9 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
         {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Line
-            key={series.key} dataKey={series.key} name={series.label} type={model.curve} className={seriesClass(index)}
-            stroke="currentColor" strokeWidth={2} dot={false}
-            activeDot={{ r: 4, strokeWidth: 2, className: cn(seriesClass(index), "fill-current stroke-card") }} {...animation}
+            key={series.key} dataKey={series.key} name={series.label} type={model.curve}
+            stroke={series.color} strokeWidth={2} dot={false}
+            activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation}
           />
         ))}
       </LineChart>
@@ -182,9 +212,9 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
         {tooltip}
         <Pie
           data={model.data as Record<string, unknown>[]} dataKey={valueKey} nameKey={model.categoryKey}
-          innerRadius="60%" outerRadius="80%" paddingAngle={2} cornerRadius={4} strokeWidth={2} rootTabIndex={-1} {...animation}
+          innerRadius="60%" outerRadius="80%" paddingAngle={2} cornerRadius={4} stroke="var(--card)" strokeWidth={2} rootTabIndex={-1} {...animation}
         >
-          {model.series.map((series, index) => <Cell key={series.key} className={cn(seriesClass(index), "stroke-card")} fill="currentColor" />)}
+          {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
           <Label
             position="center"
             content={() => (
@@ -202,8 +232,8 @@ function ChartPlot({ model, options, width, height, animate, onDrawn }: { model:
   return (
     <RadialBarChart width={width} height={height} data={model.data as Record<string, unknown>[]} innerRadius="30%" outerRadius="100%" accessibilityLayer>
       {tooltip}
-      <RadialBar dataKey={valueKey} cornerRadius={4} background={{ className: "fill-muted" }} {...animation}>
-        {model.series.map((series, index) => <Cell key={series.key} className={seriesClass(index)} fill="currentColor" />)}
+      <RadialBar dataKey={valueKey} cornerRadius={4} background={{ fill: "var(--muted)" }} {...animation}>
+        {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
       </RadialBar>
     </RadialBarChart>
   )
@@ -289,4 +319,3 @@ function Chart({
 }
 
 export { Chart }
-export type { ChartProps }
