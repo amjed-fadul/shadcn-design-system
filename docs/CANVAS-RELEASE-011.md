@@ -166,9 +166,9 @@ the authorable-set count and roster tests (Trap 1) should not change. What does 
 4. **Renderer:** the existing Badge, Alert, Icon and Avatar adapters pass the new values through.
    Add a test that renders each new value and asserts real DOM output (checklist step 7).
 5. **Charts:** keep the coloured palette for chart marks only. A governed chart family wrapping
-   Recharts is drafted for Release 012
-   ([draft spec](superpowers/specs/2026-10-03-release-012-chart-family-proposal.md)); until it ships,
-   Canvas has no chart component.
+   Recharts 3.8.1 is approved for Release 012
+   ([spec](superpowers/specs/2026-10-03-release-012-chart-family-proposal.md)). It starts after
+   Canvas's Release 011 visual-gap rerun; until it ships, Canvas has no chart component.
 
 ## Not included
 

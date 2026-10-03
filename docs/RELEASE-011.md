@@ -9,14 +9,16 @@ Release 011 answers amjed-fadul/shadcn-design-system#19.
 The design and rulings are in
 [the spec](superpowers/specs/2026-10-03-release-011-canvas-requests-design.md), and the Canvas handoff
 is in [CANVAS-RELEASE-011](CANVAS-RELEASE-011.md). The chart component family is the separate
-[Release 012 draft spec](superpowers/specs/2026-10-03-release-012-chart-family-proposal.md).
+[approved Release 012 spec](superpowers/specs/2026-10-03-release-012-chart-family-proposal.md).
 
-**Status: accepted; merge waits for macOS release qualification.**
+**Status: accepted and qualified; ready to merge.**
 - **Token contract:** the owner approved token contract `-003` on 2026-10-03, after reviewing light
   and dark renders.
 - **Candidate:** the owner accepted the Release 011 candidate the same day. The accepted candidate is
   tarball `1b76e05e…` (payload `915ee7ab…`).
-- **Before merge:** the manual macOS `release-qualification` workflow must pass.
+- **Qualification:** the manual macOS `release-qualification` workflow passed on `09adb1f`
+  ([run 37136073725](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37136073725)).
+  Later commits change docs only.
 
 ## Changes
 
@@ -157,7 +159,18 @@ All commands ran with Node 22.18.0 and npm 10.9.3.
 - **`npm audit`:** full and production audits find 0 vulnerabilities after the shadcn stylesheet
   was vendored. Before that, GHSA-vfj7-8cjw-p6xm (`braces`, published after main's last green run)
   failed the full audit for both Release 010 and this branch.
-- **CI:** both PR checks pass at `57f07c4`: `verify` (typecheck, both audits and the fast release-identity, contract and preservation tests) and `audit`. The manual macOS `release-qualification` run is recorded on PR #20.
+- **CI:** both PR checks pass at `57f07c4`: `verify` (typecheck, both audits and the fast
+  release-identity, contract and preservation tests) and `audit`.
+- **macOS release qualification:** passed on `09adb1f`
+  ([run 37136073725](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37136073725)),
+  on GitHub's macOS runner with Node 22.18.0.
+  - Typecheck passed, and the unit suite passed all 122 files.
+  - `npm run build` passed. Storybook passed all 43 files, and `build-storybook` passed.
+  - The production and full audits found 0 vulnerabilities.
+  - `release:verify` accepted payload `915ee7ab…`.
+  - A fresh `candidate:generate` on the runner, checked by `candidate:verify` against the committed
+    manifest, matched all 56 packed files with no expectations refreshed. A second machine therefore
+    reproduces the candidate byte for byte.
 
 ## Build location
 

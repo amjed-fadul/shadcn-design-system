@@ -1,4 +1,4 @@
-# Release 012: governed chart family (draft spec)
+# Release 012: governed chart family (approved spec)
 
 **Status:** Approved spec, not yet implemented.
 - **Decided:** on 2026-10-03 the owner chose to wrap Recharts, set six requirements, and approved this
