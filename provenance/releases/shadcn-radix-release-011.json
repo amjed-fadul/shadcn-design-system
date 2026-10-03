@@ -63,13 +63,13 @@
     },
     {
       "path": "contracts/components/families/avatar.json",
-      "gitBlob": "f4f599fa5cf1f18c89b8e8812bf91114bfeb020b",
-      "sha256": "27484b2351042c5b92ce6fd6dd08c8334686497b117de15c371af4bd23b67d6c"
+      "gitBlob": "2688a18e9764907a0697e218e1da7f4389ae6b5b",
+      "sha256": "75202a9bda3c91f055eac4a0e9263a16af073dfef0db60b8a06e48dc4d6eb4eb"
     },
     {
       "path": "contracts/components/families/badge.json",
-      "gitBlob": "61ec3d1d2d783acb724e3bdbb1946750a656ec6c",
-      "sha256": "bcee435c8b17b62ce8e462c291b370b34d0632e6c4d71e89d6e9f56284162db7"
+      "gitBlob": "f8167482874bdf2f03e2ac2a5adccfa876ab196d",
+      "sha256": "775e0c41b475ec47ab12a62b97d505057b382f190258607a5561bc58bb6cc82f"
     },
     {
       "path": "contracts/components/families/breadcrumb.json",
@@ -108,8 +108,8 @@
     },
     {
       "path": "contracts/components/families/drawer.json",
-      "gitBlob": "8e0567275a0ca1cdefec1d73a72e6ed5b752d0cb",
-      "sha256": "d666a774c8d35a6201c07a7053927753dad07278eaa4fae5567b9ec298a7af57"
+      "gitBlob": "677847cd64704d4deb6b02ced98a4ee00e226fca",
+      "sha256": "fd90dc010455ec9faca9bc54cd52ac137f0b53cd268860f6c1cfa6e401c753af"
     },
     {
       "path": "contracts/components/families/dropdown-menu.json",
@@ -168,18 +168,18 @@
     },
     {
       "path": "contracts/components/families/progress.json",
-      "gitBlob": "0db66bf06d964ebb1f71d8014c8ed024d9fe3c7b",
-      "sha256": "389a99cb3979face9cf0af960cfeec3e9301098c5e7f599438c37a65fd28837a"
+      "gitBlob": "7cf84c2200d17f391e79ad847eb7a92a4b3bc3c1",
+      "sha256": "8264f135be70918c5f1b7db80943b14dff2344708498d127d6c4cf05c08c64d4"
     },
     {
       "path": "contracts/components/families/radio-group.json",
-      "gitBlob": "d9cf75183442720e32e3c2eef3267feecec4eafc",
-      "sha256": "4eb00e6f47d92abc2fff53cca9829953ccb186db6cf50653da83a39646e8693a"
+      "gitBlob": "4ecd3ed260faeeb0f7781a3bf39a1f5325615876",
+      "sha256": "deaaef9babc95606e04aaed477428ee411930c2e686f039c586854e6ef88d385"
     },
     {
       "path": "contracts/components/families/scroll-area.json",
-      "gitBlob": "d437ca8eade0c71dbd60bd250c87db283395bac7",
-      "sha256": "25f0d27f743e5ed8837cb42c565af6ff0fce1001f2549f7953bf91f0ebf3f2e8"
+      "gitBlob": "d007fa3691dce24209d30ba3f2f12db9891e06e7",
+      "sha256": "4072d5cc1ae9fd423c85767efc2f4fc7f04be5fb03dfdd8d4e29f6bc9682a154"
     },
     {
       "path": "contracts/components/families/select.json",
@@ -208,8 +208,8 @@
     },
     {
       "path": "contracts/components/families/slider.json",
-      "gitBlob": "771a950d589dc6417d7d2ecfc462ae1a8c90b826",
-      "sha256": "997074c3f5f406717c1fbf9faeb0bf9862b6c3d7a93cea1869095ca50685da16"
+      "gitBlob": "193236e1614b1e0c13f49f4b9ff96f661dc16957",
+      "sha256": "a83eec3929842be834f93c1504270269d3c05c3382f25c59769ca9ce4b8f6891"
     },
     {
       "path": "contracts/components/families/spinner.json",
@@ -218,8 +218,8 @@
     },
     {
       "path": "contracts/components/families/switch.json",
-      "gitBlob": "383cc186c3f240ce7708dc45f8acd186348547b2",
-      "sha256": "0ce68a2524e48041e6f175e387b1e06037c2ea232deea461cdd7cac4460abae9"
+      "gitBlob": "fb67e378f024d768b36aa9c4cb4acbeb6784d4a7",
+      "sha256": "68564223083fa92826f92b2e0dddf59b6539c885d3c22539660de9c20f1e1488"
     },
     {
       "path": "contracts/components/families/table.json",
@@ -1693,8 +1693,8 @@
     },
     {
       "path": "src/contracts/components/canonical-token-source-analysis.ts",
-      "gitBlob": "fd3a025f563be0fc959e3c5a722ea22cd8213abc",
-      "sha256": "9284c367eed22e26bbca2c5a5f45aa9497c2bbce48ef0409cce28a39a2a12b12"
+      "gitBlob": "af9680f6bc3fe6624a94d0bb7509db48f1b03b3a",
+      "sha256": "8f81cf2f8c545b20efe6c6020646af7f91b2d018b0c75bc0d09275b16337451d"
     },
     {
       "path": "src/contracts/components/component-prop-source-analysis.ts",
@@ -61187,6 +61187,27 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "radius.full",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.full",
+              "sourceContext": {
+                "applicability": [],
+                "target": {
+                  "kind": "pseudo-element",
+                  "name": "after"
+                }
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -64904,6 +64925,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "radius.full",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -68566,6 +68594,13 @@
                   "group-data-[shape=rounded]/avatar"
                 ]
               },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.full",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -75954,6 +75989,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "radius.full",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -79743,6 +79785,13 @@
                   "group-data-[shape=rounded]/avatar"
                 ]
               },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.full",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -83760,6 +83809,13 @@
                 "propName": "variant",
                 "equals": "info"
               }
+            },
+            {
+              "tokenId": "radius.full",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -190314,6 +190370,13 @@
             },
             {
               "tokenId": "color.muted",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.full",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -354987,6 +355050,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "radius.full",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -362560,6 +362630,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "radius.full",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -362688,6 +362765,13 @@
             },
             {
               "tokenId": "color.border",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.full",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -464736,6 +464820,13 @@
                 "source",
                 "tokens"
               ]
+            },
+            {
+              "tokenId": "radius.full",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
             }
           ],
           "unresolved": []
@@ -475748,6 +475839,13 @@
                 "propName": "state",
                 "equals": "checked"
               },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.full",
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -529626,5 +529724,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "fc2d8b8493a75ddaeb7eed1305ebd3360903d62512791bc839df40499263c5d6"
+  "sha256": "a671bdfaf65a1842217c14e8cbcc0c4422afd4b1c7b7c46fb4cbbb182219a72d"
 }
