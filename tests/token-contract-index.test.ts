@@ -9,13 +9,13 @@ import {
 import type { TokenCategory, TokenContract } from "../src/contracts/tokens/types"
 
 const expectedCategoryCounts: Record<TokenCategory, number> = {
-  color: 31,
-  radius: 8,
+  color: 37,
+  radius: 9,
   "font-family": 2,
   "font-size": 13,
   "font-weight": 9,
   "letter-spacing": 6,
-  "line-height": 5,
+  "line-height": 6,
   spacing: 1,
   shadow: 7,
 } as const
@@ -26,7 +26,7 @@ describe("token contract index", () => {
   })
 
   test("contains the complete compact projection in canonical category order", () => {
-    expect(committedIndex.tokenCount).toBe(82)
+    expect(committedIndex.tokenCount).toBe(90)
     expect(committedIndex.categories).toHaveLength(9)
     expect(committedIndex.categories.map((category) => category.id)).toEqual(TOKEN_CATEGORY_ORDER)
 
@@ -36,7 +36,7 @@ describe("token contract index", () => {
     }
 
     const indexedIds = committedIndex.categories.flatMap((category) => category.tokenIds)
-    expect(new Set(indexedIds)).toHaveLength(82)
+    expect(new Set(indexedIds)).toHaveLength(90)
     expect(indexedIds).not.toContain("spacing.multiplier")
     expect(new Set(indexedIds)).toEqual(new Set(getTokenContract().tokens.map((token) => token.id)))
   })

@@ -3,7 +3,7 @@
   "id": "alert",
   "source": {
     "canonicalPath": "src/components/ui/alert.tsx",
-    "canonicalBlobSha": "04f1cb563bd0681030c095b1a51dd1010a62ae7d",
+    "canonicalBlobSha": "326810157ee3ed1bf9bc4574a3b0881453bf115f",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/alert.tsx",
     "upstreamBlobSha": "e9aa02f381ef6e588cfb57696f76703c0f7c4ceb"
@@ -11,11 +11,11 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/alert.tsx@04f1cb563bd0681030c095b1a51dd1010a62ae7d"
+      "source": "src/components/ui/alert.tsx@326810157ee3ed1bf9bc4574a3b0881453bf115f"
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-002"
+      "source": "shadcn-radix-token-contract-003"
     }
   },
   "exports": [
@@ -35,7 +35,10 @@
               "kind": "enum",
               "values": [
                 "default",
-                "destructive"
+                "destructive",
+                "success",
+                "warning",
+                "info"
               ]
             },
             "default": "default",
@@ -168,6 +171,72 @@
             "when": {
               "propName": "variant",
               "equals": "destructive"
+            }
+          },
+          {
+            "tokenId": "color.success",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "success"
+            }
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "success"
+            }
+          },
+          {
+            "tokenId": "color.warning",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "warning"
+            }
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "warning"
+            }
+          },
+          {
+            "tokenId": "color.info",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "info"
+            }
+          },
+          {
+            "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "info"
             }
           }
         ],

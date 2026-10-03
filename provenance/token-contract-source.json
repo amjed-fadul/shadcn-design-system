@@ -7,7 +7,7 @@
   "sources": {
     "canonicalTheme": {
       "path": "src/index.css",
-      "blobSha": "17d37561de0d55557ccc9f7256d3b4551556e767"
+      "blobSha": "292413e4bf94ddf6ec4422474b730e47d1e0af5f"
     },
     "shadcnNeutral": {
       "repository": "shadcn-ui/ui",
@@ -87,5 +87,61 @@
       "radius.3xl",
       "radius.4xl"
     ]
+  },
+  "release011Layer": {
+    "release": "shadcn-radix-release-011",
+    "sourceCommit": "c662cbd9f18bc714b6d0e82ae1dfd8f27ff2e489",
+    "decision": "Canvas visual-gap requests (amjed-fadul/shadcn-design-system#19). Status colours and a coloured chart palette are new values; radius.full and line-height.display are new canonical theme tokens. The owner reviewed light and dark renders and approved token contract -003 as shown on 2026-10-03.",
+    "addedTokens": [
+      "color.success",
+      "color.success-foreground",
+      "color.warning",
+      "color.warning-foreground",
+      "color.info",
+      "color.info-foreground",
+      "radius.full",
+      "line-height.display"
+    ],
+    "changedTokens": [
+      "color.chart-1",
+      "color.chart-2",
+      "color.chart-3",
+      "color.chart-4",
+      "color.chart-5"
+    ],
+    "valueOrigin": {
+      "note": "Records where the chosen values match the pinned Tailwind palette. The contract creates no semantic-to-primitive relationship. Status foregrounds reuse the brand foregrounds.",
+      "package": "tailwindcss",
+      "version": "4.3.3",
+      "path": "node_modules/tailwindcss/theme.css",
+      "light": {
+        "color.success": "--color-green-800",
+        "color.warning": "--color-amber-800",
+        "color.info": "--color-sky-700",
+        "color.chart-1": "--color-blue-700",
+        "color.chart-2": "--color-lime-600",
+        "color.chart-3": "--color-cyan-600",
+        "color.chart-4": "--color-violet-700",
+        "color.chart-5": "--color-pink-600"
+      },
+      "dark": {
+        "color.success": "--color-green-400",
+        "color.warning": "--color-amber-400",
+        "color.info": "--color-sky-400",
+        "color.chart-1": "--color-blue-600",
+        "color.chart-2": "--color-lime-600",
+        "color.chart-3": "--color-cyan-600",
+        "color.chart-4": "--color-violet-600",
+        "color.chart-5": "--color-pink-600"
+      }
+    },
+    "floors": {
+      "statusText": "4.5:1 on background, card and muted; on the 10% and 15% status tint over background and card; foreground on the solid fill",
+      "chartMarks": "3:1 against card and background; OKLCH L 0.43-0.77 light, 0.48-0.67 dark; chroma >= 0.10; adjacent pairs including the 5-to-1 wrap: protan and deutan OKLab dE x100 >= 8, unsimulated >= 15",
+      "tests": [
+        "tests/token-contract-status-contrast.test.ts",
+        "tests/token-contract-chart-palette.test.ts"
+      ]
+    }
   }
 }

@@ -3,7 +3,7 @@
   "id": "avatar",
   "source": {
     "canonicalPath": "src/components/ui/avatar.tsx",
-    "canonicalBlobSha": "f80d14cd7c88e4dc9ca7d82caaff99ae650b8b3c",
+    "canonicalBlobSha": "cedc3758d9bfda30ca639c4779d7e5996ccc621a",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/avatar.tsx",
     "upstreamBlobSha": "5521146b8a3e525170852d5aa328aed6a7d69ac5"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/avatar.tsx@f80d14cd7c88e4dc9ca7d82caaff99ae650b8b3c"
+      "source": "src/components/ui/avatar.tsx@cedc3758d9bfda30ca639c4779d7e5996ccc621a"
     },
     "declaration": {
       "kind": "inherited-interface",
@@ -19,7 +19,7 @@
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-002"
+      "source": "shadcn-radix-token-contract-003"
     }
   },
   "exports": [
@@ -44,6 +44,22 @@
               ]
             },
             "default": "default",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "shape",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "circle",
+                "rounded",
+                "square"
+              ]
+            },
+            "default": "circle",
             "evidenceRefs": [
               "source"
             ]
@@ -148,6 +164,68 @@
               "source",
               "tokens"
             ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "shape",
+              "equals": "rounded"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "self"
+                }
+              ],
+              "propName": "shape",
+              "equals": "rounded"
+            },
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
+            "sourceContext": {
+              "applicability": [],
+              "target": {
+                "kind": "pseudo-element",
+                "name": "after"
+              }
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {
@@ -174,6 +252,14 @@
                   "name": "data-size",
                   "source": "prop",
                   "prop": "size",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-shape",
+                  "source": "prop",
+                  "prop": "shape",
                   "evidenceRefs": [
                     "source"
                   ]
@@ -214,7 +300,27 @@
         "stateChannels": [],
         "conditionalApi": [],
         "events": [],
-        "tokenDependencies": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "radius.lg",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[shape=rounded]/avatar"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
         "rendering": {
           "rootNodeId": "image",
           "publicPropsTargetNodeId": "image",
@@ -310,6 +416,25 @@
                 "group-data-[size=sm]/avatar"
               ]
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[shape=rounded]/avatar"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -491,6 +616,13 @@
                 "[&>svg]"
               ]
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"
@@ -785,6 +917,13 @@
               "propName": "size",
               "equals": "sm"
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"

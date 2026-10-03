@@ -105,7 +105,7 @@ describe("general composed component prop source analysis", () => {
     const toggleContracted = localProps("toggle-group", "ToggleGroup").contracted
 
     expect(selected(alert.props, ["variant"])).toEqual([
-      { name: "variant", required: false, type: { kind: "enum", values: ["default", "destructive"] }, default: "default" },
+      { name: "variant", required: false, type: { kind: "enum", values: ["default", "destructive", "info", "success", "warning"] }, default: "default" },
     ])
     expect(dialog.localPropNames).toContain("showCloseButton")
     expect(selected(dialog.props, ["showCloseButton"])).toEqual([

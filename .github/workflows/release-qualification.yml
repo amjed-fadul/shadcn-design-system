@@ -52,17 +52,17 @@ jobs:
       - run: npm audit
       - name: Verify committed release and byte-identical candidate rebuild
         run: |
-          manifest="$PWD/provenance/distributions/shadcn-radix-release-010.distribution.json"
+          manifest="$PWD/provenance/distributions/shadcn-radix-release-011.distribution.json"
           manifest_sha256="$(shasum -a 256 "$manifest" | cut -d ' ' -f 1)"
           payload_sha256="$(node -p "JSON.parse(require('node:fs').readFileSync(process.argv[1], 'utf8')).release.payloadSha256" "$manifest")"
-          candidate="$RUNNER_TEMP/qualified-r10-candidate"
+          candidate="$RUNNER_TEMP/qualified-r11-candidate"
           npm run release:verify -- --release-sha256 "$payload_sha256"
           npm run candidate:generate -- --output "$candidate"
-          npm run candidate:verify -- --manifest "$manifest" --tarball "$candidate/adc-shadcn-design-system-0.0.0-release.10.tgz" --manifest-sha256 "$manifest_sha256"
+          npm run candidate:verify -- --manifest "$manifest" --tarball "$candidate/adc-shadcn-design-system-0.0.0-release.11.tgz" --manifest-sha256 "$manifest_sha256"
           git diff --exit-code
           printf 'Qualified PR head: `%s`\n\nRelease payload: `%s`\n\nDistribution manifest: `%s`\n' "$PR_HEAD_SHA" "$payload_sha256" "$manifest_sha256" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: release-qualification-${{ inputs.pr_head_sha }}
-          path: ${{ runner.temp }}/qualified-r10-candidate
+          path: ${{ runner.temp }}/qualified-r11-candidate
           if-no-files-found: error

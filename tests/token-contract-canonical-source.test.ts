@@ -32,6 +32,12 @@ const expectedColors = [
   "accent",
   "accent-foreground",
   "destructive",
+  "success",
+  "success-foreground",
+  "warning",
+  "warning-foreground",
+  "info",
+  "info-foreground",
   "border",
   "input",
   "ring",
@@ -92,18 +98,19 @@ describe("canonical token contract", () => {
   test("matches the contract identity and exact category shape", () => {
     const contract = readContract()
     expect(contract.schemaVersion).toBe(1)
-    expect(contract.id).toBe("shadcn-radix-token-contract-002")
+    expect(contract.id).toBe("shadcn-radix-token-contract-003")
     expect(contract.status).toBe("approved")
     expect(contract.baselineSnapshotId).toBe("shadcn-radix-bootstrap-000")
-    expect(contract.sourceBaselineCommit).toBe("e04ee6822a0b49e227970e787940db96730c9222")
+    expect(contract.sourceBaselineCommit).toBe("c662cbd9f18bc714b6d0e82ae1dfd8f27ff2e489")
     expect(contract.modes).toEqual(["light", "dark"])
     const canonicalTokens = contract.tokens.filter((candidate) => candidate.sourceId === "canonical-theme")
-    expect(canonicalTokens).toHaveLength(41)
-    expect(canonicalTokens.filter((candidate) => candidate.category === "color")).toHaveLength(31)
-    expect(canonicalTokens.filter((candidate) => candidate.category === "radius")).toHaveLength(8)
+    expect(canonicalTokens).toHaveLength(49)
+    expect(canonicalTokens.filter((candidate) => candidate.category === "color")).toHaveLength(37)
+    expect(canonicalTokens.filter((candidate) => candidate.category === "radius")).toHaveLength(9)
     expect(canonicalTokens.filter((candidate) => candidate.category === "font-family")).toHaveLength(2)
-    expect(new Set(canonicalTokens.map((candidate) => candidate.category))).toEqual(new Set(["color", "radius", "font-family"]))
-    expect(new Set(canonicalTokens.map((candidate) => candidate.id)).size).toBe(41)
+    expect(canonicalTokens.filter((candidate) => candidate.category === "line-height")).toHaveLength(1)
+    expect(new Set(canonicalTokens.map((candidate) => candidate.category))).toEqual(new Set(["color", "radius", "font-family", "line-height"]))
+    expect(new Set(canonicalTokens.map((candidate) => candidate.id)).size).toBe(49)
   })
 
   test("reconciles all semantic colors, modes, and Tailwind aliases with canonical CSS", () => {
@@ -112,7 +119,7 @@ describe("canonical token contract", () => {
     const dark = properties(".dark")
     const theme = properties("@theme inline")
 
-    expect(expectedColors).toHaveLength(31)
+    expect(expectedColors).toHaveLength(37)
     expect(expectedColors.every((name) => light.has(`--${name}`))).toBe(true)
     expect(expectedColors.every((name) => dark.has(`--${name}`))).toBe(true)
     expect(expectedColors.every((name) => theme.has(`--color-${name}`))).toBe(true)
@@ -172,6 +179,28 @@ describe("canonical token contract", () => {
       expect(candidate.value).toEqual({ kind: "derived", expression, dependencies: ["radius.base"] })
       expect(theme.get(`--radius-${name}`)).toBe(expression)
     }
+    // Release 011: the pill radius equals Tailwind's static rounded-full value.
+    expect(token(contract, "radius.full")).toEqual({
+      id: "radius.full",
+      category: "radius",
+      sourceId: "canonical-theme",
+      binding: { cssVariable: "--radius-full" },
+      value: { kind: "literal", value: theme.get("--radius-full") },
+    })
+    expect(theme.get("--radius-full")).toBe("calc(infinity * 1px)")
+  })
+
+  test("reconciles the canonical display line-height", () => {
+    const contract = readContract()
+    const theme = properties("@theme inline")
+    expect(token(contract, "line-height.display")).toEqual({
+      id: "line-height.display",
+      category: "line-height",
+      sourceId: "canonical-theme",
+      binding: { cssVariable: "--leading-display" },
+      value: { kind: "literal", value: theme.get("--leading-display") },
+    })
+    expect(theme.get("--leading-display")).toBe("1.1")
   })
 
   test("reconciles Geist font and explicit heading alias", () => {

@@ -48,6 +48,15 @@
           "shadcn.avatar.docs"
         ]
       }
+    },
+    {
+      "statement": "Use shape=\"circle\" (the default) for people. Use shape=\"rounded\" or shape=\"square\" for organizations, workspaces and product logos such as a sidebar header or workspace switcher. AvatarImage, AvatarFallback and the border follow the shape.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.avatar.source"
+        ]
+      }
     }
   ]
 }

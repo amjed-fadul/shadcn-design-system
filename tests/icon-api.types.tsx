@@ -6,6 +6,15 @@ const meaningful = <Icon name="info" decorative={false} label="Information" size
 const logical = <Icon name="arrow-end" placement="inline-end" size="sm" />
 const colored = <Icon name="info" color="primary" />
 const muted = <Icon name="info" color="muted-foreground" />
+// Release 011 content identities and status colors.
+const trend = <Icon name="trending-up" color="success" decorative={false} label="Up 12.4%" />
+const due = <Icon name="clock" color="warning" />
+const notice = <Icon name="bell" color="info" />
+const building = <Icon name="building" />
+// @ts-expect-error Lucide component names are not governed identities
+const lucideName = <Icon name="house" />
+// @ts-expect-error the chart identity is chart-column, not a generic chart
+const genericChart = <Icon name="chart" />
 // @ts-expect-error arbitrary color strings are not governed
 const rawColor = <Icon name="info" color="#ff0000" />
 // @ts-expect-error CSS variables are not a public color API
@@ -31,4 +40,4 @@ const sizing = <Icon name="search" size={32} />
 // @ts-expect-error role is owned by the component
 const role = <Icon name="search" role="alert" />
 
-void [colored, muted, rawColor, customColor, decorative, meaningful, logical, missingName, arbitraryName, missingLabel, decorativeLabel, classes, styles, children, injection, sizing, role]
+void [colored, muted, trend, due, notice, building, lucideName, genericChart, rawColor, customColor, decorative, meaningful, logical, missingName, arbitraryName, missingLabel, decorativeLabel, classes, styles, children, injection, sizing, role]

@@ -10,8 +10,8 @@ import type {
   ImplementationInput,
 } from "./types"
 
-export const EXECUTABLE_RELEASE_ID = "shadcn-radix-release-010"
-export const EXECUTABLE_RELEASE_PATH = "provenance/releases/shadcn-radix-release-010.json"
+export const EXECUTABLE_RELEASE_ID = "shadcn-radix-release-011"
+export const EXECUTABLE_RELEASE_PATH = "provenance/releases/shadcn-radix-release-011.json"
 
 export type ExecutableReleaseLoadErrorCode =
   | "RELEASE_SHAPE_INVALID"

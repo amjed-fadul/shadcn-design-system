@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "shadcn-radix-token-contract-002",
+  "id": "shadcn-radix-token-contract-003",
   "status": "approved",
   "baselineSnapshotId": "shadcn-radix-bootstrap-000",
-  "sourceBaselineCommit": "e04ee6822a0b49e227970e787940db96730c9222",
+  "sourceBaselineCommit": "c662cbd9f18bc714b6d0e82ae1dfd8f27ff2e489",
   "sourceProvenancePath": "provenance/token-contract-source.json",
   "modes": [
     "light",
@@ -345,6 +345,108 @@
       }
     },
     {
+      "id": "color.success",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--success",
+        "tailwindThemeVariable": "--color-success",
+        "tailwindExpression": "var(--success)"
+      },
+      "value": {
+        "kind": "modes",
+        "values": {
+          "light": "oklch(0.448 0.119 151.328)",
+          "dark": "oklch(0.792 0.209 151.711)"
+        }
+      }
+    },
+    {
+      "id": "color.success-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--success-foreground",
+        "tailwindThemeVariable": "--color-success-foreground",
+        "tailwindExpression": "var(--success-foreground)"
+      },
+      "value": {
+        "kind": "modes",
+        "values": {
+          "light": "oklch(1 0 0)",
+          "dark": "oklch(0.145 0 0)"
+        }
+      }
+    },
+    {
+      "id": "color.warning",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--warning",
+        "tailwindThemeVariable": "--color-warning",
+        "tailwindExpression": "var(--warning)"
+      },
+      "value": {
+        "kind": "modes",
+        "values": {
+          "light": "oklch(0.473 0.137 46.201)",
+          "dark": "oklch(0.828 0.189 84.429)"
+        }
+      }
+    },
+    {
+      "id": "color.warning-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--warning-foreground",
+        "tailwindThemeVariable": "--color-warning-foreground",
+        "tailwindExpression": "var(--warning-foreground)"
+      },
+      "value": {
+        "kind": "modes",
+        "values": {
+          "light": "oklch(1 0 0)",
+          "dark": "oklch(0.145 0 0)"
+        }
+      }
+    },
+    {
+      "id": "color.info",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--info",
+        "tailwindThemeVariable": "--color-info",
+        "tailwindExpression": "var(--info)"
+      },
+      "value": {
+        "kind": "modes",
+        "values": {
+          "light": "oklch(0.5 0.134 242.749)",
+          "dark": "oklch(0.746 0.16 232.661)"
+        }
+      }
+    },
+    {
+      "id": "color.info-foreground",
+      "category": "color",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--info-foreground",
+        "tailwindThemeVariable": "--color-info-foreground",
+        "tailwindExpression": "var(--info-foreground)"
+      },
+      "value": {
+        "kind": "modes",
+        "values": {
+          "light": "oklch(1 0 0)",
+          "dark": "oklch(0.145 0 0)"
+        }
+      }
+    },
+    {
       "id": "color.border",
       "category": "color",
       "sourceId": "canonical-theme",
@@ -407,8 +509,8 @@
       "value": {
         "kind": "modes",
         "values": {
-          "light": "oklch(0.87 0 0)",
-          "dark": "oklch(0.87 0 0)"
+          "light": "oklch(0.488 0.243 264.376)",
+          "dark": "oklch(0.546 0.245 262.881)"
         }
       }
     },
@@ -424,8 +526,8 @@
       "value": {
         "kind": "modes",
         "values": {
-          "light": "oklch(0.556 0 0)",
-          "dark": "oklch(0.556 0 0)"
+          "light": "oklch(0.648 0.2 131.684)",
+          "dark": "oklch(0.648 0.2 131.684)"
         }
       }
     },
@@ -441,8 +543,8 @@
       "value": {
         "kind": "modes",
         "values": {
-          "light": "oklch(0.439 0 0)",
-          "dark": "oklch(0.439 0 0)"
+          "light": "oklch(0.609 0.126 221.723)",
+          "dark": "oklch(0.609 0.126 221.723)"
         }
       }
     },
@@ -458,8 +560,8 @@
       "value": {
         "kind": "modes",
         "values": {
-          "light": "oklch(0.371 0 0)",
-          "dark": "oklch(0.371 0 0)"
+          "light": "oklch(0.491 0.27 292.581)",
+          "dark": "oklch(0.541 0.281 293.009)"
         }
       }
     },
@@ -475,8 +577,8 @@
       "value": {
         "kind": "modes",
         "values": {
-          "light": "oklch(0.269 0 0)",
-          "dark": "oklch(0.269 0 0)"
+          "light": "oklch(0.592 0.249 0.584)",
+          "dark": "oklch(0.592 0.249 0.584)"
         }
       }
     },
@@ -731,6 +833,18 @@
         "dependencies": [
           "radius.base"
         ]
+      }
+    },
+    {
+      "id": "radius.full",
+      "category": "radius",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--radius-full"
+      },
+      "value": {
+        "kind": "literal",
+        "value": "calc(infinity * 1px)"
       }
     },
     {
@@ -1203,6 +1317,18 @@
       "value": {
         "kind": "literal",
         "value": "2"
+      }
+    },
+    {
+      "id": "line-height.display",
+      "category": "line-height",
+      "sourceId": "canonical-theme",
+      "binding": {
+        "cssVariable": "--leading-display"
+      },
+      "value": {
+        "kind": "literal",
+        "value": "1.1"
       }
     },
     {

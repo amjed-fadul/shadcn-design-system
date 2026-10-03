@@ -2807,11 +2807,14 @@ describe("Phase 3 Task 10 independent review", () => {
     const component = exportByName(family, "Icon").component
     const { sourceFile, sourceText } = sourceFacts(join(root, family.source.canonicalPath))
     const source = componentSourceFacts(sourceFile, declarationFor(sourceFile, "Icon")!)
-    expect(source.renderBranches[0].tree?.resolvedHosts).toHaveLength(20)
+    // Release 011: 20 interface identities plus 19 content identities.
+    expect(source.renderBranches[0].tree?.resolvedHosts).toHaveLength(39)
     expect(independentRenderTreeMatches(source.renderBranches[0].tree!, component.rendering)).toBe(true)
     expect(source.booleanConditionalApi).toEqual(component.conditionalApi)
 
-    const poisonedText = sourceText.replace("AlertCircle, ArrowLeft", "createLucideIcon, AlertCircle, ArrowLeft").replace("search: Search", "search: createLucideIcon")
+    expect(sourceText).toContain("AlertCircle, ArrowDown")
+    const poisonedText = sourceText.replace("AlertCircle, ArrowDown", "createLucideIcon, AlertCircle, ArrowDown").replace("search: Search", "search: createLucideIcon")
+    expect(poisonedText).toContain("createLucideIcon, AlertCircle")
     const poisonedFile = ts.createSourceFile(sourceFile.fileName, poisonedText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
     const poisonedDeclaration = declarationFor(poisonedFile, "Icon")!
     const poisonedFunction = functionLikeFor(poisonedDeclaration)!

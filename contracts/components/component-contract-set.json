@@ -4,7 +4,7 @@
   "status": "approved",
   "designSystemId": "shadcn-radix-bootstrap",
   "sourceBaselineCommit": "6f14d8f9f5b5638ab97db009d7c164a65331dca7",
-  "tokenContractId": "shadcn-radix-token-contract-002",
+  "tokenContractId": "shadcn-radix-token-contract-003",
   "familyCount": 41,
   "familyFiles": [
     "contracts/components/families/accordion.json",

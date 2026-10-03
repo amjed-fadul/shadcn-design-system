@@ -19,7 +19,7 @@
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-002"
+      "source": "shadcn-radix-token-contract-003"
     }
   },
   "exports": [
@@ -184,6 +184,13 @@
                 "name": "after"
               }
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.full",
             "evidenceRefs": [
               "source",
               "tokens"

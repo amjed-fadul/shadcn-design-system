@@ -14,6 +14,10 @@
     {
       "statement": "Use the variant option to change the variant of the badge.",
       "basis": { "kind": "source-derived", "referenceIds": ["shadcn.badge.docs"] }
+    },
+    {
+      "statement": "Use variant=\"primary\" for a highlighted label that should carry the brand fill, such as Most popular or Save 20%. default and secondary stay neutral. Use success, warning or info for a tinted status label such as Paid, Overdue or Trial, and destructive for an error. Keep the state in the visible text: the color reinforces the label and never replaces it.",
+      "basis": { "kind": "source-derived", "referenceIds": ["canonical.badge.source"] }
     }
   ]
 }

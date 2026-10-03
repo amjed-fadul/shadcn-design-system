@@ -21,7 +21,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "destructive"],
+      options: ["default", "destructive", "success", "warning", "info"],
     },
   },
   parameters: {
@@ -59,6 +59,38 @@ export const Destructive: Story = {
       </AlertDescription>
     </Alert>
   ),
+}
+
+export const StatusVariants: Story = {
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => (
+    <div className="grid gap-3">
+      <Alert variant="success">
+        <CheckCircle2 />
+        <AlertTitle>Payment received</AlertTitle>
+        <AlertDescription>Invoice INV-2041 was paid in full.</AlertDescription>
+      </Alert>
+      <Alert variant="warning">
+        <AlertCircle />
+        <AlertTitle>Card expires soon</AlertTitle>
+        <AlertDescription>Update the payment method before 31 October.</AlertDescription>
+      </Alert>
+      <Alert variant="info">
+        <Info />
+        <AlertTitle>Scheduled maintenance</AlertTitle>
+        <AlertDescription>Reports may be delayed on Sunday from 02:00 to 03:00 UTC.</AlertDescription>
+      </Alert>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const variant of ["success", "warning", "info"]) {
+      const alert = canvasElement.querySelector(`[data-slot="alert"].text-${variant}`)
+      await expect(alert).not.toBeNull()
+      await expect(alert).toHaveAttribute("role", "alert")
+    }
+  },
 }
 
 export const WithAction: Story = {

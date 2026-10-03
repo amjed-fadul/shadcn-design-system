@@ -41,14 +41,14 @@ describe("Icon canonical and authoring contract", () => {
   })
 
   test("accepts only governed semantic colors and binds their tokens", () => {
-    for (const color of ["inherit", "foreground", "primary", "muted-foreground", "destructive"]) {
+    for (const color of ["inherit", "foreground", "primary", "muted-foreground", "destructive", "success", "warning", "info"]) {
       expect(validate({ name: "info", color }).ok).toBe(true)
     }
     for (const color of ["red", "#ff0000", "var(--custom)"]) {
       expect(validate({ name: "info", color }).ok).toBe(false)
     }
     expect(definition()!.localProps.find((prop) => prop.name === "color")!.default).toBe("inherit")
-    expect(definition()!.tokenDependencies.filter((dependency) => dependency.when?.propName === "color").map((dependency) => dependency.tokenId).sort()).toEqual(["color.destructive", "color.foreground", "color.muted-foreground", "color.primary"])
+    expect(definition()!.tokenDependencies.filter((dependency) => dependency.when?.propName === "color").map((dependency) => dependency.tokenId).sort()).toEqual(["color.destructive", "color.foreground", "color.info", "color.muted-foreground", "color.primary", "color.success", "color.warning"])
   })
 
   test("makes semantic use and RTL policy discoverable", () => {

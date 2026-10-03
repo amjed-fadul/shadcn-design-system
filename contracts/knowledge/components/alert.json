@@ -50,6 +50,15 @@
           "shadcn.alert.docs"
         ]
       }
+    },
+    {
+      "statement": "Use variant=\"success\" for a completed outcome, \"warning\" for something that needs attention soon and \"info\" for a neutral notice; their title, description and icon use the matching status color. Every Alert variant renders role=\"alert\". For routine progress or result text that should be announced politely, use <Status> instead.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.alert.source"
+        ]
+      }
     }
   ],
   "howToUse": [

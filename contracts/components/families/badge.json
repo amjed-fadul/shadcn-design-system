@@ -3,7 +3,7 @@
   "id": "badge",
   "source": {
     "canonicalPath": "src/components/ui/badge.tsx",
-    "canonicalBlobSha": "3cc274c57cc5fcd0d5c22d89814f34f3f7e194ae",
+    "canonicalBlobSha": "5146fddeeba3b7da829a09ff34d61e255db57c9b",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/badge.tsx",
     "upstreamBlobSha": "ccca32ca0046ed2b8da4057d4d7c6ef3dc307ffb"
@@ -11,11 +11,11 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/badge.tsx@3cc274c57cc5fcd0d5c22d89814f34f3f7e194ae"
+      "source": "src/components/ui/badge.tsx@5146fddeeba3b7da829a09ff34d61e255db57c9b"
     },
     "tokens": {
       "kind": "token-contract",
-      "source": "shadcn-radix-token-contract-002"
+      "source": "shadcn-radix-token-contract-003"
     }
   },
   "exports": [
@@ -35,8 +35,12 @@
               "kind": "enum",
               "values": [
                 "default",
+                "primary",
                 "secondary",
                 "destructive",
+                "success",
+                "warning",
+                "info",
                 "outline",
                 "ghost",
                 "link"
@@ -396,6 +400,68 @@
               "propName": "variant",
               "equals": "link"
             }
+          },
+          {
+            "tokenId": "color.primary",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "primary"
+            }
+          },
+          {
+            "tokenId": "color.primary-foreground",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "primary"
+            }
+          },
+          {
+            "tokenId": "color.success",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "success"
+            }
+          },
+          {
+            "tokenId": "color.warning",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "warning"
+            }
+          },
+          {
+            "tokenId": "color.info",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "variant",
+              "equals": "info"
+            }
+          },
+          {
+            "tokenId": "radius.full",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
           }
         ],
         "rendering": {

@@ -23,13 +23,13 @@ const validIdsByCategory: Record<TokenCategory, string> = {
 }
 
 const expectedCategoryCounts: Record<TokenCategory, number> = {
-  color: 31,
-  radius: 8,
+  color: 37,
+  radius: 9,
   "font-family": 2,
   "font-size": 13,
   "font-weight": 9,
   "letter-spacing": 6,
-  "line-height": 5,
+  "line-height": 6,
   spacing: 1,
   shadow: 7,
 }
@@ -84,15 +84,15 @@ describe("token contract query boundary", () => {
   test("reports contracted status exactly consistently with lookup for all IDs", () => {
     const validIds = getTokenContract().tokens.map((token) => token.id)
 
-    expect(validIds).toHaveLength(82)
+    expect(validIds).toHaveLength(90)
     for (const tokenId of [...validIds, ...invalidIds]) {
       expect(isContractedToken(tokenId)).toBe(lookupToken(tokenId).ok)
     }
   })
 
   test("lists all tokens and IDs in canonical category and lexical ID order", () => {
-    expect(listTokens()).toHaveLength(82)
-    expect(listTokenIds()).toHaveLength(82)
+    expect(listTokens()).toHaveLength(90)
+    expect(listTokenIds()).toHaveLength(90)
     expect(listTokenIds()).toEqual(listTokens().map((token) => token.id))
 
     const expectedIds = TOKEN_CATEGORY_ORDER.flatMap((category) =>

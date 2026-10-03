@@ -13,21 +13,30 @@ import {
 const imageDataUri =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='40' fill='%23d4d4d8'/%3E%3Ccircle cx='40' cy='31' r='14' fill='%2371717a'/%3E%3Cpath d='M16 72c4-16 14-24 24-24s20 8 24 24' fill='%2371717a'/%3E%3C/svg%3E"
 
+// A full-bleed square logo, so the Avatar shape alone decides the corners.
+const logoDataUri =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%231447e6'/%3E%3Cpath d='M24 58 40 20l16 38h-9l-7-18-7 18z' fill='%23ffffff'/%3E%3C/svg%3E"
+
 const meta = {
   title: "Components/Avatar",
   component: Avatar,
   args: {
     size: "default",
+    shape: "circle",
   },
   argTypes: {
     size: {
       control: "select",
       options: ["sm", "default", "lg"],
     },
+    shape: {
+      control: "select",
+      options: ["circle", "rounded", "square"],
+    },
   },
   parameters: {
     controls: {
-      include: ["size"],
+      include: ["size", "shape"],
     },
   },
   render: (args) => (
@@ -68,6 +77,31 @@ export const Sizes: Story = {
       <Avatar size="lg">
         <AvatarFallback>LG</AvatarFallback>
       </Avatar>
+    </div>
+  ),
+}
+
+export const Shapes: Story = {
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => (
+    <div className="grid gap-4">
+      {(["sm", "default", "lg"] as const).map((size) => (
+        <div key={size} className="flex items-center gap-4">
+          {(["circle", "rounded", "square"] as const).map((shape) => (
+            <Avatar key={shape} size={size} shape={shape}>
+              <AvatarImage src={logoDataUri} alt={`${shape} ${size} logo`} />
+              <AvatarFallback>AC</AvatarFallback>
+            </Avatar>
+          ))}
+          {(["rounded", "square"] as const).map((shape) => (
+            <Avatar key={`${shape}-fallback`} size={size} shape={shape}>
+              <AvatarFallback>AC</AvatarFallback>
+            </Avatar>
+          ))}
+        </div>
+      ))}
     </div>
   ),
 }
