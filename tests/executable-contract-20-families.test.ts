@@ -22,6 +22,7 @@ const familyIds = [
   "breadcrumb",
   "button",
   "card",
+  "chart",
   "checkbox",
   "collapsible",
   "command",
@@ -149,7 +150,7 @@ function errorsFor(input: AuthoredUi): ValidationError[] {
   return [...validateAuthoredUi(input, contract).errors]
 }
 
-describe("Phase 5 executable validator coverage across all 41 canonical families", () => {
+describe("Phase 5 executable validator coverage across all 42 canonical families", () => {
   test("projects and resolves every authorable canonical export", () => {
     const projectedFamilies = new Set(Object.values(contract.exports).map((entry) => entry.familyId))
     const authorable = Object.values(contract.exports).filter((entry) => entry.authorableJsx && entry.kind === "component")
@@ -157,17 +158,42 @@ describe("Phase 5 executable validator coverage across all 41 canonical families
     const hardConstraints = Object.values(contract.exports).flatMap((entry) => entry.component?.composition.hardConstraints ?? [])
 
     expect([...projectedFamilies].sort()).toEqual([...familyIds].sort())
-    expect(authorable).toHaveLength(204)
+    expect(authorable).toHaveLength(205)
     expect(nonAuthorable).toHaveLength(6)
     expect(hardConstraints).toEqual([])
+    // A required prop whose type the structured language cannot express (Chart.data) is
+    // checked by the consumer's authoring policy, so it stays an unresolved fact here.
+    const hasOpaqueRequiredProp = (entry: ExecutableExport) => componentFor(entry).props.some((prop) => prop.availability === "available" && prop.required && prop.name !== "children" && prop.type.kind === "typescript")
+    expect(authorable.filter(hasOpaqueRequiredProp).map((entry) => `${entry.familyId}.${entry.name}`)).toEqual(["chart.Chart"])
     for (const entry of authorable) {
       const exportId = `${entry.familyId}.${entry.name}`
       const result = validateAuthoredUi({ root: nodeFor(entry.familyId, entry.name) }, contract)
-      if (entry.unresolved.length) {
+      if (entry.unresolved.length || hasOpaqueRequiredProp(entry)) {
         expect(result.errors.length, exportId).toBeGreaterThan(0)
         expect([...new Set(result.errors.map((error) => error.code))], exportId).toEqual(["UNRESOLVED_FACT"])
       } else expect(result.errors, exportId).toEqual([])
     }
+  })
+
+  test("checks every closed Chart option and leaves only the data shapes to the consumer", () => {
+    const chartProps = (patch: Record<string, AuthoredValue> = {}) => ({
+      type: literal("bar"), title: literal("Revenue by month"), categoryKey: literal("month"),
+      data: literal([{ month: "Jan", revenue: 42000 }, { month: "Feb", revenue: null }]), series: literal([{ key: "revenue", label: "Revenue" }]),
+      layout: literal("stacked"), valueFormat: literal("currency"), currency: literal("USD"), height: literal(240),
+      xAxis: literal(true), yAxis: literal(false), grid: literal(true), legend: literal(false), animation: literal("off"),
+      ...patch,
+    })
+    const errors = (patch?: Record<string, AuthoredValue>) => validateAuthoredUi({ root: component("chart", "Chart", chartProps(patch)) }, contract).errors
+    const props = componentFor(entryFor("chart", "Chart")).props
+    expect(props.flatMap((prop) => (prop.availability === "available" && prop.type.kind === "typescript" ? [[prop.name, prop.type]] : []))).toEqual([
+      ["data", { kind: "typescript", typeText: "ReadonlyArray<Readonly<Record<string, string | number | null>>>" }],
+      ["series", { kind: "typescript", typeText: "ReadonlyArray<Readonly<{ key: string; label: string }>>" }],
+    ])
+    expect(errors().map((error) => [error.code, error.target.propName])).toEqual([["UNRESOLVED_FACT", "data"], ["UNRESOLVED_FACT", "series"]])
+    expect(errors({ type: literal("pie") })).toContainEqual(expect.objectContaining({ code: "INVALID_PROP_VALUE", target: expect.objectContaining({ propName: "type" }) }))
+    expect(errors({ aspectRatio: literal("21/9") })).toContainEqual(expect.objectContaining({ code: "INVALID_PROP_VALUE", target: expect.objectContaining({ propName: "aspectRatio" }) }))
+    expect(errors({ onClick: { kind: "callback" } })).toContainEqual(expect.objectContaining({ code: "INVALID_PROP", target: expect.objectContaining({ propName: "onClick" }) }))
+    expect(errors({ className: literal("size-96") })).toContainEqual(expect.objectContaining({ code: "INVALID_PROP", target: expect.objectContaining({ propName: "className" }) }))
   })
 
   test("selects Drawer fadeFromIndex presence branches and enforces required snapPoints", () => {

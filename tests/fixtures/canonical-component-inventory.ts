@@ -1,7 +1,7 @@
 // Independently approved release scope. Never derive this oracle from disk or manifests.
 export const canonicalFamilyIds = [
   "accordion", "alert", "alert-dialog", "avatar", "badge", "breadcrumb", "button", "card",
-  "checkbox", "collapsible", "command", "dialog", "drawer", "dropdown-menu", "empty", "field", "icon", "image",
+  "chart", "checkbox", "collapsible", "command", "dialog", "drawer", "dropdown-menu", "empty", "field", "icon", "image",
   "input", "input-group", "label", "link", "pagination", "popover", "progress", "radio-group", "scroll-area",
   "select", "separator", "sheet", "sidebar", "skeleton", "slider", "spinner", "switch", "table",
   "tabs", "textarea", "toggle", "toggle-group", "tooltip",

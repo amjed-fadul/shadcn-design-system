@@ -21,8 +21,8 @@ import "../src/contracts/components/canonical-loader"
 const manifest = JSON.parse(readFileSync(new URL("../contracts/components/component-contract-set.json", import.meta.url), "utf8")) as ComponentContractSet
 
 describe("canonical loader authority configuration", () => {
-  test("accepts exactly the independently approved 41-family scope", () => {
-    const expected = { ...manifest, familyCount: 41, familyFiles: canonicalFamilyIds.map((id) => `contracts/components/families/${id}.json`) }
+  test("accepts exactly the independently approved 42-family scope", () => {
+    const expected = { ...manifest, familyCount: 42, familyFiles: canonicalFamilyIds.map((id) => `contracts/components/families/${id}.json`) }
     expect(configured.options!.contractSetReconciler!(expected)).toEqual([])
   })
 
@@ -33,7 +33,7 @@ describe("canonical loader authority configuration", () => {
     expect(configured.options!.contractSetReconciler!(set).length).toBeGreaterThan(0)
   })
 
-  test("requires source identity for all 41 families and refuses unknown identities", () => {
+  test("requires source identity for all 42 families and refuses unknown identities", () => {
     expect(configured.options!.requireSourceIdentity).toBe(true)
     for (const id of canonicalFamilyIds) {
       expect(configured.options!.sourceIdentityForFamily!(id)).toMatchObject({

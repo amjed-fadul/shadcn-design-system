@@ -524,6 +524,16 @@
       "accessedOn": "2026-10-03",
       "sourceRevision": "release-011-working-tree",
       "contentHash": "cedc3758d9bfda30ca639c4779d7e5996ccc621a"
+    },
+    {
+      "id": "canonical.chart.source",
+      "kind": "canonical-source",
+      "title": "Canonical Chart source",
+      "locator": "src/components/ui/chart.tsx#Chart",
+      "locatorHint": "Closed Chart props, createChartModel validation and formats, ChartFrame sizing and draw state, Recharts plot defaults, legend and description",
+      "accessedOn": "2026-10-03",
+      "sourceRevision": "release-012-working-tree",
+      "contentHash": "72026f981f1cff981267ab0e42a1912a2c742506"
     }
   ]
 }

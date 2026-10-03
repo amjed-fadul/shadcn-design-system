@@ -303,7 +303,7 @@ describe("canonical knowledge vertical slice", () => {
     expect(registeredReferenceIds).toEqual([...referencedIds].sort())
   })
 
-  test("lists all 41 component knowledge subjects and the canonical patterns", () => {
+  test("lists all 42 component knowledge subjects and the canonical patterns", () => {
     const loaded = loadKnowledge()
     const componentIds = [
       "accordion",
@@ -314,6 +314,7 @@ describe("canonical knowledge vertical slice", () => {
       "breadcrumb",
       "button",
       "card",
+      "chart",
       "checkbox",
       "collapsible",
       "command",
@@ -403,7 +404,7 @@ describe("canonical knowledge vertical slice", () => {
   })
 
   test("canonical query exposes all components and patterns through separate entrypoints", () => {
-    expect(listComponentKnowledge()).toHaveLength(41)
+    expect(listComponentKnowledge()).toHaveLength(42)
     expect(listPatternKnowledge().map((entry) => entry.subject.id)).toEqual([
       "accordion-card",
       "dialog-with-actions",

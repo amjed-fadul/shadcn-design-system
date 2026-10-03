@@ -20,6 +20,7 @@ const expectedFamilyIds = [
   "breadcrumb",
   "button",
   "card",
+  "chart",
   "checkbox",
   "collapsible",
   "command",
@@ -56,7 +57,7 @@ const expectedFamilyIds = [
 ] as const
 
 describe("Storybook contract coverage", () => {
-  test("preserves 41 family stories and the bounded product-system integration matrix", () => {
+  test("preserves 42 family stories and the bounded product-system integration matrix", () => {
     const directoryEntries = readdirSync(storyDirectory)
     const actualComponentFiles = directoryEntries
       .filter(
@@ -72,7 +73,7 @@ describe("Storybook contract coverage", () => {
       .sort()
     const expectedStoryFiles = [...expectedFamilyIds.map((familyId) => `${familyId}.stories.tsx`), "product-system.stories.tsx"].sort()
 
-    expect(expectedFamilyIds).toHaveLength(41)
+    expect(expectedFamilyIds).toHaveLength(42)
     expect(actualComponentFiles).toEqual(expectedComponentFiles)
     expect(actualStoryFiles).toEqual(expectedStoryFiles)
   })

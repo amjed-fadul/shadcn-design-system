@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "id": "chart",
+  "source": {
+    "canonicalPath": "src/components/ui/chart.tsx",
+    "canonicalBlobSha": "72026f981f1cff981267ab0e42a1912a2c742506",
+    "implementationKind": "repo-native"
+  },
+  "evidence": {
+    "source": {
+      "kind": "canonical-source",
+      "source": "src/components/ui/chart.tsx@72026f981f1cff981267ab0e42a1912a2c742506"
+    },
+    "tokens": {
+      "kind": "token-contract",
+      "source": "shadcn-radix-token-contract-003"
+    },
+    "runtime": {
+      "kind": "runtime-test",
+      "source": "tests/chart-runtime.test.tsx"
+    }
+  },
+  "exports": [
+    {
+      "name": "Chart",
+      "kind": "component",
+      "authorableJsx": true,
+      "evidenceRefs": [
+        "source"
+      ],
+      "component": {
+        "localProps": [
+          {
+            "name": "animation",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "auto",
+                "off"
+              ]
+            },
+            "default": "auto",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "aspectRatio",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "1/1",
+                "16/9",
+                "2/1",
+                "4/3"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "categoryKey",
+            "required": true,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "centerLabel",
+            "required": false,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "curve",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "linear",
+                "monotone",
+                "step"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "data",
+            "required": true,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ReadonlyArray<Readonly<Record<string, string | number | null>>>"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "grid",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": true,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "height",
+            "required": false,
+            "type": {
+              "kind": "number"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "layout",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "grouped",
+                "stacked"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "legend",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "orientation",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "horizontal",
+                "vertical"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "series",
+            "required": false,
+            "type": {
+              "kind": "typescript",
+              "typeText": "ReadonlyArray<Readonly<{ key: string; label: string }>>"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "title",
+            "required": true,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "type",
+            "required": true,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "area",
+                "bar",
+                "donut",
+                "line",
+                "radial"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "valueFormat",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "compact",
+                "currency",
+                "number",
+                "percent"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "valueKey",
+            "required": false,
+            "type": {
+              "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "xAxis",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": true,
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "yAxis",
+            "required": false,
+            "type": {
+              "kind": "boolean"
+            },
+            "default": true,
+            "evidenceRefs": [
+              "source"
+            ]
+          }
+        ],
+        "inherits": [],
+        "slots": [],
+        "inheritedPropDefaults": [],
+        "composition": {
+          "requires": [],
+          "provides": [],
+          "hardConstraints": []
+        },
+        "stateChannels": [],
+        "conditionalApi": [],
+        "events": [],
+        "tokenDependencies": [
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          }
+        ],
+        "rendering": {
+          "rootNodeId": "root",
+          "publicPropsTargetNodeId": "root",
+          "nodes": [
+            {
+              "id": "root",
+              "host": {
+                "kind": "intrinsic",
+                "tag": "figure"
+              },
+              "receivesPublicProps": true,
+              "dataAttributes": [
+                {
+                  "name": "data-slot",
+                  "source": "literal",
+                  "value": "chart",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "name": "data-chart-type",
+                  "source": "prop",
+                  "prop": "type",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "children": [
+                {
+                  "nodeId": "frame",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                },
+                {
+                  "nodeId": "description",
+                  "evidenceRefs": [
+                    "source"
+                  ]
+                }
+              ],
+              "evidenceRefs": [
+                "source",
+                "runtime"
+              ]
+            },
+            {
+              "id": "frame",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source",
+                "runtime"
+              ]
+            },
+            {
+              "id": "description",
+              "host": {
+                "kind": "unresolved"
+              },
+              "receivesPublicProps": false,
+              "dataAttributes": [],
+              "children": [],
+              "evidenceRefs": [
+                "source",
+                "runtime"
+              ]
+            }
+          ],
+          "portalBoundaries": []
+        },
+        "accessibility": [
+          {
+            "feature": "figure name and description",
+            "owner": "component",
+            "mechanism": "The root figure is named by the title prop (aria-label) and described (aria-describedby) by a visually hidden one-sentence summary of the range and extremes plus the full data table with formatted values.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "keyboard navigation",
+            "owner": "component",
+            "mechanism": "The plot is a single tab stop; arrow keys move between data points and the tooltip follows focus. Donut and radial charts keep that single stop.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "draw-finished signal",
+            "owner": "component",
+            "mechanism": "[data-slot=chart-plot] carries data-chart-state: measuring until the container has a width (a skeleton reserves the final size), drawing while series animate, and ready once drawing finishes, immediately when animation is off or prefers-reduced-motion is set. Headless capture waits for data-chart-state=ready.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "colour and identity",
+            "owner": "component",
+            "mechanism": "Series take chart-1 to chart-5 in slot order; a sixth series is rejected. A legend names every series by default when there are two or more, so identity is never colour-only; tooltip and axis text use text tokens, never a series colour.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          },
+          {
+            "feature": "empty data",
+            "owner": "component",
+            "mechanism": "No rows, or only zero or null values, render an explicit No data state and still reach ready.",
+            "evidenceRefs": [
+              "source",
+              "runtime"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "unresolved": []
+}

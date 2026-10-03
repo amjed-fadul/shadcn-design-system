@@ -115,6 +115,15 @@
       "upstreamBlobSha": "2ba46512ffc3dd65f008c04d53399189d390fb79",
       "packageDependencies": []
     },
+    "chart": {
+      "canonicalPath": "src/components/ui/chart.tsx",
+      "canonicalBlobSha": "72026f981f1cff981267ab0e42a1912a2c742506",
+      "implementationKind": "repo-native",
+      "packageDependencies": [
+        "react-is@19.3.0",
+        "recharts@3.8.1"
+      ]
+    },
     "checkbox": {
       "canonicalPath": "src/components/ui/checkbox.tsx",
       "canonicalBlobSha": "7465ce64b9f8ccad4f4622e1bdfbe324a807d81c",

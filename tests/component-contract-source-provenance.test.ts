@@ -40,7 +40,7 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
       familySource: {
         path: "provenance/seed-components.json",
         blobSha: gitBlobSha("provenance/seed-components.json"),
-        familyCount: 41,
+        familyCount: 42,
         familyIds: expectedFamilyIds,
       },
       tokenContract: {
@@ -62,7 +62,7 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
     })
 
     expect(familyIds).toEqual(expectedFamilyIds)
-    expect(familyIds).toHaveLength(41)
+    expect(familyIds).toHaveLength(42)
     expect(provenance.familySource.familyIds).toEqual(familyIds)
     expect(provenance.familySource.blobSha).toBe(gitBlobSha(provenance.familySource.path))
 
@@ -106,7 +106,7 @@ describe("canonical component-contract source provenance", { timeout: 60000 }, (
       expect(existsSync(join(repoRoot, component.canonicalPath))).toBe(true)
       expect(component.canonicalBlobSha).toBe(gitBlobSha(component.canonicalPath))
       if (component.implementationKind === "repo-native") {
-        expect(["icon", "image", "link"]).toContain(id)
+        expect(["chart", "icon", "image", "link"]).toContain(id)
         expect(component.upstreamPath).toBeUndefined()
         expect(component.upstreamBlobSha).toBeUndefined()
         expect(family.source.upstreamPath).toBeUndefined()

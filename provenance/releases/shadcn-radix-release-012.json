@@ -37,8 +37,8 @@
     },
     {
       "path": "contracts/components/component-contract-set.json",
-      "gitBlob": "1e25aab8ca67520c901739653d31d6b35c442119",
-      "sha256": "c77cf8c76f47ca556a3ca8e63ae18e5c2d61641b04bde216475536b84f357107"
+      "gitBlob": "e52bddd714727966759128df836ecb865ec6a4ef",
+      "sha256": "9f577fa8c1e98766eae731ca8335b73685cec87ea95667fa451fa8376e4f3789"
     },
     {
       "path": "contracts/components/component-contract-set.schema.json",
@@ -89,6 +89,11 @@
       "path": "contracts/components/families/card.json",
       "gitBlob": "bff084df6cfb47ba5e47b24b22b4ca4db09d4a78",
       "sha256": "e306715b9fa15e6025c3f0fdeb3d54abae9807dbfbcdf005d6bb075f0a392027"
+    },
+    {
+      "path": "contracts/components/families/chart.json",
+      "gitBlob": "6cb5ddd87cc57c4c512c833a515c785fb0743609",
+      "sha256": "5cad2c79a3ac7cc40433563038051cc2918169404c4d37982950c6473792fbdd"
     },
     {
       "path": "contracts/components/families/checkbox.json",
@@ -257,8 +262,8 @@
     },
     {
       "path": "contracts/components/index.json",
-      "gitBlob": "ec4f9ce4dcce010c27fafeac9509743bb6f38d90",
-      "sha256": "6f92ac3af8b2cac81ef5d7e11e7cccbc6e7389b06256febf0ff5bd1259dc1c72"
+      "gitBlob": "cc6060c7b9a5592b90e96dd138aa75da044a7e8f",
+      "sha256": "bd3819e821f829c4c8e16639e46b3ccd5aeba880828b4a380a024aaf58007ab1"
     },
     {
       "path": "contracts/components/inherited-interface.schema.json",
@@ -1142,13 +1147,13 @@
     },
     {
       "path": "provenance/component-contract-source.json",
-      "gitBlob": "7481dcf8f01724316e911778c1cc1384a9d0efaa",
-      "sha256": "3da40c6648fc6e12035b6a5f673402548bc7530932fca03fb3749aaf82388609"
+      "gitBlob": "4158190e904fc79ad3930ec6cd8602c70892d317",
+      "sha256": "2b2609fe5f5d9a3f40ac09927bc736ad11ca001f5f3264f696f0017a02e4cff6"
     },
     {
       "path": "provenance/seed-components.json",
-      "gitBlob": "1663235a4d5f10a5c54aa48868d23cfe411203f9",
-      "sha256": "0df148984c3cd4880206f33ea7790bd9e2aa6efd184ab80a22bf2aae452ebc64"
+      "gitBlob": "e7d8913bd9efa073224192ad604186e73971553b",
+      "sha256": "61f4ad0de1b8cb978ff5ae1d30a2097eac66737bc13b49559d295780980938cb"
     },
     {
       "path": "provenance/token-contract-source.json",
@@ -1311,9 +1316,19 @@
       "sha256": "44b1d5f5a2431bb80e4316c2c5fd9fe3037f5f1a38877b1eceb27ee866698f14"
     },
     {
+      "path": "src/components/ui/chart-model.ts",
+      "gitBlob": "102c9a39a15fc1ceeb559fa5e679964e76c1efec",
+      "sha256": "f2fc972d14552c368cca20ede698ca7d4a0f60dcc45e74a37903f31d989977df"
+    },
+    {
+      "path": "src/components/ui/chart.stories.tsx",
+      "gitBlob": "5ced529107f9059aa2ae62734b11ffd7bb472bf5",
+      "sha256": "9104523617482766fdc0549dc5bef667116d6ff98b8ea5a40352b8b95d992773"
+    },
+    {
       "path": "src/components/ui/chart.tsx",
-      "gitBlob": "35fe08616cce16ae96e561305fb4dddf11729970",
-      "sha256": "b56aa61eeb1f20d8266885ec221c9b9f3de437ce6ab267268d34feb02d33c7d1"
+      "gitBlob": "72026f981f1cff981267ab0e42a1912a2c742506",
+      "sha256": "57f61463e2dced46589d3b2e5d38d1fa0c1217728529e50af91f8ce6b6f72d98"
     },
     {
       "path": "src/components/ui/checkbox.stories.tsx",
@@ -1692,8 +1707,8 @@
     },
     {
       "path": "src/contracts/components/canonical-token-source-analysis.ts",
-      "gitBlob": "af9680f6bc3fe6624a94d0bb7509db48f1b03b3a",
-      "sha256": "8f81cf2f8c545b20efe6c6020646af7f91b2d018b0c75bc0d09275b16337451d"
+      "gitBlob": "2f6e1962f9087b0050439e4d9e5fd1f58e70f7cb",
+      "sha256": "ce54c3cdf008da05bc944ffd80b4f4c1dd3ef31d232b04ab1ef97ffa096492d0"
     },
     {
       "path": "src/contracts/components/component-prop-source-analysis.ts",
@@ -1777,8 +1792,8 @@
     },
     {
       "path": "src/package/charts.ts",
-      "gitBlob": "2a75c6167a257c84456e3a4cf6b2cc7f486e2128",
-      "sha256": "c288e000371fa7758fbf7ce1ab5e4e9e62630ad2030829358c877a7ca15af063"
+      "gitBlob": "ddba54e919fc36e10bdb10380358f0ef29c725d8",
+      "sha256": "d2d166070227e62f6df0568919d631d5cb7491f43a3d0bc512013221a0fb7bc9"
     },
     {
       "path": "src/package/index.ts",
@@ -139622,6 +139637,253 @@
                 "applicability": [
                   "group-data-[size=sm]/card"
                 ]
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            }
+          ],
+          "unresolved": []
+        },
+        "unresolved": []
+      },
+      "chart\u0000Chart": {
+        "familyId": "chart",
+        "name": "Chart",
+        "kind": "component",
+        "authorableJsx": true,
+        "component": {
+          "props": [
+            {
+              "name": "animation",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "enum",
+                "values": [
+                  "auto",
+                  "off"
+                ]
+              },
+              "origin": "local",
+              "default": "auto"
+            },
+            {
+              "name": "aspectRatio",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "enum",
+                "values": [
+                  "1/1",
+                  "16/9",
+                  "2/1",
+                  "4/3"
+                ]
+              },
+              "origin": "local"
+            },
+            {
+              "name": "categoryKey",
+              "availability": "available",
+              "required": true,
+              "type": {
+                "kind": "string"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "centerLabel",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "string"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "currency",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "string"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "curve",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "enum",
+                "values": [
+                  "linear",
+                  "monotone",
+                  "step"
+                ]
+              },
+              "origin": "local"
+            },
+            {
+              "name": "data",
+              "availability": "available",
+              "required": true,
+              "type": {
+                "kind": "typescript",
+                "typeText": "ReadonlyArray<Readonly<Record<string, string | number | null>>>"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "grid",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "boolean"
+              },
+              "origin": "local",
+              "default": true
+            },
+            {
+              "name": "height",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "number"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "layout",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "enum",
+                "values": [
+                  "grouped",
+                  "stacked"
+                ]
+              },
+              "origin": "local"
+            },
+            {
+              "name": "legend",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "boolean"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "orientation",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "enum",
+                "values": [
+                  "horizontal",
+                  "vertical"
+                ]
+              },
+              "origin": "local"
+            },
+            {
+              "name": "series",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "typescript",
+                "typeText": "ReadonlyArray<Readonly<{ key: string; label: string }>>"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "title",
+              "availability": "available",
+              "required": true,
+              "type": {
+                "kind": "string"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "type",
+              "availability": "available",
+              "required": true,
+              "type": {
+                "kind": "enum",
+                "values": [
+                  "area",
+                  "bar",
+                  "donut",
+                  "line",
+                  "radial"
+                ]
+              },
+              "origin": "local"
+            },
+            {
+              "name": "valueFormat",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "enum",
+                "values": [
+                  "compact",
+                  "currency",
+                  "number",
+                  "percent"
+                ]
+              },
+              "origin": "local"
+            },
+            {
+              "name": "valueKey",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "string"
+              },
+              "origin": "local"
+            },
+            {
+              "name": "xAxis",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "boolean"
+              },
+              "origin": "local",
+              "default": true
+            },
+            {
+              "name": "yAxis",
+              "availability": "available",
+              "required": false,
+              "type": {
+                "kind": "boolean"
+              },
+              "origin": "local",
+              "default": true
+            }
+          ],
+          "events": [],
+          "stateChannels": [],
+          "conditionalApi": [],
+          "slots": [],
+          "composition": {
+            "requires": [],
+            "provides": [],
+            "hardConstraints": []
+          },
+          "tokenDependencies": [
+            {
+              "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
               },
               "evidenceRefs": [
                 "source",
@@ -529743,5 +530005,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "e81487b1e6287d053f7e13f7f29583717bd6b4441c2b86e2d669781d6f8f6cb4"
+  "sha256": "4bbc59499bea9930693e758d11938565d7b395781fcf46a07f5703fa004af3b0"
 }

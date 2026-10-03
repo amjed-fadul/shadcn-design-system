@@ -82,9 +82,9 @@ describe("immutable executable release", () => {
     const expectedExportIds = canonical.families.flatMap((family) => family.exports.map((entry) => `${family.id}\u0000${entry.name}`)).sort()
 
     expect(familyIds).toEqual(expectedFamilyIds)
-    expect(familyIds).toHaveLength(41)
+    expect(familyIds).toHaveLength(42)
     expect(exportIds).toEqual(expectedExportIds)
-    expect(exportIds).toHaveLength(210)
+    expect(exportIds).toHaveLength(211)
   })
 
   test("preserves releases 001 through 007 byte-for-byte while selecting 008", () => {
