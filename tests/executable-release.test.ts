@@ -69,7 +69,7 @@ describe("immutable executable release", () => {
     expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-011.json")
     expect(release.releaseId).toBe(EXECUTABLE_RELEASE_ID)
     expect(release.componentContractSetId).toBe("shadcn-radix-component-contracts-001")
-    expect(release.tokenContractId).toBe("shadcn-radix-token-contract-002")
+    expect(release.tokenContractId).toBe("shadcn-radix-token-contract-003")
     expect(release.projectionSchemaVersion).toBe(1)
   })
 
