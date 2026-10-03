@@ -85,7 +85,7 @@ export const Dark: Story = {
 function ColorExamples({ direction = "ltr" }: { direction?: "ltr" | "rtl" }) {
   return (
     <div dir={direction} className="flex flex-col gap-4">
-      {(["inherit", "foreground", "primary", "muted-foreground", "destructive"] as const).map((color) => (
+      {(["inherit", "foreground", "primary", "muted-foreground", "destructive", "success", "warning", "info"] as const).map((color) => (
         <span key={color} className="flex items-center gap-2">
           <Icon name="info" color={color} decorative={false} label={`${color} information`} />
           {color}
@@ -97,7 +97,7 @@ function ColorExamples({ direction = "ltr" }: { direction?: "ltr" | "rtl" }) {
 }
 
 const checkColors: Story["play"] = async ({ canvasElement, canvas }) => {
-  for (const color of ["foreground", "primary", "muted-foreground", "destructive"]) {
+  for (const color of ["foreground", "primary", "muted-foreground", "destructive", "success", "warning", "info"]) {
     const icon = canvas.getByRole("img", { name: `${color} information` })
     const probe = document.createElement("span")
     probe.style.color = `var(--${color})`
@@ -111,3 +111,33 @@ const checkColors: Story["play"] = async ({ canvasElement, canvas }) => {
 export const Colors: Story = { globals: { theme: "light" }, render: () => <ColorExamples />, play: checkColors }
 export const ColorsDark: Story = { globals: { theme: "dark" }, render: () => <ColorExamples />, play: checkColors }
 export const ColorsRtl: Story = { render: () => <ColorExamples direction="rtl" />, play: checkColors }
+
+const contentIcons = [
+  "home", "users", "receipt", "credit-card", "chart-column", "settings", "download", "calendar",
+  "trending-up", "trending-down", "arrow-up", "arrow-down", "clock", "star", "shield", "lock",
+  "building", "quote", "bell",
+] as const
+
+function ContentIconExamples({ direction = "ltr" }: { direction?: "ltr" | "rtl" }) {
+  return (
+    <div dir={direction} className="grid grid-cols-4 gap-4 text-sm">
+      {contentIcons.map((name) => (
+        <span key={name} className="flex items-center gap-2">
+          <Icon name={name} decorative={false} label={name} />
+          {name}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+const checkContentIcons: Story["play"] = async ({ canvas }) => {
+  for (const name of contentIcons) {
+    const icon = canvas.getByRole("img", { name })
+    await expect(icon.getBoundingClientRect().width).toBe(16)
+    await expect(getComputedStyle(icon).transform).toBe("none")
+  }
+}
+
+export const ContentIcons: Story = { render: () => <ContentIconExamples />, play: checkContentIcons }
+export const ContentIconsRtl: Story = { render: () => <ContentIconExamples direction="rtl" />, play: checkContentIcons }

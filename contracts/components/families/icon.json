@@ -3,13 +3,13 @@
   "id": "icon",
   "source": {
     "canonicalPath": "src/components/ui/icon.tsx",
-    "canonicalBlobSha": "0c9843ed6806b924490cc593017b118601f2b8ca",
+    "canonicalBlobSha": "35e3b96847b5263c31dfa01befdde36a67a88d73",
     "implementationKind": "repo-native"
   },
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/icon.tsx@0c9843ed6806b924490cc593017b118601f2b8ca"
+      "source": "src/components/ui/icon.tsx@35e3b96847b5263c31dfa01befdde36a67a88d73"
     },
     "tokens": {
       "kind": "token-contract",
@@ -37,10 +37,16 @@
               "kind": "enum",
               "values": [
                 "alert-circle",
+                "arrow-down",
                 "arrow-end",
                 "arrow-left",
                 "arrow-right",
                 "arrow-start",
+                "arrow-up",
+                "bell",
+                "building",
+                "calendar",
+                "chart-column",
                 "check",
                 "check-circle",
                 "chevron-down",
@@ -50,11 +56,24 @@
                 "chevron-start",
                 "chevron-up",
                 "circle",
+                "clock",
+                "credit-card",
+                "download",
+                "home",
                 "info",
                 "loader",
+                "lock",
                 "more-horizontal",
                 "panel-left",
+                "quote",
+                "receipt",
                 "search",
+                "settings",
+                "shield",
+                "star",
+                "trending-down",
+                "trending-up",
+                "users",
                 "x"
               ]
             },
@@ -86,9 +105,12 @@
               "values": [
                 "destructive",
                 "foreground",
+                "info",
                 "inherit",
                 "muted-foreground",
-                "primary"
+                "primary",
+                "success",
+                "warning"
               ]
             },
             "default": "inherit",
@@ -275,6 +297,39 @@
             "when": {
               "propName": "color",
               "equals": "destructive"
+            }
+          },
+          {
+            "tokenId": "color.success",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "color",
+              "equals": "success"
+            }
+          },
+          {
+            "tokenId": "color.warning",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "color",
+              "equals": "warning"
+            }
+          },
+          {
+            "tokenId": "color.info",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ],
+            "when": {
+              "propName": "color",
+              "equals": "info"
             }
           }
         ],

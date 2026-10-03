@@ -8,16 +8,19 @@ import { cn } from "@/lib/utils"
 function Avatar({
   className,
   size = "default",
+  shape = "circle",
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Root> & {
   size?: "default" | "sm" | "lg"
+  shape?: "circle" | "rounded" | "square"
 }) {
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
       data-size={size}
+      data-shape={shape}
       className={cn(
-        "group/avatar relative flex size-8 shrink-0 select-none rounded-full after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten data-[size=lg]:size-9 data-[size=sm]:size-6",
+        "group/avatar relative flex size-8 shrink-0 select-none rounded-full after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten data-[size=lg]:size-9 data-[size=sm]:size-6 data-[shape=rounded]:rounded-lg data-[shape=rounded]:after:rounded-lg data-[shape=square]:rounded-none data-[shape=square]:after:rounded-none",
         className
       )}
       {...props}
@@ -32,7 +35,10 @@ function AvatarImage({
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
-      className={cn("aspect-square size-full rounded-full object-cover", className)}
+      className={cn(
+        "aspect-square size-full rounded-full object-cover group-data-[shape=rounded]/avatar:rounded-lg group-data-[shape=square]/avatar:rounded-none",
+        className
+      )}
       {...props}
     />
   )
@@ -46,7 +52,7 @@ function AvatarFallback({
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-foreground group-data-[size=sm]/avatar:text-xs",
+        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-foreground group-data-[size=sm]/avatar:text-xs group-data-[shape=rounded]/avatar:rounded-lg group-data-[shape=square]/avatar:rounded-none",
         className
       )}
       {...props}

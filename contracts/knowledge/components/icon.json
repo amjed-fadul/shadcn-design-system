@@ -80,7 +80,16 @@
       }
     },
     {
-      "statement": "color defaults to inherit, preserving surrounding text and interactive component foregrounds. Choose foreground, primary, muted-foreground or destructive to use existing light/dark semantic tokens. Explicit colors must contrast with their surrounding surface; use inherit inside colored Buttons. Do not communicate meaning by color alone: retain visible text or a meaningful label. Icon exposes no arbitrary color string, interactions or link semantics.",
+      "statement": "color defaults to inherit, preserving surrounding text and interactive component foregrounds. Choose foreground, primary, muted-foreground, destructive, success, warning or info to use existing light/dark semantic tokens. Explicit colors must contrast with their surrounding surface; use inherit inside colored Buttons. Do not communicate meaning by color alone: retain visible text or a meaningful label. Icon exposes no arbitrary color string, interactions or link semantics.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.icon.source"
+        ]
+      }
+    },
+    {
+      "statement": "Content identities name what an item is: home, users, receipt, credit-card, chart-column, settings, download, calendar, trending-up, trending-down, arrow-up, arrow-down, clock, star, shield, lock, building, quote and bell. They are physical glyphs and never mirror in RTL. Pair a trend or status icon with its visible value or a meaningful label, for example <Icon name=\"trending-up\" color=\"success\" decorative={false} label=\"Up 12.4%\" />.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [

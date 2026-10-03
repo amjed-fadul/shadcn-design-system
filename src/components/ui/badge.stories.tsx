@@ -4,8 +4,12 @@ import { Badge } from "@/components/ui/badge"
 
 const variants = [
   "default",
+  "primary",
   "secondary",
   "destructive",
+  "success",
+  "warning",
+  "info",
   "outline",
   "ghost",
   "link",
@@ -88,5 +92,45 @@ export const DestructiveDark: Story = {
     <Badge asChild variant="destructive">
       <a href="#destructive-dark">Destructive</a>
     </Badge>
+  ),
+}
+
+const statusVariants = ["success", "warning", "info"] as const
+
+export const StatusLinksLight: Story = {
+  globals: {
+    theme: "light",
+  },
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge variant="primary">Most popular</Badge>
+      {statusVariants.map((variant) => (
+        <Badge key={variant} asChild variant={variant}>
+          <a href={`#${variant}-light`}>{variant}</a>
+        </Badge>
+      ))}
+    </div>
+  ),
+}
+
+export const StatusLinksDark: Story = {
+  globals: {
+    theme: "dark",
+  },
+  parameters: {
+    controls: { disable: true },
+  },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge variant="primary">Most popular</Badge>
+      {statusVariants.map((variant) => (
+        <Badge key={variant} asChild variant={variant}>
+          <a href={`#${variant}-dark`}>{variant}</a>
+        </Badge>
+      ))}
+    </div>
   ),
 }
