@@ -336,7 +336,7 @@ describe("release package input identity", () => {
     expect(loadExecutableRelease(release, { expectedProjection: release.projection, expectedReleaseId: "shadcn-radix-release-004", requirePackageIdentity: true })).toEqual(release)
     expect(release.packageIdentity.name).toBe("@adc/shadcn-design-system")
     expect(release.packageIdentity.version).toBe("0.0.0-release.4")
-    expect(Object.keys(release.packageIdentity.publicEntrypoints).sort()).toEqual([".", "./charts", "./release", "./styles.css"])
+    expect(Object.keys(release.packageIdentity.publicEntrypoints).sort()).toEqual([".", "./release", "./styles.css"])
     expect(release.projection.exports["sidebar\0SidebarProvider"].component.composition.provides).toEqual(["sidebar.context"])
     expect(release.projection.exports["sidebar\0Sidebar"].component.composition.requires).toEqual(["sidebar.context"])
     const inputPaths = release.implementationInputs.map((entry: { path: string }) => entry.path)
@@ -368,7 +368,9 @@ describe("release package input identity", () => {
     expect(paths.filter((file: string) => /^src\/components\/ui\/.*\.tsx$/.test(file))).toHaveLength(20)
     expect(paths).toEqual(expect.arrayContaining(["src/lib/utils.ts", "src/hooks/use-mobile.ts", "src/index.css", "scripts/library-data.ts", "scripts/build-library.mjs", "vite.library.config.ts", "tsconfig.library.json", "package-lock.json", "components.json"]))
     expect(release.documentSchemaVersion).toBe(1)
-    expect(release.packageIdentity).toEqual({ ...packageIdentity(root), version: "0.0.0-release.3" })
+    // Release 012 added the ./charts entrypoint; every other identity fact is unchanged since R3.
+    const { "./charts": _charts, ...entrypointsBeforeCharts } = packageIdentity(root).publicEntrypoints
+    expect(release.packageIdentity).toEqual({ ...packageIdentity(root), version: "0.0.0-release.3", publicEntrypoints: entrypointsBeforeCharts })
   })
   test("retained release-001 preserves the six reviewed ref facts", () => {
     const old = JSON.parse(execFileSync("git", ["show", "765e2d7786142cb3ed9f9ae56ebbc8c5e07614d2:provenance/releases/shadcn-radix-release-001.json"], { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }))
