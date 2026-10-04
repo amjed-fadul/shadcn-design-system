@@ -3,13 +3,14 @@
 // and reduced motion must skip the drawing state.
 import assert from "node:assert/strict"
 import { mkdirSync, realpathSync, writeFileSync } from "node:fs"
+import { homedir } from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { chromium } from "playwright"
 import { createServer } from "vite"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const out = process.env.RELEASE012_BROWSER_OUTPUT ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/release012-browser"
+const out = process.env.RELEASE012_BROWSER_OUTPUT ?? path.join(homedir(), ".artifacts/shadcn-design-system/release012-browser")
 const kinds = ["bar", "bar-stacked", "bar-horizontal", "area", "area-stacked", "line", "donut", "radial"]
 mkdirSync(out, { recursive: true })
 

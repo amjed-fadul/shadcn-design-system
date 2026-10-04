@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process"
 import { createHash } from "node:crypto"
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { homedir, tmpdir } from "node:os"
 import { fileURLToPath } from "node:url"
 import path from "node:path"
 import { afterAll, beforeAll, describe, expect, test } from "vitest"
@@ -11,12 +11,12 @@ import type { TokenContract } from "../src/contracts/tokens/types"
 import { hashExecutableReleasePayload } from "../src/validator/release"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-003"
+const r3ArtifactDirectory = process.env.ADC_R3_ARTIFACT_DIRECTORY ?? path.join(homedir(), ".artifacts/shadcn-design-system/shadcn-radix-release-003")
 const r3Tarball = path.join(r3ArtifactDirectory, "adc-shadcn-design-system-0.0.0-release.3.tgz")
 const r3DistributionManifest = path.join(r3ArtifactDirectory, "distribution-manifest.json")
 const r3PayloadSha256 = "5ffd25a9bac4fb44f8e826243323b20b93fb51a93db19b14b6d71089b545105b"
 const r3TarballSha256 = "bf8fdd1bd837eda50b62bea372a3d5346c54621c1e3ec8679cff3f3b71dcc629"
-const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? path.join(homedir(), ".artifacts/shadcn-design-system/shadcn-radix-release-004")
 const r4DistributionManifest = path.join(r4ArtifactDirectory, "distribution-manifest.json")
 let r3Extraction = ""
 let output = ""

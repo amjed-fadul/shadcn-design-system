@@ -1,5 +1,6 @@
 import assert from "node:assert/strict"
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { homedir } from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { chromium } from "playwright"
@@ -10,7 +11,7 @@ const sourcePath = path.join(root, "src/components/ui/product-system.stories.tsx
 const source = readFileSync(sourcePath, "utf8")
 const baseURL = (process.env.STORYBOOK_URL ?? "http://127.0.0.1:6009").replace(/\/$/, "")
 const baselineURL = (process.env.RELEASE008_STORYBOOK_URL ?? "http://127.0.0.1:6008").replace(/\/$/, "")
-const output = process.env.RELEASE009_MATRIX_OUTPUT ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/release009-matrix"
+const output = process.env.RELEASE009_MATRIX_OUTPUT ?? path.join(homedir(), ".artifacts/shadcn-design-system/release009-matrix")
 const storyImportPath = "./src/components/ui/product-system.stories.tsx"
 const matrixStories = ["Forms", "DataWorkspace", "SettingsForm", "RecordDetail", "SidePanelForm", "EmptyWorkspace", "CommandSearch", "NavigationData", "MenusOverlays", "FeedbackDisclosure"]
 const familyTitles = ["Components/Button", "Components/Card", "Components/Table", "Components/Dialog", "Components/Sidebar"]

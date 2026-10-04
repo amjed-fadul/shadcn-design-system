@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
 import { mkdirSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
+import path from 'node:path'
 import { chromium } from 'playwright'
 const base = process.env.STORYBOOK_URL ?? 'http://127.0.0.1:6009'
-const out = process.env.RELEASE009_BROWSER_OUTPUT ?? '/Users/amjedfadul/.artifacts/shadcn-design-system/release009-browser'
+const out = process.env.RELEASE009_BROWSER_OUTPUT ?? path.join(homedir(), '.artifacts/shadcn-design-system/release009-browser')
 const story = process.env.RELEASE009_STORY ?? 'forms'
 mkdirSync(out,{recursive:true})
 const browser = await chromium.launch({headless:true})
