@@ -4,6 +4,8 @@ Canonical governed shadcn design system for Agentic Design Canvas product work.
 
 This repository is separate from Canvas. The official shadcn repository is upstream/reference only; Canvas will eventually consume immutable contracted releases from this repository.
 
+Copyright (c) 2026 Amjed Fadul. All rights reserved; see [LICENSE](LICENSE). Third-party components and dependencies keep their own licences; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## Active producer: Release 012 candidate
 
 Release 012 (`0.0.0-release.12`) adds the governed chart family requested in #19, plus the producer build-memory fix. Tokens are unchanged (`shadcn-radix-token-contract-003`, 90 tokens).

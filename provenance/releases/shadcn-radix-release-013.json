@@ -22,13 +22,18 @@
   "implementationInputs": [
     {
       "path": ".gitignore",
-      "gitBlob": "a7e4e644a0b102f59fcc848a765546acb7cf43e9",
-      "sha256": "0002afc4c2e5cd5dfaca1c049fa1b6255c109fbd23cd626ae86216ae38d780fd"
+      "gitBlob": "9aa8be75736b6bb9fa3f7b1ddb52b906c7cdff97",
+      "sha256": "d40ee298dc1a03b3daf46bd4252cbeba529b734d65493088cf9cf586a3581c67"
+    },
+    {
+      "path": "LICENSE",
+      "gitBlob": "58e63ae8f472a10e1d4e72cb8fdea577b398376e",
+      "sha256": "200f68721c23d680cd5e820ba6d83de94d240fdcfe9a32688ca614a9577926b1"
     },
     {
       "path": "README.md",
-      "gitBlob": "37ab3db06afe5c5adec2255009ec78545e3ccab6",
-      "sha256": "7bcaf972c275c6e93fd85090b1b5ad34efc4785202b84d791bbac06d8186720c"
+      "gitBlob": "4872a55d0a26d3258c6410c81ec18f1fc6f33747",
+      "sha256": "f062d9c269c2870e0cf80b6ce61d20f83d6a8b9459e332104c5890098295543b"
     },
     {
       "path": "components.json",
@@ -1137,8 +1142,8 @@
     },
     {
       "path": "package.json",
-      "gitBlob": "4935a21b24957ded6002222ea4fcc1c6fc094bde",
-      "sha256": "f55a3f476c8614d2101984b6764525b2c4be2ef370c9825de32b03fac579c4c3"
+      "gitBlob": "02d3dbb535fd1fc3d7e5a699c5a801a20881c47f",
+      "sha256": "1698e150f2c4d591b9aac56a77612e94231fe32a676392d01edc7f2afebf10f5"
     },
     {
       "path": "provenance/baseline.json",
@@ -1217,8 +1222,18 @@
     },
     {
       "path": "scripts/library-licenses.ts",
-      "gitBlob": "2e12f0803f2530b8836cabf56cf0611c0f5693b9",
-      "sha256": "38c3da8ab72b105c59996176eaa1fbec9d049569fa03e443b26c6fc166ee153e"
+      "gitBlob": "a042811db24933fead94213808d9628c52525f78",
+      "sha256": "394ae94ed857b66495a5a7d5cdcb2ec9b271e17d5785865a5f6f5f2bffde87af"
+    },
+    {
+      "path": "scripts/license-overrides/react-remove-scroll-bar/LICENSE",
+      "gitBlob": "7c08c3990396ecefd90f99ff5d9a34f26f5b5616",
+      "sha256": "a79aae0c0f21990d9d963bb3c5a79cdcea9a46f8523ba55c58d7fe776b6ebc84"
+    },
+    {
+      "path": "scripts/license-overrides/react-remove-scroll-bar/source.json",
+      "gitBlob": "842192f2a14e30ced7add18b11fc233ffa51f314",
+      "sha256": "8d5b6cf4ce9da3b7a4dc98c2047917bb67b59b4b3be7726de79bf31581eb8198"
     },
     {
       "path": "scripts/package-candidate.mjs",
@@ -530005,5 +530020,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "97378c9edc8c93d6a08d9a888884e21a939dd89d2743f612be6ce7a8323c54f0"
+  "sha256": "6c95a01a7b7791cea0d646aa28efce196987563cabddc1703744aeb2c7bec034"
 }
