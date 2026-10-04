@@ -1,5 +1,6 @@
 import assert from "node:assert/strict"
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { homedir } from "node:os"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { chromium } from "playwright"
@@ -10,7 +11,7 @@ const storyFile = path.join(root, "src/components/ui/toggle-group.stories.tsx")
 const storyImportPath = "./src/components/ui/toggle-group.stories.tsx"
 const standaloneStoryFile = path.join(root, "src/components/ui/toggle.stories.tsx")
 const baseURL = (process.env.STORYBOOK_URL ?? "http://127.0.0.1:6008").replace(/\/$/, "")
-const artifactDirectory = process.env.RELEASE008_BROWSER_OUTPUT ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/release008-browser"
+const artifactDirectory = process.env.RELEASE008_BROWSER_OUTPUT ?? path.join(homedir(), ".artifacts/shadcn-design-system/release008-browser")
 mkdirSync(artifactDirectory, { recursive: true })
 
 const storySource = readFileSync(storyFile, "utf8")

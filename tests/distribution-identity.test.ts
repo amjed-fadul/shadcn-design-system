@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto"
 import { execFileSync } from "node:child_process"
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { homedir, tmpdir } from "node:os"
 import path from "node:path"
 import { afterAll, beforeAll, describe, expect, test } from "vitest"
 import { generateDistributionManifest, packedInventory, verifyDistributionManifest } from "../scripts/distribution-identity"
@@ -17,7 +17,7 @@ const isolatedConsumerSection = (document: string) => {
 }
 const release = { releaseId: "shadcn-radix-release-001", sha256: "a".repeat(64), packageIdentity: { name: "@adc/shadcn-design-system", version: "0.0.0-release.1" } }
 const toolchain = { node: "22.18.0", npm: "10.9.3", platform: process.platform, arch: process.arch, tools: { vite: "7.3.6", typescript: "5.5.4" } }
-const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? "/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-004"
+const r4ArtifactDirectory = process.env.ADC_R4_ARTIFACT_DIRECTORY ?? path.join(homedir(), ".artifacts/shadcn-design-system/shadcn-radix-release-004")
 let directory: string
 let tarball: Buffer
 let manifest: any
