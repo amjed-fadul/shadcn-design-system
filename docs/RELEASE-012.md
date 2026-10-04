@@ -13,8 +13,11 @@ contract ruling in [the spike](RELEASE-012-CHART-CONTRACT-SPIKE.md). The Canvas 
 [CANVAS-RELEASE-012](CANVAS-RELEASE-012.md). The visual review is the
 [gallery](RELEASE-012-CHART-GALLERY.md).
 
-**Status: candidate, awaiting owner review.** The owner reviews the gallery and accepts or rejects
-the candidate. The release is not tagged or approved by the producer.
+**Status: candidate under owner review; macOS release qualification requested.**
+- **2026-10-04:** the owner accepted every spec deviation below and settled the three open
+  decisions (see "Owner decisions"). They then asked for the macOS release-qualification run.
+- **Not yet decided:** candidate acceptance is still pending. The producer does not tag or approve
+  the release.
 
 ## Changes
 
@@ -59,37 +62,45 @@ the candidate. The release is not tagged or approved by the producer.
 
 ## Deviations from the approved spec
 
+The owner accepted all six on 2026-10-04. The radial centre total moves to the next release.
+
 1. **Lines never stack.** The spec allowed `layout` on line charts. Stacked lines read as
    independent trends, and the renderer never stacked them, so `layout` applies only to area and
    bar.
 2. **Legend instead of direct labels.** The spec asked for direct series labels when there are four
    or fewer. Release 012 always shows a legend for two or more series or parts. Together with the
-   data table, identity never depends on colour alone. Direct labels are a possible follow-up.
-3. **No radial centre total.** The donut shows its total; the radial chart's 30% inner hole is too
-   small for it.
+   data table, identity never depends on colour alone.
+3. **No radial centre total.** The donut shows its total, but the radial chart's 30% inner hole is
+   too small for it. The owner wants it in the next release, because KPI radials usually show their
+   total; the inner radius will need to grow to fit it.
 4. **Token dependencies.** The spec listed `chart-1..5`, `border`, `card`, `popover` and others.
    The per-export token analyzer reads only the exported function, and Chart's styling lives in
    module-private parts. The contract therefore records `spacing.unit` only. Colour use is proven
-   at runtime instead: tests pin every series to `var(--chart-N)` and reject raw colours. See open
+   at runtime instead: tests pin every series to `var(--chart-N)` and reject raw colours. See owner
    decision 1.
 5. **Source audit route.** The spec proposed pinned Recharts hosts, as for Lucide. The spike chose
    module-private hosts instead, which needed no analyzer extension.
 6. **Gallery location.** The gallery story is `Components/Chart/Gallery`, not `Charts/Gallery`.
    The side-by-side comparison sheets live under `~/.artifacts/shadcn-design-system/release012-gallery/`.
 
-## Open decisions for the owner
+## Owner decisions (2026-10-04)
 
-1. **Token attribution of private parts.** Should the token analyzer be extended to attribute
-   module-private components' classes and token-valued attributes to the export that renders them?
-   Today Chart's contract under-reports its token use.
-2. **Opaque `data` and `series`.** The contract's structured type language has no object kind, so
-   these props are recorded as `typescript` types with their exact shapes. Two options:
-   - Canvas adds an authoring policy for them (recommended for now).
-   - A later release extends the type language with object and record kinds. Canvas's registry
-     would then need the same kinds.
-3. **Runtime-only combination rules.** The analyzers derive conditional APIs only from boolean
-   unions, and `hardConstraints` may only name capabilities. Rules such as "`valueKey` only for
-   donut and radial" are runtime facts, stated in knowledge and the handoff.
+1. **Token attribution of private parts: deferred.** The per-export token analyzer can't attribute
+   module-private components' styling to the export that renders them, so Chart's contract
+   under-reports its token use. The runtime tests already prove every colour comes from the chart
+   tokens, so extending the analyzer can wait.
+2. **Opaque `data` and `series`: Canvas side.** The contract's structured type language has no object
+   kind, so these props stay recorded as `typescript` types with their exact shapes. The owner adds
+   the Canvas authoring policy for them when adopting the release.
+3. **Runtime-only combination rules: accepted for this release.** The analyzers derive conditional
+   APIs only from boolean unions, and `hardConstraints` may only name capabilities. Rules such as
+   "`valueKey` only for donut and radial" stay runtime facts, stated in knowledge and the handoff.
+   On adoption, the owner will make Canvas refuse invalid combinations at write time, so agents get
+   a clear error instead of a broken chart.
+
+## Next release
+
+- **Radial centre total**, as the donut has: the owner pushed for it on 2026-10-04 as a polish item.
 
 ## Not included
 

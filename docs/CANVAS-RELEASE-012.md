@@ -5,9 +5,10 @@ amjed-fadul/shadcn-design-system#19. It is one closed `Chart` component for area
 and radial charts, behind a separate lazy entry. Tokens are unchanged, and every Release 011
 component renders as before. Releases 001–011 remain byte-for-byte unchanged.
 
-**Status: candidate, awaiting owner review.** The owner reviews the
-[gallery](RELEASE-012-CHART-GALLERY.md) and accepts or rejects the candidate. Canvas adoption is
-the owner's call.
+**Status: candidate under owner review; macOS release qualification requested.** On 2026-10-04
+the owner accepted the spec deviations and settled the contract decisions below. Candidate
+acceptance is still pending. Canvas adoption is the owner's call; see the
+[gallery](RELEASE-012-CHART-GALLERY.md).
 
 ## Exact distribution
 
@@ -108,8 +109,13 @@ exact shapes above. The producer validator reports an authored literal for eithe
 
 Canvas's registry already requires "an explicit Canvas authoring policy" for `typescript`-kind
 props. Chart needs one for `data` (rows of flat objects with string, number or null values) and
-`series` (`{ key: string; label: string }` items, 1–5). The combination rules above are runtime
-facts. The contract cannot express props that apply only to some chart types.
+`series` (`{ key: string; label: string }` items, 1–5). The owner decided on 2026-10-04 that this
+policy lives on the Canvas side, added on adoption.
+
+The combination rules above are runtime facts, because the contract cannot express props that apply
+only to some chart types. On adoption, the owner plans for Canvas to refuse invalid combinations at
+write time, so agents get a clear error instead of a broken chart. The `ChartPropsError` messages
+name each rule and can be reused as the error text.
 
 ## Waiting for a finished chart
 
