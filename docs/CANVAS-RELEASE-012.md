@@ -5,10 +5,13 @@ amjed-fadul/shadcn-design-system#19. It is one closed `Chart` component for area
 and radial charts, behind a separate lazy entry. Tokens are unchanged, and every Release 011
 component renders as before. Releases 001–011 remain byte-for-byte unchanged.
 
-**Status: candidate under owner review; macOS release qualification requested.** On 2026-10-04
-the owner accepted the spec deviations and settled the contract decisions below. Candidate
-acceptance is still pending. Canvas adoption is the owner's call; see the
-[gallery](RELEASE-012-CHART-GALLERY.md).
+**Status: accepted by the owner on 2026-10-04.** The owner accepted the spec deviations, settled
+the contract decisions below and accepted the candidate below. The manual macOS
+release-qualification run is in progress. Canvas can vendor the exact tarball. Canvas adoption is
+the owner's call; see the [gallery](RELEASE-012-CHART-GALLERY.md).
+
+The radial chart has no centre total in this release (the donut has one). It is tracked for the
+next release in amjed-fadul/shadcn-design-system#22.
 
 ## Exact distribution
 

@@ -13,11 +13,14 @@ contract ruling in [the spike](RELEASE-012-CHART-CONTRACT-SPIKE.md). The Canvas 
 [CANVAS-RELEASE-012](CANVAS-RELEASE-012.md). The visual review is the
 [gallery](RELEASE-012-CHART-GALLERY.md).
 
-**Status: candidate under owner review; macOS release qualification requested.**
-- **2026-10-04:** the owner accepted every spec deviation below and settled the three open
-  decisions (see "Owner decisions"). They then asked for the macOS release-qualification run.
-- **Not yet decided:** candidate acceptance is still pending. The producer does not tag or approve
-  the release.
+**Status: accepted by the owner on 2026-10-04; macOS release qualification running.**
+- **Decisions:** the owner accepted every spec deviation below and settled the three open decisions
+  (see "Owner decisions").
+- **Candidate:** the owner then accepted the candidate, tarball `fb14eef4…` (payload `23e77d97…`).
+- **Qualification:** the manual macOS `release-qualification` workflow is running on `36d79ca`
+  ([run 37168619153](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37168619153)).
+  Commits after the candidate's source `25c329f` change docs and test budgets only.
+- **Merge:** the owner merges.
 
 ## Changes
 
@@ -100,7 +103,8 @@ The owner accepted all six on 2026-10-04. The radial centre total moves to the n
 
 ## Next release
 
-- **Radial centre total**, as the donut has: the owner pushed for it on 2026-10-04 as a polish item.
+- **Radial centre total**, as the donut has: the owner pushed for it on 2026-10-04 as a polish
+  item. Tracked in amjed-fadul/shadcn-design-system#22.
 
 ## Not included
 
