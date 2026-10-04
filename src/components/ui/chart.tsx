@@ -1,15 +1,16 @@
 import * as React from "react"
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Label, Line, LineChart,
-  Pie, PieChart, RadialBar, RadialBarChart, Tooltip, XAxis, YAxis,
+  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart,
+  Pie, PieChart, PolarAngleAxis, RadialBar, RadialBarChart, Tooltip, XAxis, YAxis,
 } from "recharts"
 
 import { cn } from "@/lib/utils"
 import {
   createChartModel,
-  type ChartAspectRatio, type ChartCurve, type ChartLayout, type ChartModel,
-  type ChartOrientation, type ChartType, type ChartValueFormat,
+  type ChartAspectRatio, type ChartBarSize, type ChartCenterValue, type ChartCurve, type ChartLayout,
+  type ChartModel, type ChartOrientation, type ChartType, type ChartValueFormat,
 } from "@/components/ui/chart-model"
+import { estimateTextWidth, fitCenter } from "@/components/ui/chart-text"
 
 // Data and series are written out structurally, not through aliases, so the contract's
 // type text states the exact JSON shape an author supplies.
@@ -25,17 +26,22 @@ type ChartProps = {
   curve?: ChartCurve
   valueFormat?: ChartValueFormat
   currency?: string
+  locale?: string
   height?: number
   aspectRatio?: ChartAspectRatio
+  barSize?: ChartBarSize
+  valueMin?: number
+  valueMax?: number
   xAxis?: boolean
   yAxis?: boolean
   grid?: boolean
   legend?: boolean
   animation?: "auto" | "off"
+  centerValue?: ChartCenterValue
   centerLabel?: string
 }
 
-type ChartOptions = { xAxis: boolean; yAxis: boolean; grid: boolean; legend: boolean; animation: "auto" | "off"; centerLabel?: string }
+type ChartOptions = { xAxis: boolean; yAxis: boolean; grid: boolean; legend: boolean; animation: "auto" | "off" }
 
 // Series colours come only from the governed chart tokens, in slot order: the model
 // assigns var(--chart-1) to var(--chart-5) and marks use those values directly.
@@ -45,18 +51,26 @@ const SETTLED_FRAMES = 2
 const MAX_SETTLE_FRAMES = 180
 const RATIOS: Record<ChartAspectRatio, number> = { "16/9": 16 / 9, "4/3": 4 / 3, "1/1": 1, "2/1": 2 }
 const AXIS_TICK = { className: "text-xs tabular-nums", fill: "var(--muted-foreground)" }
-// Label room comes from the longest label at the 12px tick size (a generous 0.63em per
-// glyph), so it is deterministic in headless capture and never waits for the web font.
+const TICK_PX = 12
 // Recharts offsets each tick label by its tick size (6) and tick margin (8) even with
 // tick lines off.
-const TICK_GLYPH_PX = 7.6
 const TICK_OFFSET_PX = 6 + 8
 const TICK_SLACK_PX = 2
 const EDGE_PX = 8
-const VALUE_TICK_COUNT = 5
+// Recharts' defaults for the band and group geometry the bar packing repeats.
+const BAR_CATEGORY_GAP = 0.1
+const BAR_GAP_PX = 4
+const X_AXIS_HEIGHT_PX = 30
+const BAR_MAX_PX: Record<ChartBarSize, number> = { sm: 12, md: 24, lg: 40 }
+// Recharts' default polar margin, passed explicitly so the hole radius is computed exactly.
+const POLAR_MARGIN_PX = 5
+const DONUT_INNER = 0.6
+const RADIAL_INNER = 0.5
 
+// Label room comes from the per-character estimate at semibold width, a generous budget
+// for the regular-weight ticks, so it never waits for the web font.
 function labelWidth(labels: readonly string[]): number {
-  return Math.ceil(Math.max(0, ...labels.map((label) => label.length)) * TICK_GLYPH_PX)
+  return Math.ceil(Math.max(0, ...labels.map((label) => estimateTextWidth(label, TICK_PX, "semibold"))))
 }
 
 function axisWidth(labels: readonly string[]): number {
@@ -66,24 +80,6 @@ function axisWidth(labels: readonly string[]): number {
 // Room for a label centred on the plot edge, as the first and last ticks are.
 function edgeRoom(labels: readonly string[]): number {
   return Math.max(EDGE_PX, Math.ceil(labelWidth(labels) / 2) + TICK_SLACK_PX)
-}
-
-// The value ticks are chosen here at nice steps (1, 2, 2.5 or 5 times a power
-// of ten), so the axis is sized from exactly the labels it draws.
-function valueTicks(model: ChartModel): number[] {
-  const [min, max] = valueExtent(model)
-  const raw = (max - min || 1) / (VALUE_TICK_COUNT - 1)
-  const power = 10 ** Math.floor(Math.log10(raw))
-  const step = ([1, 2, 2.5, 5].find((nice) => raw <= nice * power) ?? 10) * power
-  const first = Math.floor(min / step)
-  const last = Math.max(Math.ceil(max / step), first + 1)
-  return Array.from({ length: last - first + 1 }, (_, index) => Number(((first + index) * step).toPrecision(12)))
-}
-
-function valueExtent(model: ChartModel): [number, number] {
-  const rows = model.data.map((datum) => model.series.map((series) => (typeof datum[series.key] === "number" ? (datum[series.key] as number) : 0)))
-  const totals = model.layout === "stacked" ? rows.map((row) => row.reduce((sum, value) => sum + value, 0)) : rows.flat()
-  return [Math.min(0, ...totals), Math.max(0, ...totals)]
 }
 
 function markGeometry(plot: HTMLElement | null): string {
@@ -132,6 +128,29 @@ function ChartLegendContent({ model }: { model: ChartModel }) {
   )
 }
 
+// The centre total, fitted to the hole: its size is one of the contract's font-size tokens, chosen
+// by a deterministic estimate, and it is left out rather than drawn over the ring.
+function ChartCenter({ model, width, height, inner }: { model: ChartModel; width: number; height: number; inner: number }) {
+  if (model.centerValue !== "total") return null
+  const total = model.total ?? 0
+  const radius = inner * ((Math.min(width, height) - 2 * POLAR_MARGIN_PX) / 2)
+  const layout = fitCenter({ full: model.format(total), compact: model.formatCompact(total), caption: model.centerLabel, radius })
+  if (!layout) return null
+  const cx = width / 2
+  const cy = height / 2
+  return (
+    <g data-slot="chart-center" aria-hidden>
+      <text
+        x={cx} y={cy + layout.valueY} textAnchor="middle" dominantBaseline="central"
+        className={cn("fill-foreground font-semibold tabular-nums", layout.size === "2xl" ? "text-2xl" : layout.size === "xl" ? "text-xl" : layout.size === "lg" ? "text-lg" : layout.size === "base" ? "text-base" : "text-sm")}
+      >
+        {layout.value}
+      </text>
+      {layout.caption ? <text x={cx} y={cy + layout.captionY!} textAnchor="middle" dominantBaseline="central" className="fill-muted-foreground text-xs">{layout.caption}</text> : null}
+    </g>
+  )
+}
+
 type ChartPlotProps = { model: ChartModel; options: ChartOptions; width: number; height: number; animate: boolean; signature: string }
 
 function ChartPlotContent({ model, options, width, height, animate }: ChartPlotProps) {
@@ -140,35 +159,83 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
   // Recharts' onAnimationEnd also fires on effect cleanup, so it is not a finished signal.
   const animation = { isAnimationActive: animate, animationBegin: 0, animationDuration: ANIMATION_MS }
   const tooltip = <Tooltip cursor={model.type === "bar" ? { fill: "var(--muted)" } : { stroke: "var(--border)" }} content={<ChartTooltipContent model={model} />} />
+  const valueKey = model.valueKey!
+  const polarMargin = { top: POLAR_MARGIN_PX, right: POLAR_MARGIN_PX, bottom: POLAR_MARGIN_PX, left: POLAR_MARGIN_PX }
+
+  if (model.type === "donut") {
+    return (
+      <PieChart width={width} height={height} margin={polarMargin} accessibilityLayer>
+        {tooltip}
+        <Pie
+          data={model.data as Record<string, unknown>[]} dataKey={valueKey} nameKey={model.categoryKey}
+          innerRadius={`${DONUT_INNER * 100}%`} outerRadius="80%" paddingAngle={2} cornerRadius={4} stroke="var(--card)" strokeWidth={2} rootTabIndex={-1} {...animation}
+        >
+          {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
+        </Pie>
+        <ChartCenter model={model} width={width} height={height} inner={DONUT_INNER} />
+      </PieChart>
+    )
+  }
+  if (model.type === "radial") {
+    // The angle axis spans the total, so each ring sweeps its share and the full circle is the total.
+    return (
+      <RadialBarChart width={width} height={height} margin={polarMargin} data={model.data as Record<string, unknown>[]} innerRadius={`${RADIAL_INNER * 100}%`} outerRadius="100%" accessibilityLayer>
+        <PolarAngleAxis type="number" domain={[0, model.total ?? 0]} tick={false} axisLine={false} />
+        {tooltip}
+        <RadialBar dataKey={valueKey} cornerRadius={4} background={{ fill: "var(--muted)" }} {...animation}>
+          {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
+        </RadialBar>
+        <ChartCenter model={model} width={width} height={height} inner={RADIAL_INNER} />
+      </RadialBarChart>
+    )
+  }
+
+  const scale = model.valueScale!
   const stacked = model.layout === "stacked"
   const horizontal = model.type === "bar" && model.orientation === "horizontal"
   const grid = options.grid ? <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" strokeOpacity={0.5} vertical={horizontal} horizontal={!horizontal} /> : null
-  const ticks = valueTicks(model)
-  const valueLabels = ticks.map(model.formatTick)
   const categoryLabels = model.table.rows.map((row) => row[0])
   const categoryAxis = { dataKey: model.categoryKey, tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK }
-  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.formatTick, ticks, domain: [ticks[0], ticks[ticks.length - 1]], interval: 0 as const }
+  // The chart chooses the domain and ticks itself, so Recharts must not widen the domain past them.
+  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.formatTick, ticks: scale.ticks, domain: scale.domain, allowDataOverflow: true, interval: 0 as const }
+  const categoryAxisWidth = axisWidth(categoryLabels)
+  const valueAxisWidth = axisWidth(scale.labels)
   const xAxis = horizontal
     ? <XAxis type="number" {...valueAxis} hide={!options.xAxis} />
     : <XAxis type="category" {...categoryAxis} hide={!options.xAxis} />
   const yAxis = horizontal
-    ? <YAxis type="category" {...categoryAxis} width={axisWidth(categoryLabels)} hide={!options.yAxis} />
-    : <YAxis type="number" {...valueAxis} width={axisWidth(valueLabels)} hide={!options.yAxis} />
+    ? <YAxis type="category" {...categoryAxis} width={categoryAxisWidth} hide={!options.yAxis} />
+    : <YAxis type="number" {...valueAxis} width={valueAxisWidth} hide={!options.yAxis} />
   // Area and line charts put the first and last category on the plot edges; a horizontal
   // bar chart puts its first and last value ticks there.
-  const edgeLabels = horizontal ? valueLabels : model.type === "bar" ? [] : categoryLabels
-  const margin = { top: EDGE_PX, right: edgeRoom(edgeLabels), bottom: options.xAxis ? 0 : EDGE_PX, left: options.yAxis ? 0 : edgeRoom(horizontal ? valueLabels.slice(0, 1) : edgeLabels) }
+  const edgeLabels = horizontal ? scale.labels : model.type === "bar" ? [] : categoryLabels
+  const margin = { top: EDGE_PX, right: edgeRoom(edgeLabels), bottom: options.xAxis ? 0 : EDGE_PX, left: options.yAxis ? 0 : edgeRoom(horizontal ? scale.labels.slice(0, 1) : edgeLabels) }
   const chart = { width, height, data: model.data as Record<string, unknown>[], accessibilityLayer: true, margin }
   const last = model.series.length - 1
 
   if (model.type === "bar") {
+    const cap = BAR_MAX_PX[model.barSize ?? "md"]
+    // Recharts centres a capped bar in its uncapped slot, which pushes grouped bars apart. For
+    // grouped bars the size is the cap or the automatic slot, whichever is smaller, so each
+    // group stays packed with the 4px bar gap. A slightly high estimate is safe: Recharts
+    // shrinks bars that would overflow their band.
+    let groupedSize: number | undefined
+    if (!stacked && model.series.length > 1) {
+      const plot = horizontal
+        ? height - margin.top - margin.bottom - (options.xAxis ? X_AXIS_HEIGHT_PX : 0)
+        : width - margin.left - margin.right - (options.yAxis ? valueAxisWidth : 0)
+      const band = plot / Math.max(1, model.data.length)
+      const slot = (band * (1 - 2 * BAR_CATEGORY_GAP) - (model.series.length - 1) * BAR_GAP_PX) / model.series.length
+      groupedSize = Math.max(1, Math.floor(Math.min(cap, slot)))
+    }
     // In a stack, a card-coloured stroke leaves a 2px surface gap between segments.
     return (
-      <BarChart {...chart} layout={horizontal ? "vertical" : "horizontal"}>
+      <BarChart {...chart} layout={horizontal ? "vertical" : "horizontal"} barGap={BAR_GAP_PX} barSize={groupedSize}>
         {grid}{xAxis}{yAxis}{tooltip}
         {model.series.map((series, index) => (
           <Bar
             key={series.key} dataKey={series.key} name={series.label} fill={series.color}
+            maxBarSize={groupedSize === undefined ? cap : undefined}
             stroke={stacked ? "var(--card)" : undefined} strokeWidth={stacked ? 2 : undefined}
             stackId={stacked ? "stack" : undefined} {...animation}
             radius={stacked && index !== last ? 0 : horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
@@ -199,51 +266,17 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
       </AreaChart>
     )
   }
-  if (model.type === "line") {
-    return (
-      <LineChart {...chart}>
-        {grid}{xAxis}{yAxis}{tooltip}
-        {model.series.map((series, index) => (
-          <Line
-            key={series.key} dataKey={series.key} name={series.label} type={model.curve}
-            stroke={series.color} strokeWidth={2} dot={false}
-            activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation}
-          />
-        ))}
-      </LineChart>
-    )
-  }
-  const valueKey = model.valueKey!
-  if (model.type === "donut") {
-    return (
-      <PieChart width={width} height={height} accessibilityLayer>
-        {tooltip}
-        <Pie
-          data={model.data as Record<string, unknown>[]} dataKey={valueKey} nameKey={model.categoryKey}
-          innerRadius="60%" outerRadius="80%" paddingAngle={2} cornerRadius={4} stroke="var(--card)" strokeWidth={2} rootTabIndex={-1} {...animation}
-        >
-          {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
-          <Label
-            position="center"
-            content={() => (
-              // The legend renders outside the plot, so the pie centre is the plot centre.
-              <text x={width / 2} y={height / 2} textAnchor="middle" dominantBaseline="middle">
-                <tspan x={width / 2} dy={options.centerLabel ? "-0.4em" : 0} className="fill-foreground text-2xl font-semibold">{model.format(model.total ?? 0)}</tspan>
-                {options.centerLabel ? <tspan x={width / 2} dy="1.6em" className="fill-muted-foreground text-xs">{options.centerLabel}</tspan> : null}
-              </text>
-            )}
-          />
-        </Pie>
-      </PieChart>
-    )
-  }
   return (
-    <RadialBarChart width={width} height={height} data={model.data as Record<string, unknown>[]} innerRadius="30%" outerRadius="100%" accessibilityLayer>
-      {tooltip}
-      <RadialBar dataKey={valueKey} cornerRadius={4} background={{ fill: "var(--muted)" }} {...animation}>
-        {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
-      </RadialBar>
-    </RadialBarChart>
+    <LineChart {...chart}>
+      {grid}{xAxis}{yAxis}{tooltip}
+      {model.series.map((series) => (
+        <Line
+          key={series.key} dataKey={series.key} name={series.label} type={model.curve}
+          stroke={series.color} strokeWidth={2} dot={false}
+          activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation}
+        />
+      ))}
+    </LineChart>
   )
 }
 
@@ -254,9 +287,10 @@ const ChartPlot = React.memo(ChartPlotContent, (previous, next) => previous.sign
 function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptions }) {
   const plotRef = React.useRef<HTMLDivElement>(null)
   const [width, setWidth] = React.useState(0)
-  // Ready belongs to what was drawn: any change to the plot size, type, options, series or
-  // data starts a new drawing, so a screenshot never captures a chart mid-animation.
-  const signature = JSON.stringify([width, options, model.type, model.layout, model.orientation, model.curve, model.valueFormat, model.size, model.series, model.table])
+  // Ready belongs to what was drawn: the signature covers the plot width, every option and
+  // every model field (formatters aside), so any change starts a new drawing and a screenshot
+  // never captures a chart mid-animation.
+  const signature = JSON.stringify([width, options, model], (_key, value: unknown) => (typeof value === "function" ? undefined : value))
   const [drawnSignature, setDrawnSignature] = React.useState<string | null>(null)
   const drawn = drawnSignature === signature
   const animate = options.animation === "auto" && !model.empty && !prefersReducedMotion()
@@ -338,12 +372,15 @@ function ChartDescription({ id, model }: { id: string; model: ChartModel }) {
 }
 
 function Chart({
-  type, title, data, categoryKey, series, valueKey, layout, orientation, curve, valueFormat, currency,
-  height, aspectRatio, xAxis = true, yAxis = true, grid = true, legend, animation = "auto", centerLabel,
+  type, title, data, categoryKey, series, valueKey, layout, orientation, curve, valueFormat, currency, locale = "en-US",
+  height, aspectRatio, barSize, valueMin, valueMax, xAxis = true, yAxis = true, grid = true, legend, animation = "auto", centerValue, centerLabel,
 }: ChartProps) {
-  const model = createChartModel({ type, title, data, categoryKey, series, valueKey, layout, orientation, curve, valueFormat, currency, height, aspectRatio })
+  const model = createChartModel({
+    type, title, data, categoryKey, series, valueKey, layout, orientation, curve, valueFormat, currency, locale,
+    height, aspectRatio, barSize, valueMin, valueMax, xAxis, yAxis, grid, legend, animation, centerValue, centerLabel,
+  })
   const descriptionId = React.useId()
-  const options: ChartOptions = { xAxis, yAxis, grid, legend: legend ?? model.series.length > 1, animation, centerLabel }
+  const options: ChartOptions = { xAxis, yAxis, grid, legend: legend ?? model.series.length > 1, animation }
 
   return (
     <figure data-slot="chart" data-chart-type={type} aria-label={title} aria-describedby={descriptionId} className="m-0 flex w-full flex-col">

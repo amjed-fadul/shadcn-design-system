@@ -1,12 +1,12 @@
 import { describe, expect, test } from "vitest"
 
-import { CENTER_SIZE_PX, estimateTextWidth, fitCenter, type CenterLayout } from "../src/components/ui/chart-text"
+import { CENTER_SIZE_PX, estimateTextWidth, fitCenter, type CenterLayout, type TextWeight } from "../src/components/ui/chart-text"
 
 // Re-checks a layout against the hole: every line's half-width plus padding must sit inside the chord at
 // its farthest vertical edge.
 function fits(layout: CenterLayout, radius: number): boolean {
-  const lines = [{ text: layout.value, px: CENTER_SIZE_PX[layout.size], y: layout.valueY, weight: "semibold" as const }]
-  if (layout.caption) lines.push({ text: layout.caption, px: 12, y: layout.captionY!, weight: "regular" as const })
+  const lines: Array<{ text: string; px: number; y: number; weight: TextWeight }> = [{ text: layout.value, px: CENTER_SIZE_PX[layout.size], y: layout.valueY, weight: "semibold" }]
+  if (layout.caption) lines.push({ text: layout.caption, px: 12, y: layout.captionY!, weight: "regular" })
   return lines.every((line) => {
     const edge = Math.abs(line.y) + (line.px * 0.8) / 2
     return edge < radius && estimateTextWidth(line.text, line.px, line.weight) / 2 + 2 <= Math.sqrt(radius ** 2 - edge ** 2)
