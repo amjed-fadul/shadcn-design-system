@@ -232,6 +232,13 @@ describe("Chart", () => {
     expect([...container.querySelectorAll(".recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value")].map((tick) => tick.textContent)).toEqual(["$30K", "$35K", "$40K", "$45K", "$50K"])
   })
 
+  test("draws a sparkline edge to edge when both axes are hidden", () => {
+    render({ type: "area", title: "Weekly revenue", data: revenue, categoryKey: "month", series: [{ key: "thisYear", label: "2026" }], valueMin: 40000, xAxis: false, yAxis: false, grid: false, legend: false, height: 60, animation: "off" })
+    resize(240)
+    // Only the 8px edge margin is reserved: no room for category labels that are not drawn.
+    expect(container.querySelector(".recharts-area-curve")?.getAttribute("d")).toMatch(/^M8,/)
+  })
+
   test("formats ticks in the chart's locale, and in en-US by default", () => {
     const ticks = () => [...container.querySelectorAll(".recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value")].map((tick) => tick.textContent)
     render({ ...barProps, locale: "de-DE", animation: "off" })

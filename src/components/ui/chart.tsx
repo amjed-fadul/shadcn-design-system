@@ -207,9 +207,10 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
     ? <YAxis type="category" {...categoryAxis} width={categoryAxisWidth} hide={!options.yAxis} />
     : <YAxis type="number" {...valueAxis} width={valueAxisWidth} hide={!options.yAxis} />
   // Area and line charts put the first and last category on the plot edges; a horizontal
-  // bar chart puts its first and last value ticks there.
-  const edgeLabels = horizontal ? scale.labels : model.type === "bar" ? [] : categoryLabels
-  const margin = { top: EDGE_PX, right: edgeRoom(edgeLabels), bottom: options.xAxis ? 0 : EDGE_PX, left: options.yAxis ? 0 : edgeRoom(horizontal ? scale.labels.slice(0, 1) : edgeLabels) }
+  // bar chart puts its first and last value ticks there. Both are x-axis labels, so a hidden
+  // x-axis needs only the plain edge margin (a sparkline runs edge to edge).
+  const edgeLabels = !options.xAxis ? [] : horizontal ? scale.labels : model.type === "bar" ? [] : categoryLabels
+  const margin = { top: EDGE_PX, right: edgeRoom(edgeLabels), bottom: options.xAxis ? 0 : EDGE_PX, left: options.yAxis ? 0 : edgeRoom(horizontal ? edgeLabels.slice(0, 1) : edgeLabels) }
   const chart = { width, height, data: model.data as Record<string, unknown>[], accessibilityLayer: true, margin }
   const last = model.series.length - 1
 

@@ -50,6 +50,13 @@ function smallerStep(step: number): number {
   return index > 0 ? NICE_FACTORS[index - 1] * power : 5 * (power / 10)
 }
 
+function largerStep(step: number): number {
+  const power = 10 ** Math.floor(Math.log10(step) + EPSILON)
+  const factor = normalize(step / power)
+  const index = NICE_FACTORS.indexOf(factor)
+  return index >= 0 && index < NICE_FACTORS.length - 1 ? NICE_FACTORS[index + 1] * power : 10 * power
+}
+
 function multiples(low: number, high: number, step: number): number[] {
   const first = Math.ceil(low / step - EPSILON)
   const last = Math.floor(high / step + EPSILON)
@@ -65,20 +72,33 @@ export function valueScale(extent: readonly [number, number], bounds: { min?: nu
   const spanLow = bounds.min ?? extent[0]
   const spanHigh = bounds.max ?? extent[1]
   const width = spanHigh - spanLow
-  let step = niceStep((width > 0 ? width : Math.abs(spanHigh) || 1) / 4)
-  let low = bounds.min ?? normalize(Math.floor(spanLow / step + EPSILON) * step)
-  let high = bounds.max ?? normalize(Math.ceil(spanHigh / step - EPSILON) * step)
-  if (high <= low) {
-    if (bounds.max === undefined) high = normalize(low + step)
-    else low = normalize(high - step)
+  const build = (initial: number): ValueScale => {
+    let step = initial
+    let low = bounds.min ?? normalize(Math.floor(spanLow / step + EPSILON) * step)
+    let high = bounds.max ?? normalize(Math.ceil(spanHigh / step - EPSILON) * step)
+    if (high <= low) {
+      if (bounds.max === undefined) high = normalize(low + step)
+      else low = normalize(high - step)
+    }
+    let ticks = multiples(low, high, step)
+    for (let shrink = 0; ticks.length < 2 && shrink < MAX_STEP_SHRINKS; shrink += 1) {
+      step = smallerStep(step)
+      ticks = multiples(low, high, step)
+    }
+    return { domain: [low, high], ticks: ticks.length < 2 ? [low, high] : ticks }
   }
-  let ticks = multiples(low, high, step)
-  for (let shrink = 0; ticks.length < 2 && shrink < MAX_STEP_SHRINKS; shrink += 1) {
-    step = smallerStep(step)
-    ticks = multiples(low, high, step)
+  const step = niceStep((width > 0 ? width : Math.abs(spanHigh) || 1) / 4)
+  const scale = build(step)
+  // An explicit bound is the plot edge; when the computed step leaves it unlabelled, a neighbouring
+  // nice step that makes it a tick is preferred, as long as it keeps 2 to 6 ticks.
+  const explicit = [bounds.min, bounds.max].filter((bound): bound is number => bound !== undefined && bound !== 0)
+  const labels = (candidate: number) => explicit.every((bound) => Math.abs(bound / candidate - Math.round(bound / candidate)) < 1e-6)
+  if (explicit.length === 0 || labels(step)) return scale
+  for (const neighbour of [largerStep(step), smallerStep(step)]) {
+    const candidate = build(neighbour)
+    if (labels(neighbour) && candidate.ticks.length >= 2 && candidate.ticks.length <= 6) return candidate
   }
-  if (ticks.length < 2) ticks = [low, high]
-  return { domain: [low, high], ticks }
+  return scale
 }
 
 function formatter(format: ScaleFormat, options: Intl.NumberFormatOptions, numberingSystem?: string): Intl.NumberFormat {

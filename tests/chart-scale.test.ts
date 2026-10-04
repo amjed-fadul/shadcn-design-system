@@ -30,6 +30,12 @@ describe("valueScale", () => {
     expect(valueScale([31000, 48000], { min: 30000 })).toEqual({ domain: [30000, 50000], ticks: [30000, 35000, 40000, 45000, 50000] })
   })
 
+  test("prefers a neighbouring nice step that labels an explicit bound", () => {
+    // 25000 is not a multiple of the computed 20000 step, but it is of the next step up.
+    expect(valueScale([0, 72000], { min: 25000 })).toEqual({ domain: [25000, 75000], ticks: [25000, 50000, 75000] })
+    expect(valueScale([0, 0.5], { max: 0.75 })).toEqual({ domain: [0, 0.75], ticks: [0, 0.25, 0.5, 0.75] })
+  })
+
   test("moves a free bound one step beyond an explicit bound it would equal", () => {
     expect(valueScale([30000, 30000], { min: 30000 })).toEqual({ domain: [30000, 40000], ticks: [30000, 40000] })
     expect(valueScale([-40000, -40000], { max: -40000 })).toEqual({ domain: [-50000, -40000], ticks: [-50000, -40000] })
@@ -38,7 +44,7 @@ describe("valueScale", () => {
   test("uses explicit bounds as the domain edges and keeps exact fractional bounds", () => {
     expect(valueScale([0, 0.25], { max: 0.3 })).toEqual({ domain: [0, 0.3], ticks: [0, 0.1, 0.2, 0.3] })
     expect(valueScale([0, 0.5], { max: 0.6 }).ticks).toEqual([0, 0.2, 0.4, 0.6])
-    // 0.7 is not a multiple of the 0.2 step, so it is the unlabelled plot edge.
+    // 0.7 is a multiple of no neighbouring nice step, so it is the unlabelled plot edge.
     expect(valueScale([0, 0.5], { max: 0.7 })).toEqual({ domain: [0, 0.7], ticks: [0, 0.2, 0.4, 0.6] })
     expect(valueScale([0, 1], { max: 1.1 }).domain).toEqual([0, 1.1])
   })

@@ -33,15 +33,23 @@ const charts: Record<string, ChartProps> = {
   line: { ...cartesian, type: "line", curve: "step" },
   donut: { ...partToWhole, type: "donut", centerLabel: "Customers" },
   radial: { ...partToWhole, type: "radial" },
+  // Release 013 variants.
+  "radial-total": { ...partToWhole, type: "radial", centerLabel: "Customers" },
+  "donut-currency": { ...partToWhole, type: "donut", title: "Revenue by plan", data: plans.map((row) => ({ ...row, customers: row.customers * 1987 })), valueFormat: "currency", currency: "USD", centerLabel: "Revenue" },
+  "bar-lg": { ...cartesian, type: "bar", barSize: "lg" },
+  "line-raised": { ...cartesian, type: "line", valueMin: 25000 },
+  sparkline: { ...cartesian, type: "area", series: [yearSeries[0]], valueMin: 40000, xAxis: false, yAxis: false, grid: false, legend: false, height: 60 },
+  "bar-de": { ...cartesian, type: "bar", locale: "de-DE", currency: "EUR" },
 }
 
 const query = new URLSearchParams(location.search)
 document.documentElement.classList.toggle("dark", query.get("theme") === "dark")
 const props = charts[query.get("kind") ?? "bar"]
+const width = Number(query.get("width") ?? 480)
 
 createRoot(document.getElementById("root")!).render(
   <div className="min-h-screen bg-background p-6">
-    <div id="frame" className="w-[480px] rounded-xl border bg-card p-6">
+    <div id="frame" className="rounded-xl border bg-card p-6" style={{ width }}>
       <React.Suspense fallback={null}><Chart {...props} /></React.Suspense>
     </div>
   </div>,
