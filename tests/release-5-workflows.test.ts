@@ -88,7 +88,7 @@ describe("release-wide CI workflow gates", () => {
     expect(source).toContain("group: baseline-${{ github.event.pull_request.number || github.ref }}")
     expect(source).toContain("cancel-in-progress: ${{ github.event_name == 'pull_request' }}")
     for (const command of ["npm ci --ignore-scripts", "npm run typecheck", "npm audit --omit=dev", "npm audit"]) expect(source).toContain(command)
-    for (const file of ["canonical-release-r12-binding", "component-contract-schema", "token-contract-schema", "token-contract-index", "release009-preservation", "historical-artifacts", "release-5-workflows"]) expect(source).toContain(`tests/${file}.test.ts`)
+    for (const file of ["canonical-release-r13-binding", "component-contract-schema", "token-contract-schema", "token-contract-index", "release009-preservation", "historical-artifacts", "release-5-workflows"]) expect(source).toContain(`tests/${file}.test.ts`)
     for (const command of ["playwright install", "npm run build", "npm run test-storybook", "npm run build-storybook", "Provision retained release artifacts"]) expect(source).not.toContain(command)
     expect(source).not.toMatch(/run:\s+npm run test\s*\n/)
   })
