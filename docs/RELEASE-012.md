@@ -13,13 +13,13 @@ contract ruling in [the spike](RELEASE-012-CHART-CONTRACT-SPIKE.md). The Canvas 
 [CANVAS-RELEASE-012](CANVAS-RELEASE-012.md). The visual review is the
 [gallery](RELEASE-012-CHART-GALLERY.md).
 
-**Status: accepted by the owner on 2026-10-04; macOS release qualification running.**
+**Status: accepted by the owner on 2026-10-04, and qualified; ready to merge.**
 - **Decisions:** the owner accepted every spec deviation below and settled the three open decisions
   (see "Owner decisions").
 - **Candidate:** the owner then accepted the candidate, tarball `fb14eef4…` (payload `23e77d97…`).
-- **Qualification:** the manual macOS `release-qualification` workflow is running on `36d79ca`
-  ([run 37168619153](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37168619153)).
-  Commits after the candidate's source `25c329f` change docs and test budgets only.
+- **Qualification:** the manual macOS `release-qualification` workflow passed every step on
+  `36d79ca` ([run 37168619153](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37168619153)). Commits after the candidate's source `25c329f` change docs and test budgets
+  only.
 - **Merge:** the owner merges.
 
 ## Changes
@@ -170,8 +170,17 @@ unless noted.
     others);
   - the packaged stylesheet carries every class the chart uses.
 - **`npm audit`:** full and production audits found 0 vulnerabilities.
-- **Not yet run:** the PR checks run on the draft PR. The manual macOS `release-qualification`
-  workflow waits for the owner, as it did for Release 011.
+- **macOS release qualification:** passed on `36d79ca` ([run 37168619153](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37168619153)), on GitHub's macOS runner with
+  Node 22.18.0.
+  - Typecheck passed. The unit suite passed all 124 files and 1,753 tests, including every
+    `package-identity` test within the new budgets.
+  - `npm run build` passed. Storybook passed all 44 files and 242 tests, and `build-storybook`
+    passed.
+  - The production and full audits found 0 vulnerabilities.
+  - `release:verify` accepted payload `23e77d97…`.
+  - A fresh `candidate:generate` on the runner, checked by `candidate:verify` against the committed
+    manifest, matched all 61 packed files with no expectations refreshed. A second machine therefore
+    reproduces the candidate byte for byte.
 
 ## Build location
 
