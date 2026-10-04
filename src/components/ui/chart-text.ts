@@ -14,7 +14,9 @@ export const CAPTION_PX = 12
 
 const SIZES: readonly CenterSize[] = ["2xl", "xl", "lg", "base", "sm"]
 const FULL_SIZES: readonly CenterSize[] = ["2xl", "xl", "lg", "base"]
-const LINE_BOX = 0.8
+// Geist's SVG text box (ascent plus descent, centred on the central baseline) is 1.167 em tall, so
+// each line's box is that tall and a fitted line's box corners stay inside the hole.
+const LINE_BOX = 1.17
 const CAPTION_GAP = 0.25
 const PADDING_PX = 2
 const REGULAR_FACTOR = 0.95

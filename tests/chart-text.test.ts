@@ -8,7 +8,7 @@ function fits(layout: CenterLayout, radius: number): boolean {
   const lines: Array<{ text: string; px: number; y: number; weight: TextWeight }> = [{ text: layout.value, px: CENTER_SIZE_PX[layout.size], y: layout.valueY, weight: "semibold" }]
   if (layout.caption) lines.push({ text: layout.caption, px: 12, y: layout.captionY!, weight: "regular" })
   return lines.every((line) => {
-    const edge = Math.abs(line.y) + (line.px * 0.8) / 2
+    const edge = Math.abs(line.y) + (line.px * 1.17) / 2
     return edge < radius && estimateTextWidth(line.text, line.px, line.weight) / 2 + 2 <= Math.sqrt(radius ** 2 - edge ** 2)
   })
 }
@@ -48,10 +48,10 @@ describe("fitCenter", () => {
   })
 
   test("keeps the caption at a smaller size when that fits, and drops it only when nothing fits with it", () => {
-    const withCaption = fitCenter({ full: "1,130", compact: "1.1K", caption: "Customers", radius: 38 })
+    const withCaption = fitCenter({ full: "1,130", compact: "1.1K", caption: "Customers", radius: 42 })
     expect(withCaption).toMatchObject({ caption: "Customers", value: "1,130" })
     expect(withCaption!.size).not.toBe("2xl")
-    expect(fits(withCaption!, 38)).toBe(true)
+    expect(fits(withCaption!, 42)).toBe(true)
     const crowded = fitCenter({ full: "1,130", compact: "1.1K", caption: "Customers this quarter", radius: 30 })!
     expect(crowded.caption).toBeUndefined()
     expect(fits(crowded, 30)).toBe(true)
