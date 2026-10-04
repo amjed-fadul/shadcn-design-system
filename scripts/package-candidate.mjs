@@ -34,13 +34,13 @@ function toolchain() {
   return { node, npm, platform: process.platform, arch: process.arch, tools }
 }
 function packBuild() {
-  const stage = mkdtempSync(path.join(tmpdir(), "release-011-build-"))
+  const stage = mkdtempSync(path.join(tmpdir(), "release-012-build-"))
   try {
-    // The full pinned declaration and contract graph exceeds Node's default
-    // 4 GB heap during a fresh package build; keep the verifier reproducible.
-    // Since Release 010 the producer phase retains about 3 GB while Vite bundles
-    // the release data, so 6 GB no longer fits reliably; 8 GB leaves headroom.
-    execFileSync(process.execPath, ["--max-old-space-size=8192", path.join(root, "scripts/build-library.mjs"), "--out-dir", path.join(stage, "dist-library")], { cwd: root, stdio: "pipe", timeout: 180_000, maxBuffer: 16 * 1024 * 1024 })
+    // Loading the pinned declaration and contract graph keeps the build's live
+    // heap near 3.2 GB, too close to Node's default 4 GB for a reproducible
+    // verifier. build-library.mjs releases that graph before Vite runs, so 6 GB
+    // leaves headroom.
+    execFileSync(process.execPath, ["--max-old-space-size=6144", path.join(root, "scripts/build-library.mjs"), "--out-dir", path.join(stage, "dist-library")], { cwd: root, stdio: "pipe", timeout: 180_000, maxBuffer: 16 * 1024 * 1024 })
     for (const file of readdirSync(root)) if (file === "package.json" || /^(README|LICEN[CS]E|COPYING)(\.|$)/i.test(file)) cpSync(path.join(root, file), path.join(stage, file))
     const result = JSON.parse(execFileSync("npm", ["pack", "--ignore-scripts", "--json"], { cwd: stage, encoding: "utf8", timeout: 60_000, maxBuffer: 16 * 1024 * 1024 }))[0]
     const bytes = readFileSync(path.join(stage, result.filename))
@@ -50,10 +50,10 @@ function packBuild() {
   } finally { rmSync(stage, { recursive: true, force: true }) }
 }
 function candidateRelease(expectedSha256) {
-  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-011.json")
+  const releasePath = path.join(root, "provenance/releases/shadcn-radix-release-012.json")
   const raw = JSON.parse(readFileSync(releasePath, "utf8"))
   const expectedProjection = projectionApi.projectExecutableContract({ componentContracts: componentAuthority.loadComponentContracts(), tokenContract: tokenAuthority.getTokenContract() })
-  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-011", requirePackageIdentity: true })
+  const release = releaseApi.loadExecutableRelease(raw, { expectedProjection, expectedReleaseId: "shadcn-radix-release-012", requirePackageIdentity: true })
   if (expectedSha256 !== undefined && release.sha256 !== expectedSha256) throw new Error("RELEASE_ANCHOR_MISMATCH")
   if (JSON.stringify(release.packageIdentity) !== JSON.stringify(identity.packageIdentity(root))) throw new Error("PACKAGE_IDENTITY_MISMATCH")
   identity.verifyImplementationManifest(root, release.implementationInputs)

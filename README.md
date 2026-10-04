@@ -4,7 +4,20 @@ Canonical governed shadcn design system for Agentic Design Canvas product work.
 
 This repository is separate from Canvas. The official shadcn repository is upstream/reference only; Canvas will eventually consume immutable contracted releases from this repository.
 
-## Active producer: Release 011 candidate
+## Active producer: Release 012 candidate
+
+Release 012 (`0.0.0-release.12`) adds the governed chart family requested in #19, plus the producer build-memory fix. Tokens are unchanged (`shadcn-radix-token-contract-003`, 90 tokens).
+
+- **Chart:** one closed component for area, bar, line, donut and radial charts. It takes data, keys and named options only: no function props, no `className` or `style`, and no Recharts props.
+- **Colours:** series use `chart-1` to `chart-5` in slot order; five series at most.
+- **Lazy entry:** `@adc/shadcn-design-system/charts` carries Recharts 3.8.1 (bundled), so pages without charts load nothing extra.
+- **Draw signal:** `data-chart-state` moves from `measuring` to `drawing` to `ready`, and `ready` means the marks have stopped moving, so headless screenshots never catch a half-drawn chart.
+- **Sizing:** exactly one of `height` or `aspectRatio`.
+- **Accessibility:** one keyboard stop with arrow keys between data points, and a summary sentence plus hidden data table for screen readers.
+
+See [Release 012](docs/RELEASE-012.md), the [Canvas handoff](docs/CANVAS-RELEASE-012.md) and the [chart gallery](docs/RELEASE-012-CHART-GALLERY.md).
+
+## Release 011
 
 Release 011 (`0.0.0-release.11`) answers the Canvas visual-gap requests (#19) under the owner-approved token contract `shadcn-radix-token-contract-003` (90 tokens).
 

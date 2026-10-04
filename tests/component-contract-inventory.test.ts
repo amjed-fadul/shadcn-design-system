@@ -15,14 +15,14 @@ const provenance = read<{ familySource: { familyIds: string[]; familyCount: numb
 const families = canonicalFamilyIds.map((id) => read<ComponentFamilyContract>(`contracts/components/families/${id}.json`))
 
 describe("canonical component inventory", () => {
-  test("registers the independently approved 41 families in every authority", () => {
-    expect(canonicalFamilyIds).toHaveLength(41)
-    expect(manifest.familyCount).toBe(41)
+  test("registers the independently approved 42 families in every authority", () => {
+    expect(canonicalFamilyIds).toHaveLength(42)
+    expect(manifest.familyCount).toBe(42)
     expect(manifest.familyFiles).toEqual(canonicalFamilyIds.map((id) => `contracts/components/families/${id}.json`))
     expect(index.contractSetId).toBe(manifest.id)
-    expect(index.familyCount).toBe(41)
+    expect(index.familyCount).toBe(42)
     expect(index.families.map((family) => family.familyId)).toEqual(canonicalFamilyIds)
-    expect(provenance.familySource.familyCount).toBe(41)
+    expect(provenance.familySource.familyCount).toBe(42)
     expect(provenance.familySource.familyIds).toEqual(canonicalFamilyIds)
     expect(families.map((family) => family.id)).toEqual(canonicalFamilyIds)
   })

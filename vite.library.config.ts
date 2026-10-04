@@ -90,7 +90,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       sourcemap: false,
       cssCodeSplit: false,
       lib: {
-        entry: { index: path.join(root, "src/package/index.ts"), release: path.join(root, "src/package/release.ts") },
+        entry: { index: path.join(root, "src/package/index.ts"), charts: path.join(root, "src/package/charts.ts"), release: path.join(root, "src/package/release.ts") },
         formats: ["es"],
         fileName: (_format, name) => `${name}.js`,
         cssFileName: "styles",

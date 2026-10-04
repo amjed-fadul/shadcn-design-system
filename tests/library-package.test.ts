@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process"
 import { createHash } from "node:crypto"
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync } from "node:fs"
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { fileURLToPath } from "node:url"
 import path from "node:path"
@@ -29,11 +29,15 @@ const contractedExportNames = () => {
 }
 
 describe("published library entrypoint", () => {
-  test("exposes all 210 contracted public exports including Icon, Image and Link", async () => {
+  test("exposes all 211 contracted public exports, each through exactly one entrypoint", async () => {
     const library = await import("../src/package/index")
+    const charts = await import("../src/package/charts")
     const names = contractedExportNames()
-    expect(Object.keys(library).sort()).toEqual(names.sort())
-    expect(names).toHaveLength(210)
+    const chartNames = readJson("contracts/components/families/chart.json").exports.map((entry: { name: string }) => entry.name)
+    // The chart family ships only from the lazily loaded ./charts entry; everything else from the root.
+    expect(Object.keys(library).sort()).toEqual(names.filter((name: string) => !chartNames.includes(name)).sort())
+    expect(Object.keys(charts).sort()).toEqual([...chartNames].sort())
+    expect(names).toHaveLength(211)
     expect(Object.hasOwn(library, "Switch")).toBe(true)
     expect(Object.hasOwn(library, "SidebarNormalAppProvider")).toBe(false)
     const sidebar = readJson("contracts/components/families/sidebar.json")
@@ -43,6 +47,31 @@ describe("published library entrypoint", () => {
     ]))
     expect(provider.composition.provides).toEqual(["sidebar.context"])
     expect(sidebar.exports.find((entry: { name: string }) => entry.name === "Sidebar").component.composition.requires).toEqual(["sidebar.context"])
+  })
+
+  test("keeps Recharts out of everything the root entry can reach", () => {
+    // Follow relative and @/ imports from each entry and record every package import it reaches.
+    const packagesReachedFrom = (entry: string) => {
+      const seen = new Set<string>()
+      const packages = new Set<string>()
+      const visit = (file: string) => {
+        if (seen.has(file)) return
+        seen.add(file)
+        const source = readFileSync(file, "utf8")
+        for (const [, specifier] of source.matchAll(/(?:import|export)\s[^"']*?from\s+["']([^"']+)["']|import\s+["']([^"']+)["']/g)) {
+          if (!specifier) continue
+          if (specifier.startsWith(".") || specifier.startsWith("@/")) {
+            const base = specifier.startsWith("@/") ? path.join(root, "src", specifier.slice(2)) : path.resolve(path.dirname(file), specifier)
+            const resolved = [base, `${base}.ts`, `${base}.tsx`, path.join(base, "index.ts")].find((candidate) => existsSync(candidate) && !candidate.endsWith(".css") && statSync(candidate).isFile())
+            if (resolved) visit(resolved)
+          } else packages.add(specifier.split("/").slice(0, specifier.startsWith("@") ? 2 : 1).join("/"))
+        }
+      }
+      visit(path.join(root, entry))
+      return packages
+    }
+    expect([...packagesReachedFrom("src/package/index.ts")]).not.toContain("recharts")
+    expect([...packagesReachedFrom("src/package/charts.ts")]).toContain("recharts")
   })
 
   test("typechecks explicit Sidebar inputs through the public source entrypoint", () => {

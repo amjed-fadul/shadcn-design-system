@@ -9,7 +9,7 @@ type Provenance = {
   components: Record<string, { canonicalPath: string; canonicalBlobSha: string; implementationKind: string }>
 }
 
-const nativeFamilyIds = ["icon", "image", "link"] as const
+const nativeFamilyIds = ["chart", "icon", "image", "link"] as const
 
 const provenance = JSON.parse(readFileSync(new URL("../provenance/seed-components.json", import.meta.url), "utf8")) as Provenance
 

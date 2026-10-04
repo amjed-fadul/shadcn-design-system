@@ -11,6 +11,7 @@
     "contracts/knowledge/components/breadcrumb.json",
     "contracts/knowledge/components/button.json",
     "contracts/knowledge/components/card.json",
+    "contracts/knowledge/components/chart.json",
     "contracts/knowledge/components/checkbox.json",
     "contracts/knowledge/components/collapsible.json",
     "contracts/knowledge/components/command.json",

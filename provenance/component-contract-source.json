@@ -5,8 +5,8 @@
   },
   "familySource": {
     "path": "provenance/seed-components.json",
-    "blobSha": "1663235a4d5f10a5c54aa48868d23cfe411203f9",
-    "familyCount": 41,
+    "blobSha": "aa3c36674cd818e4dcc3c04237d4645b9abcaf22",
+    "familyCount": 42,
     "familyIds": [
       "accordion",
       "alert",
@@ -16,6 +16,7 @@
       "breadcrumb",
       "button",
       "card",
+      "chart",
       "checkbox",
       "collapsible",
       "command",
@@ -83,6 +84,9 @@
       "version": "1.33.0",
       "declarationPath": "node_modules/lucide-react/dist/lucide-react.d.ts",
       "declarationSha256": "69ef61bf5cb44106d1553fac6d8b8b107d6304d509d0f3e4cb40137653f31374"
+    },
+    "recharts": {
+      "version": "3.8.1"
     }
   },
   "capabilityIds": [

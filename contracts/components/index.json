@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contractSetId": "shadcn-radix-component-contracts-001",
-  "familyCount": 41,
+  "familyCount": 42,
   "families": [
     {"familyId":"accordion","components":["Accordion","AccordionContent","AccordionItem","AccordionTrigger"],"hooks":[],"helpers":[]},
     {"familyId":"alert","components":["Alert","AlertAction","AlertDescription","AlertTitle","Status"],"hooks":[],"helpers":["alertVariants"]},
@@ -11,6 +11,7 @@
     {"familyId":"breadcrumb","components":["Breadcrumb","BreadcrumbEllipsis","BreadcrumbItem","BreadcrumbLink","BreadcrumbList","BreadcrumbPage","BreadcrumbSeparator"],"hooks":[],"helpers":[]},
     {"familyId":"button","components":["Button"],"hooks":[],"helpers":["buttonVariants"]},
     {"familyId":"card","components":["Card","CardAction","CardContent","CardDescription","CardFooter","CardHeader","CardTitle"],"hooks":[],"helpers":[]},
+    {"familyId":"chart","components":["Chart"],"hooks":[],"helpers":[]},
     {"familyId":"checkbox","components":["Checkbox"],"hooks":[],"helpers":[]},
     {"familyId":"collapsible","components":["Collapsible","CollapsibleContent","CollapsibleTrigger"],"hooks":[],"helpers":[]},
     {"familyId":"command","components":["Command","CommandDialog","CommandEmpty","CommandGroup","CommandInput","CommandItem","CommandList","CommandSeparator","CommandShortcut"],"hooks":[],"helpers":[]},

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "chart-knowledge",
+  "subject": {
+    "kind": "component",
+    "id": "chart"
+  },
+  "guidanceStatus": {
+    "whatItIs": "available",
+    "whenToUse": "available",
+    "howToUse": "available",
+    "options": "available"
+  },
+  "whatItIs": {
+    "statement": "A governed data chart (area, bar, line, donut or radial) with a closed API: data, keys and named options only. Colours come from chart-1 to chart-5 in slot order, and every chart carries an accessible name, a one-sentence summary and a hidden data table.",
+    "basis": {
+      "kind": "source-derived",
+      "referenceIds": [
+        "canonical.chart.source"
+      ]
+    }
+  },
+  "whenToUse": [
+    {
+      "statement": "Use bar for comparing categories or periods, line for a trend over time, area for a trend whose volume matters, donut for part-to-whole with up to 5 parts, and radial for a compact part-to-whole. Use a stat tile or Card with a single number when there is one value to show, and a Table when readers need exact values or there are more than 5 series.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.chart.source"
+        ]
+      }
+    }
+  ],
+  "howToUse": [
+    {
+      "statement": "Import Chart from @adc/shadcn-design-system/charts, lazily, so pages without charts do not load the chart bundle. Pass type, a title (the accessible name), data as flat rows, categoryKey, and either series ({ key, label }, 1 to 5) for area, bar and line, or valueKey for donut and radial (one row per part, up to 5, with values of zero or more).",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.chart.source"
+        ]
+      }
+    },
+    {
+      "statement": "Give exactly one of height (plot height in pixels; the legend renders below) or aspectRatio (16/9, 4/3, 1/1 or 2/1). Before the container has a width, the chart shows a skeleton of the final size. Wait for [data-chart-state=\"ready\"] before capturing a screenshot.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.chart.source"
+        ]
+      }
+    }
+  ],
+  "options": [
+    {
+      "statement": "valueFormat is number (default), currency (requires an ISO 4217 currency such as USD), percent (values are fractions, 0.124 is 12.4%) or compact (42K); axis ticks always use the compact form. layout stacks area and bar series (lines never stack); orientation=horizontal lays bars sideways; curve is monotone (default), linear or step. xAxis, yAxis and grid default to true; legend defaults to on for 2 or more series. animation=auto animates once and respects reduced motion; animation=off renders immediately.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.chart.source"
+        ]
+      }
+    },
+    {
+      "statement": "Do not use status colours for series and do not rely on colour alone: the legend and the hidden table name every series. A sixth series is rejected; fold the rest into Other or use small multiples.",
+      "basis": {
+        "kind": "source-derived",
+        "referenceIds": [
+          "canonical.chart.source"
+        ]
+      }
+    }
+  ]
+}
