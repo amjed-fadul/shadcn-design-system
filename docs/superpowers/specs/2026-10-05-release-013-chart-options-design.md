@@ -356,6 +356,34 @@ format. Stacked checks say "stack total". The new messages:
 The numbers are the author's raw values: the bound as given and the raw running sum. Comparisons use
 12 significant digits, so a printed number never contradicts the message.
 
+### R14. Ready means drawn, on any machine (Release 012 defect) *(qualification)*
+
+The first macOS release qualification of this release failed the `Bar` story's settle check: the
+chart reported `ready`, then its bars moved by 117 px.
+- **Cause.** Release 012's watcher took two unchanged frames after 400 ms as finished.
+  - On a slow CPU, frames arrive in bursts a few milliseconds apart, faster than Recharts commits its
+    next animation step. The 400 ms wait can also end before the marks have mounted.
+  - It read only path data, while lines animate a dash pattern and areas a clip rectangle. Line and
+    area charts reported `ready` about 60 ms before their draw finished on any machine.
+  - A probe reproduced both: with the CPU slowed 4 to 8 times, 6 of 12 bar charts moved after
+    `ready`, and at full speed every line and area chart did.
+- **Fix.** Ready follows Recharts' own animation start and end for each mark: each series, or the one
+  pie or radial bar.
+  - Recharts sets a mark's final frame before it reports that animation's end (its duration timer
+    starts after its timing clock, and both run on the same animation frames). So a `ready` set from
+    the end commits with, or after, the drawn marks.
+  - Recharts also reports an end when it restarts or removes an animation. An end counts as a finish
+    only when it comes `ANIMATION_MS` after that mark's start.
+  - A freshly mounted plot animates every mark in, so it is drawn once a mark has finished and none
+    is still running.
+  - An update may move no mark: a new locale only relabels a line, and Recharts restarts no line
+    animation. Once `ANIMATION_MS` has passed with no mark running, it is drawn.
+  - 180 frames remain the backstop, counted in frames so a busy page cannot run it out early.
+  - The handlers stay stable for the plot's lifetime, because a new handler would restart a mark's
+    animation.
+- **Cost if wrong:** a headless capture of a half-drawn chart, the failure this fixes. The new
+  checks below fail on Release 012's watcher and pass on the fix.
+
 ## Render changes from Release 012
 
 Canvas sees these visible changes. They go in the release notes and the handoff:
@@ -380,6 +408,8 @@ Canvas sees these visible changes. They go in the release notes and the handoff:
 - The centre caption is added to the hidden summary, e.g. "…totalling 1,130 (Customers): …", because
   the drawn centre is hidden from assistive technology.
 - Invalid enumerated values (`layout: "stack"`) now throw instead of silently falling back (R12).
+- `ready` comes once the draw animation has finished (R14): about 60 ms later than Release 012 for
+  line and area charts, and never before the marks are drawn on a slow CPU. Nothing drawn changes.
 
 ## Open option for the owner
 
@@ -433,9 +463,13 @@ Canvas sees these visible changes. They go in the release notes and the handoff:
   - mixed-sign stack ticks, the 100%-stack ending at 100%, and the negative-range area baseline.
 - Redraw: changing only `locale`, `valueMin`, `barSize` or `centerValue` on a mounted chart returns
   it to `drawing`, then `ready`.
+- Ready means drawn (R14): stepping frame by frame, the plot surface never changes once the chart
+  reports `ready`, for bar, stacked area, line, donut and radial charts, after an update that moves
+  the marks, and after one that moves none.
 
 **Stories (browser, axe gate).** Every story keeps the label-clipping, settle-at-ready and keyboard
-checks.
+checks. The settle check reads path data, dash patterns and clip rectangles (R14), so it fails on
+Release 012's watcher for every line and area story.
 - A 180 px donut with a currency total, which is Canvas's case.
 - A radial with total and caption, and a 180 px five-part radial.
 - Bar sizes, shot where they differ.
@@ -453,6 +487,10 @@ checks.
 - Captures at `ready` stay pixel-identical.
 - The same chart without `locale`, captured in Playwright contexts with `de-DE` and `en-US`, gives
   identical pixels.
+- Ready means drawn on a slow CPU (R14). With the CPU at full speed and slowed six times, every
+  variant is recorded frame by frame, and so are updates that move the marks (bar, area, line, donut
+  and radial values) and one that moves none (a line's locale). The plot surface may not change after
+  any `ready` until the chart starts a new drawing.
 
 **Gallery.** Re-shoot the radial (against shadcn's "Radial Chart - Text"), the donut (against "Pie
 Chart - Donut with Text"), a small-frame donut, and bar sizes.

@@ -12,13 +12,15 @@ The design and every ruling are in
 [the spec](superpowers/specs/2026-10-05-release-013-chart-options-design.md), and the Canvas handoff
 is [CANVAS-RELEASE-013](CANVAS-RELEASE-013.md).
 
-**Status: accepted by the owner on 2026-10-05; macOS release qualification running.**
-- **Candidate:** the owner accepted tarball `3e1d0a0b…` (payload `0d56818a…`), and with it the
-  producer rulings below.
-- **Qualification:** the manual macOS `release-qualification` workflow is running on `abe23cd`
-  ([run 37251218657](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37251218657)).
-  Commits after the candidate's source `33f6386` change docs, the committed manifest and a manifest
-  test only.
+**Status: rebuilt candidate accepted by the owner on 2026-10-05; macOS release qualification running.**
+- **Rebuild:** the first macOS qualification failed on the chart's ready signal
+  (see [macOS qualification](#macos-qualification)). It is fixed in `8545a64`, and the candidate was rebuilt from there.
+- **Candidate:** the owner accepted the rebuilt tarball `2b63e645…` (payload `b880ec96…`),
+  and with it the producer rulings below. The earlier tarball `3e1d0a0b…` is superseded: do not vendor
+  it.
+- **Qualification:** the manual macOS `release-qualification` workflow runs again on the commit that
+  records this candidate. Commits after the source `8545a64` change docs and the committed manifest
+  only.
 - **Merge:** the owner merges.
 
 ## Changes
@@ -54,8 +56,15 @@ is [CANVAS-RELEASE-013](CANVAS-RELEASE-013.md).
   - an empty chart wins over the range check.
 - **Bars:** grouped bars pack at `min(barSize, slot)` with a 4 px gap; single and stacked bars are
   capped.
-- **Ready signal:** the draw signature covers every model field and option, so a change to only
-  `locale`, a bound, `barSize`, `centerValue` or raw data values redraws. This fixes Canvas's RT-1.
+- **Ready signal:**
+  - **Every input redraws:** the draw signature covers every model field and option, so a change to
+    only `locale`, a bound, `barSize`, `centerValue` or raw data values redraws. This fixes Canvas's
+    RT-1.
+  - **Ready means drawn** (spec R14, a Release 012 defect found by the first macOS qualification):
+    ready follows Recharts' own animation start and end for each mark. Recharts sets a mark's final
+    frame before it reports the end, and only an end that comes 400 ms after the mark's start counts.
+    A fresh plot waits for its marks to finish; an update that moves none is ready after 400 ms; 180
+    frames remain the backstop.
 - **Sparklines:** a hidden x-axis reserves only the plain edge margin.
 - **Licence:**
   - `COPYRIGHT` becomes `LICENSE`, `package.json` declares `"license": "UNLICENSED"`, and the README
@@ -77,7 +86,8 @@ adoption steps:
 - donut totals fitted or left out;
 - exact tick labels;
 - stacks covered;
-- `centerLabel` and invalid enumerated values now throw.
+- `centerLabel` and invalid enumerated values now throw;
+- `ready` once the draw animation has finished (line and area charts about 60 ms later).
 
 ## Design review
 
@@ -87,6 +97,26 @@ Two independent multi-agent reviews shaped this release:
   from it, including four latent Release 012 defects this release fixes: radial sweeps, tick
   rounding, float stack sums and mixed-sign stacks.
 - **Code review:** five lenses (the scale, the model's rules and messages, the renderer, the licence and release identity with test quality, and spec conformance), with high-severity findings adversarially verified. Every confirmed finding was fixed in `45960ce`: `allowDataOverflow` (it clipped lines and areas at the edges) was removed; radial parts with no value no longer draw full rings; bounds are normalised so data equal to a bound passes; and tick labels stay exact at the extremes. The spec was aligned with the shipped code.
+- **Qualification:** the macOS release qualification found the ready defect, fixed in `8545a64`
+  (see below).
+
+## macOS qualification
+
+- **First run:** [run 37251218657](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37251218657)
+  on `abe23cd` failed. Every step up to the Storybook tests passed, including all 1,839 unit tests
+  and the build. Storybook then failed one of 251 tests: the `Bar` story reported `ready`, then its
+  bars moved by 117 px.
+- **Cause:** Release 012's ready watcher, reproduced with a CPU-throttled probe. It took two unchanged
+  frames after 400 ms as finished. On a slow CPU, frames arrive in bursts a few milliseconds apart, and
+  the wait can end before the marks have mounted. It also read only path data, so line and area
+  charts, which animate a dash pattern and a clip rectangle, reported `ready` about 60 ms early on any
+  machine.
+- **Fix:** `8545a64` (spec R14). The new checks fail on the old watcher and pass on the fix:
+  - the story settle check: 7 line and area stories;
+  - the browser test: `area` at full speed;
+  - the jsdom runtime test: the stacked area.
+- **Candidate:** rebuilt from `8545a64`. The tarball accepted earlier (`3e1d0a0b…`) is superseded and
+  must not be vendored.
 
 ## Owner decisions applied
 
@@ -105,14 +135,14 @@ Two independent multi-agent reviews shaped this release:
 
 | Identity | SHA-256 |
 | --- | --- |
-| Release payload | `0d56818a4042708fb402e947e78a563fa32f96418d7692359037a0a77784bec6` |
-| Release record file `provenance/releases/shadcn-radix-release-013.json` | `fd387d2d653a1af1d10b9783e370ca2d9a1bce4ccd2595470a968cc33c6f5b8b` |
-| Distribution manifest | `bed576a6bdae02fd9666726ecabb5aed8a1a14f27175b47dcd8eb1842abcdd9a` |
-| Tarball `adc-shadcn-design-system-0.0.0-release.13.tgz` | `3e1d0a0b6bd8b5b36bfe821cab23e9351a603ece0a3cb3d72c04df9f66663935` |
+| Release payload | `b880ec969b60eba4de6a16d5b835303ee9ea06f933fc93a989ede5161c65a409` |
+| Release record file `provenance/releases/shadcn-radix-release-013.json` | `aaa0ced0fb66e624bc405a075f7546bd305cd6feace7b37702806c538923e80a` |
+| Distribution manifest | `112cc081ed62acc8ecfbc1d14fed3adb11c25560336bb3729c6ef8a95bab6f17` |
+| Tarball `adc-shadcn-design-system-0.0.0-release.13.tgz` | `2b63e645b497446d8a0939914450b581efbfc1bb72bf37b6070a5876801ae10a` |
 
-- **Integrity:** `sha512-QJ05JpUC/DtJMo/trCi4bkwuSB/fDW06jQTxDLK9e4BgDZTPHB0WZm9tnYIGTAFWrPZ5zg8zkwHOCe+FOYcrGg==`.
+- **Integrity:** `sha512-vqxzEJTrYyZsbP7om4wS2hQA6LJhwZm/mIziUiYNH0Pj7UPiH5XX4bTN/TxjGEO6qHjxYMD0Psmax/xroYM/zg==`.
 - **Packing:** 64 packed files, from 375 implementation inputs.
-- **Producer commit:** `33f63866890a66d5b53c1c3f515b4351bf3fc572`.
+- **Producer commit:** `8545a644b432a376b892329452af6a8e7b3aee09`.
 - **Toolchain:** Node 22.18.0, npm 10.9.3, darwin arm64, Vite 7.3.6, TypeScript 5.5.4, Rollup 4.63.1, esbuild 0.28.2.
 - **Location:**
   `/Users/amjedfadul/.artifacts/shadcn-design-system/shadcn-radix-release-013-candidate/`. The
@@ -120,29 +150,37 @@ Two independent multi-agent reviews shaped this release:
 
 ## Verification
 
-All commands ran with Node 22.18.0 and npm 10.9.3, from a detached clean worktree at `33f6386`
+All commands ran with Node 22.18.0 and npm 10.9.3, from a detached clean worktree at `8545a64`
 unless noted.
 
 - **Release generation:** ran twice at the head, with byte-identical output. Historical records,
   including Release 012's, were checked before and after.
-- **`release:verify`:** accepted payload `0d56818a…`.
+- **`release:verify`:** accepted payload `b880ec96…`.
 - **`candidate:verify`:** rebuilt the package from producer inputs. All 64 packed files matched the
   retained candidate byte for byte, and no expectations were refreshed.
-- **`npm run typecheck` and `npm run build`:** passed.
-- **Unit suite:** all 127 files and 1,839 tests passed, including every real-build `package-identity`
-  test.
-- **Storybook:** `vitest --project=storybook` passed 44 files and 251 tests, with the axe gate at
-  `error`; `build-storybook` passed. The 21 chart stories include:
+- **`npm run typecheck`:** passed.
+- **Unit suite:** 1,846 of 1,847 tests passed, in 127 of 128 files.
+  - The failure: `package-identity`'s real build with an input injected through
+    `scripts/release-inputs.ts` hit its 120 s build timeout and was killed before printing anything.
+    The gallery was being re-shot on the same machine at the time.
+  - The test doesn't touch the chart, and it passed for the earlier candidate and on the macOS
+    runner. It is being rerun on its own.
+- **Storybook** (branch worktree at `8545a64`; the clean-worktree run is in progress):
+  `vitest --project=storybook` passed 44 files and 251 tests, with the axe gate at `error`. The 21
+  chart stories include:
   - `CenterFit`: 128 charts. After fonts load, every corner of every centre text box lies inside its
     hole, measured from the rendered sectors, and the total's computed size equals its token's size.
   - `BarSizes`, `LineRaisedMinimum`, `Sparkline`, `DonutSmall`, `RadialSmall`, and the German,
     Japanese and Arabic locale stories.
-  - Every story keeps the settle-at-ready, label-clipping, keyboard and Escape checks.
-- **Determinism (`tests/release013-chart.browser.mjs`):** 35 checks passed.
+  - Every story keeps the settle-at-ready, label-clipping, keyboard and Escape checks. The settle
+    check reads path data, dash patterns and clip rectangles.
+- **Determinism and ready (`tests/release013-chart.browser.mjs`, branch worktree):** 75 checks passed.
   - 14 lazily loaded variants were byte-identical at `ready` across fresh pages, in light and dark.
   - A chart without `locale` rendered identical pixels in `de-DE`, `ar-EG` and `ja-JP` browsers and
     in `en-US`.
   - Reduced motion skips drawing.
+  - With the CPU at full speed and slowed six times, nothing in the plot changed after `ready`, for
+    all 14 variants and six updates (values on bar, area, line, donut and radial; a line's locale).
 - **Tarball contents:**
   - `LICENSE` is packed, and `package.json` declares `"license": "UNLICENSED"`;
   - `THIRD_PARTY_LICENSES.txt` carries es-toolkit's NOTICE (Lodash) and `react-remove-scroll-bar`'s MIT
@@ -153,8 +191,9 @@ unless noted.
 - **Contract and inventory audits (in the branch worktree):** 50 files and 1,002 tests passed after
   the review fixes.
 - **`npm audit`:** full and production audits found 0 vulnerabilities.
-- **Gallery:** see [the Release 013 gallery](RELEASE-013-CHART-GALLERY.md).
-- **macOS release qualification:** next; the repository is public, so the run is free.
+- **Gallery:** see [the Release 013 gallery](RELEASE-013-CHART-GALLERY.md). Re-shot after the fix,
+  both sheets are byte-identical.
+- **macOS release qualification:** runs again on the commit that records this candidate.
 
 ## Build location
 

@@ -5,20 +5,22 @@ Release 012: amjed-fadul/shadcn-design-system#22 (centre totals that fit their r
 (`locale`, `barSize` and the value-axis range). It also adds the licence files deferred from #24.
 Tokens are unchanged, and Releases 001–012 remain byte-for-byte unchanged.
 
-**Status: accepted by the owner on 2026-10-05; macOS release qualification running.**
-- **Candidate:** the owner accepted tarball `3e1d0a0b…` (payload `0d56818a…`), and with it the
-  producer rulings below.
-- **Qualification:** the manual macOS `release-qualification` workflow is running on `abe23cd`
-  ([run 37251218657](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37251218657)).
-  Commits after the candidate's source `33f6386` change docs, the committed manifest and a manifest
-  test only.
+**Status: rebuilt candidate accepted by the owner on 2026-10-05; macOS release qualification running.**
+- **Rebuild:** the first macOS qualification failed on the chart's ready signal
+  (see [the release notes](RELEASE-013.md#macos-qualification)). It is fixed in `8545a64`, and the candidate was rebuilt from there.
+- **Candidate:** the owner accepted the rebuilt tarball `2b63e645…` (payload `b880ec96…`),
+  and with it the producer rulings below. The earlier tarball `3e1d0a0b…` is superseded: do not vendor
+  it.
+- **Qualification:** the manual macOS `release-qualification` workflow runs again on the commit that
+  records this candidate. Commits after the source `8545a64` change docs and the committed manifest
+  only.
 - **Merge:** the owner merges.
 
 ## Exact distribution
 
 **Identities**
 
-- Producer source commit: `33f63866890a66d5b53c1c3f515b4351bf3fc572`
+- Producer source commit: `8545a644b432a376b892329452af6a8e7b3aee09`
 - Package: `@adc/shadcn-design-system@0.0.0-release.13`, licence `UNLICENSED`
 - Release: `shadcn-radix-release-013`
 - Token contract: `shadcn-radix-token-contract-003` (`approved`, unchanged)
@@ -26,11 +28,11 @@ Tokens are unchanged, and Releases 001–012 remain byte-for-byte unchanged.
 
 **Hashes**
 
-- Release payload SHA-256: `0d56818a4042708fb402e947e78a563fa32f96418d7692359037a0a77784bec6`
-- Release JSON SHA-256: `fd387d2d653a1af1d10b9783e370ca2d9a1bce4ccd2595470a968cc33c6f5b8b`
-- Candidate tarball SHA-256: `3e1d0a0b6bd8b5b36bfe821cab23e9351a603ece0a3cb3d72c04df9f66663935`
-- Candidate tarball integrity: `sha512-QJ05JpUC/DtJMo/trCi4bkwuSB/fDW06jQTxDLK9e4BgDZTPHB0WZm9tnYIGTAFWrPZ5zg8zkwHOCe+FOYcrGg==`
-- Distribution manifest SHA-256: `bed576a6bdae02fd9666726ecabb5aed8a1a14f27175b47dcd8eb1842abcdd9a`
+- Release payload SHA-256: `b880ec969b60eba4de6a16d5b835303ee9ea06f933fc93a989ede5161c65a409`
+- Release JSON SHA-256: `aaa0ced0fb66e624bc405a075f7546bd305cd6feace7b37702806c538923e80a`
+- Candidate tarball SHA-256: `2b63e645b497446d8a0939914450b581efbfc1bb72bf37b6070a5876801ae10a`
+- Candidate tarball integrity: `sha512-vqxzEJTrYyZsbP7om4wS2hQA6LJhwZm/mIziUiYNH0Pj7UPiH5XX4bTN/TxjGEO6qHjxYMD0Psmax/xroYM/zg==`
+- Distribution manifest SHA-256: `112cc081ed62acc8ecfbc1d14fed3adb11c25560336bb3729c6ef8a95bab6f17`
   (also committed as `provenance/distributions/shadcn-radix-release-013.distribution.json`)
 
 **Candidate**
@@ -137,6 +139,10 @@ Points that matter for write-time mirroring:
 - **Donut caption** is positioned by the new stack layout and moves slightly even where the total
   still renders at the largest size.
 - **Summary:** the hidden summary names the centre caption ("…totalling 1,130 (Customers): …").
+- **Ready timing:** `ready` now comes once the draw animation has finished. Line and area charts
+  report it about 60 ms later than Release 012, whose `ready` came while their line or fill was still
+  drawing in, and on a slow machine no chart reports it before its marks are drawn. Nothing drawn
+  changes.
 
 Polar charts keep Recharts' 5 px margin, so donut geometry is otherwise unchanged. Lines and areas are
 never clipped at the plot edge.
@@ -171,10 +177,19 @@ for every value format.
 
 ## Waiting for a finished chart
 
-Unchanged from Release 012: wait for `[data-chart-state="ready"]`, or pass `animation="off"`.
-Release 013 widens the draw signature to every drawing input, so a change to only `locale`, a bound,
-`barSize`, `centerValue` or raw data values also starts a new drawing. Canvas no longer needs to key
-bound charts on their projected rows (RT-1).
+As in Release 012, wait for `[data-chart-state="ready"]`, or pass `animation="off"`. Two things change:
+- **Ready means drawn.** Release 012 took two unchanged frames after 400 ms as finished.
+  - On a slow CPU that could fire before the bars were drawn. This failed the first macOS
+    qualification of this release.
+  - It never saw a line's dash pattern or an area's clip, so line and area charts reported `ready`
+    about 60 ms early everywhere.
+  - Release 013 reports `ready` once Recharts says every mark's draw animation has finished. Recharts
+    sets the final frame before it says so, so a capture at `ready` is the finished chart.
+  - An update that moves no mark (a line's new locale) is ready once the 400 ms animation time has
+    passed. 180 frames remain the backstop.
+- **Every drawing input starts a new drawing.** The draw signature covers every drawing input, so a
+  change to only `locale`, a bound, `barSize`, `centerValue` or raw data values also starts a new
+  drawing. Canvas no longer needs to key bound charts on their projected rows (RT-1).
 
 ## Determinism evidence
 
@@ -182,4 +197,6 @@ bound charts on their projected rows (RT-1).
 - each is captured at `ready` in two fresh pages, in light and dark, and the captures are
   byte-identical;
 - a chart without `locale` renders identical pixels in `de-DE`, `ar-EG` and `ja-JP` browsers and in
-  `en-US`.
+  `en-US`;
+- with the CPU at full speed and slowed six times, nothing in the plot changes after `ready`, for
+  every variant and after updates that move the marks or only relabel them.
