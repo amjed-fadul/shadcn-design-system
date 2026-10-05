@@ -12,15 +12,15 @@ The design and every ruling are in
 [the spec](superpowers/specs/2026-10-05-release-013-chart-options-design.md), and the Canvas handoff
 is [CANVAS-RELEASE-013](CANVAS-RELEASE-013.md).
 
-**Status: rebuilt candidate accepted by the owner on 2026-10-05; macOS release qualification running.**
+**Status: rebuilt candidate accepted by the owner on 2026-10-05; macOS release qualification passed.**
 - **Rebuild:** the first macOS qualification failed on the chart's ready signal
   (see [macOS qualification](#macos-qualification)). It is fixed in `8545a64`, and the candidate was rebuilt from there.
 - **Candidate:** the owner accepted the rebuilt tarball `2b63e645…` (payload `b880ec96…`),
   and with it the producer rulings below. The earlier tarball `3e1d0a0b…` is superseded: do not vendor
   it.
-- **Qualification:** the manual macOS `release-qualification` workflow runs again on the commit that
-  records this candidate. Commits after the source `8545a64` change docs and the committed manifest
-  only.
+- **Qualification:** passed on `50179b1`, [run 37262967223](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37262967223). The third run passed every step, including
+  the byte-identical rebuild of the committed candidate. Commits after the source `8545a64` change
+  tests, docs and the committed manifest only.
 - **Merge:** the owner merges.
 
 ## Changes
@@ -125,7 +125,15 @@ Two independent multi-agent reviews shaped this release:
   - That test and three others that took 2.3 to 3 s on the runner with no explicit limit now have
     30 s timeouts.
   - Tests are not release inputs, so the accepted candidate is unchanged.
-  - The qualification runs a third time.
+- **Third run: passed.** [run 37262967223](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37262967223) on `50179b1` passed every step:
+  - typecheck;
+  - all 1,847 unit tests in 128 files, including both real-build input-guard tests;
+  - the build;
+  - Storybook, 251 tests in 44 files, and `build-storybook`;
+  - both audits, with 0 vulnerabilities;
+  - `release:verify` for payload `b880ec96…`;
+  - `candidate:verify`: a fresh rebuild on the runner matched all 64 packed files of the committed
+    manifest, with no expectations refreshed.
 
 ## Owner decisions applied
 
@@ -202,7 +210,7 @@ unless noted.
 - **`npm audit`:** full and production audits found 0 vulnerabilities.
 - **Gallery:** see [the Release 013 gallery](RELEASE-013-CHART-GALLERY.md). Re-shot after the fix,
   both sheets are byte-identical.
-- **macOS release qualification:** runs again on the commit that records this candidate.
+- **macOS release qualification:** passed, [run 37262967223](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37262967223) on `50179b1`.
 
 ## Build location
 

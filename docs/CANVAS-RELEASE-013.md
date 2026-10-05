@@ -5,15 +5,15 @@ Release 012: amjed-fadul/shadcn-design-system#22 (centre totals that fit their r
 (`locale`, `barSize` and the value-axis range). It also adds the licence files deferred from #24.
 Tokens are unchanged, and Releases 001–012 remain byte-for-byte unchanged.
 
-**Status: rebuilt candidate accepted by the owner on 2026-10-05; macOS release qualification running.**
+**Status: rebuilt candidate accepted by the owner on 2026-10-05; macOS release qualification passed.**
 - **Rebuild:** the first macOS qualification failed on the chart's ready signal
   (see [the release notes](RELEASE-013.md#macos-qualification)). It is fixed in `8545a64`, and the candidate was rebuilt from there.
 - **Candidate:** the owner accepted the rebuilt tarball `2b63e645…` (payload `b880ec96…`),
   and with it the producer rulings below. The earlier tarball `3e1d0a0b…` is superseded: do not vendor
   it.
-- **Qualification:** the manual macOS `release-qualification` workflow runs again on the commit that
-  records this candidate. Commits after the source `8545a64` change docs and the committed manifest
-  only.
+- **Qualification:** passed on `50179b1`, [run 37262967223](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37262967223). The third run passed every step, including
+  the byte-identical rebuild of the committed candidate. Commits after the source `8545a64` change
+  tests, docs and the committed manifest only.
 - **Merge:** the owner merges.
 
 ## Exact distribution
