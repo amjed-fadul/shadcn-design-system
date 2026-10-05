@@ -2,7 +2,7 @@
   "name": "@adc/shadcn-design-system",
   "private": true,
   "license": "UNLICENSED",
-  "version": "0.0.0-release.13",
+  "version": "0.0.0-release.14",
   "type": "module",
   "engines": {
     "node": "22.18.0"

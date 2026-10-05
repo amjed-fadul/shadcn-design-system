@@ -36,7 +36,7 @@ jobs:
             tests/token-contract-index.test.ts
             tests/release-5-workflows.test.ts
           )
-          for optional in             tests/canonical-release-r13-binding.test.ts             tests/release009-preservation.test.ts             tests/historical-artifacts.test.ts
+          for optional in             tests/canonical-release-r14-binding.test.ts             tests/release009-preservation.test.ts             tests/historical-artifacts.test.ts
           do
             [[ -f "$optional" ]] && tests+=("$optional")
           done
