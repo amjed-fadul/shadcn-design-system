@@ -1,6 +1,8 @@
 // Release 013 chart determinism: every chart variant, lazily loaded and animated, is captured as soon as
 // it reports ready. Two fresh renders must give identical pixels in light and dark; a chart without a
 // locale must render the same pixels whatever the browser's language; reduced motion skips drawing.
+// Ready must mean drawn on a slow CPU too: with the CPU throttled, nothing in the plot changes after
+// the chart reports ready, on first draw and after an update.
 import assert from "node:assert/strict"
 import { mkdirSync, realpathSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
@@ -48,6 +50,44 @@ async function capture({ kind, width = 480, theme = "light", reducedMotion = fal
   return { image, states }
 }
 
+// Loads the fixture with the CPU slowed by `rate` and records, every animation frame, the chart state
+// and the whole plot surface. Each time the chart reports ready, the surface must already be final:
+// it may not change again until the chart starts a new drawing.
+async function settleTimeline({ kind, update, rate, width = 480 }) {
+  const context = await browser.newContext({ viewport: { width: 640, height: 720 } })
+  const page = await context.newPage()
+  page.setDefaultTimeout(30000)
+  page.on("pageerror", (error) => errors.push(`${kind}/${update ?? "mount"}@${rate}x: ${error.message}`))
+  const cdp = await context.newCDPSession(page)
+  await cdp.send("Emulation.setCPUThrottlingRate", { rate })
+  await page.addInitScript(() => {
+    window.__frames = []
+    const sample = () => {
+      const plot = document.querySelector('[data-slot="chart-plot"]')
+      window.__frames.push({ state: plot?.getAttribute("data-chart-state") ?? null, surface: plot?.querySelector("svg.recharts-surface")?.innerHTML ?? "" })
+      requestAnimationFrame(sample)
+    }
+    requestAnimationFrame(sample)
+  })
+  await page.goto(`http://127.0.0.1:${port}/tests/fixtures/chart-determinism.html?kind=${kind}&width=${width}${update ? `&update=${update}` : ""}`)
+  await page.waitForFunction((drawings) => {
+    const states = window.__frames.map((frame) => frame.state).filter((state, index, all) => state !== all[index - 1])
+    return states.filter((state) => state === "ready").length >= drawings
+  }, update ? 2 : 1)
+  await page.waitForTimeout(1000)
+  const frames = await page.evaluate(() => window.__frames)
+  await context.close()
+  const states = frames.map((frame) => frame.state).filter((state, index, all) => state !== all[index - 1])
+  const moved = []
+  frames.forEach((frame, index) => {
+    if (frame.state !== "ready" || frames[index - 1]?.state === "ready") return
+    for (let later = index + 1; later < frames.length && frames[later].state === "ready"; later += 1) {
+      if (frames[later].surface !== frame.surface) { moved.push(later - index); break }
+    }
+  })
+  return { states, moved }
+}
+
 const report = []
 try {
   for (const theme of ["light", "dark"]) {
@@ -67,6 +107,22 @@ try {
       const other = await capture({ kind, width: kind === "donut-currency" ? 230 : 480, locale })
       assert.ok(english.image.equals(other.image), `${kind}: a ${locale} browser renders different pixels from en-US`)
       report.push({ kind, browserLocale: locale, identicalToEnUS: true })
+    }
+  }
+  // Ready means drawn on a slow CPU: on first draw for every variant, and after updates that move
+  // the marks (new values) or only relabel them (a new locale on a line).
+  for (const rate of [1, 6]) {
+    for (const [kind, width] of variants) {
+      const { states, moved } = await settleTimeline({ kind, width, rate })
+      assert.deepEqual(states.filter(Boolean), ["measuring", "drawing", "ready"], `${kind}@${rate}x states`)
+      assert.deepEqual(moved, [], `${kind}@${rate}x: the plot changed ${moved.join(", ")} frames after ready`)
+      report.push({ kind, cpuSlowdown: rate, drawnAtReady: true })
+    }
+    for (const [kind, update] of [["bar", "data"], ["area", "data"], ["line", "data"], ["line", "locale"], ["donut", "data"], ["radial", "data"]]) {
+      const { states, moved } = await settleTimeline({ kind, update, rate })
+      assert.deepEqual(states.filter(Boolean), ["measuring", "drawing", "ready", "drawing", "ready"], `${kind} ${update} update@${rate}x states`)
+      assert.deepEqual(moved, [], `${kind} ${update} update@${rate}x: the plot changed ${moved.join(", ")} frames after ready`)
+      report.push({ kind, update, cpuSlowdown: rate, drawnAtReady: true })
     }
   }
   const reduced = await capture({ kind: "bar", reducedMotion: true })

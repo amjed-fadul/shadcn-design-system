@@ -121,6 +121,60 @@ describe("Chart", () => {
     expect(plot().getAttribute("data-chart-state")).toBe("ready")
   })
 
+  // Ready means drawn: stepping frame by frame, the plot never changes once the chart reports ready.
+  // Bars and sectors animate their paths, lines their dash pattern and areas a clip rectangle.
+  function framesAfterReady(steps = 90) {
+    const surface = () => container.querySelector("svg.recharts-surface")?.innerHTML ?? ""
+    const frames: { state: string | null; surface: string }[] = []
+    for (let step = 0; step < steps; step += 1) {
+      act(() => { vi.advanceTimersByTime(16) })
+      frames.push({ state: plot().getAttribute("data-chart-state"), surface: surface() })
+    }
+    const ready = frames.findIndex((frame) => frame.state === "ready")
+    return { ready, changed: frames.slice(ready).filter((frame) => frame.surface !== frames[ready].surface).length }
+  }
+
+  test.each<[string, Record<string, unknown>]>([
+    ["bar", {}],
+    ["stacked area", { type: "area", layout: "stacked" }],
+    ["line", { type: "line" }],
+    ["donut", { type: "donut", data: [{ plan: "Free", n: 600 }, { plan: "Pro", n: 300 }], categoryKey: "plan", series: undefined, valueKey: "n", aspectRatio: "1/1", height: undefined }],
+    ["radial", { type: "radial", data: [{ plan: "Free", n: 600 }, { plan: "Pro", n: 300 }], categoryKey: "plan", series: undefined, valueKey: "n", aspectRatio: "1/1", height: undefined }],
+  ])("reports a %s chart ready only once its marks have finished drawing", (_name, patch) => {
+    vi.useFakeTimers()
+    render({ ...barProps, ...patch })
+    resize(600)
+    const { ready, changed } = framesAfterReady()
+    expect(ready).toBeGreaterThan(400 / 16)
+    expect(changed).toBe(0)
+  })
+
+  test("after an update, reports ready only once the moved marks have finished drawing", () => {
+    vi.useFakeTimers()
+    render({ ...barProps, type: "line" })
+    resize(600)
+    expect(framesAfterReady().changed).toBe(0)
+    render({ ...barProps, type: "line", data: revenue.map((row) => ({ ...row, lastYear: row.lastYear * 1.5 })) })
+    expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    const { ready, changed } = framesAfterReady()
+    expect(ready).toBeGreaterThan(400 / 16)
+    expect(changed).toBe(0)
+  })
+
+  test("after an update that moves no mark, reports ready once the animation time has passed", () => {
+    vi.useFakeTimers()
+    render({ ...barProps, type: "line" })
+    resize(600)
+    expect(framesAfterReady().changed).toBe(0)
+    // A new locale only relabels the axis: Recharts restarts no line animation.
+    render({ ...barProps, type: "line", locale: "de-DE" })
+    expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    const { ready, changed } = framesAfterReady()
+    expect(ready).toBeGreaterThan(400 / 16 - 2)
+    expect(ready).toBeLessThan(600 / 16)
+    expect(changed).toBe(0)
+  })
+
   test("shows an explicit empty state and still signals ready", () => {
     render({ ...barProps, data: [], animation: "auto" })
     resize(600)

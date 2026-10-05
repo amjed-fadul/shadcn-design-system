@@ -46,8 +46,7 @@ type ChartOptions = { xAxis: boolean; yAxis: boolean; grid: boolean; legend: boo
 // Series colours come only from the governed chart tokens, in slot order: the model
 // assigns var(--chart-1) to var(--chart-5) and marks use those values directly.
 const ANIMATION_MS = 400
-// Frames of unchanged marks that count as finished, and the most frames to wait for them.
-const SETTLED_FRAMES = 2
+// The most frames a drawing waits for its marks before the chart reports ready anyway.
 const MAX_SETTLE_FRAMES = 180
 const RATIOS: Record<ChartAspectRatio, number> = { "16/9": 16 / 9, "4/3": 4 / 3, "1/1": 1, "2/1": 2 }
 const AXIS_TICK = { className: "text-xs tabular-nums", fill: "var(--muted-foreground)" }
@@ -83,11 +82,6 @@ function axisWidth(labels: readonly string[]): number {
 // Room for a label centred on the plot edge, as the first and last ticks are.
 function edgeRoom(labels: readonly string[]): number {
   return Math.max(EDGE_PX, Math.ceil(labelWidth(labels) / 2) + TICK_SLACK_PX)
-}
-
-function markGeometry(plot: HTMLElement | null): string {
-  if (!plot) return ""
-  return [...plot.querySelectorAll(".recharts-rectangle, .recharts-curve, .recharts-sector")].map((mark) => mark.getAttribute("d")).join("|")
 }
 
 function prefersReducedMotion(): boolean {
@@ -155,12 +149,13 @@ function ChartCenter({ model, width, height, inner }: { model: ChartModel; width
   )
 }
 
-type ChartPlotProps = { model: ChartModel; options: ChartOptions; width: number; height: number; animate: boolean; signature: string }
+type MarkAnimationHandlers = { onAnimationStart: () => void; onAnimationEnd: () => void }
+type ChartPlotProps = { model: ChartModel; options: ChartOptions; width: number; height: number; animate: boolean; signature: string; track: (mark: string) => MarkAnimationHandlers }
 
-function ChartPlotContent({ model, options, width, height, animate }: ChartPlotProps) {
+function ChartPlotContent({ model, options, width, height, animate, track }: ChartPlotProps) {
   const gradientPrefix = React.useId().replace(/:/g, "")
-  // Every mark starts at once and runs for ANIMATION_MS, so the frame knows when drawing ends.
-  // Recharts' onAnimationEnd also fires on effect cleanup, so it is not a finished signal.
+  // Every animated mark (each series, or the one pie or radial bar) reports its animation's start
+  // and end to the frame, which reports ready once they have all finished.
   const animation = { isAnimationActive: animate, animationBegin: 0, animationDuration: ANIMATION_MS }
   const tooltip = <Tooltip cursor={model.type === "bar" ? { fill: "var(--muted)" } : { stroke: "var(--border)" }} content={<ChartTooltipContent model={model} />} />
   const valueKey = model.valueKey!
@@ -172,7 +167,7 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
         {tooltip}
         <Pie
           data={model.data as Record<string, unknown>[]} dataKey={valueKey} nameKey={model.categoryKey}
-          innerRadius={`${DONUT_INNER * 100}%`} outerRadius="80%" paddingAngle={2} cornerRadius={4} stroke="var(--card)" strokeWidth={2} rootTabIndex={-1} {...animation}
+          innerRadius={`${DONUT_INNER * 100}%`} outerRadius="80%" paddingAngle={2} cornerRadius={4} stroke="var(--card)" strokeWidth={2} rootTabIndex={-1} {...animation} {...track("pie")}
         >
           {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
         </Pie>
@@ -186,7 +181,7 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
       <RadialBarChart width={width} height={height} margin={polarMargin} data={model.data.map((row) => ({ ...row, [RADIAL_DRAWN_KEY]: typeof row[valueKey] === "number" ? row[valueKey] : 0 }))} innerRadius={`${RADIAL_INNER * 100}%`} outerRadius="100%" accessibilityLayer>
         <PolarAngleAxis type="number" domain={[0, model.total ?? 0]} tick={false} tickLine={false} axisLine={false} />
         {tooltip}
-        <RadialBar dataKey={RADIAL_DRAWN_KEY} cornerRadius={4} background={{ fill: "var(--muted)" }} {...animation}>
+        <RadialBar dataKey={RADIAL_DRAWN_KEY} cornerRadius={4} background={{ fill: "var(--muted)" }} {...animation} {...track("radial")}>
           {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
         </RadialBar>
         <ChartCenter model={model} width={width} height={height} inner={RADIAL_INNER} />
@@ -244,7 +239,7 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
             key={series.key} dataKey={series.key} name={series.label} fill={series.color}
             maxBarSize={groupedSize === undefined ? cap : undefined}
             stroke={stacked ? "var(--card)" : undefined} strokeWidth={stacked ? 2 : undefined}
-            stackId={stacked ? "stack" : undefined} {...animation}
+            stackId={stacked ? "stack" : undefined} {...animation} {...track(`series:${series.key}`)}
             radius={stacked && index !== last ? 0 : horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
           />
         ))}
@@ -267,7 +262,7 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
           <Area
             key={series.key} dataKey={series.key} name={series.label} type={model.curve}
             stroke={series.color} strokeWidth={2} fill={`url(#${gradientPrefix}-${index})`} stackId={stacked ? "stack" : undefined}
-            activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation}
+            activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation} {...track(`series:${series.key}`)}
           />
         ))}
       </AreaChart>
@@ -280,7 +275,7 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
         <Line
           key={series.key} dataKey={series.key} name={series.label} type={model.curve}
           stroke={series.color} strokeWidth={2} dot={false}
-          activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation}
+          activeDot={{ r: 4, strokeWidth: 2, fill: series.color, stroke: "var(--card)" }} {...animation} {...track(`series:${series.key}`)}
         />
       ))}
     </LineChart>
@@ -305,6 +300,52 @@ function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptio
   const [drawnSignature, setDrawnSignature] = React.useState<string | null>(null)
   const drawn = drawnSignature === signature
   const animate = options.animation === "auto" && !model.empty && !prefersReducedMotion()
+  const showsPlot = width > 0 && !model.empty
+
+  // Ready means drawn, and Recharts says when each mark is. A mark's animation reports its start
+  // when it mounts and its end once it has run for ANIMATION_MS; Recharts sets the final frame
+  // before it reports that end, so a ready set from it commits with, or after, the drawn marks.
+  // Recharts also reports an end when it restarts or removes an animation, so an end counts as a
+  // finish only when it comes ANIMATION_MS after that mark's start.
+  // - A freshly mounted plot animates every mark in, so it is drawn once a mark has finished
+  //   and none is still running.
+  // - An update may move nothing (a new locale only relabels a line), so once ANIMATION_MS has
+  //   passed with no mark running it is drawn too. Recharts restarts the marks it moves while it
+  //   commits the update, well before that.
+  // - MAX_SETTLE_FRAMES keeps a chart from waiting forever.
+  const drawing = React.useRef({ signature, fresh: true, finished: false, waited: false })
+  const running = React.useRef(new Map<string, number>())
+  const shownPlot = React.useRef(false)
+  const settle = React.useCallback(() => {
+    const { signature: current, fresh, finished, waited } = drawing.current
+    if (running.current.size === 0 && (finished || (waited && !fresh))) setDrawnSignature(current)
+  }, [])
+  const handlers = React.useRef(new Map<string, MarkAnimationHandlers>())
+  const track = React.useCallback((mark: string) => {
+    let markHandlers = handlers.current.get(mark)
+    if (!markHandlers) {
+      markHandlers = {
+        onAnimationStart: () => { running.current.set(mark, performance.now()) },
+        onAnimationEnd: () => {
+          const started = running.current.get(mark)
+          if (started === undefined) return
+          running.current.delete(mark)
+          if (performance.now() - started >= ANIMATION_MS) drawing.current.finished = true
+          // Settle on the next frame: a restart reports the old end and the new start together.
+          requestAnimationFrame(settle)
+        },
+      }
+      // Stable handlers: a new handler would make Recharts restart the mark's animation.
+      handlers.current.set(mark, markHandlers)
+    }
+    return markHandlers
+  }, [settle])
+
+  // A new drawing begins before the marks' effects report their starts.
+  React.useLayoutEffect(() => {
+    drawing.current = { signature, fresh: !shownPlot.current, finished: false, waited: false }
+    shownPlot.current = showsPlot
+  }, [signature, showsPlot])
 
   React.useEffect(() => {
     const node = plotRef.current
@@ -320,30 +361,26 @@ function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptio
       setDrawnSignature(signature)
       return
     }
-    // Recharts lays marks out a render after mount and animates them by time from there, so
-    // after ANIMATION_MS the frame watches the marks and reports ready once they draw the
-    // same on consecutive frames. The frame cap keeps a chart from waiting forever.
     let frame = 0
-    let frames = 0
-    let settled = 0
-    let previous = markGeometry(plotRef.current)
-    const watch = () => {
-      const current = markGeometry(plotRef.current)
-      settled = current === previous ? settled + 1 : 0
-      previous = current
-      frames += 1
-      if (settled >= SETTLED_FRAMES || frames >= MAX_SETTLE_FRAMES) setDrawnSignature(signature)
-      else frame = requestAnimationFrame(watch)
-    }
-    const timer = setTimeout(() => {
-      previous = markGeometry(plotRef.current)
-      frame = requestAnimationFrame(watch)
+    const wait = setTimeout(() => {
+      frame = requestAnimationFrame(() => {
+        drawing.current.waited = true
+        settle()
+      })
     }, ANIMATION_MS)
-    return () => {
-      clearTimeout(timer)
-      cancelAnimationFrame(frame)
+    let frames = 0
+    const count = () => {
+      frames += 1
+      if (frames >= MAX_SETTLE_FRAMES) setDrawnSignature(signature)
+      else backstop = requestAnimationFrame(count)
     }
-  }, [width, animate, drawn, signature])
+    let backstop = requestAnimationFrame(count)
+    return () => {
+      clearTimeout(wait)
+      cancelAnimationFrame(frame)
+      cancelAnimationFrame(backstop)
+    }
+  }, [width, animate, drawn, signature, settle])
 
   const state = width <= 0 ? "measuring" : drawn ? "ready" : "drawing"
   const height = model.size.kind === "height" ? model.size.height : Math.round(width / RATIOS[model.size.aspectRatio])
@@ -352,7 +389,7 @@ function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptio
   let content: React.ReactNode
   if (width <= 0) content = <div data-slot="chart-skeleton" aria-hidden className="size-full rounded-lg bg-muted" />
   else if (model.empty) content = <div data-slot="chart-empty" className="flex size-full items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">No data</div>
-  else content = <ChartPlot model={model} options={options} width={width} height={height} animate={animate} signature={signature} />
+  else content = <ChartPlot model={model} options={options} width={width} height={height} animate={animate} signature={signature} track={track} />
 
   return (
     <div className="flex w-full flex-col gap-3">

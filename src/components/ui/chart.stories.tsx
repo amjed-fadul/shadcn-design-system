@@ -46,9 +46,14 @@ async function waitForReady(canvasElement: HTMLElement) {
   await waitFor(() => expect(canvasElement.querySelector('[data-slot="chart-plot"]')?.getAttribute("data-chart-state")).toBe("ready"), { timeout: 3000 })
 }
 
-// Ready means drawn: once the chart reports ready, no mark moves by a visible amount.
+// Ready means drawn: once the chart reports ready, no mark moves by a visible amount. Bars and
+// sectors animate their paths, lines their dash pattern and areas a clip rectangle.
 async function expectSettledAtReady(canvasElement: HTMLElement) {
-  const coordinates = () => [...canvasElement.querySelectorAll(".recharts-rectangle, .recharts-curve, .recharts-sector")].flatMap((mark) => (mark.getAttribute("d") ?? "").match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [])
+  const numbers = (value: string | null) => (value ?? "").match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? []
+  const coordinates = () => [
+    ...[...canvasElement.querySelectorAll(".recharts-rectangle, .recharts-curve, .recharts-sector")].flatMap((mark) => [...numbers(mark.getAttribute("d")), ...numbers(mark.getAttribute("stroke-dasharray"))]),
+    ...[...canvasElement.querySelectorAll("clipPath rect")].flatMap((rect) => [...numbers(rect.getAttribute("width")), ...numbers(rect.getAttribute("height"))]),
+  ]
   const atReady = coordinates()
   await new Promise((resolve) => setTimeout(resolve, 600))
   const later = coordinates()

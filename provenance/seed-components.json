@@ -117,7 +117,7 @@
     },
     "chart": {
       "canonicalPath": "src/components/ui/chart.tsx",
-      "canonicalBlobSha": "af55f8d5ffc5f6512ca47a72496a26731b395d0f",
+      "canonicalBlobSha": "45208b338afd2b02b0d99058ecece1607cbac998",
       "implementationKind": "repo-native",
       "packageDependencies": [
         "react-is@19.3.0",
