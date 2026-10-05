@@ -7,10 +7,14 @@ marker) and #29 (colour tokens). Tokens, props and the export inventory are unch
 
 The Canvas handoff is [CANVAS-RELEASE-014](CANVAS-RELEASE-014.md).
 
-**Status: accepted by the owner on 2026-10-05; macOS release qualification running.**
+**Status: accepted by the owner on 2026-10-05; macOS release qualification passed.**
 - **Candidate:** the owner accepted tarball `b7041f0e…` (payload `cee87378…`).
-- **Qualification:** the manual macOS `release-qualification` workflow is running on `1ba5c02`
-  ([run 37275097186](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37275097186)).
+- **Qualification:** passed on `1ba5c02`, [run 37275097186](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37275097186). Every step passed:
+  - all 1,850 unit tests and 257 Storybook tests;
+  - both audits;
+  - `release:verify`;
+  - a byte-identical rebuild of the committed candidate (64 files).
+
   Commits after the source `65d7387` change tests, the vitest config, docs and the committed
   manifest only.
 - **Merge:** the owner merges.
@@ -73,7 +77,7 @@ From a detached clean worktree at `65d7387`, with Node 22.18.0, npm 10.9.3 and C
       `collapsible="none"` inner panel is its only semantic change;
     - Accordion and Card keep their exact Release 008 identities;
     - the unit project defaults to 30 s.
-  - **Rerun:** the six tests pass with CI's command, and the full suite is being rerun at `3ea9a9d`.
+  - **Rerun:** the full suite at `1ba5c02`, with CI's command, passed all 1,850 tests in 129 files, including the three Release 014 delta tests.
 - **Storybook:** 257 of 257 tests in 44 files, with the axe gate at
   `error`; `build-storybook` passed. The six new stories fail on Release 013's source.
 - **`npm audit`:** full and production audits found 0 vulnerabilities.
