@@ -113,3 +113,27 @@ export const SizeComparison: Story = {
     })
   },
 }
+
+// Beside an action, the title column takes the free width and the action column fits its button (DS10).
+export const HeaderWithAction: Story = {
+  render: (args) => (
+    <Card size={args.size} style={{ width: 700 }}>
+      <CardHeader>
+        <CardTitle>Quarterly revenue across every region and product line</CardTitle>
+        <CardDescription>Updated hourly from the billing ledger.</CardDescription>
+        <CardAction><Button variant="outline" size="sm">Export</Button></CardAction>
+      </CardHeader>
+      <CardContent><p className="text-sm">Revenue is up 12% on the previous quarter.</p></CardContent>
+    </Card>
+  ),
+  play: async ({ canvasElement }) => {
+    const header = canvasElement.querySelector<HTMLElement>('[data-slot="card-header"]')!
+    const title = canvasElement.querySelector<HTMLElement>('[data-slot="card-title"]')!
+    const action = canvasElement.querySelector<HTMLElement>('[data-slot="card-action"]')!
+    const style = getComputedStyle(header)
+    const content = header.getBoundingClientRect().width - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+    const gap = parseFloat(style.columnGap) || 0
+    await expect(title.getBoundingClientRect().width).toBeGreaterThanOrEqual(content - action.getBoundingClientRect().width - gap - 1)
+    await expect(Math.abs(action.getBoundingClientRect().right - (header.getBoundingClientRect().right - parseFloat(style.paddingRight)))).toBeLessThan(1)
+  },
+}

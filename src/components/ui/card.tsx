@@ -7,7 +7,7 @@ function Card({ className, size = "default", ...props }: React.ComponentProps<"d
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-header" className={cn("grid gap-1 p-4 group-data-[size=sm]/card:p-3", className)} {...props} />
+  return <div data-slot="card-header" className={cn("grid gap-1 p-4 group-data-[size=sm]/card:p-3 has-data-[slot=card-action]:grid-cols-[1fr_auto]", className)} {...props} />
 }
 
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {

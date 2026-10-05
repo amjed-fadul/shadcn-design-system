@@ -24,6 +24,9 @@ export default mergeConfig(
             // The in-process TypeScript contract analysis needs more than 3 GB of heap.
             // Pin it so the limit does not follow host RAM (about 2 GB on a 7 GB CI runner).
             execArgv: ["--max-old-space-size=4096"],
+            // Many unit tests build TypeScript programs or load the contract graph, which can pass
+            // vitest's 5 s default on a macOS runner or a loaded machine. Longer tests set their own.
+            testTimeout: 30_000,
           },
         },
         {

@@ -35,7 +35,7 @@
   "components": {
     "accordion": {
       "canonicalPath": "src/components/ui/accordion.tsx",
-      "canonicalBlobSha": "ffc7759b74b69539f5e2e86ff45fb3ab28a94b46",
+      "canonicalBlobSha": "0f8f074060d4a4257dc1370ae9bc4a0f4cfa6e98",
       "implementationKind": "semantic-token-normalized-derivative",
       "upstreamPath": "apps/v4/registry/bases/radix/ui/accordion.tsx",
       "upstreamBlobSha": "2ba94b62680f33f1d36b9092866578695cf5f633",
@@ -109,7 +109,7 @@
     },
     "card": {
       "canonicalPath": "src/components/ui/card.tsx",
-      "canonicalBlobSha": "af588ca536e03d0c94d7612d4166771e5bfa9b84",
+      "canonicalBlobSha": "32b71dfe351353cfa1279b066130ff49ada66d68",
       "implementationKind": "semantic-token-normalized-derivative",
       "upstreamPath": "apps/v4/registry/bases/radix/ui/card.tsx",
       "upstreamBlobSha": "2ba46512ffc3dd65f008c04d53399189d390fb79",
@@ -343,7 +343,7 @@
     },
     "sidebar": {
       "canonicalPath": "src/components/ui/sidebar.tsx",
-      "canonicalBlobSha": "e7710240125fda99d4ad7fdd33a40b5cf55d5ed4",
+      "canonicalBlobSha": "d7752c1ff6dd2c7bc4bf92dba39b00e3286c8a5a",
       "implementationKind": "semantic-token-normalized-derivative",
       "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
       "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4",

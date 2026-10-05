@@ -3,7 +3,7 @@
   "id": "card",
   "source": {
     "canonicalPath": "src/components/ui/card.tsx",
-    "canonicalBlobSha": "af588ca536e03d0c94d7612d4166771e5bfa9b84",
+    "canonicalBlobSha": "32b71dfe351353cfa1279b066130ff49ada66d68",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/card.tsx",
     "upstreamBlobSha": "2ba46512ffc3dd65f008c04d53399189d390fb79"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/card.tsx@af588ca536e03d0c94d7612d4166771e5bfa9b84"
+      "source": "src/components/ui/card.tsx@32b71dfe351353cfa1279b066130ff49ada66d68"
     },
     "tokens": {
       "kind": "token-contract",

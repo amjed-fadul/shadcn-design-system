@@ -406,3 +406,79 @@ export const NavigationRtl: Story = {
     await expect(canvas.getAllByRole("link")).toHaveLength(2)
   },
 }
+
+// Variant styling (DS6). The inner panel carries the sidebar surface; a floating panel is a bordered,
+// shadowed card; beside an inset sidebar the main area is a rounded, shadowed card, flush with the
+// sidebar's padding while it is expanded. collapsible="none" renders its variant too.
+const variantLayout = (variant: "sidebar" | "floating" | "inset", collapsible: "offcanvas" | "none") => (
+  <SidebarProvider defaultOpen>
+    <Sidebar role="navigation" aria-label="Workspace navigation" variant={variant} collapsible={collapsible}>
+      <SidebarContent>
+        <SidebarMenu>
+          <SidebarMenuItem><SidebarMenuButton isActive>Overview</SidebarMenuButton></SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarContent>
+    </Sidebar>
+    <SidebarInset>
+      <header className="flex h-14 items-center gap-2 border-b px-4">
+        {collapsible === "none" ? null : <SidebarTrigger />}
+        <h1 className="text-sm font-semibold">Overview</h1>
+      </header>
+    </SidebarInset>
+  </SidebarProvider>
+)
+const transparent = "rgba(0, 0, 0, 0)"
+const box = (element: Element) => getComputedStyle(element)
+
+export const InsetVariant: Story = {
+  decorators: [finiteHost],
+  render: () => variantLayout("inset", "none"),
+  play: async ({ canvasElement }) => {
+    const inner = box(canvasElement.querySelector('[data-slot="sidebar-inner"]')!)
+    const inset = box(canvasElement.querySelector('[data-slot="sidebar-inset"]')!)
+    await expect(box(canvasElement.querySelector('[data-slot="sidebar"]')!).paddingTop).toBe("8px")
+    await expect(inner.backgroundColor).not.toBe(transparent)
+    await expect([inset.marginTop, inset.marginRight, inset.marginBottom, inset.marginLeft]).toEqual(["8px", "8px", "8px", "0px"])
+    await expect(parseFloat(inset.borderTopLeftRadius)).toBeGreaterThan(0)
+    await expect(inset.boxShadow).not.toBe("none")
+  },
+}
+
+export const FloatingVariant: Story = {
+  decorators: [finiteHost],
+  render: () => variantLayout("floating", "none"),
+  play: async ({ canvasElement }) => {
+    const inner = box(canvasElement.querySelector('[data-slot="sidebar-inner"]')!)
+    const inset = box(canvasElement.querySelector('[data-slot="sidebar-inset"]')!)
+    await expect(inner.backgroundColor).not.toBe(transparent)
+    await expect(inner.borderTopWidth).toBe("1px")
+    await expect(parseFloat(inner.borderTopLeftRadius)).toBeGreaterThan(0)
+    await expect(inner.boxShadow).not.toBe("none")
+    await expect(inset.marginLeft).toBe("0px")
+    await expect(inset.boxShadow).toBe("none")
+  },
+}
+
+export const DefaultVariantSurface: Story = {
+  decorators: [finiteHost],
+  render: () => variantLayout("sidebar", "none"),
+  play: async ({ canvasElement }) => {
+    const inner = box(canvasElement.querySelector('[data-slot="sidebar-inner"]')!)
+    const inset = box(canvasElement.querySelector('[data-slot="sidebar-inset"]')!)
+    await expect(inner.backgroundColor).not.toBe(transparent)
+    await expect(inner.borderTopWidth).toBe("0px")
+    await expect(inset.marginTop).toBe("0px")
+    await expect(inset.boxShadow).toBe("none")
+  },
+}
+
+export const InsetCollapsible: Story = {
+  decorators: [finiteHost],
+  render: () => variantLayout("inset", "offcanvas"),
+  play: async ({ canvasElement }) => {
+    const inset = canvasElement.querySelector('[data-slot="sidebar-inset"]')!
+    await expect(box(inset).marginLeft).toBe("0px")
+    await userEvent.click(within(canvasElement).getByRole("button", { name: "Toggle Sidebar" }))
+    await waitFor(() => expect(box(inset).marginLeft).toBe("8px"))
+  },
+}
