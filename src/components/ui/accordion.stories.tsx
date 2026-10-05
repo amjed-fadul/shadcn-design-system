@@ -64,3 +64,30 @@ export const MultipleItems: Story = {
     </div>
   ),
 }
+
+// A question that wraps starts every line at the trigger's start edge (DS1).
+export const LongQuestion: Story = {
+  args: {
+    type: "single",
+  },
+  render: () => (
+    <div className="w-72">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="refunds">
+          <AccordionTrigger>Can I get a refund if I cancel my annual plan partway through the year?</AccordionTrigger>
+          <AccordionContent>Yes. Unused months are refunded to the original payment method.</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole("button", { name: /refund/ })
+    await expect(getComputedStyle(trigger).textAlign).toBe("start")
+    const range = document.createRange()
+    range.selectNodeContents(trigger.firstChild!)
+    const lines = [...range.getClientRects()]
+    await expect(lines.length).toBeGreaterThan(1)
+    const start = trigger.getBoundingClientRect().left
+    for (const line of lines) await expect(Math.abs(line.left - start)).toBeLessThan(1)
+  },
+}

@@ -6,7 +6,17 @@ This repository is separate from Canvas. The official shadcn repository is upstr
 
 Copyright (c) 2026 Amjed Fadul. All rights reserved; see [LICENSE](LICENSE). Third-party components and dependencies keep their own licences; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-## Active producer: Release 013 candidate
+## Active producer: Release 014 candidate
+
+Release 014 (`0.0.0-release.14`) fixes three layout gaps Canvas found in its composition study (#26). Tokens, props and exports are unchanged.
+
+- **Accordion:** a question that wraps starts every line at the trigger's start edge; Release 013 centred it.
+- **Sidebar variants:** `floating` draws a bordered, shadowed panel, and beside an `inset` sidebar the main area becomes a rounded, shadowed card. Both now render with `collapsible="none"` too, where Release 013 drew every variant like `sidebar`.
+- **CardHeader:** beside a `CardAction`, the title takes the free width and the action fits its content.
+
+See [Release 014](docs/RELEASE-014.md) and the [Canvas handoff](docs/CANVAS-RELEASE-014.md).
+
+## Release 013
 
 Release 013 (`0.0.0-release.13`) implements the chart follow-ups Canvas raised after adopting Release 012 (#22, #23), and adds the licence files. Tokens and exports are unchanged.
 

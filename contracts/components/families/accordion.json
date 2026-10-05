@@ -3,7 +3,7 @@
   "id": "accordion",
   "source": {
     "canonicalPath": "src/components/ui/accordion.tsx",
-    "canonicalBlobSha": "ffc7759b74b69539f5e2e86ff45fb3ab28a94b46",
+    "canonicalBlobSha": "0f8f074060d4a4257dc1370ae9bc4a0f4cfa6e98",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/accordion.tsx",
     "upstreamBlobSha": "2ba94b62680f33f1d36b9092866578695cf5f633"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/accordion.tsx@ffc7759b74b69539f5e2e86ff45fb3ab28a94b46"
+      "source": "src/components/ui/accordion.tsx@0f8f074060d4a4257dc1370ae9bc4a0f4cfa6e98"
     },
     "declaration": {
       "kind": "inherited-interface",

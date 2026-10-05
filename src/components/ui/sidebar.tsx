@@ -137,7 +137,7 @@ function Sidebar({
   const flowSpacer = <div data-slot="sidebar-flow-spacer" data-state={effectiveState} data-collapsible={effectiveState === "collapsed" ? collapsible : ""} data-side={side} className={cn("h-full shrink-0 w-(--sidebar-width) data-[collapsible=offcanvas]:w-0 data-[collapsible=icon]:w-(--sidebar-width-icon) data-[side=left]:order-first rtl:data-[side=left]:order-last data-[side=right]:order-last rtl:data-[side=right]:order-first", !isMobile && collapsible !== "none" && "transition-[width] duration-300 ease-out", (variant === "floating" || variant === "inset") && "data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+--spacing(4))]")} />
 
   if (collapsible === "none") {
-    return <SidebarRenderContext.Provider value={{ side, state: effectiveState }}><>{flowSpacer}<div dir={dir} data-slot="sidebar" data-state={effectiveState} data-collapsible="" data-variant={variant} data-side={side} className={cn("absolute inset-y-0 flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground data-[side=left]:left-0 data-[side=right]:right-0", className)} style={style} {...props}>{children}</div></></SidebarRenderContext.Provider>
+    return <SidebarRenderContext.Provider value={{ side, state: effectiveState }}><>{flowSpacer}<div dir={dir} data-slot="sidebar" data-state={effectiveState} data-collapsible="" data-variant={variant} data-side={side} className={cn("group peer absolute inset-y-0 flex h-full w-(--sidebar-width) flex-col text-sidebar-foreground data-[side=left]:left-0 data-[side=right]:right-0", (variant === "floating" || variant === "inset") && "p-2", className)} style={style} {...props}><div data-sidebar="sidebar" data-slot="sidebar-inner" className="flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm">{children}</div></div></></SidebarRenderContext.Provider>
   }
 
   if (isMobile) {
@@ -180,7 +180,7 @@ function Sidebar({
     <SidebarRenderContext.Provider value={{ side, state: effectiveState }}><>{flowSpacer}<div dir={dir} className="group peer absolute inset-y-0 flex h-full w-(--sidebar-width) text-sidebar-foreground data-[side=left]:left-0 data-[side=right]:right-0" data-state={effectiveState} data-collapsible={effectiveState === "collapsed" ? collapsible : ""} data-variant={variant} data-side={side} data-slot="sidebar">
       <div data-slot="sidebar-gap" className={cn("relative w-(--sidebar-width) bg-transparent transition-[width] duration-300 ease-out", "group-data-[collapsible=offcanvas]:w-0", "group-data-[side=right]:rotate-180", variant === "floating" || variant === "inset" ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+--spacing(4))]" : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)")} />
       <div data-slot="sidebar-container" data-side={side} className={cn("absolute inset-y-0 z-10 flex h-full w-(--sidebar-width) transition-[left,right,width,transform] duration-300 ease-out data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:-translate-x-full data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:translate-x-full", variant === "floating" || variant === "inset" ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+--spacing(4)+2px)]" : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l", className)} style={style} {...props}>
-        <div data-sidebar="sidebar" data-slot="sidebar-inner" className="flex size-full flex-col">{children}</div>
+        <div data-sidebar="sidebar" data-slot="sidebar-inner" className="flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm">{children}</div>
       </div>
     </div></></SidebarRenderContext.Provider>
   )
@@ -200,7 +200,9 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
 }
 
 function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
-  return <main data-slot="sidebar-inset" className={cn("relative flex w-full flex-1 flex-col bg-background", className)} {...props} />
+  // Beside an inset sidebar the main area is a rounded card, flush with the sidebar's padding while it
+  // is expanded. Sides are physical, as the sidebar's own placement is.
+  return <main data-slot="sidebar-inset" className={cn("relative flex w-full flex-1 flex-col bg-background peer-data-[variant=inset]:m-2 peer-data-[variant=inset]:rounded-xl peer-data-[variant=inset]:shadow-sm peer-data-[variant=inset]:peer-data-[state=expanded]:peer-data-[side=left]:ml-0 peer-data-[variant=inset]:peer-data-[state=expanded]:peer-data-[side=right]:mr-0", className)} {...props} />
 }
 
 function SidebarInput({ className, ...props }: React.ComponentProps<typeof Input>) {

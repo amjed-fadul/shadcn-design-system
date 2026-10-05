@@ -32,8 +32,8 @@
     },
     {
       "path": "README.md",
-      "gitBlob": "fcc42d4e6d2515f1266b47142adaaf095f077e86",
-      "sha256": "6eade3087e14456978338eb293852bb3f367fb061b106730e54306463c0f7055"
+      "gitBlob": "b454a1bbb48181c403a89c8ce2cab4015fc365ae",
+      "sha256": "2e348c66373e5856f2ba93d984ebd2fd5d6a5cc850aede797ce8b49e8ef6c793"
     },
     {
       "path": "components.json",
@@ -57,8 +57,8 @@
     },
     {
       "path": "contracts/components/families/accordion.json",
-      "gitBlob": "a0e9a064fe027b4de838e1de0d8740254a8d3992",
-      "sha256": "d179fd65f14be9714629093bc42cdd06bb7b54ae347560c9e56c3f8841005b5a"
+      "gitBlob": "6b424c9c28c476fc2657624b5aff5e0ff8257fc8",
+      "sha256": "8e73d36fdd26ad63313055f771b98ee2c8c35c73750f04d3a9778dc810c8a1d2"
     },
     {
       "path": "contracts/components/families/alert-dialog.json",
@@ -92,8 +92,8 @@
     },
     {
       "path": "contracts/components/families/card.json",
-      "gitBlob": "bff084df6cfb47ba5e47b24b22b4ca4db09d4a78",
-      "sha256": "e306715b9fa15e6025c3f0fdeb3d54abae9807dbfbcdf005d6bb075f0a392027"
+      "gitBlob": "2f05c7b0d5b1616ea37670dbc771aa05ad8cc2fc",
+      "sha256": "4ad04d0bb7913e8a7ab85d328f35ccf723bd7e9299ad68e17fffb496e034e44f"
     },
     {
       "path": "contracts/components/families/chart.json",
@@ -212,8 +212,8 @@
     },
     {
       "path": "contracts/components/families/sidebar.json",
-      "gitBlob": "fbab8e07fb86625a72412adda795bc81afb79ac3",
-      "sha256": "26f7109b5d4b3d7feb17684531437ecfc33ca90aafb2a1f91915f5919c7f135a"
+      "gitBlob": "e888032edf5f6fddd0ec77f89001bee76dfbbd29",
+      "sha256": "d9245e3d3ce6288694f470d5eba8e7e79260276e79857ee64d07f7d7c2fca763"
     },
     {
       "path": "contracts/components/families/skeleton.json",
@@ -1152,13 +1152,13 @@
     },
     {
       "path": "provenance/component-contract-source.json",
-      "gitBlob": "d1616c8a9c18c4ebf27c8ee6a9557e3ca0e099d2",
-      "sha256": "60e5d8b75d1fc3b8c4cbe7fbb0153f8ee911dcb7938ba1ccb858a8c7d0a0e71c"
+      "gitBlob": "9ab8d79237b4988e431e4cade4b9f6b5ffc5166a",
+      "sha256": "4bf2136ba13300a5ca1bd1e2d84f5d43d800ddc9e7115fde592d2834b75851df"
     },
     {
       "path": "provenance/seed-components.json",
-      "gitBlob": "4d1c5308f8360b52c953b43987f732cf176fad58",
-      "sha256": "7764ac0ed8f959466bf53568d7a7232683e84ace6482287e10db158b2f008fc0"
+      "gitBlob": "dbd07b347c10c56f2deaaa3871aeabbcf55e4131",
+      "sha256": "c7ab748100b4353860276b118814700b9680ccd9725f13399e64217298cfe28a"
     },
     {
       "path": "provenance/token-contract-source.json",
@@ -1252,13 +1252,13 @@
     },
     {
       "path": "src/components/ui/accordion.stories.tsx",
-      "gitBlob": "6c56782dbe2e9fd9bde9a4c8d77c51162a00d05d",
-      "sha256": "1afd58b4025082e379172e975b09661ac8f1778d000d55fb4e7b5ed0e62bb238"
+      "gitBlob": "ea6dd44b7679f24d3771e599454ca4e4a88c291e",
+      "sha256": "6735f136bc37e89c496f0dbc60a8ae6af03446637a183a9985d976596366b05c"
     },
     {
       "path": "src/components/ui/accordion.tsx",
-      "gitBlob": "ffc7759b74b69539f5e2e86ff45fb3ab28a94b46",
-      "sha256": "cb7397b88ac00b6700f76e8d3d2155acf5e5c37bde0c42c3a8b908e78872bdd5"
+      "gitBlob": "0f8f074060d4a4257dc1370ae9bc4a0f4cfa6e98",
+      "sha256": "e3b09ab99eb26c53aac10b2bd9d6a61c927d9a235121a2d457514a311ca785b8"
     },
     {
       "path": "src/components/ui/alert-dialog.stories.tsx",
@@ -1322,13 +1322,13 @@
     },
     {
       "path": "src/components/ui/card.stories.tsx",
-      "gitBlob": "8a321ebe19ad61e5f745f815bbe02bd5e2ea253a",
-      "sha256": "96e58b716d2702a02eccb402a8236e3a019dde58752bc5cb77565c39a09d9c1d"
+      "gitBlob": "668182f9ebf9458287eba63de487b90d6e6cea1a",
+      "sha256": "589ebefe5ff89821bb6e6a973bfaa6b5fa2e4841301fd2ad222cdaa50ca9ff01"
     },
     {
       "path": "src/components/ui/card.tsx",
-      "gitBlob": "af588ca536e03d0c94d7612d4166771e5bfa9b84",
-      "sha256": "44b1d5f5a2431bb80e4316c2c5fd9fe3037f5f1a38877b1eceb27ee866698f14"
+      "gitBlob": "32b71dfe351353cfa1279b066130ff49ada66d68",
+      "sha256": "77b2f40032cc995667d028b6b1628b548f56b028dea0693b209d57f7f07f31e0"
     },
     {
       "path": "src/components/ui/chart-model.ts",
@@ -1582,13 +1582,13 @@
     },
     {
       "path": "src/components/ui/sidebar.stories.tsx",
-      "gitBlob": "5051432eee5b815dcfbcbd932a9e382c058b4250",
-      "sha256": "8893ee82334f854c0eed6b86ba5f712fb42bd6f2c9af6072f212d6409aec4abb"
+      "gitBlob": "39da4f3061323e2fd9567ef88b60c1d5a30ede25",
+      "sha256": "c8cf648f38be84dc8c59343b4f03dfcc2ee805defbce1299490631891ad0b60d"
     },
     {
       "path": "src/components/ui/sidebar.tsx",
-      "gitBlob": "e7710240125fda99d4ad7fdd33a40b5cf55d5ed4",
-      "sha256": "d6d53606b840477cccf563f286710eb4bd5e780abbbb800bf4fd06a21d8290c0"
+      "gitBlob": "d7752c1ff6dd2c7bc4bf92dba39b00e3286c8a5a",
+      "sha256": "acc713271f4112fe9cc48df73477b04abf9bd4c8aa5032a69af0e27f5a7496bf"
     },
     {
       "path": "src/components/ui/skeleton.stories.tsx",
@@ -372256,13 +372256,6 @@
               ]
             },
             {
-              "tokenId": "color.sidebar",
-              "evidenceRefs": [
-                "source",
-                "tokens"
-              ]
-            },
-            {
               "tokenId": "color.sidebar-foreground",
               "evidenceRefs": [
                 "source",
@@ -372315,11 +372308,49 @@
               "tokenId": "spacing.unit",
               "viaDerivedRule": {
                 "id": "spacing.multiplier",
-                "multiplier": 0
+                "multiplier": 2
               },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.sidebar",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.lg",
               "sourceContext": {
                 "applicability": [
-                  "group-data-[collapsible=offcanvas]"
+                  "group-data-[variant=floating]"
+                ]
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "color.sidebar-border",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[variant=floating]"
+                ]
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "shadow.sm",
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[variant=floating]"
                 ]
               },
               "evidenceRefs": [
@@ -372331,7 +372362,12 @@
               "tokenId": "spacing.unit",
               "viaDerivedRule": {
                 "id": "spacing.multiplier",
-                "multiplier": 2
+                "multiplier": 0
+              },
+              "sourceContext": {
+                "applicability": [
+                  "group-data-[collapsible=offcanvas]"
+                ]
               },
               "evidenceRefs": [
                 "source",
@@ -409029,6 +409065,151 @@
           "tokenDependencies": [
             {
               "tokenId": "color.background",
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 2
+              },
+              "when": {
+                "subject": "data",
+                "path": [
+                  {
+                    "kind": "peer"
+                  }
+                ],
+                "propName": "variant",
+                "equals": "inset"
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "radius.xl",
+              "when": {
+                "subject": "data",
+                "path": [
+                  {
+                    "kind": "peer"
+                  }
+                ],
+                "propName": "variant",
+                "equals": "inset"
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "shadow.sm",
+              "when": {
+                "subject": "data",
+                "path": [
+                  {
+                    "kind": "peer"
+                  }
+                ],
+                "propName": "variant",
+                "equals": "inset"
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
+              },
+              "when": {
+                "all": [
+                  {
+                    "subject": "data",
+                    "path": [
+                      {
+                        "kind": "peer"
+                      }
+                    ],
+                    "propName": "variant",
+                    "equals": "inset"
+                  },
+                  {
+                    "subject": "data",
+                    "path": [
+                      {
+                        "kind": "peer"
+                      }
+                    ],
+                    "propName": "state",
+                    "equals": "expanded"
+                  },
+                  {
+                    "subject": "data",
+                    "path": [
+                      {
+                        "kind": "peer"
+                      }
+                    ],
+                    "propName": "side",
+                    "equals": "left"
+                  }
+                ]
+              },
+              "evidenceRefs": [
+                "source",
+                "tokens"
+              ]
+            },
+            {
+              "tokenId": "spacing.unit",
+              "viaDerivedRule": {
+                "id": "spacing.multiplier",
+                "multiplier": 0
+              },
+              "when": {
+                "all": [
+                  {
+                    "subject": "data",
+                    "path": [
+                      {
+                        "kind": "peer"
+                      }
+                    ],
+                    "propName": "variant",
+                    "equals": "inset"
+                  },
+                  {
+                    "subject": "data",
+                    "path": [
+                      {
+                        "kind": "peer"
+                      }
+                    ],
+                    "propName": "state",
+                    "equals": "expanded"
+                  },
+                  {
+                    "subject": "data",
+                    "path": [
+                      {
+                        "kind": "peer"
+                      }
+                    ],
+                    "propName": "side",
+                    "equals": "right"
+                  }
+                ]
+              },
               "evidenceRefs": [
                 "source",
                 "tokens"
@@ -530085,5 +530266,5 @@
       "toggle-group.context"
     ]
   },
-  "sha256": "5e8c1d7620c307be9dc680180842d096fbb624aa1c9273fec956dea6e4353320"
+  "sha256": "cee873785f1cab82c3ea5008cd48243ccea91935d30ac02ece8ad1fbd5d558a4"
 }

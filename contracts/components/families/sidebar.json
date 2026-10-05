@@ -3,7 +3,7 @@
   "id": "sidebar",
   "source": {
     "canonicalPath": "src/components/ui/sidebar.tsx",
-    "canonicalBlobSha": "e7710240125fda99d4ad7fdd33a40b5cf55d5ed4",
+    "canonicalBlobSha": "d7752c1ff6dd2c7bc4bf92dba39b00e3286c8a5a",
     "implementationKind": "semantic-token-normalized-derivative",
     "upstreamPath": "apps/v4/registry/bases/radix/ui/sidebar.tsx",
     "upstreamBlobSha": "de2019bb3f9f434592db5a8e25db76d16a5f84f4"
@@ -11,7 +11,7 @@
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/sidebar.tsx@e7710240125fda99d4ad7fdd33a40b5cf55d5ed4"
+      "source": "src/components/ui/sidebar.tsx@d7752c1ff6dd2c7bc4bf92dba39b00e3286c8a5a"
     },
     "tokens": {
       "kind": "token-contract",
@@ -415,13 +415,6 @@
             ]
           },
           {
-            "tokenId": "color.sidebar",
-            "evidenceRefs": [
-              "source",
-              "tokens"
-            ]
-          },
-          {
             "tokenId": "color.sidebar-foreground",
             "evidenceRefs": [
               "source",
@@ -474,11 +467,49 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 0
+              "multiplier": 2
             },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.lg",
             "sourceContext": {
               "applicability": [
-                "group-data-[collapsible=offcanvas]"
+                "group-data-[variant=floating]"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "color.sidebar-border",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[variant=floating]"
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "shadow.sm",
+            "sourceContext": {
+              "applicability": [
+                "group-data-[variant=floating]"
               ]
             },
             "evidenceRefs": [
@@ -490,7 +521,12 @@
             "tokenId": "spacing.unit",
             "viaDerivedRule": {
               "id": "spacing.multiplier",
-              "multiplier": 2
+              "multiplier": 0
+            },
+            "sourceContext": {
+              "applicability": [
+                "group-data-[collapsible=offcanvas]"
+              ]
             },
             "evidenceRefs": [
               "source",
@@ -569,6 +605,37 @@
                     ]
                   },
                   {
+                    "id": "plain-inner",
+                    "host": {
+                      "kind": "intrinsic",
+                      "tag": "div"
+                    },
+                    "receivesPublicProps": false,
+                    "dataAttributes": [
+                      {
+                        "name": "data-sidebar",
+                        "source": "literal",
+                        "value": "sidebar",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "name": "data-slot",
+                        "source": "literal",
+                        "value": "sidebar-inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
+                    "derivedSpreads": [],
+                    "children": [],
+                    "evidenceRefs": [
+                      "source"
+                    ]
+                  },
+                  {
                     "id": "plain",
                     "host": {
                       "kind": "intrinsic",
@@ -618,7 +685,14 @@
                       }
                     ],
                     "derivedSpreads": [],
-                    "children": [],
+                    "children": [
+                      {
+                        "nodeId": "plain-inner",
+                        "evidenceRefs": [
+                          "source"
+                        ]
+                      }
+                    ],
                     "evidenceRefs": [
                       "source"
                     ]
@@ -1630,6 +1704,151 @@
         "tokenDependencies": [
           {
             "tokenId": "color.background",
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 2
+            },
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "peer"
+                }
+              ],
+              "propName": "variant",
+              "equals": "inset"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "radius.xl",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "peer"
+                }
+              ],
+              "propName": "variant",
+              "equals": "inset"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "shadow.sm",
+            "when": {
+              "subject": "data",
+              "path": [
+                {
+                  "kind": "peer"
+                }
+              ],
+              "propName": "variant",
+              "equals": "inset"
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "all": [
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "peer"
+                    }
+                  ],
+                  "propName": "variant",
+                  "equals": "inset"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "peer"
+                    }
+                  ],
+                  "propName": "state",
+                  "equals": "expanded"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "peer"
+                    }
+                  ],
+                  "propName": "side",
+                  "equals": "left"
+                }
+              ]
+            },
+            "evidenceRefs": [
+              "source",
+              "tokens"
+            ]
+          },
+          {
+            "tokenId": "spacing.unit",
+            "viaDerivedRule": {
+              "id": "spacing.multiplier",
+              "multiplier": 0
+            },
+            "when": {
+              "all": [
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "peer"
+                    }
+                  ],
+                  "propName": "variant",
+                  "equals": "inset"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "peer"
+                    }
+                  ],
+                  "propName": "state",
+                  "equals": "expanded"
+                },
+                {
+                  "subject": "data",
+                  "path": [
+                    {
+                      "kind": "peer"
+                    }
+                  ],
+                  "propName": "side",
+                  "equals": "right"
+                }
+              ]
+            },
             "evidenceRefs": [
               "source",
               "tokens"
