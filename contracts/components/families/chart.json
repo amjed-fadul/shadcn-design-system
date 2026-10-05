@@ -3,13 +3,13 @@
   "id": "chart",
   "source": {
     "canonicalPath": "src/components/ui/chart.tsx",
-    "canonicalBlobSha": "09d45e9c531ced931862b66ba297176a1dfb46dc",
+    "canonicalBlobSha": "45208b338afd2b02b0d99058ecece1607cbac998",
     "implementationKind": "repo-native"
   },
   "evidence": {
     "source": {
       "kind": "canonical-source",
-      "source": "src/components/ui/chart.tsx@09d45e9c531ced931862b66ba297176a1dfb46dc"
+      "source": "src/components/ui/chart.tsx@45208b338afd2b02b0d99058ecece1607cbac998"
     },
     "tokens": {
       "kind": "token-contract",
@@ -62,6 +62,21 @@
             ]
           },
           {
+            "name": "barSize",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "lg",
+                "md",
+                "sm"
+              ]
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
             "name": "categoryKey",
             "required": true,
             "type": {
@@ -76,6 +91,20 @@
             "required": false,
             "type": {
               "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "centerValue",
+            "required": false,
+            "type": {
+              "kind": "enum",
+              "values": [
+                "none",
+                "total"
+              ]
             },
             "evidenceRefs": [
               "source"
@@ -163,6 +192,17 @@
             ]
           },
           {
+            "name": "locale",
+            "required": false,
+            "type": {
+              "kind": "string"
+            },
+            "default": "en-US",
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
             "name": "orientation",
             "required": false,
             "type": {
@@ -235,6 +275,26 @@
             "required": false,
             "type": {
               "kind": "string"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "valueMax",
+            "required": false,
+            "type": {
+              "kind": "number"
+            },
+            "evidenceRefs": [
+              "source"
+            ]
+          },
+          {
+            "name": "valueMin",
+            "required": false,
+            "type": {
+              "kind": "number"
             },
             "evidenceRefs": [
               "source"
@@ -377,7 +437,7 @@
           {
             "feature": "keyboard navigation",
             "owner": "component",
-            "mechanism": "The plot is a single tab stop; arrow keys move between data points and the tooltip follows focus. Donut and radial charts keep that single stop.",
+            "mechanism": "The plot is a single tab stop; arrow keys move between data points, the tooltip follows focus and Escape dismisses it. Donut and radial charts keep that single stop.",
             "evidenceRefs": [
               "source",
               "runtime"
@@ -386,7 +446,7 @@
           {
             "feature": "draw-finished signal",
             "owner": "component",
-            "mechanism": "[data-slot=chart-plot] carries data-chart-state: measuring until the container has a width (a skeleton reserves the final size), drawing while series animate, and ready once drawing finishes, immediately when animation is off or prefers-reduced-motion is set. Headless capture waits for data-chart-state=ready.",
+            "mechanism": "[data-slot=chart-plot] carries data-chart-state: measuring until the container has a width (a skeleton reserves the final size), drawing while marks animate, and ready once every animated mark has finished drawing: Recharts reports each mark's animation end after setting its final frame, so ready never precedes the drawn marks, on a slow CPU too. An update that moves no mark is ready once the animation time has passed; ready comes immediately when animation is off or prefers-reduced-motion is set, and after 180 frames at the latest. Any change to the data, options, locale, value range or plot size starts a new drawing. Headless capture waits for data-chart-state=ready.",
             "evidenceRefs": [
               "source",
               "runtime"

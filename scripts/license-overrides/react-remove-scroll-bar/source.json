@@ -1,0 +1,8 @@
+{
+  "package": "react-remove-scroll-bar",
+  "reason": "The npm package declares MIT but publishes no licence file, so its upstream LICENSE is supplied here.",
+  "source": "https://github.com/theKashey/react-remove-scroll-bar/blob/master/LICENSE",
+  "lastChangedInCommit": "7301c160fda44cb8cf2b9fdfde61efad35736196",
+  "gitBlob": "7c08c3990396ecefd90f99ff5d9a34f26f5b5616",
+  "retrievedOn": "2026-10-05"
+}

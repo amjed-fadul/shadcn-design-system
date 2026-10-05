@@ -121,6 +121,60 @@ describe("Chart", () => {
     expect(plot().getAttribute("data-chart-state")).toBe("ready")
   })
 
+  // Ready means drawn: stepping frame by frame, the plot never changes once the chart reports ready.
+  // Bars and sectors animate their paths, lines their dash pattern and areas a clip rectangle.
+  function framesAfterReady(steps = 90) {
+    const surface = () => container.querySelector("svg.recharts-surface")?.innerHTML ?? ""
+    const frames: { state: string | null; surface: string }[] = []
+    for (let step = 0; step < steps; step += 1) {
+      act(() => { vi.advanceTimersByTime(16) })
+      frames.push({ state: plot().getAttribute("data-chart-state"), surface: surface() })
+    }
+    const ready = frames.findIndex((frame) => frame.state === "ready")
+    return { ready, changed: frames.slice(ready).filter((frame) => frame.surface !== frames[ready].surface).length }
+  }
+
+  test.each<[string, Record<string, unknown>]>([
+    ["bar", {}],
+    ["stacked area", { type: "area", layout: "stacked" }],
+    ["line", { type: "line" }],
+    ["donut", { type: "donut", data: [{ plan: "Free", n: 600 }, { plan: "Pro", n: 300 }], categoryKey: "plan", series: undefined, valueKey: "n", aspectRatio: "1/1", height: undefined }],
+    ["radial", { type: "radial", data: [{ plan: "Free", n: 600 }, { plan: "Pro", n: 300 }], categoryKey: "plan", series: undefined, valueKey: "n", aspectRatio: "1/1", height: undefined }],
+  ])("reports a %s chart ready only once its marks have finished drawing", (_name, patch) => {
+    vi.useFakeTimers()
+    render({ ...barProps, ...patch })
+    resize(600)
+    const { ready, changed } = framesAfterReady()
+    expect(ready).toBeGreaterThan(400 / 16)
+    expect(changed).toBe(0)
+  })
+
+  test("after an update, reports ready only once the moved marks have finished drawing", () => {
+    vi.useFakeTimers()
+    render({ ...barProps, type: "line" })
+    resize(600)
+    expect(framesAfterReady().changed).toBe(0)
+    render({ ...barProps, type: "line", data: revenue.map((row) => ({ ...row, lastYear: row.lastYear * 1.5 })) })
+    expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    const { ready, changed } = framesAfterReady()
+    expect(ready).toBeGreaterThan(400 / 16)
+    expect(changed).toBe(0)
+  })
+
+  test("after an update that moves no mark, reports ready once the animation time has passed", () => {
+    vi.useFakeTimers()
+    render({ ...barProps, type: "line" })
+    resize(600)
+    expect(framesAfterReady().changed).toBe(0)
+    // A new locale only relabels the axis: Recharts restarts no line animation.
+    render({ ...barProps, type: "line", locale: "de-DE" })
+    expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    const { ready, changed } = framesAfterReady()
+    expect(ready).toBeGreaterThan(400 / 16 - 2)
+    expect(ready).toBeLessThan(600 / 16)
+    expect(changed).toBe(0)
+  })
+
   test("shows an explicit empty state and still signals ready", () => {
     render({ ...barProps, data: [], animation: "auto" })
     resize(600)
@@ -168,6 +222,142 @@ describe("Chart", () => {
     expect(ticks()).toEqual(["0", "20K", "40K", "60K"])
     render({ ...barProps, layout: "stacked", animation: "off" })
     expect(ticks()).toEqual(["0", "25K", "50K", "75K", "100K"])
+  })
+
+  test("fits the centre total to the hole with a token size, and leaves it out when nothing fits", () => {
+    const parts = { type: "donut", title: "Revenue by plan", categoryKey: "plan", valueKey: "revenue", aspectRatio: "1/1", animation: "off", valueFormat: "currency", currency: "USD" }
+    const centre = () => container.querySelector('[data-slot="chart-center"] text')
+    render({ ...parts, data: [{ plan: "Free", revenue: 1130 }] })
+    resize(600)
+    expect(centre()?.textContent).toBe("$1,130")
+    expect(centre()?.getAttribute("class")).toContain("text-2xl")
+    render({ ...parts, data: [{ plan: "Free", revenue: 12345678 }] })
+    resize(180)
+    const sizes = ["text-2xl", "text-xl", "text-lg", "text-base", "text-sm"]
+    expect(sizes.filter((size) => centre()?.getAttribute("class")?.split(" ").includes(size))).toHaveLength(1)
+    expect(["$12,345,678", "$12.3M"]).toContain(centre()?.textContent)
+    resize(40)
+    expect(container.querySelector('[data-slot="chart-center"]')).toBeNull()
+  })
+
+  test("leaves the centre out with centerValue none", () => {
+    render({ type: "donut", title: "Plans", data: [{ plan: "Free", n: 600 }, { plan: "Pro", n: 300 }], categoryKey: "plan", valueKey: "n", aspectRatio: "1/1", animation: "off", centerValue: "none" })
+    resize(400)
+    expect(container.querySelector('[data-slot="chart-center"]')).toBeNull()
+  })
+
+  test("sweeps each radial ring by its share of the total, and shows the total", () => {
+    const plans = [{ plan: "Free", n: 620 }, { plan: "Pro", n: 310 }, { plan: "Team", n: 140 }, { plan: "Enterprise", n: 60 }]
+    render({ type: "radial", title: "Customers by plan", data: plans, categoryKey: "plan", valueKey: "n", aspectRatio: "1/1", animation: "off", centerLabel: "Customers" })
+    resize(600)
+    const centre = 300
+    // Each sector's outer arc starts at 0° (3 o'clock) and ends at its share of 360°, minus the corner rounding.
+    const sweeps = [...container.querySelectorAll(".recharts-radial-bar-sectors path")].map((path) => {
+      const arc = [...(path.getAttribute("d") ?? "").matchAll(/A\s*([\d.]+)\s*,\s*[\d.]+\s*,\s*0\s*,\s*[01]\s*,\s*[01]\s*,\s*([\d.]+)\s*,\s*([\d.]+)/g)].find((match) => Number(match[1]) > 10)!
+      return (Math.atan2(centre - Number(arc[3]), Number(arc[2]) - centre) * 180 / Math.PI + 360) % 360
+    })
+    const total = 1130
+    plans.forEach((part, index) => expect(Math.abs(sweeps[index] - (part.n / total) * 360), part.plan).toBeLessThan(3))
+    expect([...container.querySelectorAll('[data-slot="chart-center"] text')].map((text) => text.textContent)).toEqual(["1,130", "Customers"])
+  })
+
+  test("draws no ring for a radial part with no value, and keeps the other sweeps at their share", () => {
+    const parts = [{ plan: "Free", n: 700 }, { plan: "Pro", n: null }, { plan: "Team", n: 300 }]
+    render({ type: "radial", title: "Plans", data: parts, categoryKey: "plan", valueKey: "n", aspectRatio: "1/1", animation: "off" })
+    resize(600)
+    const sectors = [...container.querySelectorAll(".recharts-radial-bar-sectors path")]
+    const sweep = (path: Element) => {
+      const arc = [...(path.getAttribute("d") ?? "").matchAll(/A\s*([\d.]+)\s*,\s*[\d.]+\s*,\s*0\s*,\s*[01]\s*,\s*[01]\s*,\s*([\d.]+)\s*,\s*([\d.]+)/g)].find((match) => Number(match[1]) > 10)
+      return arc ? (Math.atan2(300 - Number(arc[3]), Number(arc[2]) - 300) * 180 / Math.PI + 360) % 360 : 0
+    }
+    expect(sectors.some((path) => path.getAttribute("fill") === "var(--chart-2)" && sweep(path) > 1)).toBe(false)
+    const byFill = Object.fromEntries(sectors.map((path) => [path.getAttribute("fill"), sweep(path)]))
+    expect(Math.abs(byFill["var(--chart-1)"] - 0.7 * 360)).toBeLessThan(3)
+    expect(Math.abs(byFill["var(--chart-3)"] - 0.3 * 360)).toBeLessThan(3)
+  })
+
+  test("never clips lines and areas that touch the domain edges", () => {
+    const touching = [{ month: "Jan", share: 0 }, { month: "Feb", share: 1 }]
+    for (const type of ["line", "area"]) {
+      render({ type, title: "Share", data: touching, categoryKey: "month", series: [{ key: "share", label: "Share" }], valueFormat: "percent", height: 200, animation: "off" })
+      resize(600)
+      // allowDataOverflow would add Recharts' plot-edge clip (url(#clipPath-…)) and cut strokes and active
+      // dots on the edge. Recharts' own animation reveal mask (animationClipPath) is unchanged from Release 012.
+      const edgeClips = [...container.querySelectorAll("[clip-path]")].filter((element) => /url\(#clipPath-/.test(element.getAttribute("clip-path") ?? ""))
+      expect(edgeClips, type).toEqual([])
+    }
+  })
+
+  test("packs grouped bars at the bar size, 4px apart", () => {
+    const geometry = () => [...container.querySelectorAll(".recharts-bar-rectangle path")].map((path) => ({ width: Number(path.getAttribute("width")), x: Number(path.getAttribute("x")) }))
+    for (const [barSize, width] of [["sm", 12], ["md", 24], ["lg", 40]] as const) {
+      render({ ...barProps, barSize, animation: "off" })
+      resize(600)
+      const bars = geometry()
+      expect(new Set(bars.map((bar) => bar.width)), barSize).toEqual(new Set([width]))
+      // Bars render series by series, so the first bar of series 2 sits beside the first bar of series 1.
+      expect(bars[3].x - (bars[0].x + bars[0].width), barSize).toBe(4)
+    }
+  })
+
+  test("caps single-series bars at the bar size, md by default", () => {
+    render({ ...barProps, series: [{ key: "thisYear", label: "2026" }], animation: "off" })
+    resize(600)
+    expect(new Set([...container.querySelectorAll(".recharts-bar-rectangle path")].map((path) => Number(path.getAttribute("width"))))).toEqual(new Set([24]))
+  })
+
+  test("draws value ticks inside an explicit range (the rerun case)", () => {
+    const rerun = [31000, 36000, 34000, 41000, 39000, 48000].map((revenue, index) => ({ month: `M${index + 1}`, revenue }))
+    render({ type: "line", title: "Revenue", data: rerun, categoryKey: "month", series: [{ key: "revenue", label: "Revenue" }], valueFormat: "currency", currency: "USD", valueMin: 30000, height: 200, animation: "off" })
+    resize(600)
+    expect([...container.querySelectorAll(".recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value")].map((tick) => tick.textContent)).toEqual(["$30K", "$35K", "$40K", "$45K", "$50K"])
+  })
+
+  test("draws a sparkline edge to edge when both axes are hidden", () => {
+    render({ type: "area", title: "Weekly revenue", data: revenue, categoryKey: "month", series: [{ key: "thisYear", label: "2026" }], valueMin: 40000, xAxis: false, yAxis: false, grid: false, legend: false, height: 60, animation: "off" })
+    resize(240)
+    // Only the 8px edge margin is reserved: no room for category labels that are not drawn.
+    expect(container.querySelector(".recharts-area-curve")?.getAttribute("d")).toMatch(/^M8,/)
+  })
+
+  test("formats ticks in the chart's locale, and in en-US by default", () => {
+    const ticks = () => [...container.querySelectorAll(".recharts-yAxis-tick-labels .recharts-cartesian-axis-tick-value")].map((tick) => tick.textContent)
+    render({ ...barProps, locale: "de-DE", animation: "off" })
+    resize(600)
+    expect(ticks()).toEqual(["0", "20.000", "40.000", "60.000"])
+    render({ ...barProps, animation: "off" })
+    expect(ticks()).toEqual(["0", "20K", "40K", "60K"])
+  })
+
+  test.each<[string, Record<string, unknown>]>([
+    ["valueMax", { valueMax: 100000 }],
+    ["valueMin", { valueMin: -10000 }],
+    ["barSize", { barSize: "lg" }],
+    ["locale", { locale: "de-DE" }],
+    ["data values that format the same", { data: revenue.map((row) => ({ ...row, thisYear: row.thisYear + 0.4 })) }],
+  ])("draws again when only %s changes", (_name, patch) => {
+    vi.useFakeTimers()
+    render(barProps)
+    resize(600)
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
+    render({ ...barProps, ...patch })
+    expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
+  })
+
+  test("draws again when only centerValue changes", () => {
+    vi.useFakeTimers()
+    const donut = { type: "donut", title: "Plans", data: [{ plan: "Free", n: 600 }, { plan: "Pro", n: 300 }], categoryKey: "plan", valueKey: "n", aspectRatio: "1/1" }
+    render(donut)
+    resize(400)
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
+    render({ ...donut, centerValue: "none" })
+    expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
   })
 
   test("is a single keyboard stop", () => {

@@ -66,7 +66,7 @@ describe("immutable executable release", () => {
   test("loads the versioned canonical release artifact through the production entrypoint", () => {
     const release = getExecutableRelease()
 
-    expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-012.json")
+    expect(EXECUTABLE_RELEASE_PATH).toBe("provenance/releases/shadcn-radix-release-013.json")
     expect(release.releaseId).toBe(EXECUTABLE_RELEASE_ID)
     expect(release.componentContractSetId).toBe("shadcn-radix-component-contracts-001")
     expect(release.tokenContractId).toBe("shadcn-radix-token-contract-003")
@@ -102,9 +102,10 @@ describe("immutable executable release", () => {
       const releaseBytes = readFileSync(fileURLToPath(new URL(`../provenance/releases/shadcn-radix-release-${releaseNumber}.json`, import.meta.url)))
       expect(createHash("sha256").update(releaseBytes).digest("hex")).toBe(expected)
     }
-    expect(EXECUTABLE_RELEASE_ID).toBe("shadcn-radix-release-012")
+    expect(EXECUTABLE_RELEASE_ID).toBe("shadcn-radix-release-013")
   })
 
+  // Loads and projects the component contracts twice: 5.4 s on a macOS runner, over vitest's 5 s default.
   test("derives the canonical release payload from the approved projection", () => {
     const canonicalProjection = projectExecutableContract({
       componentContracts: loadComponentContracts(),
@@ -122,7 +123,7 @@ describe("immutable executable release", () => {
       componentContract: canonicalProjection.sourceBaselineCommit,
       tokenContract: canonicalProjection.tokenSourceBaselineCommit,
     })
-  })
+  }, 30_000)
 
   test("validates a release hash over canonical serialization without sha256", () => {
     const { sha256, ...payload } = neutralRelease

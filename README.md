@@ -4,7 +4,22 @@ Canonical governed shadcn design system for Agentic Design Canvas product work.
 
 This repository is separate from Canvas. The official shadcn repository is upstream/reference only; Canvas will eventually consume immutable contracted releases from this repository.
 
-## Active producer: Release 012 candidate
+Copyright (c) 2026 Amjed Fadul. All rights reserved; see [LICENSE](LICENSE). Third-party components and dependencies keep their own licences; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Active producer: Release 013 candidate
+
+Release 013 (`0.0.0-release.13`) implements the chart follow-ups Canvas raised after adopting Release 012 (#22, #23), and adds the licence files. Tokens and exports are unchanged.
+
+- **Centre totals:** donut and radial charts show their total sized to fit the hole: shrunk, shortened, or left out, never overflowing. Radial rings now sweep each part's share of the total.
+- **`locale`:** formats in any supported BCP 47 language; `en-US` by default, so renders match on every machine.
+- **`barSize`:** `sm`, `md` (default) or `lg`, a maximum bar thickness.
+- **`valueMin` / `valueMax`:** fix the value axis; out-of-range data is refused, and bars and stacks keep zero in range. A raised minimum makes line trends and sparklines readable.
+- **Exact tick labels** in every locale, and stack axes that cover their marks.
+- **Licence:** `LICENSE` (all rights reserved) with complete bundled third-party notices.
+
+See [Release 013](docs/RELEASE-013.md) and the [Canvas handoff](docs/CANVAS-RELEASE-013.md).
+
+## Release 012
 
 Release 012 (`0.0.0-release.12`) adds the governed chart family requested in #19, plus the producer build-memory fix. Tokens are unchanged (`shadcn-radix-token-contract-003`, 90 tokens).
 

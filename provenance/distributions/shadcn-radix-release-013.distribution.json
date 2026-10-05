@@ -1,0 +1,353 @@
+{
+  "schemaVersion": 1,
+  "release": {
+    "id": "shadcn-radix-release-013",
+    "payloadSha256": "b880ec969b60eba4de6a16d5b835303ee9ea06f933fc93a989ede5161c65a409"
+  },
+  "package": {
+    "name": "@adc/shadcn-design-system",
+    "version": "0.0.0-release.13"
+  },
+  "toolchain": {
+    "node": "22.18.0",
+    "npm": "10.9.3",
+    "platform": "darwin",
+    "arch": "arm64",
+    "tools": {
+      "vite": "7.3.6",
+      "typescript": "5.5.4",
+      "@vitejs/plugin-react": "4.7.0",
+      "@tailwindcss/vite": "4.3.3",
+      "tailwindcss": "4.3.3",
+      "rollup": "4.63.1",
+      "esbuild": "0.28.2"
+    }
+  },
+  "tarball": {
+    "filename": "adc-shadcn-design-system-0.0.0-release.13.tgz",
+    "sha256": "2b63e645b497446d8a0939914450b581efbfc1bb72bf37b6070a5876801ae10a",
+    "integrity": "sha512-vqxzEJTrYyZsbP7om4wS2hQA6LJhwZm/mIziUiYNH0Pj7UPiH5XX4bTN/TxjGEO6qHjxYMD0Psmax/xroYM/zg=="
+  },
+  "files": [
+    {
+      "path": "LICENSE",
+      "size": 709,
+      "sha256": "e8432c3aa22365779b45d1be4b28ef97158f734a63e6c3e2678df711a68394f9"
+    },
+    {
+      "path": "README.md",
+      "size": 13558,
+      "sha256": "6eade3087e14456978338eb293852bb3f367fb061b106730e54306463c0f7055"
+    },
+    {
+      "path": "dist-library/THIRD_PARTY_LICENSES.txt",
+      "size": 133394,
+      "sha256": "0cccf265f5bae2e95f134c763bbdd357851d35e9c2c83204a8b2e2102e1e1437"
+    },
+    {
+      "path": "dist-library/charts.js",
+      "size": 653251,
+      "sha256": "279fd01707e4ad5ad3cde41227c2bf3135f361bdff4ca0c5d9aaa5812b2cee69"
+    },
+    {
+      "path": "dist-library/index.js",
+      "size": 447484,
+      "sha256": "25e1b4bb8b35a5a9a3696f48506b299cbbc994445ba190e3f8fc1c846fce6f7f"
+    },
+    {
+      "path": "dist-library/release.js",
+      "size": 11860532,
+      "sha256": "a305faacab741fc19289b0cf2b8e761dff60c553f1c9e06967b24d7a9a1da7df"
+    },
+    {
+      "path": "dist-library/styles.css",
+      "size": 198645,
+      "sha256": "7b5024a7f0eda3732d749684c1402d5d939c86bb4d4c0d69ddf6b189d414f74b"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/accordion.d.ts",
+      "size": 713,
+      "sha256": "7b9318d359baa80d536059271381a0647f63ff5dd32dfb5c3cfe18c53de8ca45"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/alert-dialog.d.ts",
+      "size": 2221,
+      "sha256": "8f94e2c39825eb438c4528c17a2a64be2ddc0f82fa0022956dd79f0b41d6c74c"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/alert.d.ts",
+      "size": 1210,
+      "sha256": "0f7b7a61845c808a25a8452d1c7b5b88ef937e60bc65f75e466a0af6cc748264"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/avatar.d.ts",
+      "size": 972,
+      "sha256": "91c590528cfe169a14b91fdd0455cc3bd38976237974b1b8d83bfe956a44aa35"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/badge.d.ts",
+      "size": 580,
+      "sha256": "664b3b1e0446d1e0a8c7ddee025790c619e253c8d6f6c9222e0f7b4a3539a856"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/breadcrumb.d.ts",
+      "size": 953,
+      "sha256": "ca9b200331ead12b887c845ff8cf6a9d733c08da48da2322d3ff40d52e28e14a"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/button.d.ts",
+      "size": 1105,
+      "sha256": "0347812f5a251c544c879c90325bff4ac06ecbaf571d45975f2731a9bbb0c143"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/card.d.ts",
+      "size": 880,
+      "sha256": "52ee5bc1f630903c545455b91e20e6744465ffcb887141c21b587d383a96dfc1"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/chart-model.d.ts",
+      "size": 3364,
+      "sha256": "9388dc4af659d6ac5de7e177694e3e2994d43bcf8a0511358d8f0d55c85b07a0"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/chart-scale.d.ts",
+      "size": 1854,
+      "sha256": "3242d73d7728c47a583d0daaffeb9e4c97cfc7547be9d6dd804b1fef8c7916f3"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/chart-text.d.ts",
+      "size": 1417,
+      "sha256": "a2798a82b69c79a4c62ca0fcab770e44d5f7ac951a01557c7576a7ffc874287a"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/chart.d.ts",
+      "size": 1280,
+      "sha256": "887ecae8e1ab0f6848838e710ec424a84a07a4de9e353f85ff0e493c8d658282"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/checkbox.d.ts",
+      "size": 235,
+      "sha256": "66e460bc31f1e5fa0f1d494964e15fbfb70f299b8657b699b25c29d657db29f6"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/collapsible.d.ts",
+      "size": 581,
+      "sha256": "75748281446d78762ec579c86f9ec1bacb262dcb96f1d3ed0b8414a0b9edd809"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/command.d.ts",
+      "size": 1628,
+      "sha256": "1993b9a0840137a43e826aa2b2a4ee6d2843d4ec1264dc095605e3b76ca1c04a"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/dialog.d.ts",
+      "size": 1806,
+      "sha256": "5eccb826dcce0ee6a8a60379474d018a552555feda79d3f44f9ac96cb34ff731"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/drawer.d.ts",
+      "size": 1436,
+      "sha256": "a62a952464813ad6681414a2f6708d8d8cb5ccb7ee948cef6e7f7d6f11869795"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/dropdown-menu.d.ts",
+      "size": 2936,
+      "sha256": "6affd13ab313b20f085e1bd51d422dd4870696861dd0abf8270b6bc909d294be"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/empty.d.ts",
+      "size": 1027,
+      "sha256": "f1e53ea2925637983959f369c2c9d4b27eaaed35c67e03e253cef333b9ed4afc"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/field.d.ts",
+      "size": 2127,
+      "sha256": "e5e0a3b5aceb3ea57e67473b4d5c00a190bc556fae701fdb12effa44040d4093"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/icon.d.ts",
+      "size": 1016,
+      "sha256": "93811d0835f7c5a48cb872e576904b8a0eae9a0fc0bbd99b9a6532e4b8ea0662"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/image.d.ts",
+      "size": 328,
+      "sha256": "d8f3293df715c1f761dd82f373d679ec421274bec88da9f7f4e260a5bc573ff1"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/input-group.d.ts",
+      "size": 1465,
+      "sha256": "b3b41392acef9bd50efaba1eb6f7d70cbfd6cf3e7497dd51116d1c9daaf833b5"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/input.d.ts",
+      "size": 155,
+      "sha256": "fe4ceb08d9067ccba5e917a320e68f5b6c3e371eeb6cfc352a1035b278585100"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/label.d.ts",
+      "size": 220,
+      "sha256": "87dbb1e3eac705113c6efddba4c6bfd081e58d7e1eff6a8021087b8a1ef6791d"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/link.d.ts",
+      "size": 223,
+      "sha256": "69e92091a79bc6c01b1dc2d0372f6bccf727835f6f440849295de047b4388cd2"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/pagination.d.ts",
+      "size": 1166,
+      "sha256": "3102a37c237151a1925e0556cf27aee5d9206d3991ca269e1d5073776788908f"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/popover.d.ts",
+      "size": 1136,
+      "sha256": "1c70f06f56004309d714fb620b662ce3b37899a2e103ca3e00df049d6ef2c13f"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/progress.d.ts",
+      "size": 247,
+      "sha256": "b1d62f1b0c304744c2bea154fead7c1bd707d993e0301f1a73ddaad4ddfd5446"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/radio-group.d.ts",
+      "size": 393,
+      "sha256": "ada025e1520f6fa53075f1b6b88cab291ab10dc2c0733edb6acd0ed162125933"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/scroll-area.d.ts",
+      "size": 421,
+      "sha256": "288c5f720ad48cbc5ead183aec0d9a6ddc5bcb6016b051aacbf8a35ff7c3db24"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/select.d.ts",
+      "size": 1734,
+      "sha256": "e0ddb723a28bda66952aea34741b97bd3eedf432b3132d70629940073e501c8a"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/separator.d.ts",
+      "size": 265,
+      "sha256": "0f7f8f15ef8e91eb0df1b34a8d8fa92e8522a07a84c522b500e88211c55fd333"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/sheet.d.ts",
+      "size": 1433,
+      "sha256": "b01764dad5395a14047c78763652fda963f7a8e6768f26396a40d3e4489a7eb9"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/sidebar.d.ts",
+      "size": 5556,
+      "sha256": "c5a5c4c668e00f6c4ccfe21477ab7d4b562f13672df7cd0761fc5a88fe3cff54"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/skeleton.d.ts",
+      "size": 131,
+      "sha256": "0ac76f72a94a13f3081c41c43b58679492c219ccada653f40801a89fcd5e9d04"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/slider.d.ts",
+      "size": 400,
+      "sha256": "bb26f98c5fdf5e9ac56e6567669b92d1e2127196aee857d4304a09a5b8375b6f"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/spinner.d.ts",
+      "size": 151,
+      "sha256": "8c8a006f097ca8f3a6eb617dcc9fec169ac8d641e3e9f2af118d514a7e7bf542"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/switch.d.ts",
+      "size": 266,
+      "sha256": "064304e160db8fdf50d1a6205095b3585f15498d74479734e8be5a691d03aeca"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/table.d.ts",
+      "size": 952,
+      "sha256": "e926ad55eaccec6a78801020e156111aa499351d239b7587aa661f2ff7630e2a"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/tabs.d.ts",
+      "size": 942,
+      "sha256": "79afbf1be2e5d49c51dd3b0d6f9544cb0a14697f7a63cd435bd3d5063e4ff339"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/textarea.d.ts",
+      "size": 158,
+      "sha256": "439593d167651f2e1c0c439482dc3d5d5eb248ea221ecd8feb5c62cd0d60cd86"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/toggle-group.d.ts",
+      "size": 734,
+      "sha256": "53bc95e45eaaca2576311a04c0677267bbcb595a2b11f10bfacbca5307977bc9"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/toggle.d.ts",
+      "size": 589,
+      "sha256": "a077e571a0a55f87a24452ba184bfccbd37cc467cdca48054c9e9bff4d069e5b"
+    },
+    {
+      "path": "dist-library/types/src/components/ui/tooltip.d.ts",
+      "size": 868,
+      "sha256": "5a247018c032e4f52b0dd6a3ecf4bdb24d6967c6e2afbadffd88f36cfcf2c1e4"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/invariants.d.ts",
+      "size": 1324,
+      "sha256": "1c95efac35cb6fd51b0c1bbc591993c52ed5f747a82a9514c03fb45273f1c72b"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/loader.d.ts",
+      "size": 2546,
+      "sha256": "4e2238bd60cf5e8e9a918f6a908f78a65eee71eae394ee9e5c5751152dbe8e2d"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/source-reconciliation.d.ts",
+      "size": 1661,
+      "sha256": "8c716252d0a8578b705fc6003ea90bd2fc927796bf79b7a2457d11e33999e1fb"
+    },
+    {
+      "path": "dist-library/types/src/contracts/components/types.d.ts",
+      "size": 12788,
+      "sha256": "88038ce0404df8d5f321a2c3717eb6ea0b38e29a6ada587928954e0a4a522602"
+    },
+    {
+      "path": "dist-library/types/src/contracts/tokens/types.d.ts",
+      "size": 2274,
+      "sha256": "cdc80afa96bb13b2713630facfadd861f719289cf28507cd1c3efbf6864dab23"
+    },
+    {
+      "path": "dist-library/types/src/lib/utils.d.ts",
+      "size": 101,
+      "sha256": "512960c0e955a2324b34354dac25e3e4d431a1af4cd33077935eda5e95c8b7e1"
+    },
+    {
+      "path": "dist-library/types/src/package/charts.d.ts",
+      "size": 232,
+      "sha256": "08ba2cd894ce40e556528f48b41bc1dfd99fbb94e65468ad3e31e8bf3f017aa7"
+    },
+    {
+      "path": "dist-library/types/src/package/index.d.ts",
+      "size": 1730,
+      "sha256": "7717d45887b5706103c81f68fdd1608e770fe6b21beb8e5d1b0f647c6065b601"
+    },
+    {
+      "path": "dist-library/types/src/package/release.d.ts",
+      "size": 888,
+      "sha256": "97ecc03baf91eb1979053acc5de2ad985ed9a558afe48ee32b8f9d961e205411"
+    },
+    {
+      "path": "dist-library/types/src/validator/types.d.ts",
+      "size": 5860,
+      "sha256": "6c5f22b6c0f1a323c36c176bdcbc29ce199c34cf8250261ffbf6421c0e79acef"
+    },
+    {
+      "path": "dist-library/utils-bpNB9PO2.js",
+      "size": 80704,
+      "sha256": "8660c60f37c58e35efcd28a43140e5f6cf9ee6047512309a6fc74137ed3d417f"
+    },
+    {
+      "path": "package.json",
+      "size": 3281,
+      "sha256": "1698e150f2c4d591b9aac56a77612e94231fe32a676392d01edc7f2afebf10f5"
+    }
+  ]
+}

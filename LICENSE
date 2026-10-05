@@ -8,11 +8,6 @@ permission.
 Third-party components and dependencies remain under their own licences. This
 repository contains files derived from shadcn/ui, which is MIT-licensed, and
 built packages bundle third-party code and fonts under their own licences. See
-THIRD_PARTY_NOTICES.md for the files concerned and the licence texts.
-
-Note for maintainers: this file is named COPYRIGHT, not LICENSE, on purpose.
-scripts/release-inputs.ts treats any root README, LICENSE, LICENCE or COPYING
-file as a release input, because npm always packs those files. Adding a root
-LICENSE now would no longer match the committed Release 012 implementation
-inputs (tests/canonical-release-r12-binding.test.ts). The file can become
-LICENSE when the next release's inputs are recorded.
+THIRD_PARTY_NOTICES.md in the source repository for the files concerned, and
+dist-library/THIRD_PARTY_LICENSES.txt in each built package for the licence
+texts of everything it bundles.

@@ -14,4 +14,5 @@ test("Image exports the closed source API and rejects native-image escape hatche
     baseUrl: process.cwd(), paths: { "@/*": ["src/*"] },
   })
   expect(ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"))).toEqual([])
-})
+  // A full TypeScript program check: about 2.5 s on a macOS runner.
+}, 30_000)

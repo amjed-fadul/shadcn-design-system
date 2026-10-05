@@ -530,10 +530,10 @@
       "kind": "canonical-source",
       "title": "Canonical Chart source",
       "locator": "src/components/ui/chart.tsx#Chart",
-      "locatorHint": "Closed Chart props, createChartModel validation and formats, ChartFrame sizing and draw state, Recharts plot defaults, legend and description",
-      "accessedOn": "2026-10-03",
-      "sourceRevision": "release-012-working-tree",
-      "contentHash": "09d45e9c531ced931862b66ba297176a1dfb46dc"
+      "locatorHint": "Closed Chart props, createChartModel validation, formats and value scale, centre-total fit, ChartFrame sizing and draw state, Recharts plot defaults, legend and description",
+      "accessedOn": "2026-10-05",
+      "sourceRevision": "release-013-working-tree",
+      "contentHash": "45208b338afd2b02b0d99058ecece1607cbac998"
     }
   ]
 }
