@@ -7,8 +7,13 @@ marker) and #29 (colour tokens). Tokens, props and the export inventory are unch
 
 The Canvas handoff is [CANVAS-RELEASE-014](CANVAS-RELEASE-014.md).
 
-**Status: candidate, awaiting owner review.** The macOS release qualification runs next. The producer does
-not tag or approve the release.
+**Status: accepted by the owner on 2026-10-05; macOS release qualification running.**
+- **Candidate:** the owner accepted tarball `b7041f0e…` (payload `cee87378…`).
+- **Qualification:** the manual macOS `release-qualification` workflow is running on `1ba5c02`
+  ([run 37275097186](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37275097186)).
+  Commits after the source `65d7387` change tests, the vitest config, docs and the committed
+  manifest only.
+- **Merge:** the owner merges.
 
 ## Changes
 
