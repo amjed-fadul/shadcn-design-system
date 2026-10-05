@@ -193,6 +193,31 @@ describe("chart model", () => {
     expect(() => createChartModel({ ...base, ...patch } as unknown as ChartModelInput)).toThrow(message)
   })
 
+  test("accepts data equal to a bound with more than 12 significant digits, and rounds bounds before ordering them", () => {
+    const thirds = [{ month: "Jan", thisYear: 2 / 3 }, { month: "Feb", thisYear: 1 / 3 }]
+    expect(() => createChartModel({ ...base, type: "line", data: thirds, valueMax: 2 / 3, valueMin: 1 / 3 })).not.toThrow()
+    expect(() => createChartModel({ ...base, type: "line", valueMin: 0.3, valueMax: 0.1 + 0.2 })).toThrow("Chart valueMin must be below valueMax.")
+  })
+
+  test.each<[string, Record<string, string | number | null>[], Record<string, unknown>, string]>([
+    ["an intermediate dip in a mixed-sign stack", [{ month: "Jan", a: 100, b: -150, c: 100 }], { valueMin: -40 }, 'Chart stack total -50 at "Jan" is below valueMin -40.'],
+    ["an all-negative stack", [{ month: "Jan", a: -50, b: -30, c: 0 }], { valueMin: -60 }, 'Chart stack total -80 at "Jan" is below valueMin -60.'],
+    ["a stack with a null in the middle", [{ month: "Jan", a: 60, b: null, c: 50 }], { valueMax: 100 }, 'Chart stack total 110 at "Jan" is above valueMax 100.'],
+  ])("checks running stack totals: %s", (_name, data, range, message) => {
+    const series = [{ key: "a", label: "A" }, { key: "b", label: "B" }, { key: "c", label: "C" }]
+    expect(() => createChartModel({ ...base, data, series, layout: "stacked", ...range } as unknown as ChartModelInput)).toThrow(message)
+  })
+
+  test("checks that currency is text", () => {
+    expect(() => createChartModel({ ...base, valueFormat: "currency", currency: ["USD"] } as unknown as ChartModelInput)).toThrow("Chart currency must be an ISO 4217 code.")
+  })
+
+  test("names the centre caption in the summary, so screen readers hear it", () => {
+    const plans = { type: "donut" as const, title: "Plans", data: [{ plan: "Free", n: 600 }, { plan: "Pro", n: 400 }], categoryKey: "plan", valueKey: "n", aspectRatio: "1/1" as const }
+    expect(createChartModel({ ...plans, centerLabel: "Customers" }).summary).toBe("Plans, 2 parts totalling 1,000 (Customers): Free 600 (60%), Pro 400 (40%).")
+    expect(createChartModel({ ...plans }).summary).toBe("Plans, 2 parts totalling 1,000: Free 600 (60%), Pro 400 (40%).")
+  })
+
   test("compares float stack totals at 12 significant digits", () => {
     const shares = [{ q: "Q1", a: 0.33, b: 0.56, c: 0.11 }]
     const series = [{ key: "a", label: "A" }, { key: "b", label: "B" }, { key: "c", label: "C" }]

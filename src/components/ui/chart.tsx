@@ -66,6 +66,9 @@ const BAR_MAX_PX: Record<ChartBarSize, number> = { sm: 12, md: 24, lg: 40 }
 const POLAR_MARGIN_PX = 5
 const DONUT_INNER = 0.6
 const RADIAL_INNER = 0.5
+// The radial draws from a copy of each row in which a missing value is 0, so a part with no value
+// sweeps nothing (Recharts would otherwise draw it as a full ring). Tooltips read the original value.
+const RADIAL_DRAWN_KEY = "__chartDrawnValue"
 
 // Label room comes from the per-character estimate at semibold width, a generous budget
 // for the regular-weight ticks, so it never waits for the web font.
@@ -102,7 +105,8 @@ function ChartTooltipContent({ active, payload, label, model }: { active?: boole
       {payload.map((entry) => {
         const key = partToWhole ? String(entry.payload?.[model.categoryKey] ?? entry.name) : String(entry.dataKey)
         const index = model.series.findIndex((series) => series.key === key)
-        const value = typeof entry.value === "number" ? model.format(entry.value) : "—"
+        const raw = partToWhole ? entry.payload?.[model.valueKey!] : entry.value
+        const value = typeof raw === "number" ? model.format(raw) : "—"
         return (
           <div key={key} className="flex items-center gap-2">
             <span aria-hidden className="size-2.5 shrink-0 rounded-[2px]" style={{ background: model.series[Math.max(index, 0)]?.color }} />
@@ -179,10 +183,10 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
   if (model.type === "radial") {
     // The angle axis spans the total, so each ring sweeps its share and the full circle is the total.
     return (
-      <RadialBarChart width={width} height={height} margin={polarMargin} data={model.data as Record<string, unknown>[]} innerRadius={`${RADIAL_INNER * 100}%`} outerRadius="100%" accessibilityLayer>
-        <PolarAngleAxis type="number" domain={[0, model.total ?? 0]} tick={false} axisLine={false} />
+      <RadialBarChart width={width} height={height} margin={polarMargin} data={model.data.map((row) => ({ ...row, [RADIAL_DRAWN_KEY]: typeof row[valueKey] === "number" ? row[valueKey] : 0 }))} innerRadius={`${RADIAL_INNER * 100}%`} outerRadius="100%" accessibilityLayer>
+        <PolarAngleAxis type="number" domain={[0, model.total ?? 0]} tick={false} tickLine={false} axisLine={false} />
         {tooltip}
-        <RadialBar dataKey={valueKey} cornerRadius={4} background={{ fill: "var(--muted)" }} {...animation}>
+        <RadialBar dataKey={RADIAL_DRAWN_KEY} cornerRadius={4} background={{ fill: "var(--muted)" }} {...animation}>
           {model.series.map((series) => <Cell key={series.key} fill={series.color} />)}
         </RadialBar>
         <ChartCenter model={model} width={width} height={height} inner={RADIAL_INNER} />
@@ -196,8 +200,10 @@ function ChartPlotContent({ model, options, width, height, animate }: ChartPlotP
   const grid = options.grid ? <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" strokeOpacity={0.5} vertical={horizontal} horizontal={!horizontal} /> : null
   const categoryLabels = model.table.rows.map((row) => row[0])
   const categoryAxis = { dataKey: model.categoryKey, tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK }
-  // The chart chooses the domain and ticks itself, so Recharts must not widen the domain past them.
-  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.formatTick, ticks: scale.ticks, domain: scale.domain, allowDataOverflow: true, interval: 0 as const }
+  // The model guarantees every value and running stack total lies inside the domain, so Recharts
+  // keeps it as given. allowDataOverflow would also clip lines, areas and their active dots at the
+  // plot edge, so it stays off.
+  const valueAxis = { tickLine: false, axisLine: false, tickMargin: 8, tick: AXIS_TICK, tickFormatter: model.formatTick, ticks: scale.ticks, domain: scale.domain, interval: 0 as const }
   const categoryAxisWidth = axisWidth(categoryLabels)
   const valueAxisWidth = axisWidth(scale.labels)
   const xAxis = horizontal
@@ -288,10 +294,14 @@ const ChartPlot = React.memo(ChartPlotContent, (previous, next) => previous.sign
 function ChartFrame({ model, options }: { model: ChartModel; options: ChartOptions }) {
   const plotRef = React.useRef<HTMLDivElement>(null)
   const [width, setWidth] = React.useState(0)
-  // Ready belongs to what was drawn: the signature covers the plot width, every option and
-  // every model field (formatters aside), so any change starts a new drawing and a screenshot
-  // never captures a chart mid-animation.
-  const signature = JSON.stringify([width, options, model], (_key, value: unknown) => (typeof value === "function" ? undefined : value))
+  // Ready belongs to what was drawn: the signature covers the plot width, every option, every
+  // model field (formatters aside) and, per row, only the category and drawn values, so any visible
+  // change starts a new drawing while fields the chart never draws do not.
+  const drawnKeys = model.valueKey ? [model.valueKey] : model.series.map((series) => series.key)
+  const signature = JSON.stringify(
+    [width, options, { ...model, data: model.data.map((row) => [row[model.categoryKey], ...drawnKeys.map((key) => row[key])]) }],
+    (_key, value: unknown) => (typeof value === "function" ? undefined : value),
+  )
   const [drawnSignature, setDrawnSignature] = React.useState<string | null>(null)
   const drawn = drawnSignature === signature
   const animate = options.animation === "auto" && !model.empty && !prefersReducedMotion()

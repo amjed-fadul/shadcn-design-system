@@ -22,7 +22,7 @@
   },
   "whenToUse": [
     {
-      "statement": "Use bar for comparing categories or periods, line for a trend over time, area for a trend whose volume matters, donut for part-to-whole with up to 5 parts, and radial for a compact part-to-whole. Use a stat tile or Card with a single number when there is one value to show, and a Table when readers need exact values or there are more than 5 series.",
+      "statement": "Use bar for comparing categories or periods, line for a trend over time, area for a trend whose volume matters, donut for part-to-whole with up to 5 parts, and radial for a compact part-to-whole whose rings sweep each part's share of the total. For a KPI sparkline, use a small area or line chart with xAxis, yAxis, grid and legend off and valueMin near the data's minimum. Use a stat tile or Card with a single number when there is one value to show, and a Table when readers need exact values or there are more than 5 series.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [
@@ -33,7 +33,7 @@
   ],
   "howToUse": [
     {
-      "statement": "Import Chart from @adc/shadcn-design-system/charts, lazily, so pages without charts do not load the chart bundle. Pass type, a title (the accessible name), data as flat rows, categoryKey, and either series ({ key, label }, 1 to 5) for area, bar and line, or valueKey for donut and radial (one row per part, up to 5, with values of zero or more).",
+      "statement": "Import Chart from @adc/shadcn-design-system/charts, lazily, so pages without charts do not load the chart bundle. Pass type, a title (the accessible name), data as flat rows, categoryKey, and either series ({ key, label }, 1 to 5) for area, bar and line, or valueKey for donut and radial (one row per part, up to 5, with values of zero or more). Pass locale (a supported BCP 47 tag such as en-GB, de-DE or ar) to format in the viewer's language; without it every chart formats as en-US, so renders are the same on every machine.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [
@@ -42,7 +42,7 @@
       }
     },
     {
-      "statement": "Give exactly one of height (plot height in pixels; the legend renders below) or aspectRatio (16/9, 4/3, 1/1 or 2/1). Before the container has a width, the chart shows a skeleton of the final size. Wait for [data-chart-state=\"ready\"] before capturing a screenshot.",
+      "statement": "Give exactly one of height (plot height in pixels; the legend renders below) or aspectRatio (16/9, 4/3, 1/1 or 2/1). Before the container has a width, the chart shows a skeleton of the final size. Wait for [data-chart-state=\"ready\"] before capturing a screenshot; any change to the data, options, locale, value range or plot size starts a new drawing.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [
@@ -53,7 +53,7 @@
   ],
   "options": [
     {
-      "statement": "valueFormat is number (default), currency (requires an ISO 4217 currency such as USD), percent (values are fractions, 0.124 is 12.4%) or compact (42K); axis ticks always use the compact form. layout stacks area and bar series (lines never stack); orientation=horizontal lays bars sideways; curve is monotone (default), linear or step. xAxis, yAxis and grid default to true; legend defaults to on for 2 or more series. animation=auto animates once and respects reduced motion; animation=off renders immediately.",
+      "statement": "valueFormat is number (default), currency (requires an ISO 4217 currency such as USD), percent (values are fractions, 0.124 is 12.4%) or compact (42K); axis tick labels use the least precision that shows every tick exactly. layout stacks area and bar series (lines never stack); orientation=horizontal lays bars sideways; curve is monotone (default), linear or step. barSize is sm, md (default) or lg, a maximum bar thickness of 12, 24 or 40px. valueMin and valueMax fix the value axis on area, bar and line charts: data outside the range is refused, never clipped, and bar and stacked charts must keep zero in range, so raise valueMin only on unstacked lines and areas whose variation is lost against zero. Donut and radial charts show their total in the centre (centerValue total, the default, or none), sized to fit the hole and shortened or left out rather than overflow; centerLabel adds a caption beneath it. xAxis, yAxis and grid default to true; legend defaults to on for 2 or more series. animation=auto animates once and respects reduced motion; animation=off renders immediately.",
       "basis": {
         "kind": "source-derived",
         "referenceIds": [

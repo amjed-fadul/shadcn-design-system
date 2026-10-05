@@ -90,13 +90,14 @@ export function valueScale(extent: readonly [number, number], bounds: { min?: nu
   const step = niceStep((width > 0 ? width : Math.abs(spanHigh) || 1) / 4)
   const scale = build(step)
   // An explicit bound is the plot edge; when the computed step leaves it unlabelled, a neighbouring
-  // nice step that makes it a tick is preferred, as long as it keeps 2 to 6 ticks.
-  const explicit = [bounds.min, bounds.max].filter((bound): bound is number => bound !== undefined && bound !== 0)
-  const labels = (candidate: number) => explicit.every((bound) => Math.abs(bound / candidate - Math.round(bound / candidate)) < 1e-6)
-  if (explicit.length === 0 || labels(step)) return scale
+  // nice step (the next larger, then the next smaller) whose ticks include it is preferred, as long as
+  // it keeps 2 to 6 ticks. The free bound follows the chosen step.
+  const explicit = [bounds.min, bounds.max].filter((bound): bound is number => bound !== undefined).map(normalize)
+  const labelsBounds = (candidate: ValueScale) => explicit.every((bound) => candidate.ticks.includes(bound))
+  if (explicit.length === 0 || labelsBounds(scale)) return scale
   for (const neighbour of [largerStep(step), smallerStep(step)]) {
     const candidate = build(neighbour)
-    if (labels(neighbour) && candidate.ticks.length >= 2 && candidate.ticks.length <= 6) return candidate
+    if (labelsBounds(candidate) && candidate.ticks.length >= 2 && candidate.ticks.length <= 6) return candidate
   }
   return scale
 }
@@ -114,24 +115,26 @@ function compactIsExact(value: number, latin: Intl.NumberFormat): boolean {
   const number = Number(latin.formatToParts(value).map((part) => (part.type === "integer" || part.type === "fraction" ? part.value : part.type === "decimal" ? "." : part.type === "minusSign" ? "-" : "")).join(""))
   if (!Number.isFinite(number) || number === 0) return false
   const unit = 10 ** Math.round(Math.log10(Math.abs(value / number)))
-  return Math.abs(number * unit - value) <= EPSILON * Math.max(1, Math.abs(value))
+  // Compared at 12 significant digits, not with a tolerance that grows with the value.
+  return normalize(number * unit) === normalize(value)
 }
 
+// Decimal places needed to write the value exactly at 12 significant digits (at most 20).
 function decimalsOf(value: number): number {
   let decimals = 0
-  while (decimals < 6 && Math.abs(normalize(value * 10 ** decimals) - Math.round(value * 10 ** decimals)) > EPSILON) decimals += 1
+  while (decimals < 20 && normalize(Number(value.toFixed(decimals))) !== normalize(value)) decimals += 1
   return decimals
 }
 
 /**
  * Tick labels that render every tick exactly: compact with 0, 1 or 2 fraction digits when that is
- * exact, otherwise the full format with the ticks' decimal places (percent: 0 to 3 fraction digits).
+ * exact, otherwise the full format with the ticks' decimal places (percent: as many as the ticks need).
  * Exact labels are necessarily distinct.
  */
 export function tickLabels(ticks: readonly number[], format: ScaleFormat): { labels: string[]; format: (value: number) => string } {
   const pick = (chosen: Intl.NumberFormat) => ({ labels: ticks.map((tick) => chosen.format(tick)), format: (value: number) => chosen.format(value) })
   if (format.valueFormat === "percent") {
-    const decimals = Math.min(3, Math.max(0, ...ticks.map((tick) => decimalsOf(normalize(tick * 100)))))
+    const decimals = Math.max(0, ...ticks.map((tick) => decimalsOf(normalize(tick * 100))))
     return pick(formatter(format, { style: "percent", minimumFractionDigits: 0, maximumFractionDigits: decimals }))
   }
   for (let digits = 0; digits <= 2; digits += 1) {

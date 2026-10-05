@@ -11,10 +11,10 @@ import { createServer } from "vite"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
 const out = process.env.RELEASE013_BROWSER_OUTPUT ?? path.join(homedir(), ".artifacts/shadcn-design-system/release013-browser")
-// Each frame has 24px padding, so a width of 228 gives the 180px plot Canvas reported.
+// Each frame has 24px padding and a 1px border, so a width of 230 gives the 180px plot Canvas reported.
 const variants = [
   ["bar"], ["bar-stacked"], ["bar-horizontal"], ["area"], ["area-stacked"], ["line"], ["donut"], ["radial"],
-  ["radial-total"], ["donut-currency", 228], ["bar-lg"], ["line-raised"], ["sparkline", 240], ["bar-de"],
+  ["radial-total"], ["donut-currency", 230], ["bar-lg"], ["line-raised"], ["sparkline", 240], ["bar-de"],
 ]
 mkdirSync(out, { recursive: true })
 
@@ -62,9 +62,9 @@ try {
   }
   // Without a locale prop the chart formats as en-US, so the browser's language changes nothing.
   for (const kind of ["bar", "donut-currency"]) {
-    const english = await capture({ kind, width: kind === "donut-currency" ? 228 : 480, locale: "en-US" })
+    const english = await capture({ kind, width: kind === "donut-currency" ? 230 : 480, locale: "en-US" })
     for (const locale of ["de-DE", "ar-EG", "ja-JP"]) {
-      const other = await capture({ kind, width: kind === "donut-currency" ? 228 : 480, locale })
+      const other = await capture({ kind, width: kind === "donut-currency" ? 230 : 480, locale })
       assert.ok(english.image.equals(other.image), `${kind}: a ${locale} browser renders different pixels from en-US`)
       report.push({ kind, browserLocale: locale, identicalToEnUS: true })
     }

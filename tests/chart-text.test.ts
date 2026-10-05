@@ -47,6 +47,12 @@ describe("fitCenter", () => {
     expect(fitCenter({ full: "12.345 €", compact: "12,3 mil €", radius: 40 })!.value).toBe("12.345 €")
   })
 
+  test("keeps the full Arabic value when its compact form is longer (one of Canvas's Page locales)", () => {
+    const layout = fitCenter({ full: "\u200F١٢٬٣٤٥ US$", compact: "\u200F١٢٫٣ ألف US$", radius: 51 })!
+    expect(layout.value).toBe("\u200F١٢٬٣٤٥ US$")
+    expect(fits(layout, 51)).toBe(true)
+  })
+
   test("keeps the caption at a smaller size when that fits, and drops it only when nothing fits with it", () => {
     const withCaption = fitCenter({ full: "1,130", compact: "1.1K", caption: "Customers", radius: 42 })
     expect(withCaption).toMatchObject({ caption: "Customers", value: "1,130" })

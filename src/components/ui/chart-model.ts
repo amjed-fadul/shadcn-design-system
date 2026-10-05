@@ -179,35 +179,39 @@ function color(index: number): ChartModelSeries["color"] {
   return `var(--chart-${(index + 1) as 1 | 2 | 3 | 4 | 5})`
 }
 
+// Bounds are compared at 12 significant digits, like the data, so data equal to a bound is in range.
 type Range = { min?: number; max?: number }
 
 function validateRange(input: ChartModelInput, partToWhole: boolean): Range {
-  const { valueMin: min, valueMax: max } = input
-  if (min === undefined && max === undefined) return {}
+  if (input.valueMin === undefined && input.valueMax === undefined) return {}
   if (partToWhole) fail("Chart valueMin and valueMax apply only to area, bar and line charts.")
-  for (const bound of [min, max]) {
+  for (const bound of [input.valueMin, input.valueMax]) {
     if (bound !== undefined && (typeof bound !== "number" || !Number.isFinite(bound))) fail("Chart valueMin and valueMax must be finite numbers.")
   }
+  const min = input.valueMin === undefined ? undefined : normalize(input.valueMin)
+  const max = input.valueMax === undefined ? undefined : normalize(input.valueMax)
   if (min !== undefined && max !== undefined && !(min < max)) fail("Chart valueMin must be below valueMax.")
   // Bars and stacks encode magnitude from zero, so a range that leaves out zero would exaggerate differences.
   if ((input.type === "bar" || input.layout === "stacked") && ((min !== undefined && min > 0) || (max !== undefined && max < 0))) fail("Chart valueMin and valueMax must include zero on bar charts and stacked charts.")
   return { min, max }
 }
 
-// Out-of-range data is refused, never clipped. Stacked charts check every running total, as drawn.
-function checkDataInRange(range: Range, stacked: boolean, series: readonly ChartSeries[], columns: ReadonlyArray<ReadonlyArray<number | null>>, categories: readonly string[]) {
-  const outside = (value: number) => range.min !== undefined && value < range.min ? `below valueMin ${range.min}` : range.max !== undefined && value > range.max ? `above valueMax ${range.max}` : undefined
+// Out-of-range data is refused, never clipped. Stacked charts check every running total in series
+// order (nulls count as 0), as drawn. Comparisons use 12 significant digits; messages print the raw
+// numbers the author supplied, so they never contradict themselves.
+function checkDataInRange(range: Range, input: ChartModelInput, stacked: boolean, series: readonly ChartSeries[], columns: ReadonlyArray<ReadonlyArray<number | null>>, categories: readonly string[]) {
+  const outside = (value: number) => range.min !== undefined && normalize(value) < range.min ? `below valueMin ${input.valueMin}` : range.max !== undefined && normalize(value) > range.max ? `above valueMax ${input.valueMax}` : undefined
   categories.forEach((category, row) => {
     let running = 0
     series.forEach((entry, index) => {
       const value = columns[index][row]
       if (value === null) return
       if (stacked) {
-        running = normalize(running + value)
+        running += value
         const where = outside(running)
         if (where) fail(`Chart stack total ${running} at "${category}" is ${where}.`)
       } else {
-        const where = outside(normalize(value))
+        const where = outside(value)
         if (where) fail(`Chart value ${value} for "${entry.label}" at "${category}" is ${where}.`)
       }
     })
@@ -245,6 +249,7 @@ export function createChartModel(input: ChartModelInput): ChartModel {
   if (centerLabel !== undefined && !partToWhole) fail("Chart centerLabel applies only to donut and radial charts.")
   const centerValue = partToWhole ? input.centerValue ?? "total" : undefined
   if (centerLabel !== undefined && centerValue === "none") fail('Chart centerLabel needs centerValue "total".')
+  if (input.currency !== undefined && typeof input.currency !== "string") fail("Chart currency must be an ISO 4217 code.")
   if (input.valueFormat === "currency" && !input.currency) fail("Chart valueFormat \"currency\" needs a currency code.")
   if (input.valueFormat !== "currency" && input.currency !== undefined) fail("Chart currency applies only with valueFormat \"currency\".")
   const range = validateRange(input, partToWhole)
@@ -271,7 +276,8 @@ export function createChartModel(input: ChartModelInput): ChartModel {
       layout: "grouped", orientation: "vertical", curve: "monotone", ...options, data,
       series: categories.map((category, index) => ({ key: category, label: category, color: color(index) })),
       total, format, formatCompact, formatTick: format, empty,
-      summary: empty ? `${input.title}: no data.` : `${input.title}, ${data.length} parts totalling ${format(total)}: ${parts.join(", ")}.`,
+      // The centre caption is drawn aria-hidden, so the summary carries it for screen readers.
+      summary: empty ? `${input.title}: no data.` : `${input.title}, ${data.length} parts totalling ${format(total)}${centerValue === "total" && centerLabel ? ` (${centerLabel})` : ""}: ${parts.join(", ")}.`,
       table: { columns: [input.categoryKey, valueKey], rows: categories.map((category, index) => [category, cell(values[index])]) },
     }
   }
@@ -285,7 +291,7 @@ export function createChartModel(input: ChartModelInput): ChartModel {
   const layout = input.layout ?? "grouped"
   const stacked = layout === "stacked"
   // An empty chart shows its empty state, so the range is only checked against real data.
-  if (!empty) checkDataInRange(range, stacked, series, columns, categories)
+  if (!empty) checkDataInRange(range, input, stacked, series, columns, categories)
   const scale = valueScale(valueExtent(columns, stacked), range)
   const ticks = tickLabels(scale.ticks, { locale, valueFormat, currency: input.currency })
   const clauses = series.map((entry, index) => {

@@ -8,4 +8,6 @@ permission.
 Third-party components and dependencies remain under their own licences. This
 repository contains files derived from shadcn/ui, which is MIT-licensed, and
 built packages bundle third-party code and fonts under their own licences. See
-THIRD_PARTY_NOTICES.md for the files concerned and the licence texts.
+THIRD_PARTY_NOTICES.md in the source repository for the files concerned, and
+dist-library/THIRD_PARTY_LICENSES.txt in each built package for the licence
+texts of everything it bundles.

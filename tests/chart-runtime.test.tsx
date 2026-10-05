@@ -199,12 +199,39 @@ describe("Chart", () => {
     const centre = 300
     // Each sector's outer arc starts at 0° (3 o'clock) and ends at its share of 360°, minus the corner rounding.
     const sweeps = [...container.querySelectorAll(".recharts-radial-bar-sectors path")].map((path) => {
-      const arc = [...(path.getAttribute("d") ?? "").matchAll(/A\s*([\d.]+),[\d.]+,0,[01],[01],([\d.]+),([\d.]+)/g)].find((match) => Number(match[1]) > 10)!
+      const arc = [...(path.getAttribute("d") ?? "").matchAll(/A\s*([\d.]+)\s*,\s*[\d.]+\s*,\s*0\s*,\s*[01]\s*,\s*[01]\s*,\s*([\d.]+)\s*,\s*([\d.]+)/g)].find((match) => Number(match[1]) > 10)!
       return (Math.atan2(centre - Number(arc[3]), Number(arc[2]) - centre) * 180 / Math.PI + 360) % 360
     })
     const total = 1130
     plans.forEach((part, index) => expect(Math.abs(sweeps[index] - (part.n / total) * 360), part.plan).toBeLessThan(3))
     expect([...container.querySelectorAll('[data-slot="chart-center"] text')].map((text) => text.textContent)).toEqual(["1,130", "Customers"])
+  })
+
+  test("draws no ring for a radial part with no value, and keeps the other sweeps at their share", () => {
+    const parts = [{ plan: "Free", n: 700 }, { plan: "Pro", n: null }, { plan: "Team", n: 300 }]
+    render({ type: "radial", title: "Plans", data: parts, categoryKey: "plan", valueKey: "n", aspectRatio: "1/1", animation: "off" })
+    resize(600)
+    const sectors = [...container.querySelectorAll(".recharts-radial-bar-sectors path")]
+    const sweep = (path: Element) => {
+      const arc = [...(path.getAttribute("d") ?? "").matchAll(/A\s*([\d.]+)\s*,\s*[\d.]+\s*,\s*0\s*,\s*[01]\s*,\s*[01]\s*,\s*([\d.]+)\s*,\s*([\d.]+)/g)].find((match) => Number(match[1]) > 10)
+      return arc ? (Math.atan2(300 - Number(arc[3]), Number(arc[2]) - 300) * 180 / Math.PI + 360) % 360 : 0
+    }
+    expect(sectors.some((path) => path.getAttribute("fill") === "var(--chart-2)" && sweep(path) > 1)).toBe(false)
+    const byFill = Object.fromEntries(sectors.map((path) => [path.getAttribute("fill"), sweep(path)]))
+    expect(Math.abs(byFill["var(--chart-1)"] - 0.7 * 360)).toBeLessThan(3)
+    expect(Math.abs(byFill["var(--chart-3)"] - 0.3 * 360)).toBeLessThan(3)
+  })
+
+  test("never clips lines and areas that touch the domain edges", () => {
+    const touching = [{ month: "Jan", share: 0 }, { month: "Feb", share: 1 }]
+    for (const type of ["line", "area"]) {
+      render({ type, title: "Share", data: touching, categoryKey: "month", series: [{ key: "share", label: "Share" }], valueFormat: "percent", height: 200, animation: "off" })
+      resize(600)
+      // allowDataOverflow would add Recharts' plot-edge clip (url(#clipPath-…)) and cut strokes and active
+      // dots on the edge. Recharts' own animation reveal mask (animationClipPath) is unchanged from Release 012.
+      const edgeClips = [...container.querySelectorAll("[clip-path]")].filter((element) => /url\(#clipPath-/.test(element.getAttribute("clip-path") ?? ""))
+      expect(edgeClips, type).toEqual([])
+    }
   })
 
   test("packs grouped bars at the bar size, 4px apart", () => {
@@ -250,6 +277,7 @@ describe("Chart", () => {
 
   test.each<[string, Record<string, unknown>]>([
     ["valueMax", { valueMax: 100000 }],
+    ["valueMin", { valueMin: -10000 }],
     ["barSize", { barSize: "lg" }],
     ["locale", { locale: "de-DE" }],
     ["data values that format the same", { data: revenue.map((row) => ({ ...row, thisYear: row.thisYear + 0.4 })) }],
@@ -274,6 +302,8 @@ describe("Chart", () => {
     expect(plot().getAttribute("data-chart-state")).toBe("ready")
     render({ ...donut, centerValue: "none" })
     expect(plot().getAttribute("data-chart-state")).toBe("drawing")
+    act(() => { vi.advanceTimersByTime(1000) })
+    expect(plot().getAttribute("data-chart-state")).toBe("ready")
   })
 
   test("is a single keyboard stop", () => {

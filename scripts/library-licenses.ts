@@ -1,20 +1,34 @@
+import { createHash } from "node:crypto"
 import { existsSync, readFileSync, readdirSync } from "node:fs"
 import path from "node:path"
 
 const NOTICE_FILE = /^(LICEN[CS]E(?:\.|$)|COPYING|CopyrightNotice|NOTICE(?:\.|$))/i
-// Licences whose terms require their text to travel with the code.
-const TEXT_REQUIRED = /\b(MIT|ISC)\b|BSD/
+// Licences whose terms require their text to travel with the code, matched in any case, inside SPDX
+// expressions such as "(MIT OR Apache-2.0)" and in the legacy { type } form.
+const TEXT_REQUIRED = /\b(MIT|ISC)\b|BSD/i
 
-// Upstream licence text for packages that declare a licence but publish no licence file.
-function overrideNotice(root: string, name: string): string | undefined {
-  const file = path.join(root, "scripts/license-overrides", name, "LICENSE")
+function declaredLicense(license: unknown): string {
+  if (typeof license === "string") return license
+  if (license && typeof license === "object" && typeof (license as { type?: unknown }).type === "string") return (license as { type: string }).type
+  return ""
+}
+
+// Upstream licence text for packages that declare a licence but publish no licence file. The committed
+// text must still be byte-identical to the upstream blob it records, or the provenance would be false.
+function overrideNotice(overridesRoot: string, name: string): string | undefined {
+  const file = path.join(overridesRoot, name, "LICENSE")
   if (!existsSync(file)) return undefined
-  const { source, gitBlob } = JSON.parse(readFileSync(path.join(path.dirname(file), "source.json"), "utf8")) as { source: string; gitBlob: string }
-  return `Licence text supplied from ${source} (git blob ${gitBlob}); the published package omits it.\n\n${readFileSync(file, "utf8")}`
+  const { package: owner, source, gitBlob } = JSON.parse(readFileSync(path.join(path.dirname(file), "source.json"), "utf8")) as { package: string; source: string; gitBlob: string }
+  if (owner !== name) throw new Error(`Licence override for ${name} records a different package: ${owner}`)
+  const bytes = readFileSync(file)
+  const blob = createHash("sha1").update(`blob ${bytes.length}\0`).update(bytes).digest("hex")
+  if (blob !== gitBlob) throw new Error(`Licence override for ${name} does not match its recorded git blob ${gitBlob} (found ${blob})`)
+  return `Licence text supplied from ${source} (git blob ${gitBlob}); the published package omits it.\n\n${bytes.toString("utf8")}`
 }
 
 /** Preserve upstream notices for the code and CSS/font inputs we redistribute. */
-export function libraryLicenseNotices(root: string, moduleIds: readonly string[]): string {
+export function libraryLicenseNotices(root: string, moduleIds: readonly string[], options: { overridesRoot?: string } = {}): string {
+  const overridesRoot = options.overridesRoot ?? path.join(root, "scripts/license-overrides")
   const directories = new Set<string>()
   for (const id of moduleIds) {
     const marker = "/node_modules/"
@@ -42,11 +56,11 @@ export function libraryLicenseNotices(root: string, moduleIds: readonly string[]
     const metadata = JSON.parse(readFileSync(path.join(directory, "package.json"), "utf8"))
     const entries = readdirSync(directory)
     const files = entries.filter((name) => NOTICE_FILE.test(name)).sort()
-    const override = files.length ? undefined : overrideNotice(root, metadata.name)
+    const override = files.length ? undefined : overrideNotice(overridesRoot, metadata.name)
     if (!files.length && !override) {
       // A permissive licence is only honoured if its text ships, so a package that declares one
       // without publishing it needs an upstream override in scripts/license-overrides.
-      if (TEXT_REQUIRED.test(String(metadata.license))) throw new Error(`Bundled dependency ${metadata.name} declares ${metadata.license} but ships no licence text; add scripts/license-overrides/${metadata.name}/LICENSE`)
+      if (TEXT_REQUIRED.test(declaredLicense(metadata.license))) throw new Error(`Bundled dependency ${metadata.name} declares ${declaredLicense(metadata.license)} but ships no licence text; add scripts/license-overrides/${metadata.name}/LICENSE`)
       // Otherwise preserve its supplied metadata and README instead of silently dropping the notice.
       files.push(...entries.filter((name) => /^readme(?:\.|$)/i.test(name)))
     }

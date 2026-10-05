@@ -74,6 +74,17 @@ describe("tickLabels", () => {
     expect(labels([1234000, 1234250, 1234500], "number")).toEqual(["1,234,000", "1,234,250", "1,234,500"])
   })
 
+  test("stays exact at the extremes: narrow percent ranges, micro values and huge values", () => {
+    expect(labels([0.9999, 0.999905, 0.99991, 0.999915], "percent")).toEqual(["99.99%", "99.9905%", "99.991%", "99.9915%"])
+    expect(labels([0, 1e-7, 2e-7, 3e-7], "number")).toEqual(["0", "0.0000001", "0.0000002", "0.0000003"])
+    expect(labels([1e9, 1e9 + 0.25, 1e9 + 0.5], "number")).toEqual(["1,000,000,000", "1,000,000,000.25", "1,000,000,000.5"])
+    expect(labels([8e9, 8e9 + 2, 8e9 + 4], "number")).toEqual(["8,000,000,000", "8,000,000,002", "8,000,000,004"])
+  })
+
+  test("labels de-DE currency ticks exactly", () => {
+    expect(labels([48000, 48025, 48050], "currency", "de-DE", "EUR").map((label) => label.replace(/\s/gu, " "))).toEqual(["48.000 €", "48.025 €", "48.050 €"])
+  })
+
   test("labels stay exact and distinct in other locales", () => {
     for (const locale of ["de-DE", "ja-JP", "ar", "hi-IN", "es-ES"]) {
       const result = labels([1200000, 1225000, 1250000, 1275000, 1300000], "currency", locale, "EUR")
