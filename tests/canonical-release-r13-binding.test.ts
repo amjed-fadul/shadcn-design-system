@@ -42,7 +42,8 @@ describe("Release 013 active canonical binding", { timeout: 60000 }, () => {
 
     const canonical = await import("../src/validator/canonical-release")
     expect(canonical.getExecutableRelease().releaseId).toBe("shadcn-radix-release-013")
-  })
+    // Imports the canonical release and its projection: about 3 s on a macOS runner.
+  }, 30_000)
 
   test("rejects a hash-valid tampered Release 013 projection against canonical source", () => {
     const candidate = structuredClone(release013Artifact) as MutableRelease

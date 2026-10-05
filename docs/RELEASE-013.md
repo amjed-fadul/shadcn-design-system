@@ -117,6 +117,15 @@ Two independent multi-agent reviews shaped this release:
   - the jsdom runtime test: the stacked area.
 - **Candidate:** rebuilt from `8545a64`. The tarball accepted earlier (`3e1d0a0b…`) is superseded and
   must not be vendored.
+- **Second run:** [run 37260185273](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37260185273)
+  on `b2598ca` failed one of 1,847 unit tests, and the steps after it were skipped. The test was
+  `executable-release`'s payload derivation, which loads and projects the component contracts twice.
+  It took 5.4 s against vitest's 5 s default; its whole file took 3 s in the first run.
+  - Local verification passed `--testTimeout=120000`, which hid the default limit.
+  - That test and three others that took 2.3 to 3 s on the runner with no explicit limit now have
+    30 s timeouts.
+  - Tests are not release inputs, so the accepted candidate is unchanged.
+  - The qualification runs a third time.
 
 ## Owner decisions applied
 
@@ -158,23 +167,23 @@ unless noted.
 - **`release:verify`:** accepted payload `b880ec96…`.
 - **`candidate:verify`:** rebuilt the package from producer inputs. All 64 packed files matched the
   retained candidate byte for byte, and no expectations were refreshed.
-- **`npm run typecheck`:** passed.
+- **`npm run typecheck` and `npm run build`:** passed.
 - **Unit suite:** 1,846 of 1,847 tests passed, in 127 of 128 files.
-  - The failure: `package-identity`'s real build with an input injected through
-    `scripts/release-inputs.ts` hit its 120 s build timeout and was killed before printing anything.
-    The gallery was being re-shot on the same machine at the time.
-  - The test doesn't touch the chart, and it passed for the earlier candidate and on the macOS
-    runner. It is being rerun on its own.
-- **Storybook** (branch worktree at `8545a64`; the clean-worktree run is in progress):
-  `vitest --project=storybook` passed 44 files and 251 tests, with the axe gate at `error`. The 21
-  chart stories include:
+  - **Timed out:** `package-identity` has two real-build tests, each injecting an unlisted input,
+    through `vite.library.config.ts` and through `scripts/release-inputs.ts`. Each passed once and,
+    on another try, hit its 120 s build timeout.
+  - **Cause:** the timeouts came while other sessions loaded the machine (load average 15). The
+    tests don't touch the chart, and both passed for the earlier candidate on the macOS runner.
+  - **Authority:** the macOS qualification runs them on a dedicated runner.
+- **Storybook:** `vitest --project=storybook` passed 44 files and 251 tests, with the axe gate at
+  `error`; `build-storybook` passed. The 21 chart stories include:
   - `CenterFit`: 128 charts. After fonts load, every corner of every centre text box lies inside its
     hole, measured from the rendered sectors, and the total's computed size equals its token's size.
   - `BarSizes`, `LineRaisedMinimum`, `Sparkline`, `DonutSmall`, `RadialSmall`, and the German,
     Japanese and Arabic locale stories.
   - Every story keeps the settle-at-ready, label-clipping, keyboard and Escape checks. The settle
     check reads path data, dash patterns and clip rectangles.
-- **Determinism and ready (`tests/release013-chart.browser.mjs`, branch worktree):** 75 checks passed.
+- **Determinism and ready (`tests/release013-chart.browser.mjs`):** 75 checks passed.
   - 14 lazily loaded variants were byte-identical at `ready` across fresh pages, in light and dark.
   - A chart without `locale` rendered identical pixels in `de-DE`, `ar-EG` and `ja-JP` browsers and
     in `en-US`.

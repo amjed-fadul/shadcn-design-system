@@ -12,4 +12,5 @@ test("Link exports a closed native API with required destination and content", (
   })
   const errors = ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"))
   expect(errors).toEqual([])
-})
+  // A full TypeScript program check: about 3 s on a macOS runner.
+}, 30_000)
