@@ -4,7 +4,7 @@ Release 013 implements amjed-fadul/shadcn-design-system#22 and #23, the chart fo
 found after adopting Release 012 (amjed-fadul/agentic-design-canvas#56). It also takes the licence
 items deferred from #24, because they change release inputs. Tokens are unchanged.
 
-**Status: revised after independent review (2026-10-05).** The owner decided the option names, shapes
+**Status: revised after the independent design review and the code review (2026-10-05).** The owner decided the option names, shapes
 and rules on 2026-10-04, recorded in #22 and #23. Under the owner's standing instruction, the producer
 makes the remaining design decisions and records them below as rulings, each with its reason and the
 cost if it's wrong.
@@ -75,13 +75,16 @@ from Geist at weight 600 with tabular figures:
 | anything else | 0.8 |
 
 The width is the sum of the characters' advances times the font size. The caption uses the same table
-at 0.95× for regular weight. The value axis uses the table too, at 0.95×, so CJK compact suffixes such
-as `万` no longer clip (R9).
+at 0.95× for regular weight. The value axis uses the table too, at the full semibold width (a generous
+budget for its regular-weight labels), so CJK compact suffixes such as `万` no longer clip (R9).
 
 **Layout and fit** *(review)*.
 - Text is centred as one stack: the total at size S, then, when a caption is shown, a gap of 0.25 S
   and the 12 px caption.
-- Each line's box is 0.8× its font size tall, and the stack is centred vertically on the hole.
+- Each line's box is 1.17× its font size tall, and the stack is centred vertically on the hole. 1.17 em
+  is Geist's measured SVG text box: ascent plus descent, centred on the central baseline. So a line
+  that fits has its real bounding-box corners inside the hole, which the browser check verifies. The
+  first draft said 0.8×, which modelled only the glyph ink, and the code review corrected it.
 - A line fits only if its half-width plus 2 px padding is within the chord at its farthest vertical
   edge: `√(r² − y²)`, where y is that edge's distance from the centre.
 - Positions are explicit `y` values with `dominantBaseline="central"`. They are not `dy` offsets, so
@@ -206,20 +209,26 @@ a 39 px slot, so `lg` reaches the automatic width there. That revises the first 
   - A raised `valueMin` is therefore allowed only on non-stacked line and area charts.
 
 **Validation.**
-- Every non-null value must lie within the range. For stacked charts, so must every running stack
-  total, including the zero baseline, as Recharts' sequential stacking draws them.
-- Values and running totals are normalised to 12 significant digits before any comparison
-  *(review)*. `0.33 + 0.56 + 0.11` is `1.0000000000000002` in floating point, so without it a valid
-  100%-stacked share chart would fail `valueMax={1}`.
+- For unstacked charts, every non-null value must lie within the range.
+- For stacked charts, the running stack totals are checked instead of individual values: each
+  running total in series order, with null counted as 0, which is what Recharts' sequential stacking
+  draws.
+- Values, running totals and both bounds are normalised to 12 significant digits before any
+  comparison *(review)*.
+  - `0.33 + 0.56 + 0.11` is `1.0000000000000002` in floating point, so without it a valid 100%-stacked
+    share chart would fail `valueMax={1}`.
+  - A value exactly equal to a bound with more than 12 significant digits, such as 2/3, stays in
+    range.
+  - Bounds that are equal after rounding fail the order check.
 - The error prints raw, unrounded numbers, so the message never contradicts itself and Canvas can
   reuse it: `Chart value 52000 for "2026" at "Jun" is above valueMax 50000.`
 - **Empty charts** *(review)*. If every value is null or zero, the empty state wins and the range is
   not checked, as in Release 012.
 
 **Domain** *(review)*.
-- **Explicit bounds** are the domain edges exactly. The value axis gets `allowDataOverflow`, so
-  Recharts never silently widens the domain past our ticks. Release 012 had that symptom for
-  mixed-sign stacks: an unlabelled band beyond the last tick.
+- **Explicit bounds** are the domain edges exactly. Recharts widens a domain only for data outside
+  it, and the model refuses such data, so the domain is never widened past our ticks. Release 012
+  had that symptom for mixed-sign stacks: an unlabelled band beyond the last tick.
 - **A free bound** steps over the span left by the explicit one: `[valueMin, dataHigh]` or
   `[dataLow, valueMax]`. With no explicit bounds the span is the data extent including zero, as in
   Release 012. The free bound rounds outward to the next multiple of the step. If it would equal the
@@ -233,7 +242,16 @@ a 39 px slot, so `lg` reaches the automatic width there. That revises the first 
   bound such as 0.3 is never dropped by floating-point division.
 - If fewer than two ticks fit, the step shrinks through the nice sequence (5, 2.5, 2, 1 × 10ⁿ), at
   most 8 times. After that, the two bounds themselves are the ticks.
-- An explicit bound that isn't a multiple is the unlabelled plot edge.
+- **Labelled bounds** *(added in implementation)*. When the computed step leaves an explicit bound
+  off the ticks, the scale tries the next larger, then the next smaller, nice step. It keeps the
+  first whose ticks include every explicit bound and number 2 to 6. The free bound is recomputed for
+  that step, so `valueMin={25000}` over data up to 72k gives 25K, 50K, 75K rather than 40K, 60K,
+  80K with an unlabelled bottom edge.
+- If no neighbouring step labels the bound, it is the unlabelled plot edge (for example
+  `valueMax={0.7}`).
+- **No clip.** The value axis does not use `allowDataOverflow` *(code review)*. The model already
+  guarantees every value and running total lies inside the domain, so Recharts keeps it as given.
+  The flag would also clip lines, areas and their active dots at the plot edge.
 - Labels follow R8.
 
 **Area baseline.** Recharts fills an area to `domainMax < 0 ? domainMax : max(domainMin, 0)`. A
@@ -260,21 +278,26 @@ rule. It's flagged for the owner's review, and relaxing it later is additive.
   (`1.2M | 1.2M | 1.2M`).
 - Release 013 picks the first formatter, in this order, that renders every tick exactly:
   1. compact with 0, 1 or 2 fraction digits;
-  2. the full format with the step's decimal places.
+  2. the full format with as many decimal places as the ticks need, up to 20.
 
-  For percent the order is 0 to 3 fraction digits.
+  Percent uses as many fraction digits as the ticks need, so `99.9905%` is shown exactly.
+- The code review found that the first implementation capped percent at 3 digits and the full form
+  at 6, and so mislabelled narrow uptime ranges and micro values; both caps were lifted.
 - **Exactness test.** A compact label is exact when its number, read with `formatToParts` and scaled
-  by the compact unit, equals the tick value. The unit is the power of ten that the value divided by
-  the label's number rounds to; this works in any locale, including `万` and lakh units.
+  by the compact unit, equals the tick value at 12 significant digits. The unit is the power of ten
+  that the value divided by the label's number rounds to; this works in any locale, including `万`
+  and lakh units.
+  - The comparison is not a tolerance that grows with the value. That version passed "1B" for every
+    tick between 1,000,000,000 and 1,000,000,001.
 - Exact labels are necessarily distinct. The axis width still comes from exactly the labels drawn.
 - **Cost if wrong:** none. Labels become accurate. Existing charts whose ticks were rounded (2.5%
   steps, for example) now show the exact value.
 
 ### R9. One width estimate for axis labels and centre text
 
-Release 012's axis estimate was 7.6 px per character. Release 013 uses R1's character table at
-0.95×, so wide CJK compact units and full-width currency signs are budgeted at 1 em. Latin output is
-unchanged or slightly wider.
+Release 012's axis estimate was 7.6 px per character. Release 013 uses R1's character table at its
+full semibold width for the regular-weight tick labels, a deliberately generous budget. Wide CJK
+compact units and full-width currency signs are budgeted at 1 em. Latin digits stay at about 7.6 px.
 
 ### R10. The ready signal covers every drawing input *(review)*
 
@@ -314,7 +337,11 @@ unchanged or slightly wider.
 Messages use raw numbers (`String(n)`), never the chart's formatter, so they don't depend on locale or
 format. Stacked checks say "stack total". The new messages:
 - `Chart locale "<tag>" is not a supported BCP 47 language tag.`
-- `Chart <prop> must be one of <values>.` (R12)
+- `Chart <prop> must be one of <values>.` (R12: layout, orientation, curve, valueFormat, animation,
+  barSize, centerValue)
+- `Chart <prop> must be true or false.` (R12: xAxis, yAxis, grid, legend)
+- `Chart centerLabel must be text.` (R12)
+- `Chart currency must be an ISO 4217 code.` (also when `currency` is not text)
 - `Chart barSize applies only to bar charts.`
 - `Chart centerValue applies only to donut and radial charts.`
 - `Chart centerLabel applies only to donut and radial charts.`
@@ -325,6 +352,9 @@ format. Stacked checks say "stack total". The new messages:
 - `Chart valueMin and valueMax must include zero on bar charts and stacked charts.`
 - `Chart value <n> for "<series>" at "<category>" is below valueMin <min>.` (or "above valueMax")
 - `Chart stack total <n> at "<category>" is above valueMax <max>.` (or "below valueMin")
+
+The numbers are the author's raw values: the bound as given and the raw running sum. Comparisons use
+12 significant digits, so a printed number never contradicts the message.
 
 ## Render changes from Release 012
 
@@ -340,6 +370,15 @@ Canvas sees these visible changes. They go in the release notes and the handoff:
   handoff gives this as an adoption step.
 - Bars are capped at 24 px by default (`barSize` `md`), where Release 012 drew them full width (R5).
 - Polar charts keep Recharts' 5 px margin, so donut geometry is unchanged apart from the centre total.
+- A chart with a hidden x-axis no longer reserves room for edge labels, so its plot is wider. This
+  affects area, line and horizontal bar charts; sparklines run edge to edge.
+- Axis widths come from the per-character estimate instead of 7.6 px per character, so the value or
+  category axis of every cartesian chart moves by a few pixels.
+- The donut caption is positioned by the new explicit stack layout, so it moves slightly even where
+  the total still renders at `2xl`.
+- A radial part with no value sweeps nothing; Release 012 drew it as a full ring.
+- The centre caption is added to the hidden summary, e.g. "…totalling 1,130 (Customers): …", because
+  the drawn centre is hidden from assistive technology.
 - Invalid enumerated values (`layout: "stack"`) now throw instead of silently falling back (R12).
 
 ## Open option for the owner
