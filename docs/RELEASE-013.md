@@ -12,7 +12,14 @@ The design and every ruling are in
 [the spec](superpowers/specs/2026-10-05-release-013-chart-options-design.md), and the Canvas handoff
 is [CANVAS-RELEASE-013](CANVAS-RELEASE-013.md).
 
-**Status: candidate, awaiting owner review.** The macOS release qualification runs next; the repository is public, so it is free. The producer does not tag or approve the release.
+**Status: accepted by the owner on 2026-10-05; macOS release qualification running.**
+- **Candidate:** the owner accepted tarball `3e1d0a0b…` (payload `0d56818a…`), and with it the
+  producer rulings below.
+- **Qualification:** the manual macOS `release-qualification` workflow is running on `abe23cd`
+  ([run 37251218657](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37251218657)).
+  Commits after the candidate's source `33f6386` change docs, the committed manifest and a manifest
+  test only.
+- **Merge:** the owner merges.
 
 ## Changes
 
@@ -87,9 +94,10 @@ Two independent multi-agent reviews shaped this release:
 - **`barSize` default:** `md`, from the owner-decisions comment on #23 (2026-10-04T14:11Z). An
   earlier line in the issue body said unset kept the automatic width; that was the producer's
   inference and is corrected there.
-- **Producer rulings for the owner to confirm:**
+- **Producer rulings, accepted with the candidate (2026-10-05):**
   - The zero-in-range rule extends to stacked areas (R6).
   - Release 012's silently ignored `centerLabel` outside donut and radial now throws (R3).
+  - `barSize` defaults to `md`.
 - **Open option:** exporting the pure validator for Canvas's write-time checks would add a public
   export, so it was not done.
 

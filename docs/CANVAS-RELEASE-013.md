@@ -5,7 +5,14 @@ Release 012: amjed-fadul/shadcn-design-system#22 (centre totals that fit their r
 (`locale`, `barSize` and the value-axis range). It also adds the licence files deferred from #24.
 Tokens are unchanged, and Releases 001–012 remain byte-for-byte unchanged.
 
-**Status: candidate, awaiting owner review.** The macOS release qualification runs next; the repository is public, so it is free. The producer does not tag or approve the release.
+**Status: accepted by the owner on 2026-10-05; macOS release qualification running.**
+- **Candidate:** the owner accepted tarball `3e1d0a0b…` (payload `0d56818a…`), and with it the
+  producer rulings below.
+- **Qualification:** the manual macOS `release-qualification` workflow is running on `abe23cd`
+  ([run 37251218657](https://github.com/amjed-fadul/shadcn-design-system/actions/runs/37251218657)).
+  Commits after the candidate's source `33f6386` change docs, the committed manifest and a manifest
+  test only.
+- **Merge:** the owner merges.
 
 ## Exact distribution
 
