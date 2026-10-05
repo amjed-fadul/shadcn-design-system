@@ -40,7 +40,8 @@ describe("canonical component provenance", () => {
   })
 
   test("records deterministic Sidebar adaptation without ambient-app policy", () => {
-    expect(provenance.components.sidebar.canonicalBlobSha).toBe("e7710240125fda99d4ad7fdd33a40b5cf55d5ed4")
+    // Release 014 (DS6) styles the Sidebar variants and gives collapsible="none" the inner panel.
+    expect(provenance.components.sidebar.canonicalBlobSha).toBe("d7752c1ff6dd2c7bc4bf92dba39b00e3286c8a5a")
     expect(provenance.derivation.operations).toContain(
       "make Sidebar presentation and desktop/mobile state explicit, preserve sidebar.context, and move viewport detection, persistence, and keyboard shortcuts to an external normal-app recipe"
     )

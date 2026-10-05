@@ -80,7 +80,8 @@ describe("Release 011 component API delta", () => {
 
   test("every other family keeps its exact Release 008 semantic identity", () => {
     for (const [id, expected] of Object.entries(baseline.families)) {
-      if (id in additions) continue
+      // Release 014 changes Sidebar; tests/release-014-delta.test.ts proves its only change.
+      if (id in additions || id === "sidebar") continue
       expect(semanticIdentity(loadFamily(id)), id).toBe(expected)
     }
   })
